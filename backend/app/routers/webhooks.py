@@ -10,6 +10,7 @@ from app.models.user import User
 from app.schemas.webhooks import (
     IncomingWebhookPayload,
     WebhookCreate,
+    WebhookCreateResponse,
     WebhookDeliveryListResponse,
     WebhookDeliveryResponse,
     WebhookListResponse,
@@ -23,7 +24,11 @@ logger = logging.getLogger("wrapiq")
 router = APIRouter(prefix="/api/webhooks", tags=["webhooks"])
 
 
-@router.post("", response_model=WebhookResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "",
+    response_model=WebhookCreateResponse,
+    status_code=status.HTTP_201_CREATED,
+)
 async def create_webhook(
     data: WebhookCreate,
     admin: User = Depends(require_admin),
@@ -108,7 +113,7 @@ async def delete_webhook(
         ) from e
 
 
-@router.post("/{webhook_id}/regenerate-secret", response_model=WebhookResponse)
+@router.post("/{webhook_id}/regenerate-secret", response_model=WebhookCreateResponse)
 async def regenerate_secret(
     webhook_id: uuid.UUID,
     admin: User = Depends(require_admin),
