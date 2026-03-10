@@ -3,7 +3,7 @@ import uuid
 import pytest
 from fastapi import HTTPException
 
-from app.auth.permissions import require_org_member, require_role
+from app.auth.permissions import require_org_member, require_role, require_superadmin
 from app.models.organization import Organization
 from app.models.plan import Plan
 from app.models.user import Role, User
@@ -79,4 +79,23 @@ async def test_require_org_member_denies_without_org():
     user = make_user(org_id=None)
     with pytest.raises(HTTPException) as exc_info:
         await require_org_member(user=user)
+    assert exc_info.value.status_code == 403
+
+
+async def test_require_org_member_allows_superadmin_without_org():
+    user = make_user(org_id=None, is_superadmin=True)
+    result = await require_org_member(user=user)
+    assert result.is_superadmin is True
+
+
+async def test_require_superadmin_allows_superadmin():
+    user = make_user(org_id=None, is_superadmin=True)
+    result = await require_superadmin(user=user)
+    assert result.is_superadmin is True
+
+
+async def test_require_superadmin_denies_regular_user(org):
+    user = make_user(org_id=org.id, role=Role.ADMIN, is_superadmin=False)
+    with pytest.raises(HTTPException) as exc_info:
+        await require_superadmin(user=user)
     assert exc_info.value.status_code == 403

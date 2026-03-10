@@ -29,11 +29,25 @@ require_admin = require_role(Role.ADMIN)
 async def require_org_member(
     user: User = Depends(get_current_user),
 ) -> User:
-    """Ensures user belongs to an organization."""
+    """Ensures user belongs to an organization. Superadmins bypass."""
+    if user.is_superadmin:
+        return user
     if user.organization_id is None:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="User is not a member of any organization",
+        )
+    return user
+
+
+async def require_superadmin(
+    user: User = Depends(get_current_user),
+) -> User:
+    """Ensures user is a superadmin. Returns 403 otherwise."""
+    if not user.is_superadmin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Superadmin access required",
         )
     return user
 
