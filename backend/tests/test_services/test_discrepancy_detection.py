@@ -30,9 +30,7 @@ def _discrepancy_json(**overrides):
 def _mock_vehicle(**overrides):
     vehicle = MagicMock()
     vehicle.id = overrides.get("id", uuid.uuid4())
-    vehicle.organization_id = overrides.get(
-        "organization_id", uuid.uuid4()
-    )
+    vehicle.organization_id = overrides.get("organization_id", uuid.uuid4())
     vehicle.make = overrides.get("make", "Toyota")
     vehicle.model = overrides.get("model", "Camry")
     vehicle.vehicle_type = overrides.get("vehicle_type", MagicMock(value="car"))
@@ -63,9 +61,7 @@ async def test_no_discrepancies(_set_api_key):
     session = _mock_session(vehicle)
 
     mock_aio_models = AsyncMock()
-    mock_aio_models.generate_content.return_value = _mock_response(
-        _discrepancy_json()
-    )
+    mock_aio_models.generate_content.return_value = _mock_response(_discrepancy_json())
     mock_client = MagicMock()
     mock_client.aio.models = mock_aio_models
 
@@ -106,9 +102,7 @@ async def test_with_discrepancies(_set_api_key):
     )
 
     mock_aio_models = AsyncMock()
-    mock_aio_models.generate_content.return_value = _mock_response(
-        discrepancy_data
-    )
+    mock_aio_models.generate_content.return_value = _mock_response(discrepancy_data)
     mock_client = MagicMock()
     mock_client.aio.models = mock_aio_models
 

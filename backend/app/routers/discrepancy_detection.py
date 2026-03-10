@@ -14,9 +14,7 @@ MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
 ACCEPTED_TYPES = {"image/jpeg", "image/png", "image/webp"}
 
 
-@router.post(
-    "/discrepancy-check", response_model=DiscrepancyCheckResponse
-)
+@router.post("/discrepancy-check", response_model=DiscrepancyCheckResponse)
 async def check_discrepancy(
     file: UploadFile,
     vehicle_id: uuid.UUID,
