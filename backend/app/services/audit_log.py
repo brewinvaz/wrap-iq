@@ -42,11 +42,11 @@ class AuditLogService:
         limit: int = 50,
         offset: int = 0,
     ) -> tuple[list[AuditLog], int]:
-        query = select(AuditLog).where(
-            AuditLog.organization_id == organization_id
-        )
-        count_query = select(func.count()).select_from(AuditLog).where(
-            AuditLog.organization_id == organization_id
+        query = select(AuditLog).where(AuditLog.organization_id == organization_id)
+        count_query = (
+            select(func.count())
+            .select_from(AuditLog)
+            .where(AuditLog.organization_id == organization_id)
         )
 
         if action is not None:
@@ -55,9 +55,7 @@ class AuditLogService:
 
         if resource_type is not None:
             query = query.where(AuditLog.resource_type == resource_type)
-            count_query = count_query.where(
-                AuditLog.resource_type == resource_type
-            )
+            count_query = count_query.where(AuditLog.resource_type == resource_type)
 
         if resource_id is not None:
             query = query.where(AuditLog.resource_id == resource_id)
