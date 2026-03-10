@@ -229,3 +229,39 @@ export interface ProjectDetail extends ProjectCard {
   revenue: number;
   cost: number;
 }
+
+export interface APIKeyScope {
+  scope: string;
+  description: string;
+}
+
+export interface APIKey {
+  id: string;
+  name: string;
+  keyPrefix: string;
+  scopes: string[];
+  rateLimitPerMinute: number;
+  rateLimitPerDay: number;
+  isActive: boolean;
+  lastUsedAt: string | null;
+  expiresAt: string | null;
+  createdBy: string;
+  createdAt: string;
+  revokedAt: string | null;
+  usageCount: number;
+}
+
+export interface APIKeyUsageStats {
+  totalRequests: number;
+  requestsToday: number;
+  avgResponseTime: number;
+  topEndpoints: { endpoint: string; count: number }[];
+}
+
+export interface APIKeyCreateRequest {
+  name: string;
+  scopes: string[];
+  rateLimitPerMinute: number;
+  rateLimitPerDay: number;
+  expiresAt: string | null;
+}
