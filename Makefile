@@ -1,4 +1,4 @@
-.PHONY: help up down restart build rebuild logs ps migrate test lint clean
+.PHONY: help up down restart build rebuild logs ps migrate test lint clean prune-branches
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -58,3 +58,7 @@ shell-backend: ## Open a shell in the backend container
 
 shell-db: ## Open a psql shell
 	docker compose exec db psql -U postgres -d wrapiq
+
+prune-branches: ## Delete local branches already merged to main on remote
+	git fetch -p
+	git branch -vv | grep 'origin/.*: gone]' | awk '{print $$1}' | xargs -r git branch -d
