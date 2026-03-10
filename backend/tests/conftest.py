@@ -11,19 +11,21 @@ from app.db import Base
 
 
 async def _cleanup(conn):
-    # Drop all tables using SQLAlchemy metadata (handles FK ordering)
-    await conn.run_sync(Base.metadata.drop_all)
-
-    # Dynamically drop ALL custom enum types in the public schema.
-    # This avoids maintaining a hardcoded list that goes stale when
-    # new models/enums are added.
-    result = await conn.execute(
-        text(
-            "SELECT typname FROM pg_type WHERE typtype = 'e' "
-            "AND typnamespace = (SELECT oid FROM pg_namespace "
-            "WHERE nspname = 'public')"
+    # Drop all tables in public schema (handles leftover tables from other branches)
+    result = await conn.execute(text(
+        "SELECT tablename FROM pg_tables WHERE schemaname = 'public'"
+    ))
+    for row in result:
+        await conn.execute(
+            text(f'DROP TABLE IF EXISTS "{row[0]}" CASCADE')
         )
-    )
+
+    # Drop all custom enum types in public schema
+    result = await conn.execute(text(
+        "SELECT typname FROM pg_type WHERE typtype = 'e' "
+        "AND typnamespace = (SELECT oid FROM pg_namespace "
+        "WHERE nspname = 'public')"
+    ))
     for row in result:
         await conn.execute(text(f'DROP TYPE IF EXISTS "{row[0]}" CASCADE'))
 
