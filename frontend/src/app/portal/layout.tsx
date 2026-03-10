@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import AuthGuard from '@/components/AuthGuard';
+import PortalAuthGuard from '@/components/PortalAuthGuard';
 
 export const metadata = {
   title: 'Client Portal | WrapFlow',
@@ -12,7 +12,7 @@ export default function PortalLayout({
   children: React.ReactNode;
 }) {
   return (
-    <AuthGuard>
+    <PortalAuthGuard>
       <div className="flex min-h-screen flex-col bg-[#f8f8fa]">
         {/* Header */}
         <header className="sticky top-0 z-30 border-b border-[#e6e6eb] bg-white">
@@ -44,6 +44,6 @@ export default function PortalLayout({
           {children}
         </main>
       </div>
-    </AuthGuard>
+    </PortalAuthGuard>
   );
 }
