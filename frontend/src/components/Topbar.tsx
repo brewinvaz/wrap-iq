@@ -1,13 +1,33 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
+
+const ROUTE_TITLES: Record<string, string> = {
+  '/dashboard': 'Jobs Board',
+  '/dashboard/work-orders': 'Work Orders',
+  '/dashboard/calendar': 'Calendar',
+  '/dashboard/customers': 'Customers',
+  '/dashboard/design-queue': 'Design Queue',
+  '/dashboard/print': 'Print / Lam',
+  '/dashboard/install-schedule': 'Install Schedule',
+  '/dashboard/financials': 'Financials',
+  '/dashboard/time-tracking': 'Time Tracking',
+  '/dashboard/users': 'User Management',
+  '/dashboard/settings/billing': 'Billing & Settings',
+  '/dashboard/integrations': 'Integrations',
+  '/dashboard/ai': 'Shop Intelligence',
+  '/dashboard/3d': '3D Rendering',
+};
+
 interface TopbarProps {
-  title: string;
   subtitle?: string;
   actionLabel?: string;
   onAction?: () => void;
 }
 
-export default function Topbar({ title, subtitle, actionLabel, onAction }: TopbarProps) {
+export default function Topbar({ subtitle, actionLabel, onAction }: TopbarProps) {
+  const pathname = usePathname();
+  const title = ROUTE_TITLES[pathname] ?? 'Dashboard';
   return (
     <header className="flex h-[54px] shrink-0 items-center border-b border-[#e6e6eb] bg-white px-5">
       {/* Left: Title */}
