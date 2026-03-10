@@ -29,7 +29,7 @@ async def test_create_client(db_session):
         ClientCreate(name="John Doe", email="john@example.com"),
     )
     assert client.name == "John Doe"
-    assert client.client_type == ClientType.PERSONAL
+    assert client.client_type == ClientType.personal
     assert client.email == "john@example.com"
     assert client.organization_id == org.id
     assert client.is_active is True
@@ -44,12 +44,12 @@ async def test_create_business_client(db_session):
         org.id,
         ClientCreate(
             name="Fleet Corp",
-            client_type=ClientType.BUSINESS,
+            client_type=ClientType.business,
             phone="555-0100",
         ),
     )
     assert client.name == "Fleet Corp"
-    assert client.client_type == ClientType.BUSINESS
+    assert client.client_type == ClientType.business
     assert client.phone == "555-0100"
 
 
@@ -59,7 +59,7 @@ async def test_create_sub_client(db_session):
 
     parent = await service.create(
         org.id,
-        ClientCreate(name="Dealership", client_type=ClientType.BUSINESS),
+        ClientCreate(name="Dealership", client_type=ClientType.business),
     )
 
     sub = await service.add_sub_client(
@@ -77,7 +77,7 @@ async def test_sub_client_must_have_business_parent(db_session):
 
     parent = await service.create(
         org.id,
-        ClientCreate(name="Personal Client", client_type=ClientType.PERSONAL),
+        ClientCreate(name="Personal Client", client_type=ClientType.personal),
     )
 
     with pytest.raises(ValueError, match="business account"):
@@ -94,12 +94,12 @@ async def test_no_nested_sub_clients(db_session):
 
     parent = await service.create(
         org.id,
-        ClientCreate(name="Parent", client_type=ClientType.BUSINESS),
+        ClientCreate(name="Parent", client_type=ClientType.business),
     )
     sub = await service.add_sub_client(
         parent.id,
         org.id,
-        ClientCreate(name="Sub", client_type=ClientType.BUSINESS),
+        ClientCreate(name="Sub", client_type=ClientType.business),
     )
 
     with pytest.raises(ValueError, match="cannot have sub-clients"):
@@ -128,7 +128,7 @@ async def test_list_parent_only(db_session):
 
     parent = await service.create(
         org.id,
-        ClientCreate(name="Parent", client_type=ClientType.BUSINESS),
+        ClientCreate(name="Parent", client_type=ClientType.business),
     )
     await service.add_sub_client(parent.id, org.id, ClientCreate(name="Sub"))
 
@@ -143,7 +143,7 @@ async def test_list_by_parent_id(db_session):
 
     parent = await service.create(
         org.id,
-        ClientCreate(name="Parent", client_type=ClientType.BUSINESS),
+        ClientCreate(name="Parent", client_type=ClientType.business),
     )
     await service.add_sub_client(parent.id, org.id, ClientCreate(name="Sub A"))
     await service.add_sub_client(parent.id, org.id, ClientCreate(name="Sub B"))
@@ -175,7 +175,7 @@ async def test_get_aggregate_report(db_session):
 
     parent = await service.create(
         org.id,
-        ClientCreate(name="Fleet Co", client_type=ClientType.BUSINESS),
+        ClientCreate(name="Fleet Co", client_type=ClientType.business),
     )
     sub = await service.add_sub_client(parent.id, org.id, ClientCreate(name="Branch 1"))
 

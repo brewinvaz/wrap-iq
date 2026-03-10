@@ -12,14 +12,14 @@ from app.models.base import TenantMixin, TimestampMixin
 
 
 class JobType(enum.StrEnum):
-    COMMERCIAL = "commercial"
-    PERSONAL = "personal"
+    commercial = "commercial"
+    personal = "personal"
 
 
 class Priority(enum.StrEnum):
-    HIGH = "high"
-    MEDIUM = "medium"
-    LOW = "low"
+    high = "high"
+    medium = "medium"
+    low = "low"
 
 
 class WorkOrder(Base, TenantMixin, TimestampMixin):
@@ -34,7 +34,7 @@ class WorkOrder(Base, TenantMixin, TimestampMixin):
     job_number: Mapped[str] = mapped_column(String(50), index=True)
     job_type: Mapped[JobType] = mapped_column(
         Enum(JobType, values_callable=lambda e: [m.value for m in e]),
-        default=JobType.PERSONAL,
+        default=JobType.personal,
     )
     job_value: Mapped[int] = mapped_column(Integer, default=0)
     status_id: Mapped[uuid.UUID] = mapped_column(
@@ -42,7 +42,7 @@ class WorkOrder(Base, TenantMixin, TimestampMixin):
     )
     priority: Mapped[Priority] = mapped_column(
         Enum(Priority, values_callable=lambda e: [m.value for m in e]),
-        default=Priority.MEDIUM,
+        default=Priority.medium,
     )
     date_in: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     estimated_completion_date: Mapped[datetime | None] = mapped_column(

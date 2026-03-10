@@ -8,7 +8,7 @@ from app.models.client import ClientType
 
 class ClientCreate(BaseModel):
     name: str
-    client_type: ClientType = ClientType.PERSONAL
+    client_type: ClientType = ClientType.personal
     email: str | None = None
     phone: str | None = None
     address: str | None = None

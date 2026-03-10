@@ -180,7 +180,7 @@ class OnboardingService:
             job_number=job_number,
             job_type=job_type,
             status_id=lead_stage.id,
-            priority=Priority.MEDIUM,
+            priority=Priority.medium,
             date_in=datetime.now(UTC),
             internal_notes="\n".join(notes_parts) if notes_parts else None,
         )

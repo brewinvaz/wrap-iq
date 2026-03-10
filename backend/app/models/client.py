@@ -10,8 +10,8 @@ from app.models.base import TenantMixin, TimestampMixin
 
 
 class ClientType(enum.StrEnum):
-    PERSONAL = "personal"
-    BUSINESS = "business"
+    personal = "personal"
+    business = "business"
 
 
 class Client(Base, TenantMixin, TimestampMixin):
@@ -21,7 +21,7 @@ class Client(Base, TenantMixin, TimestampMixin):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     client_type: Mapped[ClientType] = mapped_column(
         Enum(ClientType, values_callable=lambda e: [m.value for m in e]),
-        default=ClientType.PERSONAL,
+        default=ClientType.personal,
     )
     email: Mapped[str | None] = mapped_column(String(255), nullable=True)
     phone: Mapped[str | None] = mapped_column(String(50), nullable=True)

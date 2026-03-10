@@ -305,10 +305,10 @@ async def process_upload(
 
             # Parse work order fields
             job_type_str = row.get("job_type", "").strip().lower()
-            job_type = JobType(job_type_str) if job_type_str else JobType.COMMERCIAL
+            job_type = JobType(job_type_str) if job_type_str else JobType.commercial
 
             priority_str = row.get("priority", "").strip().lower()
-            priority = Priority(priority_str) if priority_str else Priority.MEDIUM
+            priority = Priority(priority_str) if priority_str else Priority.medium
 
             job_value_str = row.get("job_value", "").strip()
             job_value = 0
