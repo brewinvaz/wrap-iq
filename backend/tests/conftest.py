@@ -17,6 +17,8 @@ _DROP_TABLES = [
     "estimate_line_items",
     "invoices",
     "estimates",
+    "payment_methods",
+    "subscriptions",
     "message_logs",
     "message_templates",
     "audit_logs",
@@ -32,6 +34,9 @@ _DROP_TABLES = [
 
 # All known enum types
 _DROP_TYPES = [
+    "subscriptionstatus",
+    "paymentmethodtype",
+    "invoicestatus",
     "role",
     "notificationtype",
     "actiontype",

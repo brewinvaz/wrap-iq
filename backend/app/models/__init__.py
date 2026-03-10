@@ -22,6 +22,12 @@ from app.models.payment import Payment
 from app.models.plan import Plan
 from app.models.production_details import ProductionDetails
 from app.models.refresh_token import RefreshToken
+from app.models.subscription import (
+    PaymentMethod,
+    PaymentMethodType,
+    Subscription,
+    SubscriptionStatus,
+)
 from app.models.user import Role, User
 from app.models.vehicle import Vehicle, VehicleType
 from app.models.work_order import JobType, Priority, WorkOrder, WorkOrderVehicle
@@ -62,11 +68,15 @@ __all__ = [
     "NotificationType",
     "Organization",
     "Payment",
+    "PaymentMethod",
+    "PaymentMethodType",
     "Plan",
     "Priority",
     "ProductionDetails",
     "RefreshToken",
     "Role",
+    "Subscription",
+    "SubscriptionStatus",
     "SystemStatus",
     "TenantMixin",
     "TimestampMixin",
