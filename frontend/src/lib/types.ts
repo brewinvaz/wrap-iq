@@ -35,3 +35,26 @@ export interface KanbanColumn {
   color: string;
   cards: ProjectCard[];
 }
+
+export interface CalendarEvent {
+  id: string;
+  projectId: string;
+  title: string;
+  vehicle: string;
+  installer: string;
+  installerInitials: string;
+  installerColor: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  difficulty: 'easy' | 'standard' | 'complex';
+  location: 'shop' | 'on-site';
+  color: string;
+}
+
+export interface Installer {
+  id: string;
+  name: string;
+  initials: string;
+  color: string;
+}
