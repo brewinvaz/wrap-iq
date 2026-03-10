@@ -153,3 +153,79 @@ export interface Permission {
   feature: string;
   roles: { role: string; access: 'full' | 'read' | 'none' }[];
 }
+
+export interface VehicleDetails {
+  vin: string;
+  year: string;
+  make: string;
+  model: string;
+  vehicleType: string;
+  unitNumber?: string;
+}
+
+export interface WrapDetails {
+  coverage: string;
+  roofCoverage: string;
+  windowCoverage: string;
+  bumperCoverage: string;
+  doorHandles: string;
+  miscItems: string[];
+  specialInstructions?: string;
+}
+
+export interface DesignDetails {
+  designHours: number;
+  versionCount: number;
+  revisionCount: number;
+}
+
+export interface ProductionDetails {
+  equipment: string;
+  mediaBrand: string;
+  mediaWidth: string;
+  laminateBrand: string;
+  printLength: number;
+}
+
+export interface InstallDetails {
+  location: string;
+  difficulty: string;
+  startDate: string;
+  endDate: string;
+  timeLogs: { installer: string; task: string; hours: number }[];
+}
+
+export interface StatusHistoryEntry {
+  status: string;
+  timestamp: string;
+  changedBy: string;
+}
+
+export interface Note {
+  id: string;
+  text: string;
+  author: string;
+  timestamp: string;
+}
+
+export interface ProjectPhoto {
+  url: string;
+  type: 'before' | 'after';
+  caption?: string;
+}
+
+export interface ProjectDetail extends ProjectCard {
+  vehicleDetails: VehicleDetails;
+  vehicleSummary: string;
+  wrapDetails: WrapDetails;
+  designDetails: DesignDetails;
+  productionDetails: ProductionDetails;
+  installDetails: InstallDetails;
+  statusHistory: StatusHistoryEntry[];
+  notes: Note[];
+  photos: ProjectPhoto[];
+  estimatedHours: number;
+  actualHours: number;
+  revenue: number;
+  cost: number;
+}
