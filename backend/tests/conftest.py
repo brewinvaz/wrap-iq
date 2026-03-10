@@ -1,7 +1,7 @@
 from collections.abc import AsyncGenerator
 
 import pytest
-from sqlalchemy import NullPool, text
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 # Import all models so Base.metadata knows about them
@@ -9,68 +9,28 @@ import app.models  # noqa: F401
 from app.config import settings
 from app.db import Base
 
-# All known tables that may have FK dependencies, in safe drop order
-_DROP_TABLES = [
-    "api_key_usage_logs",
-    "api_keys",
-    "payments",
-    "estimate_line_items",
-    "invoices",
-    "estimates",
-    "payment_methods",
-    "subscriptions",
-    "message_logs",
-    "message_templates",
-    "audit_logs",
-    "install_time_logs",
-    "notifications",
-    "magic_links",
-    "refresh_tokens",
-    "kanban_stages",
-    "users",
-    "organizations",
-    "plans",
-]
-
-# All known enum types
-_DROP_TYPES = [
-    "subscriptionstatus",
-    "paymentmethodtype",
-    "invoicestatus",
-    "role",
-    "notificationtype",
-    "actiontype",
-    "systemstatus",
-    "vehicletype",
-    "jobtype",
-    "priority",
-    "wrapcoverage",
-    "roof_coverage_level",
-    "door_handle_coverage",
-    "windowcoverage",
-    "bumpercoverage",
-    "logtype",
-    "installlocation",
-    "installdifficulty",
-    "triggertype",
-    "channeltype",
-    "messagestatus",
-    "estimatestatus",
-]
-
 
 async def _cleanup(conn):
-    for table in _DROP_TABLES:
-        await conn.execute(text(f"DROP TABLE IF EXISTS {table} CASCADE"))
-    for typ in _DROP_TYPES:
-        await conn.execute(text(f"DROP TYPE IF EXISTS {typ} CASCADE"))
+    # Drop all tables using SQLAlchemy metadata (handles FK ordering)
+    await conn.run_sync(Base.metadata.drop_all)
+
+    # Dynamically drop ALL custom enum types in the public schema.
+    # This avoids maintaining a hardcoded list that goes stale when
+    # new models/enums are added.
+    result = await conn.execute(
+        text(
+            "SELECT typname FROM pg_type WHERE typtype = 'e' "
+            "AND typnamespace = (SELECT oid FROM pg_namespace "
+            "WHERE nspname = 'public')"
+        )
+    )
+    for row in result:
+        await conn.execute(text(f'DROP TYPE IF EXISTS "{row[0]}" CASCADE'))
 
 
 @pytest.fixture(autouse=True)
 async def setup_db():
-    engine = create_async_engine(
-        settings.test_database_url, echo=False, poolclass=NullPool
-    )
+    engine = create_async_engine(settings.test_database_url, echo=False)
     async with engine.begin() as conn:
         await _cleanup(conn)
     async with engine.begin() as conn:
