@@ -12,7 +12,7 @@ interface RoleContextValue {
 
 const RoleContext = createContext<RoleContextValue | null>(null);
 
-const STORAGE_KEY = 'wrapiq-role';
+const STORAGE_KEY = 'wrapiq_selected_role';
 
 function getStoredRole(): RoleKey {
   if (typeof window === 'undefined') return 'admin';
