@@ -16,7 +16,7 @@ export default function DashboardLayout({
           <div className="flex h-screen bg-[#f4f4f6]">
             <Sidebar />
             <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-              <Topbar actionLabel="+ New Job" />
+              <Topbar />
               <main className="flex-1 overflow-auto">{children}</main>
             </div>
           </div>

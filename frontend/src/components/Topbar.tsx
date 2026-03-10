@@ -80,7 +80,7 @@ export default function Topbar({ subtitle, actionLabel, onAction }: TopbarProps)
           <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-red-500" />
         </button>
 
-        {actionLabel && (
+        {actionLabel && onAction && (
           <button
             onClick={onAction}
             className="flex h-8 items-center rounded-lg bg-[#18181b] px-3.5 text-[13px] font-medium text-white transition-colors hover:bg-[#2d2d30]"
