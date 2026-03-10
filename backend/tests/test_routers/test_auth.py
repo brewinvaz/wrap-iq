@@ -28,10 +28,22 @@ async def client(db_session, seed_plan):
     app.dependency_overrides.clear()
 
 
+async def test_register_short_password(client):
+    resp = await client.post(
+        "/api/auth/register",
+        json={"email": "short@shop.com", "password": "abc", "org_name": "Short Shop"},
+    )
+    assert resp.status_code == 422
+
+
 async def test_register(client):
     resp = await client.post(
         "/api/auth/register",
-        json={"email": "new@shop.com", "password": "pass123", "org_name": "New Shop"},
+        json={
+            "email": "new@shop.com",
+            "password": "testpass123",
+            "org_name": "New Shop",
+        },
     )
     assert resp.status_code == 200
     data = resp.json()
@@ -42,11 +54,11 @@ async def test_register(client):
 async def test_register_duplicate(client):
     await client.post(
         "/api/auth/register",
-        json={"email": "dup@shop.com", "password": "pass", "org_name": "Shop"},
+        json={"email": "dup@shop.com", "password": "testpass123", "org_name": "Shop"},
     )
     resp = await client.post(
         "/api/auth/register",
-        json={"email": "dup@shop.com", "password": "pass", "org_name": "Shop 2"},
+        json={"email": "dup@shop.com", "password": "testpass123", "org_name": "Shop 2"},
     )
     assert resp.status_code == 409
 
@@ -54,11 +66,15 @@ async def test_register_duplicate(client):
 async def test_login(client):
     await client.post(
         "/api/auth/register",
-        json={"email": "log@shop.com", "password": "mypass", "org_name": "Log Shop"},
+        json={
+            "email": "log@shop.com",
+            "password": "testpass123",
+            "org_name": "Log Shop",
+        },
     )
     resp = await client.post(
         "/api/auth/login",
-        json={"email": "log@shop.com", "password": "mypass"},
+        json={"email": "log@shop.com", "password": "testpass123"},
     )
     assert resp.status_code == 200
     assert "access_token" in resp.json()
@@ -67,11 +83,15 @@ async def test_login(client):
 async def test_login_wrong_password(client):
     await client.post(
         "/api/auth/register",
-        json={"email": "bad@shop.com", "password": "right", "org_name": "Bad Shop"},
+        json={
+            "email": "bad@shop.com",
+            "password": "testpass123",
+            "org_name": "Bad Shop",
+        },
     )
     resp = await client.post(
         "/api/auth/login",
-        json={"email": "bad@shop.com", "password": "wrong"},
+        json={"email": "bad@shop.com", "password": "wrongpass123"},
     )
     assert resp.status_code == 401
 
@@ -79,7 +99,11 @@ async def test_login_wrong_password(client):
 async def test_refresh_token(client):
     reg = await client.post(
         "/api/auth/register",
-        json={"email": "ref@shop.com", "password": "pass", "org_name": "Ref Shop"},
+        json={
+            "email": "ref@shop.com",
+            "password": "testpass123",
+            "org_name": "Ref Shop",
+        },
     )
     refresh = reg.json()["refresh_token"]
     resp = await client.post(
@@ -97,7 +121,11 @@ async def test_refresh_token(client):
 async def test_logout(client):
     reg = await client.post(
         "/api/auth/register",
-        json={"email": "out@shop.com", "password": "pass", "org_name": "Out Shop"},
+        json={
+            "email": "out@shop.com",
+            "password": "testpass123",
+            "org_name": "Out Shop",
+        },
     )
     refresh = reg.json()["refresh_token"]
     resp = await client.post(

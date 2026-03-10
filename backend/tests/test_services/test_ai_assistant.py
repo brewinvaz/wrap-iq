@@ -3,7 +3,11 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from app.services.ai_assistant import AIAssistantService, validate_sql, _strip_sql_comments
+from app.services.ai_assistant import (
+    AIAssistantService,
+    validate_sql,
+    _strip_sql_comments,
+)
 
 
 def _mock_user(org_id=None):

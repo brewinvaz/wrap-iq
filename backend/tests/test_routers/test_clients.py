@@ -2,7 +2,11 @@ async def _register_and_get_token(client):
     """Register a user and return auth token."""
     resp = await client.post(
         "/api/auth/register",
-        json={"email": "admin@shop.com", "password": "pass", "org_name": "My Shop"},
+        json={
+            "email": "admin@shop.com",
+            "password": "testpass123",
+            "org_name": "My Shop",
+        },
     )
     return resp.json()["access_token"]
 
