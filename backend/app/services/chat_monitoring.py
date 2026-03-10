@@ -156,9 +156,33 @@ class ChatMonitoringService:
             current_notes = work_order.internal_notes or ""
             work_order.internal_notes = current_notes + note_entry
         elif request.field_to_update == "priority":
+            allowed_priorities = {"high", "medium", "low"}
+            if request.value not in allowed_priorities:
+                return ApplyUpdateResponse(
+                    success=False,
+                    message=(
+                        f"Invalid priority '{request.value}'. "
+                        f"Must be one of: {', '.join(sorted(allowed_priorities))}."
+                    ),
+                )
             work_order.priority = request.value
         elif request.field_to_update == "estimated_completion_date":
-            work_order.estimated_completion_date = datetime.fromisoformat(request.value)
+            try:
+                parsed_date = datetime.fromisoformat(request.value)
+            except ValueError:
+                logger.warning(
+                    "Invalid datetime value for estimated_completion_date: %s",
+                    request.value,
+                )
+                return ApplyUpdateResponse(
+                    success=False,
+                    message=(
+                        f"Invalid datetime format '{request.value}'. "
+                        "Expected an ISO 8601 datetime string "
+                        "(e.g. '2025-06-15T14:00:00')."
+                    ),
+                )
+            work_order.estimated_completion_date = parsed_date
 
         await session.commit()
 
