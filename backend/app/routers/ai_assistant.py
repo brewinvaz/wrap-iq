@@ -16,7 +16,7 @@ async def query_assistant(
     session: AsyncSession = Depends(get_session),
     user: User = Depends(get_current_user),
 ):
-    if not settings.anthropic_api_key:
+    if not settings.gemini_api_key:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="AI assistant is not configured",

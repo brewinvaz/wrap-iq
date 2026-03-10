@@ -15,30 +15,31 @@ def _mock_user(org_id=None):
 
 
 def _mock_text_response(text_content):
-    """Build a mock Anthropic response with a text block."""
-    block = MagicMock()
-    block.type = "text"
-    block.text = text_content
+    """Build a mock Gemini response with a text part."""
+    part = MagicMock()
+    part.function_call = None
+    part.text = text_content
+    candidate = MagicMock()
+    candidate.content.parts = [part]
     response = MagicMock()
-    response.content = [block]
+    response.candidates = [candidate]
     return response
 
 
-def _mock_tool_use_response(sql, explanation="Querying data"):
-    """Build a mock Anthropic response with a tool_use block."""
-    tool_block = MagicMock()
-    tool_block.type = "tool_use"
-    tool_block.name = "execute_sql"
-    tool_block.id = "toolu_123"
-    tool_block.input = {"sql": sql, "explanation": explanation}
-    tool_block.model_dump.return_value = {
-        "type": "tool_use",
-        "id": "toolu_123",
-        "name": "execute_sql",
-        "input": {"sql": sql, "explanation": explanation},
-    }
+def _mock_function_call_response(sql, explanation="Querying data"):
+    """Build a mock Gemini response with a function_call part."""
+    fc = MagicMock()
+    fc.name = "execute_sql"
+    fc.args = {"sql": sql, "explanation": explanation}
+
+    part = MagicMock()
+    part.function_call = fc
+    part.text = None
+
+    candidate = MagicMock()
+    candidate.content.parts = [part]
     response = MagicMock()
-    response.content = [tool_block]
+    response.candidates = [candidate]
     return response
 
 
@@ -124,20 +125,23 @@ def test_validate_sql_rejects_select_with_embedded_delete():
 
 @patch("app.services.ai_assistant.settings")
 async def test_service_raises_without_api_key(mock_settings):
-    mock_settings.anthropic_api_key = ""
+    mock_settings.gemini_api_key = ""
     with pytest.raises(ValueError, match="not configured"):
         AIAssistantService()
 
 
 @patch("app.services.ai_assistant.settings")
-@patch("app.services.ai_assistant.anthropic.AsyncAnthropic")
-async def test_answer_question_text_response(mock_anthropic_cls, mock_settings):
-    mock_settings.anthropic_api_key = "test-key"
-    mock_client = AsyncMock()
-    mock_anthropic_cls.return_value = mock_client
-    mock_client.messages.create.return_value = _mock_text_response(
+@patch("app.services.ai_assistant.genai.Client")
+async def test_answer_question_text_response(mock_genai_cls, mock_settings):
+    mock_settings.gemini_api_key = "test-key"
+    mock_client = MagicMock()
+    mock_genai_cls.return_value = mock_client
+
+    mock_aio_models = AsyncMock()
+    mock_aio_models.generate_content.return_value = _mock_text_response(
         "There are no late jobs currently."
     )
+    mock_client.aio.models = mock_aio_models
 
     service = AIAssistantService()
     user = _mock_user()
@@ -152,19 +156,21 @@ async def test_answer_question_text_response(mock_anthropic_cls, mock_settings):
 
 
 @patch("app.services.ai_assistant.settings")
-@patch("app.services.ai_assistant.anthropic.AsyncAnthropic")
-async def test_answer_question_with_sql_execution(mock_anthropic_cls, mock_settings):
-    mock_settings.anthropic_api_key = "test-key"
-    mock_client = AsyncMock()
-    mock_anthropic_cls.return_value = mock_client
+@patch("app.services.ai_assistant.genai.Client")
+async def test_answer_question_with_sql_execution(mock_genai_cls, mock_settings):
+    mock_settings.gemini_api_key = "test-key"
+    mock_client = MagicMock()
+    mock_genai_cls.return_value = mock_client
 
     sql = "SELECT job_number FROM work_orders WHERE organization_id = :org_id LIMIT 100"
 
-    # First call returns tool_use, second call returns summary
-    mock_client.messages.create.side_effect = [
-        _mock_tool_use_response(sql),
+    mock_aio_models = AsyncMock()
+    # First call returns function_call, second call returns summary
+    mock_aio_models.generate_content.side_effect = [
+        _mock_function_call_response(sql),
         _mock_text_response("You have 2 jobs: JOB-001 and JOB-002."),
     ]
+    mock_client.aio.models = mock_aio_models
 
     service = AIAssistantService()
     user = _mock_user()
@@ -189,16 +195,17 @@ async def test_answer_question_with_sql_execution(mock_anthropic_cls, mock_setti
 
 
 @patch("app.services.ai_assistant.settings")
-@patch("app.services.ai_assistant.anthropic.AsyncAnthropic")
-async def test_answer_question_unsafe_sql_rejected(mock_anthropic_cls, mock_settings):
-    mock_settings.anthropic_api_key = "test-key"
-    mock_client = AsyncMock()
-    mock_anthropic_cls.return_value = mock_client
+@patch("app.services.ai_assistant.genai.Client")
+async def test_answer_question_unsafe_sql_rejected(mock_genai_cls, mock_settings):
+    mock_settings.gemini_api_key = "test-key"
+    mock_client = MagicMock()
+    mock_genai_cls.return_value = mock_client
 
-    # Claude generates a dangerous query
-    mock_client.messages.create.return_value = _mock_tool_use_response(
+    mock_aio_models = AsyncMock()
+    mock_aio_models.generate_content.return_value = _mock_function_call_response(
         "DELETE FROM work_orders WHERE organization_id = :org_id"
     )
+    mock_client.aio.models = mock_aio_models
 
     service = AIAssistantService()
     user = _mock_user()
@@ -207,22 +214,23 @@ async def test_answer_question_unsafe_sql_rejected(mock_anthropic_cls, mock_sett
     result = await service.answer_question("Delete all my jobs", user, session)
 
     assert "unsafe" in result.answer.lower()
-    # The session should never have been called
     session.execute.assert_not_called()
 
 
 @patch("app.services.ai_assistant.settings")
-@patch("app.services.ai_assistant.anthropic.AsyncAnthropic")
+@patch("app.services.ai_assistant.genai.Client")
 async def test_answer_question_sql_without_org_id_rejected(
-    mock_anthropic_cls, mock_settings
+    mock_genai_cls, mock_settings
 ):
-    mock_settings.anthropic_api_key = "test-key"
-    mock_client = AsyncMock()
-    mock_anthropic_cls.return_value = mock_client
+    mock_settings.gemini_api_key = "test-key"
+    mock_client = MagicMock()
+    mock_genai_cls.return_value = mock_client
 
-    mock_client.messages.create.return_value = _mock_tool_use_response(
+    mock_aio_models = AsyncMock()
+    mock_aio_models.generate_content.return_value = _mock_function_call_response(
         "SELECT * FROM work_orders"
     )
+    mock_client.aio.models = mock_aio_models
 
     service = AIAssistantService()
     user = _mock_user()
@@ -236,14 +244,17 @@ async def test_answer_question_sql_without_org_id_rejected(
 
 
 @patch("app.services.ai_assistant.settings")
-@patch("app.services.ai_assistant.anthropic.AsyncAnthropic")
-async def test_answer_question_sql_error_handled(mock_anthropic_cls, mock_settings):
-    mock_settings.anthropic_api_key = "test-key"
-    mock_client = AsyncMock()
-    mock_anthropic_cls.return_value = mock_client
+@patch("app.services.ai_assistant.genai.Client")
+async def test_answer_question_sql_error_handled(mock_genai_cls, mock_settings):
+    mock_settings.gemini_api_key = "test-key"
+    mock_client = MagicMock()
+    mock_genai_cls.return_value = mock_client
 
     sql = "SELECT * FROM work_orders WHERE organization_id = :org_id LIMIT 100"
-    mock_client.messages.create.return_value = _mock_tool_use_response(sql)
+
+    mock_aio_models = AsyncMock()
+    mock_aio_models.generate_content.return_value = _mock_function_call_response(sql)
+    mock_client.aio.models = mock_aio_models
 
     service = AIAssistantService()
     user = _mock_user()

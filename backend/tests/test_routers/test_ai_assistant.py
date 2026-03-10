@@ -43,7 +43,7 @@ def _query_response(**kwargs):
 @patch("app.routers.ai_assistant.settings")
 @patch("app.routers.ai_assistant.AIAssistantService")
 async def test_query_success(mock_service_cls, mock_settings, client):
-    mock_settings.anthropic_api_key = "test-key"
+    mock_settings.gemini_api_key = "test-key"
     mock_service = AsyncMock()
     mock_service.answer_question.return_value = _query_response()
     mock_service_cls.return_value = mock_service
@@ -61,7 +61,7 @@ async def test_query_success(mock_service_cls, mock_settings, client):
 
 @patch("app.routers.ai_assistant.settings")
 async def test_query_service_unavailable(mock_settings, client):
-    mock_settings.anthropic_api_key = ""
+    mock_settings.gemini_api_key = ""
 
     resp = await client.post(
         "/api/ai/query",
@@ -95,7 +95,7 @@ async def test_query_requires_auth():
 @patch("app.routers.ai_assistant.settings")
 @patch("app.routers.ai_assistant.AIAssistantService")
 async def test_query_with_conversation_id(mock_service_cls, mock_settings, client):
-    mock_settings.anthropic_api_key = "test-key"
+    mock_settings.gemini_api_key = "test-key"
     conv_id = uuid.uuid4()
     mock_service = AsyncMock()
     mock_service.answer_question.return_value = _query_response(conversation_id=conv_id)
@@ -113,7 +113,7 @@ async def test_query_with_conversation_id(mock_service_cls, mock_settings, clien
 @patch("app.routers.ai_assistant.settings")
 @patch("app.routers.ai_assistant.AIAssistantService")
 async def test_query_service_error(mock_service_cls, mock_settings, client):
-    mock_settings.anthropic_api_key = "test-key"
+    mock_settings.gemini_api_key = "test-key"
     mock_service = AsyncMock()
     mock_service.answer_question.side_effect = Exception("API error")
     mock_service_cls.return_value = mock_service

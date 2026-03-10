@@ -1,7 +1,8 @@
 import re
 import uuid
 
-import anthropic
+from google import genai
+from google.genai import types
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -59,14 +60,14 @@ Available tables and columns (PostgreSQL):
      created_at, updated_at
 """
 
-_EXECUTE_SQL_TOOL = {
-    "name": "execute_sql",
-    "description": "Execute a read-only SQL query against the database",
-    "input_schema": {
-        "type": "object",
+_EXECUTE_SQL_TOOL = types.FunctionDeclaration(
+    name="execute_sql",
+    description="Execute a read-only SQL query against the database",
+    parameters={
+        "type": "OBJECT",
         "properties": {
             "sql": {
-                "type": "string",
+                "type": "STRING",
                 "description": (
                     "A SELECT query. Must include "
                     "WHERE organization_id = :org_id "
@@ -74,13 +75,13 @@ _EXECUTE_SQL_TOOL = {
                 ),
             },
             "explanation": {
-                "type": "string",
+                "type": "STRING",
                 "description": "Brief explanation of what this query does",
             },
         },
         "required": ["sql", "explanation"],
     },
-}
+)
 
 
 def _build_system_prompt(user: User) -> str:
@@ -97,7 +98,7 @@ RULES:
 - Only generate SELECT queries. Never INSERT, UPDATE, DELETE, or any DDL.
 - ALWAYS filter by organization_id = :org_id for tenant data isolation.
 - Add LIMIT 100 to queries unless the user asks for a specific count.
-- Use the execute_sql tool when you need to query data.
+- Use the execute_sql function when you need to query data.
 - If the question can be answered without a query, answer directly.
 - When summarizing results, be concise and helpful.
 - Dates should be presented in a human-readable format.
@@ -130,10 +131,10 @@ def validate_sql(sql: str) -> str | None:
 
 class AIAssistantService:
     def __init__(self) -> None:
-        if not settings.anthropic_api_key:
-            msg = "Anthropic API key is not configured"
+        if not settings.gemini_api_key:
+            msg = "Gemini API key is not configured"
             raise ValueError(msg)
-        self._client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
+        self._client = genai.Client(api_key=settings.gemini_api_key)
 
     async def answer_question(
         self,
@@ -144,37 +145,38 @@ class AIAssistantService:
         conversation_id = uuid.uuid4()
         system_prompt = _build_system_prompt(user)
 
-        # First call: ask Claude to answer or generate SQL
-        response = await self._client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=1024,
-            system=system_prompt,
-            tools=[_EXECUTE_SQL_TOOL],
-            messages=[{"role": "user", "content": question}],
+        # First call: ask Gemini to answer or generate SQL via function calling
+        response = await self._client.aio.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=question,
+            config=types.GenerateContentConfig(
+                system_instruction=system_prompt,
+                tools=[types.Tool(function_declarations=[_EXECUTE_SQL_TOOL])],
+            ),
         )
 
-        # Check if Claude wants to execute SQL
-        tool_use_block = None
-        text_blocks = []
-        for block in response.content:
-            if block.type == "tool_use" and block.name == "execute_sql":
-                tool_use_block = block
-            elif block.type == "text":
-                text_blocks.append(block.text)
+        # Check if Gemini wants to call a function
+        function_call = None
+        text_parts = []
+        for part in response.candidates[0].content.parts:
+            if part.function_call and part.function_call.name == "execute_sql":
+                function_call = part.function_call
+            elif part.text:
+                text_parts.append(part.text)
 
-        # If no tool use, return the text answer directly
-        if tool_use_block is None:
+        # If no function call, return the text answer directly
+        if function_call is None:
             return QueryResponse(
                 answer=(
-                    "\n".join(text_blocks)
-                    if text_blocks
+                    "\n".join(text_parts)
+                    if text_parts
                     else "I could not generate an answer."
                 ),
                 conversation_id=conversation_id,
             )
 
-        sql = tool_use_block.input.get("sql", "")
-        explanation = tool_use_block.input.get("explanation", "")
+        sql = function_call.args.get("sql", "")
+        explanation = function_call.args.get("explanation", "")
 
         # Validate SQL safety
         validation_error = validate_sql(sql)
@@ -201,40 +203,27 @@ class AIAssistantService:
                 conversation_id=conversation_id,
             )
 
-        # Second call: have Claude summarize the results
-        summary_messages = [
-            {"role": "user", "content": question},
-            {
-                "role": "assistant",
-                "content": [
-                    {"type": "text", "text": f"I'll query the database. {explanation}"},
-                    tool_use_block.model_dump(),
-                ],
-            },
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "tool_result",
-                        "tool_use_id": tool_use_block.id,
-                        "content": _format_results(rows),
-                    }
-                ],
-            },
-        ]
+        # Second call: have Gemini summarize the results
+        summary_prompt = (
+            f"Original question: {question}\n\n"
+            f"Query explanation: {explanation}\n"
+            f"SQL executed: {sql}\n\n"
+            f"Results: {_format_results(rows)}\n\n"
+            "Please provide a concise, helpful summary of these results."
+        )
 
-        summary_response = await self._client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=1024,
-            system=system_prompt,
-            tools=[_EXECUTE_SQL_TOOL],
-            messages=summary_messages,
+        summary_response = await self._client.aio.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=summary_prompt,
+            config=types.GenerateContentConfig(
+                system_instruction=system_prompt,
+            ),
         )
 
         answer_parts = []
-        for block in summary_response.content:
-            if block.type == "text":
-                answer_parts.append(block.text)
+        for part in summary_response.candidates[0].content.parts:
+            if part.text:
+                answer_parts.append(part.text)
 
         return QueryResponse(
             answer="\n".join(answer_parts) if answer_parts else "No summary available.",
