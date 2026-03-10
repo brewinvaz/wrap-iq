@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -30,10 +31,28 @@ from app.routers.vin import router as vin_router
 from app.routers.webhooks import router as webhooks_router
 from app.routers.work_orders import router as work_orders_router
 
+logger = logging.getLogger("wrapiq")
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
+    # Startup — log external service status
+    logger.info(
+        "Gemini AI: %s",
+        "configured" if settings.gemini_api_key else "not configured",
+    )
+    logger.info(
+        "Resend Email: %s",
+        "configured"
+        if settings.resend_api_key
+        else "not configured (emails will print to console)",
+    )
+    logger.info(
+        "Cloudflare R2: %s",
+        "configured"
+        if settings.r2_account_id
+        else "not configured (file uploads disabled)",
+    )
     yield
     # Shutdown
 

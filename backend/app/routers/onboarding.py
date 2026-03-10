@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_session
+from app.config import settings
 from app.schemas.onboarding import (
     OnboardingOrgInfo,
     OnboardingResult,
@@ -66,6 +67,11 @@ async def get_upload_url(
     session: AsyncSession = Depends(get_session),
 ):
     """Generate a presigned R2 upload URL for the client."""
+    if not settings.r2_account_id:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="File upload is not configured (R2 storage unavailable)",
+        )
     invite = await _get_valid_invite(token, session)
     try:
         r2_key = generate_object_key(invite.organization_id, body.filename)
