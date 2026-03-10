@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import CreateWorkOrderModal from '@/components/work-orders/CreateWorkOrderModal';
 
 type PhaseFilter = 'all' | 'work-order' | 'design' | 'production' | 'install';
 
@@ -42,6 +43,7 @@ const tabs: { key: PhaseFilter; label: string }[] = [
 
 export default function JobsPage() {
   const [filter, setFilter] = useState<PhaseFilter>('all');
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const filtered = filter === 'all' ? jobs : jobs.filter((j) => j.phase === filter);
 
   return (
@@ -54,7 +56,10 @@ export default function JobsPage() {
               {jobs.length} jobs
             </span>
           </div>
-          <button className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700">
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+          >
             + New Job
           </button>
         </div>
@@ -108,6 +113,12 @@ export default function JobsPage() {
           </table>
         </div>
       </div>
+
+      <CreateWorkOrderModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onCreate={() => { /* Jobs page uses static data — new work orders appear on Work Orders page */ }}
+      />
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { api, ApiError } from '@/lib/api-client';
+import CreateWorkOrderModal from '@/components/work-orders/CreateWorkOrderModal';
 
 // --- API response types ---
 
@@ -108,6 +109,7 @@ export default function WorkOrdersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(0);
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const limit = 20;
 
   const fetchStages = useCallback(async () => {
@@ -175,6 +177,12 @@ export default function WorkOrdersPage() {
               onChange={(e) => setSearch(e.target.value)}
               className="h-9 w-56 rounded-lg border border-[#e6e6eb] bg-[#f4f4f6] px-3 text-sm text-[#18181b] placeholder-[#a8a8b4] outline-none focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
             />
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+            >
+              + New Work Order
+            </button>
           </div>
         </div>
         {/* Status tabs */}
@@ -298,6 +306,12 @@ export default function WorkOrdersPage() {
           </div>
         )}
       </div>
+
+      <CreateWorkOrderModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onCreate={() => { fetchWorkOrders(); }}
+      />
     </div>
   );
 }
