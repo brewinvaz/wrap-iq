@@ -5,6 +5,7 @@ import { Client } from '@/lib/types';
 import { api, ApiError } from '@/lib/api-client';
 import ClientList from './ClientList';
 import ClientDetail from './ClientDetail';
+import CreateClientModal from './CreateClientModal';
 
 // --- API response types ---
 
@@ -117,6 +118,7 @@ export default function ClientsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const fetchClients = useCallback(async () => {
     setLoading(true);
@@ -157,25 +159,49 @@ export default function ClientsPage() {
   if (error) return <ErrorState message={error} onRetry={fetchClients} />;
 
   return (
-    <div className="flex h-full">
-      <ClientList
-        clients={clients}
-        selectedId={selectedClient?.id ?? null}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        onSelect={setSelectedClient}
-      />
-      {selectedClient ? (
-        <ClientDetail client={selectedClient} />
-      ) : (
-        <div className="flex flex-1 items-center justify-center bg-[#f4f4f6]">
-          <p className="text-sm text-gray-400">
-            {clients.length === 0
-              ? 'No clients found. Create your first client to get started.'
-              : 'Select a client to view details'}
-          </p>
+    <div className="flex h-full flex-col">
+      {/* Header */}
+      <header className="flex shrink-0 items-center justify-between border-b border-[#e6e6eb] bg-white px-6 py-4">
+        <div className="flex items-center gap-3">
+          <h1 className="text-xl font-bold text-[#18181b]">Clients</h1>
+          <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-[#60606a]">
+            {clients.length} total
+          </span>
         </div>
-      )}
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+        >
+          + New Client
+        </button>
+      </header>
+
+      <div className="flex min-h-0 flex-1">
+        <ClientList
+          clients={clients}
+          selectedId={selectedClient?.id ?? null}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          onSelect={setSelectedClient}
+        />
+        {selectedClient ? (
+          <ClientDetail client={selectedClient} />
+        ) : (
+          <div className="flex flex-1 items-center justify-center bg-[#f4f4f6]">
+            <p className="text-sm text-gray-400">
+              {clients.length === 0
+                ? 'No clients found. Create your first client to get started.'
+                : 'Select a client to view details'}
+            </p>
+          </div>
+        )}
+      </div>
+
+      <CreateClientModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onCreate={() => { fetchClients(); }}
+      />
     </div>
   );
 }
