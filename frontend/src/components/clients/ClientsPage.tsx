@@ -183,7 +183,6 @@ export default function ClientsPage() {
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           onSelect={setSelectedClient}
-          onAddClick={() => setIsAddModalOpen(true)}
         />
         {selectedClient ? (
           <ClientDetail client={selectedClient} />
@@ -203,7 +202,6 @@ export default function ClientsPage() {
         onClose={() => setIsAddModalOpen(false)}
         onCreate={() => {
           fetchClients();
-          setIsAddModalOpen(false);
         }}
       />
     </div>

@@ -15,7 +15,6 @@ interface ClientListProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
   onSelect: (client: Client) => void;
-  onAddClick: () => void;
 }
 
 export default function ClientList({
@@ -24,7 +23,6 @@ export default function ClientList({
   searchQuery,
   onSearchChange,
   onSelect,
-  onAddClick,
 }: ClientListProps) {
   const filtered = clients.filter((c) => {
     const q = searchQuery.toLowerCase();
@@ -61,17 +59,9 @@ export default function ClientList({
             className="w-full rounded-lg border border-gray-200 bg-gray-100 py-2 pl-9 pr-3 text-sm text-[#18181b] placeholder-gray-400 outline-none focus:border-blue-300 focus:ring-1 focus:ring-blue-300"
           />
         </div>
-        <div className="mt-2 flex items-center justify-between">
-          <p className="font-[family-name:var(--font-dm-mono)] text-xs text-gray-400">
-            {filtered.length} client{filtered.length !== 1 ? 's' : ''}
-          </p>
-          <button
-            onClick={onAddClick}
-            className="rounded-lg bg-blue-600 px-2.5 py-1 text-xs font-medium text-white transition-colors hover:bg-blue-700"
-          >
-            + Add
-          </button>
-        </div>
+        <p className="mt-2 font-[family-name:var(--font-dm-mono)] text-xs text-gray-400">
+          {filtered.length} client{filtered.length !== 1 ? 's' : ''}
+        </p>
       </div>
 
       {/* Client entries */}
