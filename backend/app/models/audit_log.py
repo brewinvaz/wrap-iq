@@ -41,7 +41,9 @@ class AuditLog(Base, TenantMixin, TimestampMixin):
     user_id: Mapped[uuid.UUID | None] = mapped_column(
         Uuid, ForeignKey("users.id"), index=True, nullable=True
     )
-    action: Mapped[ActionType] = mapped_column(Enum(ActionType), index=True)
+    action: Mapped[ActionType] = mapped_column(
+        Enum(ActionType, values_callable=lambda e: [m.value for m in e]), index=True
+    )
     resource_type: Mapped[str] = mapped_column(String(100), index=True)
     resource_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, nullable=True)
     details: Mapped[dict | None] = mapped_column(JSONB, nullable=True)

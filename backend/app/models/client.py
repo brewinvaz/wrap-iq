@@ -20,7 +20,8 @@ class Client(Base, TenantMixin, TimestampMixin):
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     client_type: Mapped[ClientType] = mapped_column(
-        Enum(ClientType), default=ClientType.PERSONAL
+        Enum(ClientType, values_callable=lambda e: [m.value for m in e]),
+        default=ClientType.PERSONAL,
     )
     email: Mapped[str | None] = mapped_column(String(255), nullable=True)
     phone: Mapped[str | None] = mapped_column(String(50), nullable=True)

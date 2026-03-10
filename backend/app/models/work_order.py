@@ -32,12 +32,18 @@ class WorkOrder(Base, TenantMixin, TimestampMixin):
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
     job_number: Mapped[str] = mapped_column(String(50), index=True)
-    job_type: Mapped[JobType] = mapped_column(Enum(JobType), default=JobType.PERSONAL)
+    job_type: Mapped[JobType] = mapped_column(
+        Enum(JobType, values_callable=lambda e: [m.value for m in e]),
+        default=JobType.PERSONAL,
+    )
     job_value: Mapped[int] = mapped_column(Integer, default=0)
     status_id: Mapped[uuid.UUID] = mapped_column(
         Uuid, ForeignKey("kanban_stages.id"), index=True
     )
-    priority: Mapped[Priority] = mapped_column(Enum(Priority), default=Priority.MEDIUM)
+    priority: Mapped[Priority] = mapped_column(
+        Enum(Priority, values_callable=lambda e: [m.value for m in e]),
+        default=Priority.MEDIUM,
+    )
     date_in: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     estimated_completion_date: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True

@@ -29,9 +29,12 @@ class MessageLog(Base, TenantMixin):
     )
     subject: Mapped[str] = mapped_column(String(500))
     body: Mapped[str] = mapped_column(Text)
-    channel: Mapped[ChannelType] = mapped_column(Enum(ChannelType))
+    channel: Mapped[ChannelType] = mapped_column(
+        Enum(ChannelType, values_callable=lambda e: [m.value for m in e])
+    )
     status: Mapped[MessageStatus] = mapped_column(
-        Enum(MessageStatus), default=MessageStatus.PENDING
+        Enum(MessageStatus, values_callable=lambda e: [m.value for m in e]),
+        default=MessageStatus.PENDING,
     )
     sent_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()

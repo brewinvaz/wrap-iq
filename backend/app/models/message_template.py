@@ -27,13 +27,15 @@ class MessageTemplate(Base, TenantMixin, TimestampMixin):
     subject: Mapped[str] = mapped_column(String(500))
     body: Mapped[str] = mapped_column(Text)
     trigger_type: Mapped[TriggerType] = mapped_column(
-        Enum(TriggerType), default=TriggerType.MANUAL
+        Enum(TriggerType, values_callable=lambda e: [m.value for m in e]),
+        default=TriggerType.MANUAL,
     )
     trigger_stage_id: Mapped[uuid.UUID | None] = mapped_column(
         Uuid, ForeignKey("kanban_stages.id"), nullable=True
     )
     channel: Mapped[ChannelType] = mapped_column(
-        Enum(ChannelType), default=ChannelType.EMAIL
+        Enum(ChannelType, values_callable=lambda e: [m.value for m in e]),
+        default=ChannelType.EMAIL,
     )
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 

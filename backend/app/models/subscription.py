@@ -39,7 +39,8 @@ class Subscription(Base, TimestampMixin):
     )
     plan_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("plans.id"), index=True)
     status: Mapped[SubscriptionStatus] = mapped_column(
-        Enum(SubscriptionStatus), default=SubscriptionStatus.ACTIVE
+        Enum(SubscriptionStatus, values_callable=lambda e: [m.value for m in e]),
+        default=SubscriptionStatus.ACTIVE,
     )
     current_period_start: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
@@ -62,7 +63,8 @@ class PaymentMethod(Base, TimestampMixin):
         Uuid, ForeignKey("organizations.id"), index=True
     )
     type: Mapped[PaymentMethodType] = mapped_column(
-        Enum(PaymentMethodType), default=PaymentMethodType.CARD
+        Enum(PaymentMethodType, values_callable=lambda e: [m.value for m in e]),
+        default=PaymentMethodType.CARD,
     )
     last_four: Mapped[str] = mapped_column(String(4))
     brand: Mapped[str] = mapped_column(String(50), default="")
