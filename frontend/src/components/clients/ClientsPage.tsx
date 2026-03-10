@@ -118,7 +118,7 @@ export default function ClientsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const fetchClients = useCallback(async () => {
     setLoading(true);
@@ -169,7 +169,7 @@ export default function ClientsPage() {
           </span>
         </div>
         <button
-          onClick={() => setShowCreateModal(true)}
+          onClick={() => setIsAddModalOpen(true)}
           className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
         >
           + New Client
@@ -183,6 +183,7 @@ export default function ClientsPage() {
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           onSelect={setSelectedClient}
+          onAddClick={() => setIsAddModalOpen(true)}
         />
         {selectedClient ? (
           <ClientDetail client={selectedClient} />
@@ -198,9 +199,12 @@ export default function ClientsPage() {
       </div>
 
       <CreateClientModal
-        isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        onCreate={() => { fetchClients(); }}
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onCreate={() => {
+          fetchClients();
+          setIsAddModalOpen(false);
+        }}
       />
     </div>
   );
