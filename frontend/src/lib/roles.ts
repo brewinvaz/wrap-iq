@@ -53,8 +53,8 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
         label: 'Business',
         items: [
           { icon: '💰', label: 'Financials', href: '/dashboard/financials' },
-          { icon: '⏱️', label: 'Time Tracking', href: '/dashboard/time-tracking' },
-          { icon: '👤', label: 'User Management', href: '/dashboard/users' },
+          { icon: '⏱️', label: 'Time Tracking', href: '/dashboard/time-logs' },
+          { icon: '👤', label: 'User Management', href: '/dashboard/team' },
           { icon: '💳', label: 'Billing & Settings', href: '/dashboard/settings/billing' },
           { icon: '🔌', label: 'Integrations', href: '/dashboard/integrations' },
         ],
@@ -114,7 +114,7 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
           { icon: '📋', label: 'My Jobs', href: '/dashboard', badge: 4 },
           { icon: '📅', label: 'My Schedule', href: '/dashboard/schedule' },
           { icon: '📸', label: 'Photos', href: '/dashboard/photos' },
-          { icon: '⏱️', label: 'Time Tracking', href: '/dashboard/time-tracking' },
+          { icon: '⏱️', label: 'Time Tracking', href: '/dashboard/time-logs' },
         ],
       },
       {
@@ -122,7 +122,7 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
         items: [
           { icon: '✅', label: 'Checklists', href: '/dashboard/checklists' },
           { icon: '📄', label: 'Proofs & Instructions', href: '/dashboard/proofs' },
-          { icon: '💬', label: 'Job Chat', href: '/dashboard/chat' },
+          { icon: '💬', label: 'Job Chat', href: '/dashboard/comms' },
         ],
       },
     ],
@@ -166,7 +166,7 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
           { icon: '🖨️', label: 'Print Queue', href: '/dashboard', badge: 3 },
           { icon: '⚙️', label: 'My Equipment', href: '/dashboard/equipment' },
           { icon: '📦', label: 'Materials', href: '/dashboard/materials' },
-          { icon: '⏱️', label: 'Time Log', href: '/dashboard/time-log' },
+          { icon: '⏱️', label: 'Time Log', href: '/dashboard/time-logs' },
         ],
       },
       {
