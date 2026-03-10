@@ -6,7 +6,7 @@ import PermissionsMatrix from '@/components/team/PermissionsMatrix';
 import InviteModal from '@/components/team/InviteModal';
 import { TeamMemberDetail, Permission } from '@/lib/types';
 import { api, ApiError } from '@/lib/api-client';
-import { permissionsMatrix } from '@/lib/mock-team-data';
+import { permissionsMatrix } from '@/lib/role-config';
 
 // --- API response types ---
 

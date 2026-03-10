@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { TeamMemberDetail } from '@/lib/types';
-import { roleLabels, roleColors } from '@/lib/mock-team-data';
+import { roleLabels, roleColors } from '@/lib/role-config';
 
 const allRoles = [
   'admin',

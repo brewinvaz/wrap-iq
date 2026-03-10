@@ -2,11 +2,10 @@
 
 import { useState, useCallback } from 'react';
 import { KanbanColumn as KanbanColumnType } from '@/lib/types';
-import { kanbanColumns as mockColumns } from '@/lib/mock-data';
 import KanbanColumn from './KanbanColumn';
 
 interface KanbanBoardProps {
-  /** If provided, uses these columns instead of mock data. */
+  /** Columns to display on the board. */
   columns?: KanbanColumnType[];
   /** Called after a card is moved to a new column (drag-drop or advance). */
   onStatusChange?: (cardId: string, targetColumnId: string) => void;
@@ -15,7 +14,7 @@ interface KanbanBoardProps {
 export default function KanbanBoard({ columns: externalColumns, onStatusChange }: KanbanBoardProps = {}) {
   const isControlled = externalColumns !== undefined;
 
-  const [internalColumns, setInternalColumns] = useState<KanbanColumnType[]>(mockColumns);
+  const [internalColumns, setInternalColumns] = useState<KanbanColumnType[]>([]);
 
   const columns = isControlled ? externalColumns : internalColumns;
 
