@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_current_user, get_session
 from app.config import settings
+from app.middleware.rate_limit import limiter
 from app.models.user import User
 from app.schemas.ai_assistant import QueryRequest, QueryResponse
 from app.services.ai_assistant import AIAssistantService
@@ -11,7 +12,9 @@ router = APIRouter(prefix="/api/ai", tags=["ai-assistant"])
 
 
 @router.post("/query", response_model=QueryResponse)
+@limiter.limit("10/minute")
 async def query_assistant(
+    request: Request,
     data: QueryRequest,
     session: AsyncSession = Depends(get_session),
     user: User = Depends(get_current_user),

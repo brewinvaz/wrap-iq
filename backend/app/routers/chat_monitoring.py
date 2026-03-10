@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_current_user, get_session
 from app.config import settings
+from app.middleware.rate_limit import limiter
 from app.models.user import User
 from app.schemas.chat_monitoring import (
     ApplyUpdateRequest,
@@ -16,7 +17,9 @@ router = APIRouter(prefix="/api/ai/chat", tags=["chat-monitoring"])
 
 
 @router.post("/analyze", response_model=ChatAnalysisResponse)
+@limiter.limit("10/minute")
 async def analyze_chat_message(
+    request: Request,
     data: ChatMessage,
     session: AsyncSession = Depends(get_session),
     user: User = Depends(get_current_user),
@@ -38,7 +41,9 @@ async def analyze_chat_message(
 
 
 @router.post("/apply", response_model=ApplyUpdateResponse)
+@limiter.limit("10/minute")
 async def apply_chat_update(
+    request: Request,
     data: ApplyUpdateRequest,
     session: AsyncSession = Depends(get_session),
     user: User = Depends(get_current_user),

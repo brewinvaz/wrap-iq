@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_session
+from app.middleware.rate_limit import limiter
 from app.schemas.auth import (
     LoginRequest,
     MagicLinkRequest,
@@ -18,7 +19,12 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 
 @router.post("/register", response_model=TokenResponse)
-async def register(body: RegisterRequest, session: AsyncSession = Depends(get_session)):
+@limiter.limit("5/minute")
+async def register(
+    request: Request,
+    body: RegisterRequest,
+    session: AsyncSession = Depends(get_session),
+):
     service = AuthService(session)
     try:
         tokens = await service.register(
@@ -30,7 +36,12 @@ async def register(body: RegisterRequest, session: AsyncSession = Depends(get_se
 
 
 @router.post("/login", response_model=TokenResponse)
-async def login(body: LoginRequest, session: AsyncSession = Depends(get_session)):
+@limiter.limit("5/minute")
+async def login(
+    request: Request,
+    body: LoginRequest,
+    session: AsyncSession = Depends(get_session),
+):
     service = AuthService(session)
     try:
         tokens = await service.login(email=body.email, password=body.password)
@@ -43,8 +54,11 @@ async def login(body: LoginRequest, session: AsyncSession = Depends(get_session)
 
 
 @router.post("/magic-link/request", response_model=MessageResponse)
+@limiter.limit("5/minute")
 async def request_magic_link(
-    body: MagicLinkRequest, session: AsyncSession = Depends(get_session)
+    request: Request,
+    body: MagicLinkRequest,
+    session: AsyncSession = Depends(get_session),
 ):
     service = AuthService(session)
     token = await service.request_magic_link(email=body.email)
@@ -54,8 +68,11 @@ async def request_magic_link(
 
 
 @router.post("/magic-link/verify", response_model=TokenResponse)
+@limiter.limit("5/minute")
 async def verify_magic_link(
-    body: MagicLinkVerify, session: AsyncSession = Depends(get_session)
+    request: Request,
+    body: MagicLinkVerify,
+    session: AsyncSession = Depends(get_session),
 ):
     service = AuthService(session)
     try:
