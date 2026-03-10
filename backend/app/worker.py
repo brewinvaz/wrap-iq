@@ -11,8 +11,12 @@ async def shutdown(ctx: dict) -> None:
     pass
 
 
+async def ping(ctx: dict) -> str:
+    return "pong"
+
+
 class WorkerSettings:
-    functions: list = []
+    functions = [ping]
     on_startup = startup
     on_shutdown = shutdown
     redis_settings = RedisSettings.from_dsn(settings.redis_url)
