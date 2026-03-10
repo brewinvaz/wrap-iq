@@ -223,7 +223,7 @@ async def test_set_default_payment_method(client):
     token = await _register_user(client)
 
     # Add two payment methods
-    r1 = await client.post(
+    await client.post(
         "/api/subscriptions/payment-methods",
         json={"type": "card", "last_four": "1111", "brand": "Visa", "is_default": True},
         headers={"Authorization": f"Bearer {token}"},

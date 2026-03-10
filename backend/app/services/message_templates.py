@@ -1,3 +1,4 @@
+import logging
 import re
 import uuid
 
@@ -10,6 +11,8 @@ from app.models.message_log import MessageLog, MessageStatus
 from app.models.message_template import ChannelType, MessageTemplate
 from app.models.notification import NotificationType
 from app.services.notifications import NotificationService
+
+logger = logging.getLogger("wrapiq")
 
 
 class MessageTemplateService:
@@ -146,7 +149,8 @@ class MessageTemplateService:
 
     async def _send_email(self, to_email: str, subject: str, body: str) -> None:
         if not settings.resend_api_key:
-            print(f"\n[DEV] Email to {to_email}: {subject}\n{body}\n")
+            logger.warning("Resend not configured — email will not be sent")
+            logger.info("[DEV] Email to %s: %s\n%s", to_email, subject, body)
             return
 
         resend.api_key = settings.resend_api_key

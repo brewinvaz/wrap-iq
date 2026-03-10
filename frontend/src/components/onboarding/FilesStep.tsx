@@ -2,8 +2,9 @@
 
 import { useRef, useState } from 'react';
 import type { ProjectData, UploadedFile } from '@/app/onboarding/[token]/page';
+import { API_BASE_URL } from '@/lib/config';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
+const API_BASE = API_BASE_URL;
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB

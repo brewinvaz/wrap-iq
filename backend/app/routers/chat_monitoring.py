@@ -36,7 +36,11 @@ async def analyze_chat_message(
     except Exception as exc:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Chat monitoring error: {exc}",
+            detail=(
+                str(exc)
+                if settings.debug
+                else "An error occurred processing your request"
+            ),
         ) from exc
 
 
@@ -60,5 +64,9 @@ async def apply_chat_update(
     except Exception as exc:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Chat monitoring error: {exc}",
+            detail=(
+                str(exc)
+                if settings.debug
+                else "An error occurred processing your request"
+            ),
         ) from exc

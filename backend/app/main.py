@@ -5,8 +5,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
+from sqlalchemy import text
+from starlette.requests import Request
+from starlette.responses import JSONResponse
 
 from app.config import settings
+from app.db import async_session
 from app.middleware.rate_limit import limiter
 from app.routers.admin import router as admin_router
 from app.routers.ai_assistant import router as ai_assistant_router
@@ -78,6 +82,13 @@ app.add_middleware(
 )
 
 
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.exception("Unhandled exception on %s %s", request.method, request.url.path)
+    detail = str(exc) if settings.debug else "Internal server error"
+    return JSONResponse(status_code=500, content={"detail": detail})
+
+
 app.include_router(ai_assistant_router)
 app.include_router(api_keys_router)
 app.include_router(chat_monitoring_router)
@@ -107,4 +118,23 @@ app.include_router(work_orders_router)
 
 @app.get("/health")
 async def health():
-    return {"status": "ok"}
+    status = {"app": "ok", "db": "ok", "redis": "ok"}
+    try:
+        async with async_session() as session:
+            await session.execute(text("SELECT 1"))
+    except Exception:
+        status["db"] = "unavailable"
+    try:
+        import redis.asyncio as aioredis
+
+        r = aioredis.from_url(settings.redis_url)
+        await r.ping()
+        await r.aclose()
+    except Exception:
+        status["redis"] = "unavailable"
+
+    healthy = all(v == "ok" for v in status.values())
+    return JSONResponse(
+        status_code=200 if healthy else 503,
+        content={"status": "ok" if healthy else "degraded", "services": status},
+    )

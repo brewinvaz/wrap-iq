@@ -24,7 +24,7 @@ class Estimate(Base, TenantMixin, TimestampMixin):
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
     work_order_id: Mapped[uuid.UUID | None] = mapped_column(
-        Uuid, ForeignKey("work_orders.id"), nullable=True
+        Uuid, ForeignKey("work_orders.id"), nullable=True, index=True
     )
     client_email: Mapped[str] = mapped_column(String(255))
     client_name: Mapped[str] = mapped_column(String(255))
