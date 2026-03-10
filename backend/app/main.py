@@ -12,6 +12,7 @@ from app.routers.csv_upload import router as csv_upload_router
 from app.routers.kanban_stages import router as kanban_stages_router
 from app.routers.message_templates import router as message_templates_router
 from app.routers.notifications import router as notifications_router
+from app.routers.superadmin import router as superadmin_router
 from app.routers.users import router as users_router
 from app.routers.vehicles import router as vehicles_router
 from app.routers.vin import router as vin_router
@@ -48,6 +49,7 @@ app.include_router(csv_upload_router)
 app.include_router(kanban_stages_router)
 app.include_router(message_templates_router)
 app.include_router(notifications_router)
+app.include_router(superadmin_router)
 app.include_router(users_router)
 app.include_router(vehicles_router)
 app.include_router(vin_router)
