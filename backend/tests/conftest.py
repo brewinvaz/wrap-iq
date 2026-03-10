@@ -9,54 +9,62 @@ import app.models  # noqa: F401
 from app.config import settings
 from app.db import Base
 
+# All known tables that may have FK dependencies, in safe drop order
+_DROP_TABLES = [
+    "message_logs",
+    "message_templates",
+    "audit_logs",
+    "install_time_logs",
+    "notifications",
+    "magic_links",
+    "refresh_tokens",
+    "kanban_stages",
+    "users",
+    "organizations",
+    "plans",
+]
+
+# All known enum types
+_DROP_TYPES = [
+    "role",
+    "notificationtype",
+    "actiontype",
+    "systemstatus",
+    "vehicletype",
+    "jobtype",
+    "priority",
+    "wrapcoverage",
+    "roof_coverage_level",
+    "door_handle_coverage",
+    "windowcoverage",
+    "bumpercoverage",
+    "logtype",
+    "installlocation",
+    "installdifficulty",
+    "triggertype",
+    "channeltype",
+    "messagestatus",
+]
+
+
+async def _cleanup(conn):
+    for table in _DROP_TABLES:
+        await conn.execute(text(f"DROP TABLE IF EXISTS {table} CASCADE"))
+    for typ in _DROP_TYPES:
+        await conn.execute(text(f"DROP TYPE IF EXISTS {typ} CASCADE"))
+
 
 @pytest.fixture(autouse=True)
 async def setup_db():
     engine = create_async_engine(settings.test_database_url, echo=False)
     async with engine.begin() as conn:
-        # Drop any stale tables not tracked by Base.metadata
-        await conn.execute(text("DROP TABLE IF EXISTS message_logs CASCADE"))
-        await conn.execute(text("DROP TABLE IF EXISTS message_templates CASCADE"))
-        await conn.execute(text("DROP TABLE IF EXISTS audit_logs CASCADE"))
+        await _cleanup(conn)
         await conn.run_sync(Base.metadata.drop_all)
-        # Drop PostgreSQL enum types that are not removed by drop_all
-        await conn.execute(text("DROP TYPE IF EXISTS role CASCADE"))
-        await conn.execute(text("DROP TYPE IF EXISTS notificationtype CASCADE"))
-        await conn.execute(text("DROP TYPE IF EXISTS systemstatus CASCADE"))
-        await conn.execute(text("DROP TYPE IF EXISTS actiontype CASCADE"))
-        await conn.execute(text("DROP TYPE IF EXISTS vehicletype CASCADE"))
-        await conn.execute(text("DROP TYPE IF EXISTS jobtype CASCADE"))
-        await conn.execute(text("DROP TYPE IF EXISTS priority CASCADE"))
-        await conn.execute(text("DROP TYPE IF EXISTS wrapcoverage CASCADE"))
-        await conn.execute(text("DROP TYPE IF EXISTS roof_coverage_level CASCADE"))
-        await conn.execute(text("DROP TYPE IF EXISTS door_handle_coverage CASCADE"))
-        await conn.execute(text("DROP TYPE IF EXISTS windowcoverage CASCADE"))
-        await conn.execute(text("DROP TYPE IF EXISTS bumpercoverage CASCADE"))
-        await conn.execute(text("DROP TYPE IF EXISTS logtype CASCADE"))
-        await conn.execute(text("DROP TYPE IF EXISTS installlocation CASCADE"))
-        await conn.execute(text("DROP TYPE IF EXISTS installdifficulty CASCADE"))
         await conn.run_sync(Base.metadata.create_all)
     yield engine
     async with engine.begin() as conn:
-        await conn.execute(text("DROP TABLE IF EXISTS message_logs CASCADE"))
-        await conn.execute(text("DROP TABLE IF EXISTS message_templates CASCADE"))
-        await conn.execute(text("DROP TABLE IF EXISTS audit_logs CASCADE"))
+        await _cleanup(conn)
         await conn.run_sync(Base.metadata.drop_all)
-        await conn.execute(text("DROP TYPE IF EXISTS role CASCADE"))
-        await conn.execute(text("DROP TYPE IF EXISTS notificationtype CASCADE"))
-        await conn.execute(text("DROP TYPE IF EXISTS systemstatus CASCADE"))
-        await conn.execute(text("DROP TYPE IF EXISTS actiontype CASCADE"))
-        await conn.execute(text("DROP TYPE IF EXISTS vehicletype CASCADE"))
-        await conn.execute(text("DROP TYPE IF EXISTS jobtype CASCADE"))
-        await conn.execute(text("DROP TYPE IF EXISTS priority CASCADE"))
-        await conn.execute(text("DROP TYPE IF EXISTS wrapcoverage CASCADE"))
-        await conn.execute(text("DROP TYPE IF EXISTS roof_coverage_level CASCADE"))
-        await conn.execute(text("DROP TYPE IF EXISTS door_handle_coverage CASCADE"))
-        await conn.execute(text("DROP TYPE IF EXISTS windowcoverage CASCADE"))
-        await conn.execute(text("DROP TYPE IF EXISTS bumpercoverage CASCADE"))
-        await conn.execute(text("DROP TYPE IF EXISTS logtype CASCADE"))
-        await conn.execute(text("DROP TYPE IF EXISTS installlocation CASCADE"))
-        await conn.execute(text("DROP TYPE IF EXISTS installdifficulty CASCADE"))
     await engine.dispose()
 
 
