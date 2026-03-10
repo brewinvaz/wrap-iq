@@ -56,8 +56,34 @@ class ClientService:
         parent_id: uuid.UUID | None = None,
         skip: int = 0,
         limit: int = 50,
-    ) -> tuple[list[Client], int]:
-        query = select(Client).where(Client.organization_id == org_id)
+    ) -> tuple[list[dict], int]:
+        # Subqueries for project_count and total_revenue per client
+        project_count_sq = (
+            select(
+                WorkOrder.client_id,
+                func.count(WorkOrder.id).label("project_count"),
+                func.coalesce(func.sum(WorkOrder.job_value), 0).label(
+                    "total_revenue"
+                ),
+            )
+            .where(WorkOrder.organization_id == org_id)
+            .group_by(WorkOrder.client_id)
+            .subquery()
+        )
+
+        query = (
+            select(
+                Client,
+                func.coalesce(project_count_sq.c.project_count, 0).label(
+                    "project_count"
+                ),
+                func.coalesce(project_count_sq.c.total_revenue, 0).label(
+                    "total_revenue"
+                ),
+            )
+            .outerjoin(project_count_sq, Client.id == project_count_sq.c.client_id)
+            .where(Client.organization_id == org_id)
+        )
         count_query = select(func.count(Client.id)).where(
             Client.organization_id == org_id
         )
@@ -75,7 +101,20 @@ class ClientService:
 
         query = query.order_by(Client.created_at.desc()).offset(skip).limit(limit)
         result = await self.session.execute(query)
-        return list(result.scalars().all()), total
+        rows = result.all()
+
+        items = []
+        for row in rows:
+            client = row[0]
+            items.append(
+                {
+                    "client": client,
+                    "project_count": row.project_count,
+                    "total_revenue": row.total_revenue,
+                }
+            )
+
+        return items, total
 
     async def update(
         self, client_id: uuid.UUID, org_id: uuid.UUID, data: ClientUpdate

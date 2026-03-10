@@ -25,20 +25,19 @@ interface ApiClientResponse {
   updated_at: string;
 }
 
-interface ApiClientListResponse {
-  items: ApiClientResponse[];
-  total: number;
-}
-
-interface ApiClientDetailResponse extends ApiClientResponse {
-  sub_clients: ApiClientResponse[];
+interface ApiClientListItemResponse extends ApiClientResponse {
   project_count: number;
   total_revenue: number;
 }
 
+interface ApiClientListResponse {
+  items: ApiClientListItemResponse[];
+  total: number;
+}
+
 // --- Transform API response to UI Client type ---
 
-function transformApiClient(apiClient: ApiClientResponse, detail?: ApiClientDetailResponse): Client {
+function transformApiClient(apiClient: ApiClientListItemResponse): Client {
   return {
     id: apiClient.id,
     name: apiClient.name,
@@ -51,8 +50,8 @@ function transformApiClient(apiClient: ApiClientResponse, detail?: ApiClientDeta
     notes: apiClient.notes ?? undefined,
     vehicles: [],
     projects: [],
-    projectCount: detail?.project_count ?? 0,
-    totalSpent: detail?.total_revenue ?? 0,
+    projectCount: apiClient.project_count ?? 0,
+    totalSpent: apiClient.total_revenue ?? 0,
     joinedDate: apiClient.created_at.split('T')[0],
   };
 }
@@ -127,21 +126,9 @@ export default function ClientsPage() {
       const response = await api.get<ApiClientListResponse>('/api/clients?limit=100');
       const transformed = response.items.map((item) => transformApiClient(item));
 
-      // Fetch detail for each client to get project_count and total_revenue
-      const detailedClients = await Promise.all(
-        transformed.map(async (client, index) => {
-          try {
-            const detail = await api.get<ApiClientDetailResponse>(`/api/clients/${response.items[index].id}`);
-            return transformApiClient(response.items[index], detail);
-          } catch {
-            return client;
-          }
-        }),
-      );
-
-      setClients(detailedClients);
-      if (detailedClients.length > 0) {
-        setSelectedClient(detailedClients[0]);
+      setClients(transformed);
+      if (transformed.length > 0) {
+        setSelectedClient(transformed[0]);
       }
     } catch (err) {
       const message = err instanceof ApiError ? err.message : 'An unexpected error occurred';
