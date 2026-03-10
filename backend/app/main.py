@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.routers.admin import router as admin_router
+from app.routers.audit_logs import router as audit_logs_router
 from app.routers.auth import router as auth_router
 from app.routers.users import router as users_router
 
@@ -32,6 +33,7 @@ app.add_middleware(
 
 
 app.include_router(admin_router)
+app.include_router(audit_logs_router)
 app.include_router(auth_router)
 app.include_router(users_router)
 
