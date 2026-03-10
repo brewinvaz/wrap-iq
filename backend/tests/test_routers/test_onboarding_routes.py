@@ -112,6 +112,9 @@ async def test_validate_invite_already_used(client, seed_data, db_session):
 
 
 @patch(
+    "app.routers.onboarding.settings",
+)
+@patch(
     "app.routers.onboarding.generate_upload_url",
     return_value="https://r2.example.com/signed",
 )
@@ -119,7 +122,8 @@ async def test_validate_invite_already_used(client, seed_data, db_session):
     "app.routers.onboarding.generate_object_key",
     return_value="org/onboarding/abc_photo.jpg",
 )
-async def test_get_upload_url(mock_key, mock_url, client, seed_data):
+async def test_get_upload_url(mock_key, mock_url, mock_settings, client, seed_data):
+    mock_settings.r2_account_id = "fake-account-id"
     token = seed_data["token"]
     resp = await client.post(
         f"/api/portal/onboarding/{token}/upload-url",
