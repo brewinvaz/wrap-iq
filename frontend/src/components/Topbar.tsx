@@ -1,6 +1,7 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { useSidebar } from '@/lib/sidebar-context';
 
 const ROUTE_TITLES: Record<string, string> = {
@@ -20,6 +21,18 @@ const ROUTE_TITLES: Record<string, string> = {
   '/dashboard/integrations': 'Integrations',
   '/dashboard/ai': 'Shop Intelligence',
   '/dashboard/3d': '3D Rendering',
+  '/dashboard/jobs': 'Jobs',
+  '/dashboard/schedule': 'Schedule',
+  '/dashboard/contracts': 'Contracts',
+  '/dashboard/proofs': 'Proofs',
+  '/dashboard/reports': 'Reports',
+  '/dashboard/photos': 'Photos',
+  '/dashboard/materials': 'Materials',
+  '/dashboard/equipment': 'Equipment',
+  '/dashboard/brand-files': 'Brand Files',
+  '/dashboard/briefs': 'Briefs',
+  '/dashboard/checklists': 'Checklists',
+  '/dashboard/projects': 'Projects',
 };
 
 interface TopbarProps {
@@ -30,8 +43,17 @@ interface TopbarProps {
 
 export default function Topbar({ subtitle, actionLabel, onAction }: TopbarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const { toggleMobile } = useSidebar();
+  const [searchQuery, setSearchQuery] = useState('');
   const title = ROUTE_TITLES[pathname] ?? 'Dashboard';
+
+  function handleSearchSubmit(e: React.FormEvent | React.KeyboardEvent) {
+    e.preventDefault();
+    const trimmed = searchQuery.trim();
+    if (!trimmed) return;
+    router.push(`/dashboard/work-orders?q=${encodeURIComponent(trimmed)}`);
+  }
   return (
     <header className="flex h-[54px] shrink-0 items-center border-b border-[#e6e6eb] bg-white px-3 md:px-5">
       {/* Hamburger menu - mobile only */}
@@ -54,7 +76,7 @@ export default function Topbar({ subtitle, actionLabel, onAction }: TopbarProps)
       </div>
 
       {/* Center-right: Search (hidden on mobile) */}
-      <div className="relative hidden sm:block">
+      <form onSubmit={handleSearchSubmit} className="relative hidden sm:block">
         <svg
           className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#a8a8b4]"
           fill="none"
@@ -66,10 +88,12 @@ export default function Topbar({ subtitle, actionLabel, onAction }: TopbarProps)
         </svg>
         <input
           type="text"
-          placeholder="Search..."
+          placeholder="Search work orders..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
           className="h-8 w-[210px] rounded-lg border border-[#e6e6eb] bg-[#f4f4f6] pl-8 pr-3 text-[13px] text-[#18181b] placeholder-[#a8a8b4] outline-none transition-colors focus:border-blue-300 focus:bg-white"
         />
-      </div>
+      </form>
 
       {/* Right: Notifications + Action */}
       <div className="ml-3 flex items-center gap-2">
