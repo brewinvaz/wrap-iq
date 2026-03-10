@@ -1,19 +1,16 @@
 import json
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import anthropic
 import pytest
 
 from app.services.vehicle_detection import detect_vehicle_from_image
 
 
-def _mock_message(text: str):
-    """Build a mock Anthropic Message with the given text content."""
-    content_block = MagicMock()
-    content_block.text = text
-    message = MagicMock()
-    message.content = [content_block]
-    return message
+def _mock_response(text: str):
+    """Build a mock Gemini response with the given text content."""
+    response = MagicMock()
+    response.text = text
+    return response
 
 
 def _detection_json(**overrides):
@@ -36,16 +33,20 @@ def _detection_json(**overrides):
 @pytest.fixture(autouse=True)
 def _set_api_key():
     with patch("app.services.vehicle_detection.settings") as mock_settings:
-        mock_settings.anthropic_api_key = "test-key"
+        mock_settings.gemini_api_key = "test-key"
         yield mock_settings
 
 
 async def test_detect_vehicle_success(_set_api_key):
-    mock_client = AsyncMock()
-    mock_client.messages.create.return_value = _mock_message(_detection_json())
+    mock_aio_models = AsyncMock()
+    mock_aio_models.generate_content.return_value = _mock_response(
+        _detection_json()
+    )
+    mock_client = MagicMock()
+    mock_client.aio.models = mock_aio_models
 
     with patch(
-        "app.services.vehicle_detection.anthropic.AsyncAnthropic",
+        "app.services.vehicle_detection.genai.Client",
         return_value=mock_client,
     ):
         result = await detect_vehicle_from_image(b"fake-image", "image/jpeg")
@@ -61,8 +62,8 @@ async def test_detect_vehicle_success(_set_api_key):
 
 
 async def test_detect_vehicle_suv(_set_api_key):
-    mock_client = AsyncMock()
-    mock_client.messages.create.return_value = _mock_message(
+    mock_aio_models = AsyncMock()
+    mock_aio_models.generate_content.return_value = _mock_response(
         _detection_json(
             make="Ford",
             model="Explorer",
@@ -71,9 +72,11 @@ async def test_detect_vehicle_suv(_set_api_key):
             confidence=0.88,
         )
     )
+    mock_client = MagicMock()
+    mock_client.aio.models = mock_aio_models
 
     with patch(
-        "app.services.vehicle_detection.anthropic.AsyncAnthropic",
+        "app.services.vehicle_detection.genai.Client",
         return_value=mock_client,
     ):
         result = await detect_vehicle_from_image(b"fake-image", "image/png")
@@ -83,8 +86,8 @@ async def test_detect_vehicle_suv(_set_api_key):
 
 
 async def test_detect_vehicle_pickup(_set_api_key):
-    mock_client = AsyncMock()
-    mock_client.messages.create.return_value = _mock_message(
+    mock_aio_models = AsyncMock()
+    mock_aio_models.generate_content.return_value = _mock_response(
         _detection_json(
             make="Ford",
             model="F-150",
@@ -92,9 +95,11 @@ async def test_detect_vehicle_pickup(_set_api_key):
             confidence=0.85,
         )
     )
+    mock_client = MagicMock()
+    mock_client.aio.models = mock_aio_models
 
     with patch(
-        "app.services.vehicle_detection.anthropic.AsyncAnthropic",
+        "app.services.vehicle_detection.genai.Client",
         return_value=mock_client,
     ):
         result = await detect_vehicle_from_image(b"fake-image", "image/jpeg")
@@ -103,8 +108,8 @@ async def test_detect_vehicle_pickup(_set_api_key):
 
 
 async def test_detect_vehicle_van(_set_api_key):
-    mock_client = AsyncMock()
-    mock_client.messages.create.return_value = _mock_message(
+    mock_aio_models = AsyncMock()
+    mock_aio_models.generate_content.return_value = _mock_response(
         _detection_json(
             make="Mercedes-Benz",
             model="Sprinter",
@@ -112,9 +117,11 @@ async def test_detect_vehicle_van(_set_api_key):
             confidence=0.90,
         )
     )
+    mock_client = MagicMock()
+    mock_client.aio.models = mock_aio_models
 
     with patch(
-        "app.services.vehicle_detection.anthropic.AsyncAnthropic",
+        "app.services.vehicle_detection.genai.Client",
         return_value=mock_client,
     ):
         result = await detect_vehicle_from_image(b"fake-image", "image/webp")
@@ -123,31 +130,31 @@ async def test_detect_vehicle_van(_set_api_key):
 
 
 async def test_detect_vehicle_api_error(_set_api_key):
-    mock_client = AsyncMock()
-    mock_client.messages.create.side_effect = anthropic.APIError(
-        message="Internal Server Error",
-        request=MagicMock(),
-        body=None,
-    )
+    mock_aio_models = AsyncMock()
+    mock_aio_models.generate_content.side_effect = Exception("API Error")
+    mock_client = MagicMock()
+    mock_client.aio.models = mock_aio_models
 
     with (
         patch(
-            "app.services.vehicle_detection.anthropic.AsyncAnthropic",
+            "app.services.vehicle_detection.genai.Client",
             return_value=mock_client,
         ),
-        pytest.raises(anthropic.APIError),
+        pytest.raises(Exception, match="API Error"),
     ):
         await detect_vehicle_from_image(b"fake-image", "image/jpeg")
 
 
 async def test_detect_vehicle_invalid_json(_set_api_key):
-    mock_client = AsyncMock()
-    mock_client.messages.create.return_value = _mock_message(
+    mock_aio_models = AsyncMock()
+    mock_aio_models.generate_content.return_value = _mock_response(
         "I cannot parse this image properly"
     )
+    mock_client = MagicMock()
+    mock_client.aio.models = mock_aio_models
 
     with patch(
-        "app.services.vehicle_detection.anthropic.AsyncAnthropic",
+        "app.services.vehicle_detection.genai.Client",
         return_value=mock_client,
     ):
         result = await detect_vehicle_from_image(b"fake-image", "image/jpeg")
@@ -159,20 +166,22 @@ async def test_detect_vehicle_invalid_json(_set_api_key):
 
 async def test_detect_vehicle_empty_api_key():
     with patch("app.services.vehicle_detection.settings") as mock_settings:
-        mock_settings.anthropic_api_key = ""
+        mock_settings.gemini_api_key = ""
 
         with pytest.raises(RuntimeError, match="AI features are not configured"):
             await detect_vehicle_from_image(b"fake-image", "image/jpeg")
 
 
 async def test_detect_vehicle_unknown_vehicle_type(_set_api_key):
-    mock_client = AsyncMock()
-    mock_client.messages.create.return_value = _mock_message(
+    mock_aio_models = AsyncMock()
+    mock_aio_models.generate_content.return_value = _mock_response(
         _detection_json(vehicle_type="spaceship")
     )
+    mock_client = MagicMock()
+    mock_client.aio.models = mock_aio_models
 
     with patch(
-        "app.services.vehicle_detection.anthropic.AsyncAnthropic",
+        "app.services.vehicle_detection.genai.Client",
         return_value=mock_client,
     ):
         result = await detect_vehicle_from_image(b"fake-image", "image/jpeg")

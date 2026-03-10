@@ -1,8 +1,8 @@
-import base64
 import json
 import logging
 
-import anthropic
+from google import genai
+from google.genai import types
 
 from app.config import settings
 from app.schemas.vehicle_detection import (
@@ -43,54 +43,36 @@ async def detect_vehicle_from_image(
     image_data: bytes,
     content_type: str,
 ) -> VehicleDetectionResponse:
-    """Detect vehicle year/make/model from an image using Claude vision.
+    """Detect vehicle year/make/model from an image using Gemini vision.
 
     Raises:
         RuntimeError: If AI features are not configured (no API key).
-        anthropic.APIError: If the Anthropic API returns an error.
+        google.genai.errors.APIError: If the Gemini API returns an error.
     """
-    if not settings.anthropic_api_key:
-        msg = "AI features are not configured. Set ANTHROPIC_API_KEY."
+    if not settings.gemini_api_key:
+        msg = "AI features are not configured. Set GEMINI_API_KEY."
         raise RuntimeError(msg)
 
-    base64_image = base64.b64encode(image_data).decode("utf-8")
+    client = genai.Client(api_key=settings.gemini_api_key)
 
-    client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
-
-    message = await client.messages.create(
-        model="claude-sonnet-4-20250514",
-        max_tokens=1024,
-        messages=[
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "image",
-                        "source": {
-                            "type": "base64",
-                            "media_type": content_type,
-                            "data": base64_image,
-                        },
-                    },
-                    {
-                        "type": "text",
-                        "text": DETECTION_PROMPT,
-                    },
-                ],
-            }
+    response = await client.aio.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=[
+            types.Part.from_bytes(data=image_data, mime_type=content_type),
+            DETECTION_PROMPT,
         ],
     )
 
-    raw_text = message.content[0].text
+    raw_text = response.text
     return _parse_response(raw_text)
 
 
 def _parse_response(raw_text: str) -> VehicleDetectionResponse:
-    """Parse the Claude JSON response into a VehicleDetectionResponse."""
+    """Parse the Gemini JSON response into a VehicleDetectionResponse."""
     try:
         data = json.loads(raw_text)
     except json.JSONDecodeError:
-        logger.warning("Failed to parse Claude response as JSON: %s", raw_text)
+        logger.warning("Failed to parse Gemini response as JSON: %s", raw_text)
         return VehicleDetectionResponse(confidence=0.0)
 
     # Sanitize vehicle_type
