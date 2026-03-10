@@ -53,7 +53,7 @@ async def test_decode_vin_success(client):
     assert data["year"] == 2023
     assert data["make"] == "Toyota"
     assert data["model"] == "Camry"
-    assert data["vehicle_type"] == "Car"
+    assert data["vehicle_type"] == "car"
 
 
 async def test_decode_vin_invalid_format(client):
@@ -131,6 +131,6 @@ async def test_decode_vin_pickup_with_truck_fields(client):
 
     assert resp.status_code == 200
     data = resp.json()
-    assert data["vehicle_type"] == "Pickup"
+    assert data["vehicle_type"] == "pickup"
     assert data["truck_cab_size"] == "Crew Cab"
     assert data["truck_bed_length"] == "67"

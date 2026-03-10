@@ -285,12 +285,7 @@ async def process_upload(
                     if not model and vin_info.model:
                         model = vin_info.model
                     if not vehicle_type:
-                        # Map schema VehicleType to model VehicleType
-                        vt_str = vin_info.vehicle_type.value.lower().replace(" ", "_")
-                        try:
-                            vehicle_type = VehicleType(vt_str)
-                        except ValueError:
-                            pass
+                        vehicle_type = VehicleType(vin_info.vehicle_type.value)
                 except Exception:
                     # VIN lookup failure is non-fatal
                     pass
