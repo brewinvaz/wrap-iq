@@ -45,7 +45,7 @@ async def test_seed_is_idempotent(db_session):
         id=uuid.uuid4(),
         organization_id=None,
         email=email,
-        password_hash=hash_password("pass"),
+        password_hash=hash_password("testpass123"),
         role=Role.ADMIN,
         is_superadmin=True,
     )
@@ -69,7 +69,7 @@ async def test_seed_upgrades_existing_user(db_session):
         id=uuid.uuid4(),
         organization_id=None,
         email=email,
-        password_hash=hash_password("pass"),
+        password_hash=hash_password("testpass123"),
         role=Role.ADMIN,
         is_superadmin=False,
     )

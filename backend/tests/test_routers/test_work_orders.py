@@ -2,7 +2,7 @@ async def _register_and_seed_stages(client, db_session):
     """Register a user, then seed kanban stages for their org."""
     resp = await client.post(
         "/api/auth/register",
-        json={"email": "admin@shop.com", "password": "pass", "org_name": "My Shop"},
+        json={"email": "admin@shop.com", "password": "testpass123", "org_name": "My Shop"},
     )
     token = resp.json()["access_token"]
 

@@ -12,7 +12,7 @@ async def _register_user(client, db_session, role: Role = Role.ADMIN):
     """Register a user and seed kanban stages, return token."""
     resp = await client.post(
         "/api/auth/register",
-        json={"email": "admin@shop.com", "password": "pass", "org_name": "My Shop"},
+        json={"email": "admin@shop.com", "password": "testpass123", "org_name": "My Shop"},
     )
     token = resp.json()["access_token"]
 
@@ -46,7 +46,7 @@ async def _register_non_admin(client, db_session, role: Role = Role.INSTALLER):
         "/api/auth/register",
         json={
             "email": "installer@shop.com",
-            "password": "pass",
+            "password": "testpass123",
             "org_name": "Installer Shop",
         },
     )
