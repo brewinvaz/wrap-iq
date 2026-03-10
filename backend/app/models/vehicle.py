@@ -39,7 +39,8 @@ class Vehicle(Base, TenantMixin, TimestampMixin):
     model: Mapped[str | None] = mapped_column(String(100), nullable=True)
     vehicle_unit_number: Mapped[str | None] = mapped_column(String(50), nullable=True)
     vehicle_type: Mapped[VehicleType | None] = mapped_column(
-        Enum(VehicleType), nullable=True
+        Enum(VehicleType, values_callable=lambda e: [m.value for m in e]),
+        nullable=True,
     )
     truck_cab_size: Mapped[str | None] = mapped_column(String(50), nullable=True)
     truck_bed_length: Mapped[str | None] = mapped_column(String(50), nullable=True)

@@ -34,7 +34,8 @@ class Invoice(Base, TenantMixin, TimestampMixin):
     client_email: Mapped[str] = mapped_column(String(255))
     client_name: Mapped[str] = mapped_column(String(255))
     status: Mapped[InvoiceStatus] = mapped_column(
-        Enum(InvoiceStatus), default=InvoiceStatus.DRAFT
+        Enum(InvoiceStatus, values_callable=lambda e: [m.value for m in e]),
+        default=InvoiceStatus.DRAFT,
     )
     subtotal: Mapped[int] = mapped_column(Integer, default=0)
     tax_rate: Mapped[Decimal] = mapped_column(Numeric(5, 4), default=Decimal("0"))

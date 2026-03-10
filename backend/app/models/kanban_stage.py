@@ -23,7 +23,8 @@ class KanbanStage(Base, TenantMixin, TimestampMixin):
     color: Mapped[str] = mapped_column(String(7), default="#64748b")
     position: Mapped[int] = mapped_column(Integer, default=0)
     system_status: Mapped[SystemStatus | None] = mapped_column(
-        Enum(SystemStatus), nullable=True
+        Enum(SystemStatus, values_callable=lambda e: [m.value for m in e]),
+        nullable=True,
     )
     is_default: Mapped[bool] = mapped_column(Boolean, default=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)

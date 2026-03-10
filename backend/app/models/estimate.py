@@ -30,7 +30,8 @@ class Estimate(Base, TenantMixin, TimestampMixin):
     client_name: Mapped[str] = mapped_column(String(255))
     estimate_number: Mapped[str] = mapped_column(String(50), index=True)
     status: Mapped[EstimateStatus] = mapped_column(
-        Enum(EstimateStatus), default=EstimateStatus.DRAFT
+        Enum(EstimateStatus, values_callable=lambda e: [m.value for m in e]),
+        default=EstimateStatus.DRAFT,
     )
     subtotal: Mapped[int] = mapped_column(Integer, default=0)
     tax_rate: Mapped[Decimal] = mapped_column(Numeric(5, 4), default=Decimal("0"))

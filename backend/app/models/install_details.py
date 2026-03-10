@@ -35,10 +35,12 @@ class InstallDetails(Base, TimestampMixin):
         Uuid, ForeignKey("work_orders.id"), unique=True, index=True
     )
     install_location: Mapped[InstallLocation | None] = mapped_column(
-        Enum(InstallLocation), nullable=True
+        Enum(InstallLocation, values_callable=lambda e: [m.value for m in e]),
+        nullable=True,
     )
     install_difficulty: Mapped[InstallDifficulty | None] = mapped_column(
-        Enum(InstallDifficulty), nullable=True
+        Enum(InstallDifficulty, values_callable=lambda e: [m.value for m in e]),
+        nullable=True,
     )
     install_start_date: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
@@ -61,7 +63,9 @@ class InstallTimeLog(Base, TimestampMixin):
         Uuid, ForeignKey("install_details.id"), index=True
     )
     user_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("users.id"), index=True)
-    log_type: Mapped[LogType] = mapped_column(Enum(LogType))
+    log_type: Mapped[LogType] = mapped_column(
+        Enum(LogType, values_callable=lambda e: [m.value for m in e])
+    )
     hours: Mapped[Decimal] = mapped_column(Numeric(6, 2))
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
 

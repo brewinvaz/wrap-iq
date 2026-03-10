@@ -47,19 +47,32 @@ class WrapDetails(Base, TimestampMixin):
         Uuid, ForeignKey("vehicles.id"), index=True
     )
     wrap_coverage: Mapped[WrapCoverage | None] = mapped_column(
-        Enum(WrapCoverage), nullable=True
+        Enum(WrapCoverage, values_callable=lambda e: [m.value for m in e]),
+        nullable=True,
     )
     roof_coverage: Mapped[CoverageLevel | None] = mapped_column(
-        Enum(CoverageLevel, name="roof_coverage_level"), nullable=True
+        Enum(
+            CoverageLevel,
+            name="roof_coverage_level",
+            values_callable=lambda e: [m.value for m in e],
+        ),
+        nullable=True,
     )
     door_handles: Mapped[CoverageLevel | None] = mapped_column(
-        Enum(CoverageLevel, name="door_handle_coverage"), nullable=True
+        Enum(
+            CoverageLevel,
+            name="door_handle_coverage",
+            values_callable=lambda e: [m.value for m in e],
+        ),
+        nullable=True,
     )
     window_coverage: Mapped[WindowCoverage | None] = mapped_column(
-        Enum(WindowCoverage), nullable=True
+        Enum(WindowCoverage, values_callable=lambda e: [m.value for m in e]),
+        nullable=True,
     )
     bumper_coverage: Mapped[BumperCoverage | None] = mapped_column(
-        Enum(BumperCoverage), nullable=True
+        Enum(BumperCoverage, values_callable=lambda e: [m.value for m in e]),
+        nullable=True,
     )
     misc_items: Mapped[list | None] = mapped_column(JSONB, nullable=True)
     special_wrap_instructions: Mapped[str | None] = mapped_column(Text, nullable=True)

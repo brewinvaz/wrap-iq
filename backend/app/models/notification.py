@@ -24,7 +24,8 @@ class Notification(Base, TenantMixin, TimestampMixin):
     title: Mapped[str] = mapped_column(String(255))
     message: Mapped[str] = mapped_column(Text)
     notification_type: Mapped[NotificationType] = mapped_column(
-        Enum(NotificationType), default=NotificationType.INFO
+        Enum(NotificationType, values_callable=lambda e: [m.value for m in e]),
+        default=NotificationType.INFO,
     )
     is_read: Mapped[bool] = mapped_column(Boolean, default=False)
     read_at: Mapped[datetime | None] = mapped_column(
