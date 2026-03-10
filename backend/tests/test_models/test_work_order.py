@@ -41,10 +41,10 @@ async def test_create_work_order(db_session):
         id=uuid.uuid4(),
         organization_id=org.id,
         job_number="WO-0001",
-        job_type=JobType.COMMERCIAL,
+        job_type=JobType.commercial,
         job_value=5000,
         status_id=stage.id,
-        priority=Priority.HIGH,
+        priority=Priority.high,
         date_in=datetime.now(UTC),
         internal_notes="Rush job",
     )
@@ -54,9 +54,9 @@ async def test_create_work_order(db_session):
     result = await db_session.execute(select(WorkOrder).where(WorkOrder.id == wo.id))
     saved = result.scalar_one()
     assert saved.job_number == "WO-0001"
-    assert saved.job_type == JobType.COMMERCIAL
+    assert saved.job_type == JobType.commercial
     assert saved.job_value == 5000
-    assert saved.priority == Priority.HIGH
+    assert saved.priority == Priority.high
     assert saved.internal_notes == "Rush job"
     assert saved.status_id == stage.id
     assert saved.created_at is not None

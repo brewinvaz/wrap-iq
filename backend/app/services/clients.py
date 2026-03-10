@@ -18,7 +18,7 @@ class ClientService:
             parent = await self.get(data.parent_id, org_id)
             if not parent:
                 raise ValueError("Parent client not found")
-            if parent.client_type != ClientType.BUSINESS:
+            if parent.client_type != ClientType.business:
                 raise ValueError("Parent client must be a business account")
             if parent.parent_id is not None:
                 raise ValueError("Sub-clients cannot have sub-clients")

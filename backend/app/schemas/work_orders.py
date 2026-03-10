@@ -8,9 +8,9 @@ from app.models.work_order import JobType, Priority
 
 
 class WorkOrderCreate(BaseModel):
-    job_type: JobType = JobType.PERSONAL
+    job_type: JobType = JobType.personal
     job_value: int = 0
-    priority: Priority = Priority.MEDIUM
+    priority: Priority = Priority.medium
     date_in: datetime
     estimated_completion_date: datetime | None = None
     internal_notes: str | None = None
