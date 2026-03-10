@@ -1,4 +1,11 @@
+import logging
+import sys
+
 from pydantic_settings import BaseSettings
+
+_DEV_SECRET_KEY = "dev-secret-key-change-in-production"
+
+logger = logging.getLogger("wrapiq")
 
 
 class Settings(BaseSettings):
@@ -7,9 +14,9 @@ class Settings(BaseSettings):
         "postgresql+asyncpg://postgres:postgres@localhost:5433/wrapiq_test"
     )
     redis_url: str = "redis://localhost:6379/0"
-    secret_key: str = "dev-secret-key-change-in-production"
+    secret_key: str = _DEV_SECRET_KEY
     cors_origins: str = "http://localhost:3000"
-    debug: bool = True
+    debug: bool = False
     frontend_url: str = "http://localhost:3000"
 
     # JWT
@@ -37,5 +44,20 @@ class Settings(BaseSettings):
 
     model_config = {"env_file": ".env", "extra": "ignore"}
 
+    def validate_production(self) -> None:
+        """Fail fast if production is misconfigured."""
+        if self.debug:
+            return
+        errors: list[str] = []
+        if self.secret_key == _DEV_SECRET_KEY:
+            errors.append("SECRET_KEY is still the dev default — set a strong secret")
+        if len(self.secret_key) < 32:
+            errors.append("SECRET_KEY must be at least 32 characters")
+        if errors:
+            for err in errors:
+                logger.critical("CONFIG ERROR: %s", err)
+            sys.exit(1)
+
 
 settings = Settings()
+settings.validate_production()
