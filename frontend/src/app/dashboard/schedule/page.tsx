@@ -44,6 +44,7 @@ const phaseColors: Record<ScheduleBlock['phase'], string> = {
 
 export default function SchedulePage() {
   const [weekOffset, setWeekOffset] = useState(0);
+  const weekLabel = weekOffset === 0 ? 'This Week' : weekOffset > 0 ? `+${weekOffset} week${weekOffset > 1 ? 's' : ''}` : `${weekOffset} week${weekOffset < -1 ? 's' : ''}`;
 
   return (
     <div className="flex h-full flex-col">
@@ -52,7 +53,7 @@ export default function SchedulePage() {
           <div className="flex items-center gap-3">
             <h1 className="text-xl font-bold text-[#18181b]">Schedule</h1>
             <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-[#60606a]">
-              Week of Mar 9
+              {weekLabel}
             </span>
           </div>
           <div className="flex items-center gap-2">
