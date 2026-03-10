@@ -1,90 +1,184 @@
 'use client';
 
-import { useState } from 'react';
-import { APIKey } from '@/lib/types';
+import { useState, useEffect, useCallback } from 'react';
+import { APIKey, APIKeyScope, APIKeyUsageStats } from '@/lib/types';
 import {
-  mockAPIKeys,
-  availableScopes,
-  mockUsageStats,
-} from '@/lib/mock/api-key-data';
+  fetchApiKeys,
+  fetchScopes,
+  createApiKey,
+  revokeApiKey,
+  rotateApiKey,
+  fetchApiKeyUsage,
+  ApiError,
+} from '@/lib/api/settings';
 import APIKeyList from '@/components/api-keys/APIKeyList';
 import CreateKeyModal from '@/components/api-keys/CreateKeyModal';
 import KeyRevealBanner from '@/components/api-keys/KeyRevealBanner';
 import UsageChart from '@/components/api-keys/UsageChart';
 
 export default function APIKeysPage() {
-  const [keys, setKeys] = useState<APIKey[]>(mockAPIKeys);
+  const [keys, setKeys] = useState<APIKey[]>([]);
+  const [scopes, setScopes] = useState<APIKeyScope[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+
   const [showCreate, setShowCreate] = useState(false);
   const [revealedKey, setRevealedKey] = useState<string | null>(null);
   const [selectedKey, setSelectedKey] = useState<APIKey | null>(null);
+  const [usageStats, setUsageStats] = useState<APIKeyUsageStats | null>(null);
 
-  function handleCreate(data: {
+  const loadKeys = useCallback(async () => {
+    try {
+      setError(null);
+      const [keysData, scopesData] = await Promise.all([
+        fetchApiKeys(),
+        fetchScopes(),
+      ]);
+      setKeys(keysData);
+      setScopes(scopesData);
+    } catch (err) {
+      const message =
+        err instanceof ApiError ? err.message : 'Failed to load API keys';
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadKeys();
+  }, [loadKeys]);
+
+  // Load usage stats when a key is selected
+  useEffect(() => {
+    if (!selectedKey) {
+      setUsageStats(null);
+      return;
+    }
+    let cancelled = false;
+    fetchApiKeyUsage(selectedKey.id)
+      .then((stats) => {
+        if (!cancelled) setUsageStats(stats);
+      })
+      .catch(() => {
+        if (!cancelled) setUsageStats(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedKey]);
+
+  async function handleCreate(data: {
     name: string;
     scopes: string[];
     rateLimitPerMinute: number;
     rateLimitPerDay: number;
   }) {
-    const fakeFullKey = `wiq_${Math.random().toString(36).slice(2)}${Math.random().toString(36).slice(2)}`;
-    const newKey: APIKey = {
-      id: crypto.randomUUID(),
-      name: data.name,
-      keyPrefix: fakeFullKey.slice(0, 8),
-      scopes: data.scopes,
-      rateLimitPerMinute: data.rateLimitPerMinute,
-      rateLimitPerDay: data.rateLimitPerDay,
-      isActive: true,
-      lastUsedAt: null,
-      expiresAt: null,
-      createdBy: '1',
-      createdAt: new Date().toISOString(),
-      revokedAt: null,
-      usageCount: 0,
-    };
-    setKeys((prev) => [newKey, ...prev]);
-    setRevealedKey(fakeFullKey);
-  }
-
-  function handleRevoke(id: string) {
-    setKeys((prev) =>
-      prev.map((k) =>
-        k.id === id
-          ? { ...k, isActive: false, revokedAt: new Date().toISOString() }
-          : k,
-      ),
-    );
-    if (selectedKey?.id === id) {
-      setSelectedKey(null);
+    try {
+      setActionError(null);
+      const { key, fullKey } = await createApiKey({
+        name: data.name,
+        scopes: data.scopes,
+        rateLimitPerMinute: data.rateLimitPerMinute,
+        rateLimitPerDay: data.rateLimitPerDay,
+        expiresAt: null,
+      });
+      setKeys((prev) => [key, ...prev]);
+      setRevealedKey(fullKey);
+      setShowCreate(false);
+    } catch (err) {
+      const message =
+        err instanceof ApiError ? err.message : 'Failed to create API key';
+      setActionError(message);
     }
   }
 
-  function handleRotate(id: string) {
-    const oldKey = keys.find((k) => k.id === id);
-    if (!oldKey) return;
-
-    const fakeFullKey = `wiq_${Math.random().toString(36).slice(2)}${Math.random().toString(36).slice(2)}`;
-    const rotatedKey: APIKey = {
-      ...oldKey,
-      id: crypto.randomUUID(),
-      keyPrefix: fakeFullKey.slice(0, 8),
-      createdAt: new Date().toISOString(),
-      lastUsedAt: null,
-      usageCount: 0,
-    };
-
-    setKeys((prev) =>
-      prev
-        .map((k) =>
+  async function handleRevoke(id: string) {
+    try {
+      setActionError(null);
+      await revokeApiKey(id);
+      setKeys((prev) =>
+        prev.map((k) =>
           k.id === id
             ? { ...k, isActive: false, revokedAt: new Date().toISOString() }
             : k,
-        )
-        .concat([rotatedKey]),
-    );
-    setRevealedKey(fakeFullKey);
-    setSelectedKey(rotatedKey);
+        ),
+      );
+      if (selectedKey?.id === id) {
+        setSelectedKey(null);
+      }
+    } catch (err) {
+      const message =
+        err instanceof ApiError ? err.message : 'Failed to revoke API key';
+      setActionError(message);
+    }
+  }
+
+  async function handleRotate(id: string) {
+    try {
+      setActionError(null);
+      const { key: newKey, fullKey } = await rotateApiKey(id);
+      setKeys((prev) =>
+        prev
+          .map((k) =>
+            k.id === id
+              ? { ...k, isActive: false, revokedAt: new Date().toISOString() }
+              : k,
+          )
+          .concat([newKey]),
+      );
+      setRevealedKey(fullKey);
+      setSelectedKey(newKey);
+    } catch (err) {
+      const message =
+        err instanceof ApiError ? err.message : 'Failed to rotate API key';
+      setActionError(message);
+    }
   }
 
   const activeCount = keys.filter((k) => k.isActive).length;
+
+  if (loading) {
+    return (
+      <div className="flex h-full flex-col">
+        <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+          <div className="flex items-center gap-3">
+            <h1 className="text-xl font-bold text-[#18181b]">API Keys</h1>
+          </div>
+        </header>
+        <div className="flex flex-1 items-center justify-center">
+          <div className="space-y-3 text-center">
+            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+            <p className="text-sm text-[#60606a]">Loading API keys...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex h-full flex-col">
+        <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+          <div className="flex items-center gap-3">
+            <h1 className="text-xl font-bold text-[#18181b]">API Keys</h1>
+          </div>
+        </header>
+        <div className="flex flex-1 items-center justify-center">
+          <div className="space-y-3 text-center">
+            <p className="text-sm text-red-600">{error}</p>
+            <button
+              onClick={loadKeys}
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-full flex-col">
@@ -106,6 +200,18 @@ export default function APIKeysPage() {
       </header>
 
       <div className="flex-1 space-y-6 overflow-auto p-6">
+        {actionError && (
+          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {actionError}
+            <button
+              onClick={() => setActionError(null)}
+              className="ml-2 font-medium underline"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
+
         {revealedKey && (
           <KeyRevealBanner
             fullKey={revealedKey}
@@ -205,7 +311,7 @@ export default function APIKeysPage() {
               </div>
             </div>
 
-            <UsageChart stats={mockUsageStats} />
+            {usageStats && <UsageChart stats={usageStats} />}
           </div>
         )}
       </div>
@@ -214,7 +320,7 @@ export default function APIKeysPage() {
         isOpen={showCreate}
         onClose={() => setShowCreate(false)}
         onCreate={handleCreate}
-        availableScopes={availableScopes}
+        availableScopes={scopes}
       />
     </div>
   );
