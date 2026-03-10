@@ -13,16 +13,15 @@ import asyncio
 import logging
 import os
 import secrets
-import uuid
 
-from sqlalchemy import select, text
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 # Import all models so Base.metadata is populated
 import app.models  # noqa: F401
 from app.auth.passwords import hash_password
 from app.config import settings
-from app.models.user import User
+from app.models.user import Role, User
 
 logger = logging.getLogger("wrapiq")
 
@@ -38,24 +37,31 @@ async def _ensure_superadmin(session, email: str, password: str) -> None:
     existing = result.scalar_one_or_none()
 
     if existing:
-        if existing.is_superadmin:
-            logger.info("Superadmin already exists: %s", email)
-        else:
+        changed = False
+        if not existing.is_superadmin:
             existing.is_superadmin = True
+            changed = True
+        # Update password if explicitly provided via env var
+        if os.environ.get("SUPERADMIN_PASSWORD"):
+            existing.password_hash = hash_password(password)
+            changed = True
+        if changed:
             await session.commit()
-            logger.info("Upgraded existing user to superadmin: %s", email)
+            logger.info("Updated superadmin: %s", email)
+        else:
+            logger.info("Superadmin already exists: %s", email)
         return
 
-    user_id = uuid.uuid4()
-    await session.execute(
-        text(
-            "INSERT INTO users (id, organization_id, email, password_hash, role, is_active, is_superadmin) "
-            "VALUES (:id, NULL, :email, :password_hash, 'admin', true, true)"
-        ),
-        {"id": user_id, "email": email, "password_hash": hash_password(password)},
+    user = User(
+        email=email,
+        password_hash=hash_password(password),
+        role=Role.ADMIN,
+        is_active=True,
+        is_superadmin=True,
     )
+    session.add(user)
     await session.commit()
-    logger.info("Created superadmin: %s (id=%s)", email, user_id)
+    logger.info("Created superadmin: %s (id=%s)", email, user.id)
 
 
 async def seed_superadmin() -> None:
