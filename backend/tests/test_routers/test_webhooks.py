@@ -111,6 +111,9 @@ async def test_list_webhooks_endpoint(client, seed_data):
     data = resp.json()
     assert data["total"] == 2
     assert len(data["items"]) == 2
+    # Secrets should be masked in list responses
+    for item in data["items"]:
+        assert item["secret"].startswith("****")
 
 
 async def test_get_webhook_endpoint(client, seed_data):
@@ -121,6 +124,8 @@ async def test_get_webhook_endpoint(client, seed_data):
     resp = await client.get(f"/api/webhooks/{webhook_id}", headers=headers)
     assert resp.status_code == 200
     assert resp.json()["name"] == "Test Webhook"
+    # Secret should be masked in GET responses
+    assert resp.json()["secret"].startswith("****")
 
 
 async def test_update_webhook_endpoint(client, seed_data):
@@ -137,6 +142,8 @@ async def test_update_webhook_endpoint(client, seed_data):
     data = resp.json()
     assert data["name"] == "Updated Webhook"
     assert data["is_active"] is False
+    # Secret should be masked in PATCH responses
+    assert data["secret"].startswith("****")
 
 
 async def test_delete_webhook_endpoint(client, seed_data):

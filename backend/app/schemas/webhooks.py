@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer
 
 
 class WebhookCreate(BaseModel):
@@ -32,6 +32,20 @@ class WebhookResponse(BaseModel):
     description: str | None = None
     created_at: datetime
     updated_at: datetime
+
+    @field_serializer("secret")
+    def mask_secret(self, value: str) -> str:
+        if len(value) <= 4:
+            return "****"
+        return "****" + value[-4:]
+
+
+class WebhookCreateResponse(WebhookResponse):
+    """Returned only at creation time and secret regeneration."""
+
+    @field_serializer("secret")
+    def show_full_secret(self, value: str) -> str:
+        return value
 
 
 class WebhookListResponse(BaseModel):
