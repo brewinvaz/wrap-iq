@@ -99,8 +99,9 @@ function computeKPIs(workOrders: WorkOrderResponse[], stages: KanbanStageRespons
   const totalValue = workOrders.reduce((sum, wo) => sum + wo.job_value, 0);
 
   const formatCurrency = (cents: number) => {
-    if (cents >= 100_000) return `$${(cents / 1000).toFixed(1)}k`;
-    return `$${cents.toLocaleString()}`;
+    const dollars = cents / 100;
+    if (dollars >= 1000) return `$${(dollars / 1000).toFixed(1)}k`;
+    return `$${dollars.toLocaleString()}`;
   };
 
   return [
