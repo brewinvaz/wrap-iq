@@ -214,6 +214,66 @@ export interface ProjectPhoto {
   caption?: string;
 }
 
+// --- Subscription & Billing ---
+
+export interface BillingPlan {
+  id: string;
+  name: string;
+  priceCents: number;
+  priceYearlyCents?: number;
+  maxSeats: number;
+  maxStorageGb: number;
+  features: string[];
+  isDefault: boolean;
+}
+
+export type SubscriptionStatusType =
+  | 'active'
+  | 'past_due'
+  | 'canceled'
+  | 'trialing';
+
+export interface BillingSubscription {
+  id: string;
+  planId: string;
+  planName: string;
+  status: SubscriptionStatusType;
+  currentPeriodStart: string;
+  currentPeriodEnd: string;
+  cancelAtPeriodEnd: boolean;
+  trialEnd?: string;
+}
+
+export interface BillingPaymentMethod {
+  id: string;
+  type: 'card' | 'bank';
+  lastFour: string;
+  brand: string;
+  expMonth: number;
+  expYear: number;
+  isDefault: boolean;
+}
+
+export type InvoiceStatusType = 'paid' | 'pending' | 'failed' | 'refunded';
+
+export interface BillingInvoice {
+  id: string;
+  amountCents: number;
+  status: InvoiceStatusType;
+  invoiceDate: string;
+  paidAt?: string;
+  description: string;
+  invoiceNumber: string;
+}
+
+export interface BillingUsageMetrics {
+  seatsUsed: number;
+  seatsLimit: number;
+  storageUsedGb: number;
+  storageLimitGb: number;
+  projectsCount: number;
+}
+
 export interface ProjectDetail extends ProjectCard {
   vehicleDetails: VehicleDetails;
   vehicleSummary: string;
