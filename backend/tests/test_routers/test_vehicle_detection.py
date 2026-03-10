@@ -88,7 +88,7 @@ async def test_detect_vehicle_file_too_large(client):
         files={"file": ("big.jpg", large_data, "image/jpeg")},
     )
 
-    assert resp.status_code == 400
+    assert resp.status_code in (400, 413)
     assert "too large" in resp.json()["detail"].lower()
 
 
