@@ -48,15 +48,18 @@ class Settings(BaseSettings):
         """Fail fast if production is misconfigured."""
         if self.debug:
             return
-        errors: list[str] = []
         if self.secret_key == _DEV_SECRET_KEY:
-            errors.append("SECRET_KEY is still the dev default — set a strong secret")
-        if len(self.secret_key) < 32:
-            errors.append("SECRET_KEY must be at least 32 characters")
-        if errors:
-            for err in errors:
-                logger.critical("CONFIG ERROR: %s", err)
+            logger.critical(
+                "CONFIG ERROR: SECRET_KEY is still the dev default — "
+                "set a strong secret for production"
+            )
             sys.exit(1)
+        if len(self.secret_key) < 32:
+            logger.warning(
+                "SECRET_KEY is only %d characters — "
+                "recommended minimum is 32 for production",
+                len(self.secret_key),
+            )
 
 
 settings = Settings()
