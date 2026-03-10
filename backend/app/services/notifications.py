@@ -29,6 +29,7 @@ class NotificationService:
         )
         self.session.add(notification)
         await self.session.commit()
+        await self.session.refresh(notification)
         return notification
 
     async def list_for_user(
@@ -78,6 +79,7 @@ class NotificationService:
         notification.is_read = True
         notification.read_at = datetime.now(UTC)
         await self.session.commit()
+        await self.session.refresh(notification)
         return notification
 
     async def mark_all_as_read(
