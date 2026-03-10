@@ -1,6 +1,6 @@
 import uuid
 
-from app.models.kanban_stage import KanbanStage, SystemStatus
+from app.models.kanban_stage import SystemStatus
 from app.models.organization import Organization
 from app.models.plan import Plan
 from app.services.kanban_stages import DEFAULT_STAGES, KanbanStageService
