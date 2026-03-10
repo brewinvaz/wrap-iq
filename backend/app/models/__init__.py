@@ -1,5 +1,6 @@
 from app.models.audit_log import ActionType, AuditLog
 from app.models.base import TenantMixin, TimestampMixin
+from app.models.kanban_stage import KanbanStage, SystemStatus
 from app.models.magic_link import MagicLink
 from app.models.notification import Notification, NotificationType
 from app.models.organization import Organization
@@ -10,6 +11,7 @@ from app.models.user import Role, User
 __all__ = [
     "ActionType",
     "AuditLog",
+    "KanbanStage",
     "MagicLink",
     "Notification",
     "NotificationType",
@@ -17,6 +19,7 @@ __all__ = [
     "Plan",
     "RefreshToken",
     "Role",
+    "SystemStatus",
     "TenantMixin",
     "TimestampMixin",
     "User",
