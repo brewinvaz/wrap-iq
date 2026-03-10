@@ -15,7 +15,14 @@ const dmMono = DM_Mono({
 
 export const metadata: Metadata = {
   title: "WrapIQ",
-  description: "WrapIQ — Vehicle Wrap Project Management",
+  description:
+    "WrapIQ is a shop management platform for vehicle wrap and paint protection film (PPF) businesses. Track projects, manage schedules, and streamline operations.",
+  openGraph: {
+    title: "WrapIQ",
+    description:
+      "Shop management platform for vehicle wrap and PPF businesses. Track projects, manage schedules, and streamline operations.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({

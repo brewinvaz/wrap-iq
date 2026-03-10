@@ -79,7 +79,37 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type", "Accept"],
+    max_age=600,
 )
+
+
+# ---------------------------------------------------------------------------
+# Middleware: reject request bodies larger than 10 MB (413 Payload Too Large)
+# ---------------------------------------------------------------------------
+MAX_BODY_SIZE = 10 * 1024 * 1024  # 10 MB
+
+
+@app.middleware("http")
+async def limit_upload_size(request: Request, call_next):
+    content_length = request.headers.get("content-length")
+    if content_length and int(content_length) > MAX_BODY_SIZE:
+        return JSONResponse(
+            status_code=413,
+            content={"detail": "Request body too large. Maximum size is 10 MB."},
+        )
+    return await call_next(request)
+
+
+@app.middleware("http")
+async def security_headers_middleware(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = (
+        "camera=(), microphone=(), geolocation=()"
+    )
+    return response
 
 
 @app.exception_handler(Exception)
