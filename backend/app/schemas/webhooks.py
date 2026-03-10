@@ -20,6 +20,12 @@ class WebhookUpdate(BaseModel):
     is_active: bool | None = None
 
 
+def _mask_secret(value: str) -> str:
+    if len(value) <= 4:
+        return "****"
+    return "****" + value[-4:]
+
+
 class WebhookResponse(BaseModel):
     model_config = {"from_attributes": True}
 
@@ -35,17 +41,22 @@ class WebhookResponse(BaseModel):
 
     @field_serializer("secret")
     def mask_secret(self, value: str) -> str:
-        if len(value) <= 4:
-            return "****"
-        return "****" + value[-4:]
+        return _mask_secret(value)
 
 
-class WebhookCreateResponse(WebhookResponse):
-    """Returned only at creation time and secret regeneration."""
+class WebhookCreateResponse(BaseModel):
+    """Returned only at creation time and secret regeneration — shows full secret."""
+    model_config = {"from_attributes": True}
 
-    @field_serializer("secret")
-    def show_full_secret(self, value: str) -> str:
-        return value
+    id: uuid.UUID
+    name: str
+    url: str
+    secret: str
+    events: list[str]
+    is_active: bool
+    description: str | None = None
+    created_at: datetime
+    updated_at: datetime
 
 
 class WebhookListResponse(BaseModel):
