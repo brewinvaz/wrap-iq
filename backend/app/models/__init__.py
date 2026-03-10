@@ -4,9 +4,9 @@ from app.models.base import TenantMixin, TimestampMixin
 from app.models.client import Client, ClientType
 from app.models.client_invite import ClientInvite
 from app.models.design_details import DesignDetails
-from app.models.file_upload import FileUpload
 from app.models.estimate import Estimate, EstimateStatus
 from app.models.estimate_line_item import EstimateLineItem
+from app.models.file_upload import FileUpload
 from app.models.install_details import (
     InstallDetails,
     InstallDifficulty,
