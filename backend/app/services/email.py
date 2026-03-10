@@ -16,18 +16,21 @@ async def send_magic_link_email(to_email: str, token: str) -> None:
         return
 
     resend.api_key = settings.resend_api_key
-    resend.Emails.send(
-        {
-            "from": settings.email_from,
-            "to": [to_email],
-            "subject": "Your WrapFlow login link",
-            "html": (
-                f"<p>Click the link below to log in:</p>"
-                f'<p><a href="{magic_url}">Log in to WrapFlow</a></p>'
-                f"<p>This link expires in 15 minutes.</p>"
-            ),
-        }
-    )
+    try:
+        resend.Emails.send(
+            {
+                "from": settings.email_from,
+                "to": [to_email],
+                "subject": "Your WrapFlow login link",
+                "html": (
+                    f"<p>Click the link below to log in:</p>"
+                    f'<p><a href="{magic_url}">Log in to WrapFlow</a></p>'
+                    f"<p>This link expires in 15 minutes.</p>"
+                ),
+            }
+        )
+    except Exception:
+        logger.exception("Failed to send email to %s", to_email)
 
 
 async def send_onboarding_invite_email(
@@ -41,16 +44,19 @@ async def send_onboarding_invite_email(
         return
 
     resend.api_key = settings.resend_api_key
-    resend.Emails.send(
-        {
-            "from": settings.email_from,
-            "to": [to_email],
-            "subject": f"{org_name} - Start Your Project",
-            "html": (
-                f"<p>{org_name} has invited you to start a project.</p>"
-                f"<p>Please fill out the onboarding form to get started:</p>"
-                f'<p><a href="{onboarding_url}">Start Onboarding</a></p>'
-                f"<p>This link expires in 7 days.</p>"
-            ),
-        }
-    )
+    try:
+        resend.Emails.send(
+            {
+                "from": settings.email_from,
+                "to": [to_email],
+                "subject": f"{org_name} - Start Your Project",
+                "html": (
+                    f"<p>{org_name} has invited you to start a project.</p>"
+                    f"<p>Please fill out the onboarding form to get started:</p>"
+                    f'<p><a href="{onboarding_url}">Start Onboarding</a></p>'
+                    f"<p>This link expires in 7 days.</p>"
+                ),
+            }
+        )
+    except Exception:
+        logger.exception("Failed to send email to %s", to_email)
