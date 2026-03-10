@@ -94,7 +94,10 @@ export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): 
   });
 
   // Handle 401 — attempt token refresh then retry once
-  if (res.status === 401) {
+  // Skip refresh/redirect for the login endpoint so the error propagates
+  // to the caller (e.g. the login form's catch block).
+  const isLoginRequest = path.includes('/api/auth/login');
+  if (res.status === 401 && !isLoginRequest) {
     const refreshed = await tryRefresh();
 
     if (refreshed) {
