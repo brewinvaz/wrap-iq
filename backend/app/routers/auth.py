@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import Response
@@ -15,6 +17,8 @@ from app.schemas.auth import (
 )
 from app.services.auth import AuthService
 from app.services.email import send_magic_link_email
+
+logger = logging.getLogger("wrapiq")
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -34,6 +38,11 @@ async def register(
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
+    except Exception as e:
+        logger.exception("Failed to register user")
+        raise HTTPException(
+            status_code=500, detail="An unexpected error occurred"
+        ) from e
     return tokens
 
 

@@ -1,3 +1,4 @@
+import logging
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -16,6 +17,8 @@ from app.schemas.invoices import (
     PaymentResponse,
 )
 from app.services.invoices import InvoiceService
+
+logger = logging.getLogger("wrapiq")
 
 router = APIRouter(prefix="/api/invoices", tags=["invoices"])
 
@@ -109,6 +112,11 @@ async def record_payment(
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.exception("Failed to record payment for invoice %s", invoice_id)
+        raise HTTPException(
+            status_code=500, detail="An unexpected error occurred"
+        ) from e
     if not payment:
         raise HTTPException(status_code=404, detail="Invoice not found")
     return payment

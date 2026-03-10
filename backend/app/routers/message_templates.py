@@ -1,3 +1,4 @@
+import logging
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -16,6 +17,8 @@ from app.schemas.message_templates import (
     SendMessageRequest,
 )
 from app.services.message_templates import MessageTemplateService
+
+logger = logging.getLogger("wrapiq")
 
 router = APIRouter(prefix="/api/message-templates", tags=["message-templates"])
 
@@ -65,6 +68,11 @@ async def get_template(
         template = await service.get(template_id, user.organization_id)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except Exception as e:
+        logger.exception("Failed to get template %s", template_id)
+        raise HTTPException(
+            status_code=500, detail="An unexpected error occurred"
+        ) from e
     return template
 
 
@@ -84,6 +92,11 @@ async def update_template(
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except Exception as e:
+        logger.exception("Failed to update template %s", template_id)
+        raise HTTPException(
+            status_code=500, detail="An unexpected error occurred"
+        ) from e
     return template
 
 
@@ -98,6 +111,11 @@ async def delete_template(
         await service.delete(template_id, user.organization_id)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except Exception as e:
+        logger.exception("Failed to delete template %s", template_id)
+        raise HTTPException(
+            status_code=500, detail="An unexpected error occurred"
+        ) from e
     return MessageResponse(message="Template deleted")
 
 
@@ -119,6 +137,11 @@ async def send_message(
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except Exception as e:
+        logger.exception("Failed to send message for template %s", template_id)
+        raise HTTPException(
+            status_code=500, detail="An unexpected error occurred"
+        ) from e
     return log
 
 
@@ -133,6 +156,11 @@ async def preview_template(
         template = await service.get(template_id, user.organization_id)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except Exception as e:
+        logger.exception("Failed to preview template %s", template_id)
+        raise HTTPException(
+            status_code=500, detail="An unexpected error occurred"
+        ) from e
 
     sample_variables = {
         "client_name": "John Doe",

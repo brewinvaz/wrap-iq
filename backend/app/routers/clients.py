@@ -1,3 +1,4 @@
+import logging
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -15,6 +16,8 @@ from app.schemas.clients import (
 )
 from app.services.clients import ClientService
 
+logger = logging.getLogger("wrapiq")
+
 router = APIRouter(prefix="/api/clients", tags=["clients"])
 
 
@@ -29,6 +32,11 @@ async def create_client(
         client = await service.create(user.organization_id, data)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
+    except Exception as e:
+        logger.exception("Failed to create client")
+        raise HTTPException(
+            status_code=500, detail="An unexpected error occurred"
+        ) from e
     return client
 
 
@@ -95,6 +103,11 @@ async def update_client(
         client = await service.update(client_id, user.organization_id, data)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e)) from e
+    except Exception as e:
+        logger.exception("Failed to update client %s", client_id)
+        raise HTTPException(
+            status_code=500, detail="An unexpected error occurred"
+        ) from e
     return client
 
 
@@ -114,6 +127,11 @@ async def create_sub_client(
         client = await service.add_sub_client(client_id, user.organization_id, data)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
+    except Exception as e:
+        logger.exception("Failed to create sub-client for %s", client_id)
+        raise HTTPException(
+            status_code=500, detail="An unexpected error occurred"
+        ) from e
     return client
 
 
@@ -128,4 +146,9 @@ async def get_aggregate_report(
         report = await service.get_aggregate_report(client_id, user.organization_id)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e)) from e
+    except Exception as e:
+        logger.exception("Failed to get aggregate report for client %s", client_id)
+        raise HTTPException(
+            status_code=500, detail="An unexpected error occurred"
+        ) from e
     return report

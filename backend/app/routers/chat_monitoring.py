@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import Response
@@ -13,6 +15,8 @@ from app.schemas.chat_monitoring import (
     ChatMessage,
 )
 from app.services.chat_monitoring import ChatMonitoringService
+
+logger = logging.getLogger("wrapiq")
 
 router = APIRouter(prefix="/api/ai/chat", tags=["chat-monitoring"])
 
@@ -36,13 +40,10 @@ async def analyze_chat_message(
         service = ChatMonitoringService()
         return await service.analyze_message(data, user, session)
     except Exception as exc:
+        logger.exception("Chat monitoring request failed")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=(
-                str(exc)
-                if settings.debug
-                else "An error occurred processing your request"
-            ),
+            detail="An error occurred processing your request",
         ) from exc
 
 
@@ -65,11 +66,8 @@ async def apply_chat_update(
         service = ChatMonitoringService()
         return await service.apply_update(data, user, session)
     except Exception as exc:
+        logger.exception("Chat monitoring request failed")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=(
-                str(exc)
-                if settings.debug
-                else "An error occurred processing your request"
-            ),
+            detail="An error occurred processing your request",
         ) from exc

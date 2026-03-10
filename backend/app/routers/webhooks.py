@@ -1,3 +1,4 @@
+import logging
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
@@ -17,6 +18,8 @@ from app.schemas.webhooks import (
 )
 from app.services.webhooks import WebhookService
 
+logger = logging.getLogger("wrapiq")
+
 router = APIRouter(prefix="/api/webhooks", tags=["webhooks"])
 
 
@@ -31,6 +34,11 @@ async def create_webhook(
         webhook = await service.create(admin.organization_id, data)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
+    except Exception as e:
+        logger.exception("Failed to create webhook")
+        raise HTTPException(
+            status_code=500, detail="An unexpected error occurred"
+        ) from e
     return webhook
 
 
@@ -74,6 +82,11 @@ async def update_webhook(
         webhook = await service.update(webhook_id, admin.organization_id, data)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e)) from e
+    except Exception as e:
+        logger.exception("Failed to update webhook %s", webhook_id)
+        raise HTTPException(
+            status_code=500, detail="An unexpected error occurred"
+        ) from e
     return webhook
 
 
@@ -88,6 +101,11 @@ async def delete_webhook(
         await service.delete(webhook_id, admin.organization_id)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e)) from e
+    except Exception as e:
+        logger.exception("Failed to delete webhook %s", webhook_id)
+        raise HTTPException(
+            status_code=500, detail="An unexpected error occurred"
+        ) from e
 
 
 @router.post("/{webhook_id}/regenerate-secret", response_model=WebhookResponse)
@@ -101,6 +119,11 @@ async def regenerate_secret(
         webhook = await service.regenerate_secret(webhook_id, admin.organization_id)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e)) from e
+    except Exception as e:
+        logger.exception("Failed to regenerate secret for webhook %s", webhook_id)
+        raise HTTPException(
+            status_code=500, detail="An unexpected error occurred"
+        ) from e
     return webhook
 
 
@@ -119,6 +142,11 @@ async def get_deliveries(
         )
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e)) from e
+    except Exception as e:
+        logger.exception("Failed to get deliveries for webhook %s", webhook_id)
+        raise HTTPException(
+            status_code=500, detail="An unexpected error occurred"
+        ) from e
     return WebhookDeliveryListResponse(
         items=[WebhookDeliveryResponse.model_validate(d) for d in items],
         total=total,
@@ -136,6 +164,11 @@ async def test_webhook(
         delivery = await service.test_webhook(webhook_id, admin.organization_id)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e)) from e
+    except Exception as e:
+        logger.exception("Failed to test webhook %s", webhook_id)
+        raise HTTPException(
+            status_code=500, detail="An unexpected error occurred"
+        ) from e
     return delivery
 
 
