@@ -82,11 +82,13 @@ async def test_multiple_audit_logs_ordered(db_session):
     db_session.add(org)
     await db_session.flush()
 
-    for i, action in enumerate([
-        ActionType.USER_CREATED,
-        ActionType.PROJECT_UPDATED,
-        ActionType.STATUS_CHANGED,
-    ]):
+    for i, action in enumerate(
+        [
+            ActionType.USER_CREATED,
+            ActionType.PROJECT_UPDATED,
+            ActionType.STATUS_CHANGED,
+        ]
+    ):
         log = AuditLog(
             id=uuid.uuid4(),
             organization_id=org.id,

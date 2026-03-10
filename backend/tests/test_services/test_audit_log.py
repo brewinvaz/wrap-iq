@@ -1,6 +1,6 @@
 import uuid
 
-from app.models.audit_log import ActionType, AuditLog
+from app.models.audit_log import ActionType
 from app.models.organization import Organization
 from app.models.plan import Plan
 from app.models.user import User
@@ -139,14 +139,10 @@ async def test_list_audit_logs_pagination(db_session):
             resource_id=uuid.uuid4(),
         )
 
-    logs, total = await service.list_logs(
-        organization_id=org.id, limit=2, offset=0
-    )
+    logs, total = await service.list_logs(organization_id=org.id, limit=2, offset=0)
     assert total == 5
     assert len(logs) == 2
 
-    logs2, total2 = await service.list_logs(
-        organization_id=org.id, limit=2, offset=2
-    )
+    logs2, total2 = await service.list_logs(organization_id=org.id, limit=2, offset=2)
     assert total2 == 5
     assert len(logs2) == 2
