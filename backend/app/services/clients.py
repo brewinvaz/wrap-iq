@@ -73,7 +73,12 @@ class ClientService:
         total_result = await self.session.execute(count_query)
         total = total_result.scalar() or 0
 
-        query = query.order_by(Client.created_at.desc()).offset(skip).limit(limit)
+        query = (
+            query.options(selectinload(Client.work_orders))
+            .order_by(Client.created_at.desc())
+            .offset(skip)
+            .limit(limit)
+        )
         result = await self.session.execute(query)
         return list(result.scalars().all()), total
 
