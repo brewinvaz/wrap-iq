@@ -220,10 +220,10 @@ export default function CreateClientModal({
             />
           </div>
 
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-[#18181b]">
+          <div role="group" aria-labelledby="tags-label">
+            <span id="tags-label" className="mb-1.5 block text-sm font-medium text-[#18181b]">
               Tags
-            </label>
+            </span>
             <div className="flex flex-wrap gap-2">
               {PREDEFINED_TAGS.map((tag) => {
                 const selected = tags.includes(tag);
@@ -231,6 +231,7 @@ export default function CreateClientModal({
                   <button
                     key={tag}
                     type="button"
+                    aria-pressed={selected}
                     onClick={() => toggleTag(tag)}
                     className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                       selected
@@ -255,7 +256,10 @@ export default function CreateClientModal({
             <select
               id="client-referral"
               value={referralSource}
-              onChange={(e) => setReferralSource(e.target.value)}
+              onChange={(e) => {
+                setReferralSource(e.target.value);
+                if (e.target.value !== 'other') setCustomReferral('');
+              }}
               className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             >
               {REFERRAL_SOURCES.map((src) => (
@@ -267,6 +271,7 @@ export default function CreateClientModal({
             {referralSource === 'other' && (
               <input
                 type="text"
+                aria-label="Custom referral source"
                 value={customReferral}
                 onChange={(e) => setCustomReferral(e.target.value)}
                 placeholder="Please specify..."
