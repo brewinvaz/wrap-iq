@@ -15,7 +15,21 @@ MAX_FILE_SIZE_MB = 10
 MAX_FILES_PER_SUBMISSION = 5
 
 
+def is_r2_configured() -> bool:
+    """Check whether R2 credentials are present."""
+    return bool(
+        settings.r2_account_id
+        and settings.r2_access_key_id
+        and settings.r2_secret_access_key
+    )
+
+
 def _get_client():
+    if not is_r2_configured():
+        raise RuntimeError(
+            "Cloudflare R2 is not configured. "
+            "Set R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, and R2_SECRET_ACCESS_KEY."
+        )
     return boto3.client(
         "s3",
         endpoint_url=f"https://{settings.r2_account_id}.r2.cloudflarestorage.com",
