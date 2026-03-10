@@ -2,7 +2,9 @@ from app.models.api_key import APIKey, APIKeyUsageLog
 from app.models.audit_log import ActionType, AuditLog
 from app.models.base import TenantMixin, TimestampMixin
 from app.models.client import Client, ClientType
+from app.models.client_invite import ClientInvite
 from app.models.design_details import DesignDetails
+from app.models.file_upload import FileUpload
 from app.models.estimate import Estimate, EstimateStatus
 from app.models.estimate_line_item import EstimateLineItem
 from app.models.install_details import (
@@ -30,6 +32,7 @@ from app.models.subscription import (
     SubscriptionStatus,
 )
 from app.models.user import Role, User
+from app.models.user_profile import UserProfile
 from app.models.vehicle import Vehicle, VehicleType
 from app.models.webhook import Webhook, WebhookDelivery, WebhookEventType
 from app.models.work_order import JobType, Priority, WorkOrder, WorkOrderVehicle
@@ -49,12 +52,14 @@ __all__ = [
     "BumperCoverage",
     "ChannelType",
     "Client",
+    "ClientInvite",
     "ClientType",
     "CoverageLevel",
     "DesignDetails",
     "Estimate",
     "EstimateLineItem",
     "EstimateStatus",
+    "FileUpload",
     "InstallDetails",
     "InstallDifficulty",
     "InstallLocation",
@@ -86,6 +91,7 @@ __all__ = [
     "TimestampMixin",
     "TriggerType",
     "User",
+    "UserProfile",
     "Vehicle",
     "VehicleType",
     "Webhook",
