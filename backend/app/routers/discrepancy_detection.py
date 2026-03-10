@@ -1,6 +1,7 @@
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, status
+from starlette.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_current_user, get_session
@@ -19,6 +20,7 @@ ACCEPTED_TYPES = {"image/jpeg", "image/png", "image/webp"}
 @limiter.limit("10/minute")
 async def check_discrepancy(
     request: Request,
+    response: Response,
     file: UploadFile,
     vehicle_id: uuid.UUID,
     user: User = Depends(get_current_user),

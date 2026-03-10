@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from starlette.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_current_user, get_session
@@ -15,6 +16,7 @@ router = APIRouter(prefix="/api/ai", tags=["ai-assistant"])
 @limiter.limit("10/minute")
 async def query_assistant(
     request: Request,
+    response: Response,
     data: QueryRequest,
     session: AsyncSession = Depends(get_session),
     user: User = Depends(get_current_user),

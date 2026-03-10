@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from starlette.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_current_user, get_session
@@ -20,6 +21,7 @@ router = APIRouter(prefix="/api/ai/chat", tags=["chat-monitoring"])
 @limiter.limit("10/minute")
 async def analyze_chat_message(
     request: Request,
+    response: Response,
     data: ChatMessage,
     session: AsyncSession = Depends(get_session),
     user: User = Depends(get_current_user),
@@ -48,6 +50,7 @@ async def analyze_chat_message(
 @limiter.limit("10/minute")
 async def apply_chat_update(
     request: Request,
+    response: Response,
     data: ApplyUpdateRequest,
     session: AsyncSession = Depends(get_session),
     user: User = Depends(get_current_user),
