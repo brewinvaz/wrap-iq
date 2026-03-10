@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from starlette.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_session
@@ -19,9 +20,10 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 
 @router.post("/register", response_model=TokenResponse)
-@limiter.limit("5/minute")
+@limiter.limit("10/minute")
 async def register(
     request: Request,
+    response: Response,
     body: RegisterRequest,
     session: AsyncSession = Depends(get_session),
 ):
@@ -36,9 +38,10 @@ async def register(
 
 
 @router.post("/login", response_model=TokenResponse)
-@limiter.limit("5/minute")
+@limiter.limit("10/minute")
 async def login(
     request: Request,
+    response: Response,
     body: LoginRequest,
     session: AsyncSession = Depends(get_session),
 ):
@@ -54,9 +57,10 @@ async def login(
 
 
 @router.post("/magic-link/request", response_model=MessageResponse)
-@limiter.limit("5/minute")
+@limiter.limit("10/minute")
 async def request_magic_link(
     request: Request,
+    response: Response,
     body: MagicLinkRequest,
     session: AsyncSession = Depends(get_session),
 ):
@@ -68,9 +72,10 @@ async def request_magic_link(
 
 
 @router.post("/magic-link/verify", response_model=TokenResponse)
-@limiter.limit("5/minute")
+@limiter.limit("10/minute")
 async def verify_magic_link(
     request: Request,
+    response: Response,
     body: MagicLinkVerify,
     session: AsyncSession = Depends(get_session),
 ):

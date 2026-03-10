@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, status
+from starlette.responses import Response
 
 from app.auth.dependencies import get_current_user
 from app.middleware.rate_limit import limiter
@@ -16,6 +17,7 @@ ACCEPTED_TYPES = {"image/jpeg", "image/png", "image/webp"}
 @limiter.limit("10/minute")
 async def detect_vehicle(
     request: Request,
+    response: Response,
     file: UploadFile,
     user: User = Depends(get_current_user),
 ):
