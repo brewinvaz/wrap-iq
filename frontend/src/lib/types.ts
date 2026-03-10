@@ -58,3 +58,45 @@ export interface Installer {
   initials: string;
   color: string;
 }
+
+export interface ClientContact {
+  name: string;
+  role: string;
+  email: string;
+  phone: string;
+}
+
+export interface ClientVehicle {
+  vin: string;
+  year: string;
+  make: string;
+  model: string;
+}
+
+export interface ClientProject {
+  id: string;
+  name: string;
+  date: string;
+  value: number;
+  status: 'completed' | 'in-progress' | 'scheduled';
+}
+
+export interface Client {
+  id: string;
+  name: string;
+  type: 'personal' | 'business';
+  email: string;
+  phone: string;
+  address?: string;
+  tags: string[];
+  referralSource?: string;
+  primaryContact?: string;
+  contacts?: ClientContact[];
+  vehicles: ClientVehicle[];
+  projects: ClientProject[];
+  projectCount: number;
+  totalSpent: number;
+  lastProject?: string;
+  joinedDate: string;
+  notes?: string;
+}
