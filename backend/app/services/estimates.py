@@ -23,7 +23,7 @@ class EstimateService:
         return f"EST-{count + 1001}"
 
     def _compute_line_item_total(self, quantity: Decimal, unit_price: int) -> int:
-        return int(quantity * unit_price)
+        return round(quantity * unit_price)
 
     def _compute_totals(
         self, line_items: list[EstimateLineItem], tax_rate: Decimal
