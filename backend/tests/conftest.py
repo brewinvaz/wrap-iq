@@ -14,6 +14,8 @@ from app.db import Base
 async def setup_db():
     engine = create_async_engine(settings.test_database_url, echo=False)
     async with engine.begin() as conn:
+        # Drop any stale tables not tracked by Base.metadata
+        await conn.execute(text("DROP TABLE IF EXISTS audit_logs CASCADE"))
         await conn.run_sync(Base.metadata.drop_all)
         # Drop PostgreSQL enum types that are not removed by drop_all
         await conn.execute(text("DROP TYPE IF EXISTS role CASCADE"))
@@ -21,6 +23,7 @@ async def setup_db():
         await conn.run_sync(Base.metadata.create_all)
     yield engine
     async with engine.begin() as conn:
+        await conn.execute(text("DROP TABLE IF EXISTS audit_logs CASCADE"))
         await conn.run_sync(Base.metadata.drop_all)
         await conn.execute(text("DROP TYPE IF EXISTS role CASCADE"))
         await conn.execute(text("DROP TYPE IF EXISTS notificationtype CASCADE"))
