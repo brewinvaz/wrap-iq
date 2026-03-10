@@ -24,6 +24,13 @@ class Settings(BaseSettings):
     resend_api_key: str = ""
     email_from: str = "WrapFlow <noreply@wrapflow.io>"
 
+    # Cloudflare R2
+    r2_account_id: str = ""
+    r2_access_key_id: str = ""
+    r2_secret_access_key: str = ""
+    r2_bucket_name: str = "wrapiq-uploads"
+    r2_public_url: str = ""
+
     @property
     def cors_origins_list(self) -> list[str]:
         return [origin.strip() for origin in self.cors_origins.split(",")]
