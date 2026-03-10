@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from sqlalchemy import text
+from sqlalchemy.exc import DBAPIError, IntegrityError, SQLAlchemyError
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
@@ -110,11 +111,41 @@ async def security_headers_middleware(request: Request, call_next):
     return response
 
 
+@app.exception_handler(IntegrityError)
+async def integrity_error_handler(request: Request, exc: IntegrityError):
+    logger.exception(
+        "Database integrity error on %s %s", request.method, request.url.path
+    )
+    return JSONResponse(
+        status_code=409,
+        content={"detail": "A database conflict occurred. Please check your data."},
+    )
+
+
+@app.exception_handler(DBAPIError)
+async def dbapi_error_handler(request: Request, exc: DBAPIError):
+    logger.exception(
+        "Database connection error on %s %s", request.method, request.url.path
+    )
+    return JSONResponse(
+        status_code=503,
+        content={"detail": "A database error occurred. Please try again later."},
+    )
+
+
+@app.exception_handler(SQLAlchemyError)
+async def sqlalchemy_error_handler(request: Request, exc: SQLAlchemyError):
+    logger.exception("Database error on %s %s", request.method, request.url.path)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "A database error occurred. Please try again later."},
+    )
+
+
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     logger.exception("Unhandled exception on %s %s", request.method, request.url.path)
-    detail = str(exc) if settings.debug else "Internal server error"
-    return JSONResponse(status_code=500, content={"detail": detail})
+    return JSONResponse(status_code=500, content={"detail": "Internal server error"})
 
 
 app.include_router(ai_assistant_router)
