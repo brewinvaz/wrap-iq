@@ -31,7 +31,11 @@ async def client(db_session, seed_plan):
 async def test_register(client):
     resp = await client.post(
         "/api/auth/register",
-        json={"email": "new@shop.com", "password": "testpass123", "org_name": "New Shop"},
+        json={
+            "email": "new@shop.com",
+            "password": "testpass123",
+            "org_name": "New Shop",
+        },
     )
     assert resp.status_code == 200
     data = resp.json()
@@ -54,7 +58,11 @@ async def test_register_duplicate(client):
 async def test_login(client):
     await client.post(
         "/api/auth/register",
-        json={"email": "log@shop.com", "password": "testpass123", "org_name": "Log Shop"},
+        json={
+            "email": "log@shop.com",
+            "password": "testpass123",
+            "org_name": "Log Shop",
+        },
     )
     resp = await client.post(
         "/api/auth/login",
@@ -67,7 +75,11 @@ async def test_login(client):
 async def test_login_wrong_password(client):
     await client.post(
         "/api/auth/register",
-        json={"email": "bad@shop.com", "password": "rightpass1", "org_name": "Bad Shop"},
+        json={
+            "email": "bad@shop.com",
+            "password": "rightpass1",
+            "org_name": "Bad Shop",
+        },
     )
     resp = await client.post(
         "/api/auth/login",
@@ -79,7 +91,11 @@ async def test_login_wrong_password(client):
 async def test_refresh_token(client):
     reg = await client.post(
         "/api/auth/register",
-        json={"email": "ref@shop.com", "password": "testpass123", "org_name": "Ref Shop"},
+        json={
+            "email": "ref@shop.com",
+            "password": "testpass123",
+            "org_name": "Ref Shop",
+        },
     )
     refresh = reg.json()["refresh_token"]
     resp = await client.post(
@@ -97,7 +113,11 @@ async def test_refresh_token(client):
 async def test_logout(client):
     reg = await client.post(
         "/api/auth/register",
-        json={"email": "out@shop.com", "password": "testpass123", "org_name": "Out Shop"},
+        json={
+            "email": "out@shop.com",
+            "password": "testpass123",
+            "org_name": "Out Shop",
+        },
     )
     refresh = reg.json()["refresh_token"]
     resp = await client.post(
