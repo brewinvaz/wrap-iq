@@ -229,6 +229,7 @@ export default function Sidebar() {
         <button
           onClick={handleLogout}
           disabled={loggingOut}
+          aria-label="Sign out"
           className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px] text-[#60606a] transition-colors hover:bg-[#f4f4f6] hover:text-[#18181b] disabled:opacity-60 md:justify-center md:px-2 lg:justify-start lg:px-2.5"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
