@@ -355,7 +355,7 @@ export default function DashboardPage() {
           );
           return computeKPIs(updatedOrders, stages) || prevKpis;
         });
-      } catch (err) {
+      } catch {
         // Revert optimistic update by re-fetching
         fetchData();
       }
