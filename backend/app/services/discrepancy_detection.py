@@ -117,8 +117,6 @@ def _parse_response(raw_text: str) -> DiscrepancyCheckResponse:
 
     return DiscrepancyCheckResponse(
         discrepancies=discrepancies,
-        match_confidence=max(
-            0.0, min(1.0, float(data.get("match_confidence", 0)))
-        ),
+        match_confidence=max(0.0, min(1.0, float(data.get("match_confidence", 0)))),
         image_analysis_summary=data.get("image_analysis_summary", ""),
     )
