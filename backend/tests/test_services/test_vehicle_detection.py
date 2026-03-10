@@ -39,9 +39,7 @@ def _set_api_key():
 
 async def test_detect_vehicle_success(_set_api_key):
     mock_aio_models = AsyncMock()
-    mock_aio_models.generate_content.return_value = _mock_response(
-        _detection_json()
-    )
+    mock_aio_models.generate_content.return_value = _mock_response(_detection_json())
     mock_client = MagicMock()
     mock_client.aio.models = mock_aio_models
 

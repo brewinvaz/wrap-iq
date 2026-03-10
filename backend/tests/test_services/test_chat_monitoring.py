@@ -48,19 +48,21 @@ async def test_analyze_message_relevant(mock_genai_cls, mock_settings):
     mock_genai_cls.return_value = mock_client
 
     wo_id = str(uuid.uuid4())
-    gemini_response = json.dumps({
-        "message_relevant": True,
-        "suggested_updates": [
-            {
-                "work_order_id": wo_id,
-                "work_order_job_number": "JOB-001",
-                "field_to_update": "internal_notes",
-                "suggested_value": "Customer confirmed delivery for Friday",
-                "reason": "Message mentions JOB-001 delivery date",
-                "confidence": 0.85,
-            }
-        ],
-    })
+    gemini_response = json.dumps(
+        {
+            "message_relevant": True,
+            "suggested_updates": [
+                {
+                    "work_order_id": wo_id,
+                    "work_order_job_number": "JOB-001",
+                    "field_to_update": "internal_notes",
+                    "suggested_value": "Customer confirmed delivery for Friday",
+                    "reason": "Message mentions JOB-001 delivery date",
+                    "confidence": 0.85,
+                }
+            ],
+        }
+    )
 
     mock_aio_models = AsyncMock()
     mock_aio_models.generate_content.return_value = _mock_gemini_response(
@@ -93,10 +95,12 @@ async def test_analyze_message_irrelevant(mock_genai_cls, mock_settings):
     mock_client = MagicMock()
     mock_genai_cls.return_value = mock_client
 
-    gemini_response = json.dumps({
-        "message_relevant": False,
-        "suggested_updates": [],
-    })
+    gemini_response = json.dumps(
+        {
+            "message_relevant": False,
+            "suggested_updates": [],
+        }
+    )
 
     mock_aio_models = AsyncMock()
     mock_aio_models.generate_content.return_value = _mock_gemini_response(
@@ -262,19 +266,21 @@ async def test_apply_update_disallowed_field(mock_genai_cls, mock_settings):
 
 
 def test_parse_analysis_response_valid():
-    raw = json.dumps({
-        "message_relevant": True,
-        "suggested_updates": [
-            {
-                "work_order_id": str(uuid.uuid4()),
-                "work_order_job_number": "JOB-001",
-                "field_to_update": "internal_notes",
-                "suggested_value": "Test",
-                "reason": "Match",
-                "confidence": 0.9,
-            }
-        ],
-    })
+    raw = json.dumps(
+        {
+            "message_relevant": True,
+            "suggested_updates": [
+                {
+                    "work_order_id": str(uuid.uuid4()),
+                    "work_order_job_number": "JOB-001",
+                    "field_to_update": "internal_notes",
+                    "suggested_value": "Test",
+                    "reason": "Match",
+                    "confidence": 0.9,
+                }
+            ],
+        }
+    )
     result = _parse_analysis_response(raw)
     assert result.message_relevant is True
     assert len(result.suggested_updates) == 1
@@ -288,12 +294,14 @@ def test_parse_analysis_response_invalid_json():
 
 
 def test_parse_analysis_response_malformed_update():
-    raw = json.dumps({
-        "message_relevant": True,
-        "suggested_updates": [
-            {"work_order_id": "not-a-uuid"},  # missing required fields
-        ],
-    })
+    raw = json.dumps(
+        {
+            "message_relevant": True,
+            "suggested_updates": [
+                {"work_order_id": "not-a-uuid"},  # missing required fields
+            ],
+        }
+    )
     result = _parse_analysis_response(raw)
     assert result.message_relevant is True
     assert len(result.suggested_updates) == 0
