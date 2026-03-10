@@ -31,24 +31,24 @@ logs-frontend: ## Tail frontend logs
 	docker compose logs -f frontend
 
 migrate: ## Run database migrations
-	docker compose exec backend alembic upgrade head
+	docker compose exec backend uv run alembic upgrade head
 
 migration: ## Create a new migration (usage: make migration msg="description")
-	docker compose exec backend alembic revision --autogenerate -m "$(msg)"
+	docker compose exec backend uv run alembic revision --autogenerate -m "$(msg)"
 
 test: ## Run backend tests
-	docker compose exec backend pytest -v
+	docker compose exec backend uv run pytest -v
 
 test-cov: ## Run backend tests with coverage
-	docker compose exec backend pytest --cov=app --cov-report=term-missing
+	docker compose exec backend uv run pytest --cov=app --cov-report=term-missing
 
 lint: ## Run linting
-	docker compose exec backend ruff check app
-	docker compose exec backend ruff format --check app
+	docker compose exec backend uv run ruff check app
+	docker compose exec backend uv run ruff format --check app
 
 lint-fix: ## Fix linting issues
-	docker compose exec backend ruff check --fix app
-	docker compose exec backend ruff format app
+	docker compose exec backend uv run ruff check --fix app
+	docker compose exec backend uv run ruff format app
 
 clean: ## Remove all containers, volumes, and images
 	docker compose down -v --rmi local
