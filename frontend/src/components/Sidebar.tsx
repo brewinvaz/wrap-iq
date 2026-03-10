@@ -1,18 +1,22 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 import { useRole } from '@/lib/role-context';
 import { ROLES, type RoleKey } from '@/lib/roles';
+import { getRefreshToken, clearTokens } from '@/lib/auth';
+import { api } from '@/lib/api-client';
 
 const INTERNAL_ROLES: RoleKey[] = ['admin', 'pm', 'installer', 'designer', 'production'];
 const CLIENT_ROLES: RoleKey[] = ['client'];
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { currentRole, setRole, roleConfig } = useRole();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -26,6 +30,21 @@ export default function Sidebar() {
     }
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [dropdownOpen]);
+
+  async function handleLogout() {
+    setLoggingOut(true);
+    try {
+      const refreshToken = getRefreshToken();
+      if (refreshToken) {
+        await api.post('/api/auth/logout', { refresh_token: refreshToken });
+      }
+    } catch {
+      // Proceed with logout even if the API call fails
+    } finally {
+      clearTokens();
+      router.replace('/login');
+    }
+  }
 
   // Hide sidebar for client role
   if (currentRole === 'client') {
@@ -196,6 +215,20 @@ export default function Sidebar() {
           </div>
         </div>
       )}
+
+      {/* Logout */}
+      <div className="border-t border-[#e6e6eb] px-3 py-3">
+        <button
+          onClick={handleLogout}
+          disabled={loggingOut}
+          className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px] text-[#60606a] transition-colors hover:bg-[#f4f4f6] hover:text-[#18181b] disabled:opacity-60"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+          </svg>
+          <span>{loggingOut ? 'Signing out...' : 'Sign out'}</span>
+        </button>
+      </div>
     </aside>
   );
 }
