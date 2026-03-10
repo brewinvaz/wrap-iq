@@ -2,9 +2,12 @@ import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.requests import Request
+from starlette.responses import Response
 
 from app.auth.dependencies import get_session
 from app.auth.permissions import require_role
+from app.middleware.rate_limit import limiter
 from app.models.user import Role, User
 from app.schemas.auth import MagicLinkRequest, MessageResponse
 from app.schemas.client_portal import (
@@ -72,7 +75,10 @@ async def get_unread_count(
 
 
 @router.post("/magic-link/request", response_model=MessageResponse)
+@limiter.limit("5/minute")
 async def request_portal_magic_link(
+    request: Request,
+    response: Response,
     body: MagicLinkRequest,
     session: AsyncSession = Depends(get_session),
 ):
