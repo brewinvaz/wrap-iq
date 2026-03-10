@@ -31,6 +31,7 @@ from app.models.subscription import (
 )
 from app.models.user import Role, User
 from app.models.vehicle import Vehicle, VehicleType
+from app.models.webhook import Webhook, WebhookDelivery, WebhookEventType
 from app.models.work_order import JobType, Priority, WorkOrder, WorkOrderVehicle
 from app.models.wrap_details import (
     BumperCoverage,
@@ -87,6 +88,9 @@ __all__ = [
     "User",
     "Vehicle",
     "VehicleType",
+    "Webhook",
+    "WebhookDelivery",
+    "WebhookEventType",
     "WindowCoverage",
     "WorkOrder",
     "WorkOrderVehicle",
