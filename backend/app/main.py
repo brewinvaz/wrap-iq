@@ -12,6 +12,7 @@ from app.routers.auth import router as auth_router
 from app.routers.client_portal import router as client_portal_router
 from app.routers.clients import router as clients_router
 from app.routers.csv_upload import router as csv_upload_router
+from app.routers.discrepancy_detection import router as discrepancy_detection_router
 from app.routers.estimates import router as estimates_router
 from app.routers.invoices import router as invoices_router
 from app.routers.kanban_stages import router as kanban_stages_router
@@ -56,6 +57,7 @@ app.include_router(auth_router)
 app.include_router(client_portal_router)
 app.include_router(clients_router)
 app.include_router(csv_upload_router)
+app.include_router(discrepancy_detection_router)
 app.include_router(estimates_router)
 app.include_router(invoices_router)
 app.include_router(kanban_stages_router)
