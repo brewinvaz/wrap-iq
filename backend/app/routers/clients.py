@@ -10,6 +10,7 @@ from app.schemas.clients import (
     ClientAggregateReport,
     ClientCreate,
     ClientDetailResponse,
+    ClientListItemResponse,
     ClientListResponse,
     ClientResponse,
     ClientUpdate,
@@ -54,7 +55,14 @@ async def list_clients(
         user.organization_id, parent_only, parent_id, skip, limit
     )
     return ClientListResponse(
-        items=[ClientResponse.model_validate(c) for c in items],
+        items=[
+            ClientListItemResponse(
+                **ClientResponse.model_validate(c).model_dump(),
+                project_count=len(c.work_orders or []),
+                total_revenue=sum(wo.job_value for wo in (c.work_orders or [])),
+            )
+            for c in items
+        ],
         total=total,
     )
 

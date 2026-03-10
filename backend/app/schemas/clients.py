@@ -54,8 +54,13 @@ class ClientDetailResponse(ClientResponse):
     total_revenue: int = 0
 
 
+class ClientListItemResponse(ClientResponse):
+    project_count: int = 0
+    total_revenue: int = 0
+
+
 class ClientListResponse(BaseModel):
-    items: list[ClientResponse]
+    items: list[ClientListItemResponse]
     total: int
 
 
