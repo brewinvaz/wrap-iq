@@ -8,6 +8,7 @@ from app.routers.admin import router as admin_router
 from app.routers.audit_logs import router as audit_logs_router
 from app.routers.auth import router as auth_router
 from app.routers.client_portal import router as client_portal_router
+from app.routers.csv_upload import router as csv_upload_router
 from app.routers.kanban_stages import router as kanban_stages_router
 from app.routers.notifications import router as notifications_router
 from app.routers.users import router as users_router
@@ -42,6 +43,7 @@ app.include_router(admin_router)
 app.include_router(audit_logs_router)
 app.include_router(auth_router)
 app.include_router(client_portal_router)
+app.include_router(csv_upload_router)
 app.include_router(kanban_stages_router)
 app.include_router(notifications_router)
 app.include_router(users_router)
