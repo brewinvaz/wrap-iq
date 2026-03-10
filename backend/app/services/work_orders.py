@@ -54,7 +54,11 @@ async def get_work_order(
 ) -> WorkOrder | None:
     result = await session.execute(
         select(WorkOrder)
-        .options(selectinload(WorkOrder.work_order_vehicles))
+        .options(
+            selectinload(WorkOrder.work_order_vehicles),
+            selectinload(WorkOrder.status),
+            selectinload(WorkOrder.client),
+        )
         .where(WorkOrder.id == wo_id, WorkOrder.organization_id == org_id)
     )
     return result.scalar_one_or_none()
@@ -79,6 +83,11 @@ async def list_work_orders(
     total_result = await session.execute(count_query)
     total = total_result.scalar() or 0
 
+    query = query.options(
+        selectinload(WorkOrder.work_order_vehicles),
+        selectinload(WorkOrder.status),
+        selectinload(WorkOrder.client),
+    )
     query = query.order_by(WorkOrder.created_at.desc()).offset(skip).limit(limit)
     result = await session.execute(query)
     return list(result.scalars().all()), total
