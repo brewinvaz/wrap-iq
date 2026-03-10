@@ -75,3 +75,38 @@ class AuditLogService:
         total = count_result.scalar_one()
 
         return logs, total
+
+    async def list_all_logs(
+        self,
+        organization_id: uuid.UUID | None = None,
+        action: ActionType | None = None,
+        user_id: uuid.UUID | None = None,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> tuple[list[AuditLog], int]:
+        """Cross-org audit log query for superadmins. No mandatory org filter."""
+        query = select(AuditLog)
+        count_query = select(func.count()).select_from(AuditLog)
+
+        if organization_id is not None:
+            query = query.where(AuditLog.organization_id == organization_id)
+            count_query = count_query.where(AuditLog.organization_id == organization_id)
+
+        if action is not None:
+            query = query.where(AuditLog.action == action)
+            count_query = count_query.where(AuditLog.action == action)
+
+        if user_id is not None:
+            query = query.where(AuditLog.user_id == user_id)
+            count_query = count_query.where(AuditLog.user_id == user_id)
+
+        query = query.order_by(AuditLog.created_at.desc())
+        query = query.limit(limit).offset(offset)
+
+        result = await self.session.execute(query)
+        logs = list(result.scalars().all())
+
+        count_result = await self.session.execute(count_query)
+        total = count_result.scalar_one()
+
+        return logs, total
