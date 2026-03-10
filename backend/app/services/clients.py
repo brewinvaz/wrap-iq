@@ -119,8 +119,14 @@ class ClientService:
         total_projects = row.project_count
         total_revenue = row.revenue
 
-        # Count sub-client work orders and revenue
-        sub_client_ids = [sc.id for sc in client.sub_clients]
+        # Get sub-client IDs directly from DB to avoid stale relationship cache
+        sub_ids_result = await self.session.execute(
+            select(Client.id).where(
+                Client.parent_id == client_id,
+                Client.organization_id == org_id,
+            )
+        )
+        sub_client_ids = list(sub_ids_result.scalars().all())
         sub_client_projects = 0
         sub_client_revenue = 0
 
