@@ -3,6 +3,7 @@
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react';
 import { setTokens } from '@/lib/auth';
+import { API_BASE_URL } from '@/lib/config';
 
 type VerifyState = 'verifying' | 'success' | 'error';
 
@@ -20,8 +21,7 @@ function VerifyContent() {
 
     const verify = async () => {
       try {
-        const apiBase = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
-        const res = await fetch(`${apiBase}/api/auth/magic-link/verify`, {
+        const res = await fetch(`${API_BASE_URL}/api/auth/magic-link/verify`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ token }),
@@ -60,8 +60,7 @@ function VerifyContent() {
   const handleRequestNewLink = async () => {
     if (!requestEmail) return;
     try {
-      const apiBase = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
-      await fetch(`${apiBase}/api/portal/magic-link/request`, {
+      await fetch(`${API_BASE_URL}/api/portal/magic-link/request`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: requestEmail }),

@@ -7,8 +7,9 @@ import { VehicleStep } from '@/components/onboarding/VehicleStep';
 import { FilesStep } from '@/components/onboarding/FilesStep';
 import { ReviewStep } from '@/components/onboarding/ReviewStep';
 import { SuccessPage } from '@/components/onboarding/SuccessPage';
+import { API_BASE_URL } from '@/lib/config';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
+const API_BASE = API_BASE_URL;
 
 type PageState = 'loading' | 'invalid' | 'form' | 'submitting' | 'success';
 

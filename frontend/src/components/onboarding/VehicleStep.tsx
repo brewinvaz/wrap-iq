@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import type { VehicleData } from '@/app/onboarding/[token]/page';
+import { API_BASE_URL } from '@/lib/config';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
+const API_BASE = API_BASE_URL;
 
 const VEHICLE_TYPES = [
   { value: '', label: 'Select type...' },

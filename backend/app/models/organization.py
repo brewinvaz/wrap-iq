@@ -14,7 +14,7 @@ class Organization(Base, TimestampMixin):
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String(255))
     slug: Mapped[str] = mapped_column(String(255), unique=True, index=True)
-    plan_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("plans.id"))
+    plan_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("plans.id"), index=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     default_tax_rate: Mapped[Decimal | None] = mapped_column(
         Numeric(5, 4), nullable=True

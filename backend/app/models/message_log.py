@@ -21,11 +21,11 @@ class MessageLog(Base, TenantMixin):
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
     template_id: Mapped[uuid.UUID | None] = mapped_column(
-        Uuid, ForeignKey("message_templates.id"), nullable=True
+        Uuid, ForeignKey("message_templates.id"), nullable=True, index=True
     )
     recipient_email: Mapped[str] = mapped_column(String(255))
     recipient_user_id: Mapped[uuid.UUID | None] = mapped_column(
-        Uuid, ForeignKey("users.id"), nullable=True
+        Uuid, ForeignKey("users.id"), nullable=True, index=True
     )
     subject: Mapped[str] = mapped_column(String(500))
     body: Mapped[str] = mapped_column(Text)

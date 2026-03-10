@@ -6,6 +6,7 @@ Usage:
 """
 
 import asyncio
+import logging
 import os
 import sys
 import uuid
@@ -19,13 +20,15 @@ from app.auth.passwords import hash_password
 from app.config import settings
 from app.models.user import Role, User
 
+logger = logging.getLogger("wrapiq")
+
 
 async def seed_superadmin() -> None:
     email = os.environ.get("SUPERADMIN_EMAIL")
     password = os.environ.get("SUPERADMIN_PASSWORD")
 
     if not email or not password:
-        print("Error: SUPERADMIN_EMAIL and SUPERADMIN_PASSWORD env vars are required.")
+        logger.error("SUPERADMIN_EMAIL and SUPERADMIN_PASSWORD env vars are required.")
         sys.exit(1)
 
     engine = create_async_engine(settings.database_url, echo=False)
@@ -37,11 +40,11 @@ async def seed_superadmin() -> None:
 
         if existing:
             if existing.is_superadmin:
-                print(f"Superadmin already exists: {email}")
+                logger.info("Superadmin already exists: %s", email)
             else:
                 existing.is_superadmin = True
                 await session.commit()
-                print(f"Upgraded existing user to superadmin: {email}")
+                logger.info("Upgraded existing user to superadmin: %s", email)
             await engine.dispose()
             return
 
@@ -55,7 +58,7 @@ async def seed_superadmin() -> None:
         )
         session.add(user)
         await session.commit()
-        print(f"Created superadmin: {email} (id={user.id})")
+        logger.info("Created superadmin: %s (id=%s)", email, user.id)
 
     await engine.dispose()
 
