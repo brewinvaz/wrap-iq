@@ -1,3 +1,4 @@
+from app.models.api_key import APIKey, APIKeyUsageLog
 from app.models.audit_log import ActionType, AuditLog
 from app.models.base import TenantMixin, TimestampMixin
 from app.models.design_details import DesignDetails
@@ -33,6 +34,8 @@ from app.models.wrap_details import (
 )
 
 __all__ = [
+    "APIKey",
+    "APIKeyUsageLog",
     "ActionType",
     "AuditLog",
     "BumperCoverage",

@@ -11,6 +11,8 @@ from app.db import Base
 
 # All known tables that may have FK dependencies, in safe drop order
 _DROP_TABLES = [
+    "api_key_usage_logs",
+    "api_keys",
     "payments",
     "estimate_line_items",
     "invoices",
