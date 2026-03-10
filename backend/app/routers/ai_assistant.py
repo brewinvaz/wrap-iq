@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from starlette.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.responses import Response
 
 from app.auth.dependencies import get_current_user, get_session
 from app.config import settings
