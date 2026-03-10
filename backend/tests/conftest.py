@@ -8,6 +8,10 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 import app.models  # noqa: F401
 from app.config import settings
 from app.db import Base
+from app.middleware.rate_limit import limiter
+
+# Disable rate limiting during tests (no Redis available)
+limiter.enabled = False
 
 
 async def _cleanup(conn):
