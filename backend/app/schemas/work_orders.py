@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 from app.models.kanban_stage import SystemStatus
 from app.models.work_order import JobType, Priority
@@ -17,6 +17,18 @@ class WorkOrderCreate(BaseModel):
     vehicle_ids: list[uuid.UUID] = []
     client_id: uuid.UUID | None = None
 
+    @field_validator("client_id", mode="before")
+    @classmethod
+    def coerce_client_id(cls, v):
+        if v is None or v == "":
+            return None
+        if isinstance(v, str):
+            try:
+                return uuid.UUID(v)
+            except ValueError:
+                raise ValueError("client_id must be a valid UUID")  # noqa: B904
+        return v
+
 
 class WorkOrderUpdate(BaseModel):
     job_type: JobType | None = None
@@ -25,6 +37,18 @@ class WorkOrderUpdate(BaseModel):
     estimated_completion_date: datetime | None = None
     internal_notes: str | None = None
     client_id: uuid.UUID | None = None
+
+    @field_validator("client_id", mode="before")
+    @classmethod
+    def coerce_client_id(cls, v):
+        if v is None or v == "":
+            return None
+        if isinstance(v, str):
+            try:
+                return uuid.UUID(v)
+            except ValueError:
+                raise ValueError("client_id must be a valid UUID")  # noqa: B904
+        return v
 
 
 class StatusUpdate(BaseModel):

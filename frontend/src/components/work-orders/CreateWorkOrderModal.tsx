@@ -9,6 +9,13 @@ interface CreateWorkOrderModalProps {
   onCreate: () => void;
 }
 
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function isValidUUID(value: string): boolean {
+  return UUID_RE.test(value);
+}
+
 function todayString() {
   return new Date().toISOString().slice(0, 10);
 }
@@ -63,6 +70,11 @@ export default function CreateWorkOrderModal({
         payload.internal_notes = internalNotes.trim();
       }
       if (clientId.trim()) {
+        if (!isValidUUID(clientId.trim())) {
+          setError('Client ID must be a valid UUID.');
+          setIsSubmitting(false);
+          return;
+        }
         payload.client_id = clientId.trim();
       }
 
