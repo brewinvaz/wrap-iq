@@ -165,8 +165,7 @@ class APIKeyService:
             .limit(5)
         )
         top_endpoints = [
-            {"endpoint": row.endpoint, "count": row.count}
-            for row in top_result.all()
+            {"endpoint": row.endpoint, "count": row.count} for row in top_result.all()
         ]
 
         return {

@@ -42,9 +42,7 @@ class APIKey(Base, TenantMixin, TimestampMixin):
     )
 
     creator = relationship("User", lazy="selectin")
-    usage_logs = relationship(
-        "APIKeyUsageLog", back_populates="api_key", lazy="noload"
-    )
+    usage_logs = relationship("APIKeyUsageLog", back_populates="api_key", lazy="noload")
 
 
 class APIKeyUsageLog(Base):
