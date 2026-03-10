@@ -132,8 +132,9 @@ export function FilesStep({ data, onChange, files, onFilesChange, token, onBack,
   };
 
   const removeFile = (index: number) => {
+    const removedFile = files[index];
     onFilesChange(files.filter((_, i) => i !== index));
-    setUploading((prev) => prev.filter((u) => u.status !== 'done' || !files[index] || u.uploaded?.r2_key !== files[index].r2_key));
+    setUploading((prev) => prev.filter((u) => u.status !== 'done' || u.uploaded?.r2_key !== removedFile.r2_key));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
