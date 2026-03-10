@@ -1,3 +1,4 @@
+from app.models.audit_log import ActionType, AuditLog
 from app.models.base import TenantMixin, TimestampMixin
 from app.models.magic_link import MagicLink
 from app.models.organization import Organization
@@ -6,6 +7,8 @@ from app.models.refresh_token import RefreshToken
 from app.models.user import Role, User
 
 __all__ = [
+    "ActionType",
+    "AuditLog",
     "MagicLink",
     "Organization",
     "Plan",
