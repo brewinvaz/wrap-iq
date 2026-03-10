@@ -1,0 +1,52 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { RevenueDataPoint } from '@/lib/types';
+
+interface RevenueChartProps {
+  data: RevenueDataPoint[];
+}
+
+export default function RevenueChart({ data }: RevenueChartProps) {
+  const [mounted, setMounted] = useState(false);
+  const maxValue = Math.max(...data.map((d) => d.value));
+
+  useEffect(() => {
+    const timer = setTimeout(() => setMounted(true), 50);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <div className="overflow-hidden rounded-lg border border-[#e6e6eb] bg-white">
+      <div className="px-5 py-4 border-b border-[#e6e6eb]">
+        <h3 className="text-sm font-semibold text-[#18181b]">Revenue Trend</h3>
+        <p className="mt-0.5 text-[11px] text-[#a8a8b4]">Last 6 months</p>
+      </div>
+      <div className="px-5 py-5">
+        <div className="flex items-end justify-between gap-3" style={{ height: '160px' }}>
+          {data.map((point) => {
+            const pct = (point.value / maxValue) * 100;
+            return (
+              <div key={point.month} className="group flex flex-1 flex-col items-center gap-2">
+                <div className="relative w-full flex justify-center" style={{ height: '130px' }}>
+                  <div
+                    className="w-full max-w-[40px] rounded-t-md bg-blue-500 transition-all duration-700 ease-out"
+                    style={{
+                      height: mounted ? `${pct}%` : '0%',
+                    }}
+                  />
+                  <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 rounded bg-[#18181b] px-2 py-0.5 text-[10px] font-medium text-white opacity-0 transition-opacity group-hover:opacity-100 whitespace-nowrap">
+                    ${(point.value / 1000).toFixed(1)}k
+                  </div>
+                </div>
+                <span className="font-mono text-[10px] uppercase tracking-wider text-gray-400">
+                  {point.month}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}

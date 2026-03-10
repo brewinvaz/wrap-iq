@@ -100,3 +100,39 @@ export interface Client {
   joinedDate: string;
   notes?: string;
 }
+
+export interface KPIMetric {
+  label: string;
+  value: string;
+  delta?: string;
+  trend?: 'up' | 'down' | 'neutral';
+}
+
+export interface DepartmentScorecard {
+  department: string;
+  color: string;
+  metrics: { label: string; value: string; subtext?: string }[];
+}
+
+export interface InstallerInsight {
+  name: string;
+  initials: string;
+  color: string;
+  installs: number;
+  avgTime: string;
+  rating: number;
+}
+
+export interface DesignerInsight {
+  name: string;
+  initials: string;
+  color: string;
+  hoursLogged: number;
+  revisions: number;
+  throughput: number;
+}
+
+export interface RevenueDataPoint {
+  month: string;
+  value: number;
+}
