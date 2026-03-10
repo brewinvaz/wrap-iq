@@ -1,4 +1,3 @@
-import anthropic
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
 
 from app.auth.dependencies import get_current_user
@@ -42,7 +41,7 @@ async def detect_vehicle(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=str(e),
         )
-    except anthropic.APIError:
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail="AI service returned an error. Please try again.",
