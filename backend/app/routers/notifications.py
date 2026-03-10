@@ -37,7 +37,9 @@ async def list_notifications(
     return NotificationListResponse(items=notifications, total=total)
 
 
-@router.post("", response_model=NotificationResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "", response_model=NotificationResponse, status_code=status.HTTP_201_CREATED
+)
 async def create_notification(
     body: NotificationCreate,
     user: User = Depends(require_admin),

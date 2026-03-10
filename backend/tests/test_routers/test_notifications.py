@@ -5,7 +5,6 @@ from httpx import ASGITransport, AsyncClient
 
 from app.auth.dependencies import get_session
 from app.main import app
-from app.models.notification import Notification, NotificationType
 from app.models.plan import Plan
 
 

@@ -20,9 +20,7 @@ class Notification(Base, TenantMixin, TimestampMixin):
     __tablename__ = "notifications"
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(
-        Uuid, ForeignKey("users.id"), index=True
-    )
+    user_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("users.id"), index=True)
     title: Mapped[str] = mapped_column(String(255))
     message: Mapped[str] = mapped_column(Text)
     notification_type: Mapped[NotificationType] = mapped_column(

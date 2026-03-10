@@ -6,6 +6,7 @@ Create Date: 2026-03-10
 """
 
 import sqlalchemy as sa
+
 from alembic import op
 
 revision = "003"
@@ -61,8 +62,6 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     op.drop_index(op.f("ix_notifications_user_id"), table_name="notifications")
-    op.drop_index(
-        op.f("ix_notifications_organization_id"), table_name="notifications"
-    )
+    op.drop_index(op.f("ix_notifications_organization_id"), table_name="notifications")
     op.drop_table("notifications")
     op.execute("DROP TYPE IF EXISTS notificationtype")
