@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { ProjectCard } from '@/lib/types';
 
 const priorityColors: Record<string, string> = {
@@ -40,6 +41,7 @@ interface KanbanCardProps {
 }
 
 export default function KanbanCard({ card, onDragStart, onAdvance }: KanbanCardProps) {
+  const router = useRouter();
   const completedTasks = card.tasks?.filter((t) => t.done).length ?? 0;
   const totalTasks = card.tasks?.length ?? 0;
 
@@ -47,7 +49,7 @@ export default function KanbanCard({ card, onDragStart, onAdvance }: KanbanCardP
     <div
       draggable
       onDragStart={(e) => onDragStart(e, card.id)}
-      onClick={() => console.log('Open project detail:', card.id)}
+      onClick={() => router.push(`/dashboard/projects/${card.id}`)}
       className="group cursor-grab rounded-lg border border-[#e6e6eb] bg-white p-3.5 shadow-[0_1px_4px_rgba(0,0,0,.06)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,.1)] active:cursor-grabbing"
     >
       {/* Header: ID + Priority */}
