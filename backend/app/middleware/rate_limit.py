@@ -10,5 +10,4 @@ limiter = Limiter(
     key_func=get_remote_address,
     storage_uri=settings.redis_url,
     headers_enabled=True,
-    default_limits=["120/minute"],
 )
