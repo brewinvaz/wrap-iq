@@ -28,6 +28,12 @@ export default function RegisterPage() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError('');
+
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters.');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -108,9 +114,10 @@ export default function RegisterPage() {
                 id="password"
                 type="password"
                 required
+                minLength={8}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Create a password"
+                placeholder="Create a password (min. 8 characters)"
                 className="h-10 w-full rounded-lg border border-[#e6e6eb] bg-[#f4f4f6] px-3 text-[14px] text-[#18181b] placeholder-[#a8a8b4] outline-none transition-colors focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
               />
             </div>
