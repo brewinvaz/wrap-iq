@@ -28,6 +28,7 @@ def create_refresh_token(user_id: uuid.UUID) -> str:
     payload = {
         "sub": str(user_id),
         "type": "refresh",
+        "jti": uuid.uuid4().hex,
         "iat": now,
         "exp": now + timedelta(days=settings.refresh_token_expire_days),
     }
