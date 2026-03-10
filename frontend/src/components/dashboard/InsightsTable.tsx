@@ -33,10 +33,10 @@ export default function InsightsTable({ data }: InsightsTableProps) {
     }
   }
 
-  function SortIcon({ col }: { col: SortKey }) {
+  const sortIcon = (col: SortKey) => {
     if (sortKey !== col) return <span className="ml-1 text-gray-300">{'\u2195'}</span>;
     return <span className="ml-1">{sortAsc ? '\u2191' : '\u2193'}</span>;
-  }
+  };
 
   return (
     <div className="overflow-hidden rounded-lg border border-[#e6e6eb] bg-white">
@@ -50,13 +50,13 @@ export default function InsightsTable({ data }: InsightsTableProps) {
               className="cursor-pointer px-5 py-2.5 text-left font-mono text-[10px] uppercase tracking-wider text-gray-400"
               onClick={() => handleSort('name')}
             >
-              Name <SortIcon col="name" />
+              Name {sortIcon("name")}
             </th>
             <th
               className="cursor-pointer px-5 py-2.5 text-left font-mono text-[10px] uppercase tracking-wider text-gray-400"
               onClick={() => handleSort('installs')}
             >
-              Installs <SortIcon col="installs" />
+              Installs {sortIcon("installs")}
             </th>
             <th className="px-5 py-2.5 text-left font-mono text-[10px] uppercase tracking-wider text-gray-400">
               Performance
@@ -65,13 +65,13 @@ export default function InsightsTable({ data }: InsightsTableProps) {
               className="cursor-pointer px-5 py-2.5 text-left font-mono text-[10px] uppercase tracking-wider text-gray-400"
               onClick={() => handleSort('avgTime')}
             >
-              Avg Time <SortIcon col="avgTime" />
+              Avg Time {sortIcon("avgTime")}
             </th>
             <th
               className="cursor-pointer px-5 py-2.5 text-left font-mono text-[10px] uppercase tracking-wider text-gray-400"
               onClick={() => handleSort('rating')}
             >
-              Rating <SortIcon col="rating" />
+              Rating {sortIcon("rating")}
             </th>
           </tr>
         </thead>
