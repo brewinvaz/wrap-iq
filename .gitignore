@@ -54,6 +54,9 @@ Thumbs.db
 # Docker
 docker-compose.override.yml
 
+# Worktrees
+.worktrees/
+
 # Misc
 *.bak
 *.tmp

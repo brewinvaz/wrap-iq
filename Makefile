@@ -1,4 +1,4 @@
-.PHONY: help up down restart build rebuild logs migrate test lint clean
+.PHONY: help up down restart build rebuild logs ps migrate test lint clean
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -17,6 +17,9 @@ build: ## Build all services
 
 rebuild: ## Rebuild all services (no cache)
 	docker compose build --no-cache
+
+ps: ## Show status of all containers
+	docker compose ps -a
 
 logs: ## Tail logs for all services
 	docker compose logs -f
