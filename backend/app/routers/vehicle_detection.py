@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, status
 
 from app.auth.dependencies import get_current_user
+from app.middleware.rate_limit import limiter
 from app.models.user import User
 from app.schemas.vehicle_detection import VehicleDetectionResponse
 from app.services.vehicle_detection import detect_vehicle_from_image
@@ -12,7 +13,9 @@ ACCEPTED_TYPES = {"image/jpeg", "image/png", "image/webp"}
 
 
 @router.post("/detect", response_model=VehicleDetectionResponse)
+@limiter.limit("10/minute")
 async def detect_vehicle(
+    request: Request,
     file: UploadFile,
     user: User = Depends(get_current_user),
 ):

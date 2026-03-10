@@ -1,9 +1,10 @@
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_current_user, get_session
+from app.middleware.rate_limit import limiter
 from app.models.user import User
 from app.schemas.discrepancy_detection import DiscrepancyCheckResponse
 from app.services.discrepancy_detection import detect_discrepancies
@@ -15,7 +16,9 @@ ACCEPTED_TYPES = {"image/jpeg", "image/png", "image/webp"}
 
 
 @router.post("/discrepancy-check", response_model=DiscrepancyCheckResponse)
+@limiter.limit("10/minute")
 async def check_discrepancy(
+    request: Request,
     file: UploadFile,
     vehicle_id: uuid.UUID,
     user: User = Depends(get_current_user),
