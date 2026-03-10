@@ -33,7 +33,7 @@ async def superadmin(db_session):
         id=uuid.uuid4(),
         organization_id=None,
         email="sa@test.com",
-        password_hash=hash_password("pass"),
+        password_hash=hash_password("testpass123"),
         role=Role.ADMIN,
         is_superadmin=True,
     )
@@ -169,7 +169,7 @@ async def test_update_user(db_session, org, superadmin, service):
 async def test_create_superadmin_user(db_session, superadmin, service):
     user = await service.create_superadmin_user(
         email="new-sa@test.com",
-        password="pass123",
+        password="testpass123",
         superadmin_id=superadmin.id,
     )
     assert user.is_superadmin is True
@@ -180,7 +180,7 @@ async def test_create_superadmin_user_duplicate_email(db_session, superadmin, se
     with pytest.raises(ValueError, match="Email already registered"):
         await service.create_superadmin_user(
             email="sa@test.com",
-            password="pass",
+            password="testpass123",
             superadmin_id=superadmin.id,
         )
 
