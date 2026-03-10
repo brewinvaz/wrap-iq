@@ -29,15 +29,11 @@ class AuthService:
     async def register(
         self, email: str, password: str, org_name: str
     ) -> dict[str, str]:
-        existing = await self.session.execute(
-            select(User).where(User.email == email)
-        )
+        existing = await self.session.execute(select(User).where(User.email == email))
         if existing.scalar_one_or_none():
             raise ValueError("Email already registered")
 
-        plan = await self.session.execute(
-            select(Plan).where(Plan.is_default.is_(True))
-        )
+        plan = await self.session.execute(select(Plan).where(Plan.is_default.is_(True)))
         plan = plan.scalar_one()
 
         org = Organization(
@@ -64,9 +60,7 @@ class AuthService:
         return tokens
 
     async def login(self, email: str, password: str) -> dict[str, str]:
-        result = await self.session.execute(
-            select(User).where(User.email == email)
-        )
+        result = await self.session.execute(select(User).where(User.email == email))
         user = result.scalar_one_or_none()
         if not user or not user.password_hash:
             raise ValueError("Invalid email or password")
@@ -78,9 +72,7 @@ class AuthService:
         return tokens
 
     async def request_magic_link(self, email: str) -> str | None:
-        result = await self.session.execute(
-            select(User).where(User.email == email)
-        )
+        result = await self.session.execute(select(User).where(User.email == email))
         user = result.scalar_one_or_none()
         if not user:
             return None
@@ -110,9 +102,7 @@ class AuthService:
 
         link.used_at = datetime.now(UTC)
 
-        result = await self.session.execute(
-            select(User).where(User.id == link.user_id)
-        )
+        result = await self.session.execute(select(User).where(User.id == link.user_id))
         user = result.scalar_one()
 
         tokens = await self._create_tokens(user)

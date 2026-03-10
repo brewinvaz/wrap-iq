@@ -3,7 +3,9 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5433/wrapiq"
-    test_database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5433/wrapiq_test"
+    test_database_url: str = (
+        "postgresql+asyncpg://postgres:postgres@localhost:5433/wrapiq_test"
+    )
     redis_url: str = "redis://localhost:6379/0"
     secret_key: str = "dev-secret-key-change-in-production"
     cors_origins: str = "http://localhost:3000"
