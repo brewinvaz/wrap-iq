@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import MetricsBar from '@/components/dashboard/MetricsBar';
 import DepartmentCard from '@/components/dashboard/DepartmentCard';
 import InsightsTable from '@/components/dashboard/InsightsTable';
 import RevenueChart from '@/components/dashboard/RevenueChart';
-import DateRangeFilter from '@/components/dashboard/DateRangeFilter';
+import DateRangeFilter, { type Preset } from '@/components/dashboard/DateRangeFilter';
 import { api, ApiError } from '@/lib/api-client';
 import {
   KPIMetric,
@@ -183,6 +183,32 @@ function deriveInstallerInsights(workOrders: ApiWorkOrder[]): InstallerInsight[]
   ];
 }
 
+// --- Date range filtering ---
+
+function filterByDateRange(workOrders: ApiWorkOrder[], preset: Preset): ApiWorkOrder[] {
+  if (preset === 'Custom') return workOrders;
+
+  const now = new Date();
+  let startDate: Date;
+
+  switch (preset) {
+    case '7D':
+      startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
+      break;
+    case '30D':
+      startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30);
+      break;
+    case '90D':
+      startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 90);
+      break;
+    case 'YTD':
+      startDate = new Date(now.getFullYear(), 0, 1);
+      break;
+  }
+
+  return workOrders.filter((wo) => new Date(wo.date_in) >= startDate);
+}
+
 // --- Loading skeleton ---
 
 function LoadingSkeleton() {
@@ -249,10 +275,8 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
 }
 
 export default function ReportsPage() {
-  const [kpis, setKpis] = useState<KPIMetric[]>([]);
-  const [scorecards, setScorecards] = useState<DepartmentScorecard[]>([]);
-  const [insights, setInsights] = useState<InstallerInsight[]>([]);
-  const [revenue, setRevenue] = useState<RevenueDataPoint[]>([]);
+  const [allWorkOrders, setAllWorkOrders] = useState<ApiWorkOrder[]>([]);
+  const [dateRange, setDateRange] = useState<Preset>('30D');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -261,12 +285,7 @@ export default function ReportsPage() {
     setError(null);
     try {
       const response = await api.get<ApiWorkOrderListResponse>('/api/work-orders?limit=100');
-      const workOrders = response.items;
-
-      setKpis(deriveKPIs(workOrders));
-      setScorecards(deriveDepartmentScorecards(workOrders));
-      setInsights(deriveInstallerInsights(workOrders));
-      setRevenue(deriveRevenueData(workOrders));
+      setAllWorkOrders(response.items);
     } catch (err) {
       const message = err instanceof ApiError ? err.message : 'An unexpected error occurred';
       setError(message);
@@ -278,6 +297,12 @@ export default function ReportsPage() {
   useEffect(() => {
     fetchReports();
   }, [fetchReports]);
+
+  const filtered = useMemo(() => filterByDateRange(allWorkOrders, dateRange), [allWorkOrders, dateRange]);
+  const kpis = useMemo(() => deriveKPIs(filtered), [filtered]);
+  const scorecards = useMemo(() => deriveDepartmentScorecards(filtered), [filtered]);
+  const insights = useMemo(() => deriveInstallerInsights(filtered), [filtered]);
+  const revenue = useMemo(() => deriveRevenueData(filtered), [filtered]);
 
   if (loading) return <LoadingSkeleton />;
   if (error) return <ErrorState message={error} onRetry={fetchReports} />;
@@ -293,7 +318,7 @@ export default function ReportsPage() {
               Business health overview and department performance
             </p>
           </div>
-          <DateRangeFilter />
+          <DateRangeFilter onChange={setDateRange} />
         </div>
       </header>
 
