@@ -1,6 +1,7 @@
 import uuid
+from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 from app.models.user import Role
 
@@ -16,5 +17,19 @@ class UserListResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class UserDetailResponse(UserListResponse):
+    created_at: datetime
+    updated_at: datetime
+
+
 class UpdateRoleRequest(BaseModel):
     role: Role
+
+
+class InviteUserRequest(BaseModel):
+    email: EmailStr
+    role: Role
+
+
+class ToggleActiveRequest(BaseModel):
+    is_active: bool

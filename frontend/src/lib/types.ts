@@ -136,3 +136,20 @@ export interface RevenueDataPoint {
   month: string;
   value: number;
 }
+
+export interface TeamMemberDetail {
+  id: string;
+  email: string;
+  role: string;
+  isActive: boolean;
+  isSuperadmin: boolean;
+  initials: string;
+  color: string;
+  joinedDate: string;
+  lastActive?: string;
+}
+
+export interface Permission {
+  feature: string;
+  roles: { role: string; access: 'full' | 'read' | 'none' }[];
+}
