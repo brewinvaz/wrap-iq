@@ -1,8 +1,8 @@
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, status
-from starlette.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.responses import Response
 
 from app.auth.dependencies import get_current_user, get_session
 from app.middleware.rate_limit import limiter
