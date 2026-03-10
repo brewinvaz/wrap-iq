@@ -1,6 +1,7 @@
 import httpx
 
-from app.schemas.vin import VehicleInfo, VehicleType
+from app.models.vehicle import VehicleType
+from app.schemas.vin import VehicleInfo
 
 NHTSA_URL = "https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/{vin}?format=json"
 

@@ -1,19 +1,8 @@
 import re
-from enum import StrEnum
 
 from pydantic import BaseModel, field_validator
 
-
-class VehicleType(StrEnum):
-    CAR = "Car"
-    SUV = "SUV"
-    PICKUP = "Pickup"
-    VAN = "Van"
-    UTILITY_VAN = "Utility Van"
-    BOX_TRUCK = "Box Truck"
-    SEMI = "Semi"
-    TRAILER = "Trailer"
-
+from app.models.vehicle import VehicleType
 
 # VIN must be 17 alphanumeric chars, excluding I, O, Q
 _VIN_PATTERN = re.compile(r"^[A-HJ-NPR-Z0-9]{17}$", re.IGNORECASE)
