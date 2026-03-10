@@ -3,7 +3,7 @@
 import { useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { mockProjectDetails } from '@/lib/mock-project-detail';
-import { ProjectDetail, Note } from '@/lib/types';
+import { ProjectDetail, Note, ProjectPhoto } from '@/lib/types';
 
 type Tab = 'overview' | 'checklist' | 'notes' | 'photos' | 'timeline';
 
@@ -90,7 +90,6 @@ function InfoCard({
 // ---- Steps Indicator ----
 function StepsIndicator({ history }: { history: ProjectDetail['statusHistory'] }) {
   const steps = ['Quoted', 'Confirmed', 'Design', 'Production', 'Install', 'Complete'];
-  const completedStatuses = new Set(history.map((h) => h.status));
   const lastStatus = history[history.length - 1]?.status ?? '';
   const currentIndex = steps.indexOf(lastStatus);
 
@@ -516,18 +515,15 @@ function NotesTab({ project }: { project: ProjectDetail }) {
   );
 }
 
-// ---- Photos Tab ----
-function PhotosTab({ project }: { project: ProjectDetail }) {
-  const beforePhotos = project.photos.filter((p) => p.type === 'before');
-  const afterPhotos = project.photos.filter((p) => p.type === 'after');
-
-  const PhotoGrid = ({
-    photos,
-    label,
-  }: {
-    photos: typeof project.photos;
-    label: string;
-  }) => (
+// ---- Photo Grid ----
+function PhotoGrid({
+  photos,
+  label,
+}: {
+  photos: ProjectPhoto[];
+  label: string;
+}) {
+  return (
     <div>
       <h3 className="mb-3 font-mono text-[11px] uppercase tracking-wider text-[#a8a8b4]">
         {label}
@@ -563,6 +559,12 @@ function PhotosTab({ project }: { project: ProjectDetail }) {
       </div>
     </div>
   );
+}
+
+// ---- Photos Tab ----
+function PhotosTab({ project }: { project: ProjectDetail }) {
+  const beforePhotos = project.photos.filter((p) => p.type === 'before');
+  const afterPhotos = project.photos.filter((p) => p.type === 'after');
 
   return (
     <div className="space-y-8">
