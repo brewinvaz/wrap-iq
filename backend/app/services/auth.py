@@ -130,6 +130,7 @@ class AuthService:
             user_id=user.id,
             organization_id=user.organization_id,
             role=user.role.value,
+            is_superadmin=user.is_superadmin,
         )
         return {"access_token": access_token}
 
@@ -147,6 +148,7 @@ class AuthService:
             user_id=user.id,
             organization_id=user.organization_id,
             role=user.role.value,
+            is_superadmin=user.is_superadmin,
         )
         refresh_token_str = create_refresh_token(user_id=user.id)
 
