@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { api, ApiError } from '@/lib/api-client';
 import CreateWorkOrderModal from '@/components/work-orders/CreateWorkOrderModal';
 
@@ -101,11 +102,12 @@ function LoadingSkeleton() {
 // --- Main page ---
 
 export default function WorkOrdersPage() {
+  const searchParams = useSearchParams();
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [total, setTotal] = useState(0);
   const [stages, setStages] = useState<KanbanStageResponse[]>([]);
   const [activeStage, setActiveStage] = useState<string | null>(null);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(searchParams.get('q') ?? '');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(0);
@@ -136,6 +138,12 @@ export default function WorkOrdersPage() {
       setLoading(false);
     }
   }, [page, activeStage]);
+
+  // Sync search state when query param changes (e.g. from topbar search)
+  useEffect(() => {
+    const q = searchParams.get('q') ?? '';
+    setSearch(q);
+  }, [searchParams]);
 
   useEffect(() => {
     fetchStages();
