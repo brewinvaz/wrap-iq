@@ -10,6 +10,7 @@ from app.routers.api_keys import router as api_keys_router
 from app.routers.audit_logs import router as audit_logs_router
 from app.routers.auth import router as auth_router
 from app.routers.chat_monitoring import router as chat_monitoring_router
+from app.routers.client_invites import router as client_invites_router
 from app.routers.client_portal import router as client_portal_router
 from app.routers.clients import router as clients_router
 from app.routers.csv_upload import router as csv_upload_router
@@ -54,6 +55,7 @@ app.add_middleware(
 app.include_router(ai_assistant_router)
 app.include_router(api_keys_router)
 app.include_router(chat_monitoring_router)
+app.include_router(client_invites_router)
 app.include_router(admin_router)
 app.include_router(audit_logs_router)
 app.include_router(auth_router)
