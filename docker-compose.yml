@@ -53,7 +53,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: wrapiq-worker
-    command: python -m arq app.worker.WorkerSettings
+    command: uv run python -m arq app.worker.WorkerSettings
     volumes:
       - ./backend/app:/app/app
     environment:
