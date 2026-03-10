@@ -20,6 +20,7 @@ from app.routers.invoices import router as invoices_router
 from app.routers.kanban_stages import router as kanban_stages_router
 from app.routers.message_templates import router as message_templates_router
 from app.routers.notifications import router as notifications_router
+from app.routers.onboarding import router as onboarding_router
 from app.routers.subscriptions import router as subscriptions_router
 from app.routers.superadmin import router as superadmin_router
 from app.routers.users import router as users_router
@@ -68,6 +69,7 @@ app.include_router(invoices_router)
 app.include_router(kanban_stages_router)
 app.include_router(message_templates_router)
 app.include_router(notifications_router)
+app.include_router(onboarding_router)
 app.include_router(subscriptions_router)
 app.include_router(superadmin_router)
 app.include_router(users_router)
