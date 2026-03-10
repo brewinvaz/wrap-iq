@@ -1,9 +1,194 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import CalendarHeader from './CalendarHeader';
 import WeekView from './WeekView';
-import { installers, calendarEvents } from '@/lib/mock-calendar-data';
+import { api, ApiError } from '@/lib/api-client';
+import { CalendarEvent, Installer } from '@/lib/types';
+
+// ---------------------------------------------------------------------------
+// API response interfaces
+// ---------------------------------------------------------------------------
+
+interface VehicleInWorkOrder {
+  id: string;
+  make: string | null;
+  model: string | null;
+  year: number | null;
+  vin: string | null;
+}
+
+interface KanbanStageResponse {
+  id: string;
+  name: string;
+  color: string;
+  system_status: string | null;
+}
+
+interface WorkOrderResponse {
+  id: string;
+  job_number: string;
+  job_type: string;
+  job_value: number;
+  priority: 'high' | 'medium' | 'low';
+  date_in: string;
+  estimated_completion_date: string | null;
+  completion_date: string | null;
+  internal_notes: string | null;
+  status: KanbanStageResponse | null;
+  vehicles: VehicleInWorkOrder[];
+  client_id: string | null;
+  client_name: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+interface WorkOrderListResponse {
+  items: WorkOrderResponse[];
+  total: number;
+}
+
+// ---------------------------------------------------------------------------
+// Installer color palette (assigned deterministically by index)
+// ---------------------------------------------------------------------------
+
+const INSTALLER_COLORS = [
+  '#2563eb',
+  '#7c3aed',
+  '#059669',
+  '#e11d48',
+  '#d97706',
+  '#0891b2',
+  '#4f46e5',
+  '#be185d',
+];
+
+// ---------------------------------------------------------------------------
+// Transform helpers
+// ---------------------------------------------------------------------------
+
+function formatDateStr(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function vehicleLabel(vehicles: VehicleInWorkOrder[]): string {
+  if (vehicles.length === 0) return 'No vehicle';
+  const v = vehicles[0];
+  const parts: string[] = [];
+  if (v.year) parts.push(String(v.year));
+  if (v.make) parts.push(v.make);
+  if (v.model) parts.push(v.model);
+  return parts.length > 0 ? parts.join(' ') : 'Vehicle';
+}
+
+function jobTypeLabel(jobType: string): string {
+  return jobType
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function difficultyFromPriority(
+  priority: string,
+): 'easy' | 'standard' | 'complex' {
+  switch (priority) {
+    case 'high':
+      return 'complex';
+    case 'low':
+      return 'easy';
+    default:
+      return 'standard';
+  }
+}
+
+function initials(name: string): string {
+  return name
+    .split(/\s+/)
+    .map((w) => w[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+}
+
+/**
+ * Build a deterministic list of Installer objects from the work orders
+ * themselves (since there is no dedicated users-list endpoint).
+ */
+function extractInstallers(workOrders: WorkOrderResponse[]): Installer[] {
+  const seen = new Map<string, Installer>();
+
+  for (const wo of workOrders) {
+    const name = wo.client_name ?? 'Unassigned';
+    if (!seen.has(name)) {
+      const colorIdx = seen.size % INSTALLER_COLORS.length;
+      seen.set(name, {
+        id: `installer-${seen.size}`,
+        name,
+        initials: initials(name),
+        color: INSTALLER_COLORS[colorIdx],
+      });
+    }
+  }
+
+  return Array.from(seen.values());
+}
+
+/**
+ * Convert a list of WorkOrderResponse objects into CalendarEvent objects
+ * that the existing WeekView / EventBlock components expect.
+ */
+function transformToCalendarEvents(
+  workOrders: WorkOrderResponse[],
+  installerMap: Map<string, Installer>,
+): CalendarEvent[] {
+  return workOrders.map((wo) => {
+    const dateIn = new Date(wo.date_in);
+    const endDate = wo.estimated_completion_date
+      ? new Date(wo.estimated_completion_date)
+      : null;
+
+    const installerName = wo.client_name ?? 'Unassigned';
+    const installer = installerMap.get(installerName);
+    const color = installer?.color ?? INSTALLER_COLORS[0];
+
+    const startHour = dateIn.getHours();
+    const startMin = dateIn.getMinutes();
+    const startTime = `${String(startHour).padStart(2, '0')}:${String(startMin).padStart(2, '0')}`;
+
+    let endTime = '17:00'; // default full-day end
+    if (endDate && formatDateStr(endDate) === formatDateStr(dateIn)) {
+      const endHour = endDate.getHours();
+      const endMinute = endDate.getMinutes();
+      endTime = `${String(endHour).padStart(2, '0')}:${String(endMinute).padStart(2, '0')}`;
+    }
+
+    // If start time is midnight (00:00), default to business hours
+    const effectiveStart = startTime === '00:00' ? '08:00' : startTime;
+    const effectiveEnd = endTime === '00:00' ? '17:00' : endTime;
+
+    return {
+      id: wo.id,
+      projectId: wo.job_number,
+      title: `${jobTypeLabel(wo.job_type)} - ${wo.job_number}`,
+      vehicle: vehicleLabel(wo.vehicles),
+      installer: installer?.id ?? 'installer-0',
+      installerInitials: installer?.initials ?? '??',
+      installerColor: color,
+      date: formatDateStr(dateIn),
+      startTime: effectiveStart,
+      endTime: effectiveEnd,
+      difficulty: difficultyFromPriority(wo.priority),
+      location: 'shop' as const,
+      color,
+    };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Date helpers
+// ---------------------------------------------------------------------------
 
 function getMonday(date: Date): Date {
   const d = new Date(date);
@@ -12,13 +197,6 @@ function getMonday(date: Date): Date {
   d.setDate(d.getDate() + diff);
   d.setHours(0, 0, 0, 0);
   return d;
-}
-
-function formatDate(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
 }
 
 function formatWeekLabel(monday: Date): string {
@@ -36,19 +214,166 @@ function formatWeekLabel(monday: Date): string {
   return `${monthNames[monday.getMonth()]} ${monday.getDate()} \u2013 ${monthNames[friday.getMonth()]} ${friday.getDate()}, ${friday.getFullYear()}`;
 }
 
+// ---------------------------------------------------------------------------
+// Skeleton loader
+// ---------------------------------------------------------------------------
+
+function CalendarSkeleton() {
+  return (
+    <div className="flex h-full flex-col">
+      {/* Header skeleton */}
+      <div className="flex flex-col gap-4 border-b border-[#e6e6eb] bg-white px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="h-8 w-64 animate-pulse rounded-lg bg-gray-200" />
+          <div className="h-8 w-40 animate-pulse rounded-lg bg-gray-200" />
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="h-6 w-16 animate-pulse rounded bg-gray-200" />
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div
+              key={i}
+              className="h-7 w-24 animate-pulse rounded-full bg-gray-200"
+            />
+          ))}
+        </div>
+      </div>
+      {/* Grid skeleton */}
+      <div className="flex-1 overflow-auto bg-white p-4">
+        <div className="grid grid-cols-6 gap-2">
+          {Array.from({ length: 30 }).map((_, i) => (
+            <div
+              key={i}
+              className="h-20 animate-pulse rounded-lg bg-gray-100"
+            />
+          ))}
+        </div>
+      </div>
+      {/* Summary bar skeleton */}
+      <div className="flex items-center gap-6 border-t border-[#e6e6eb] bg-white px-6 py-3">
+        <div className="h-4 w-32 animate-pulse rounded bg-gray-200" />
+        <div className="h-4 w-20 animate-pulse rounded bg-gray-200" />
+        <div className="h-4 w-20 animate-pulse rounded bg-gray-200" />
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Error state
+// ---------------------------------------------------------------------------
+
+function CalendarError({
+  message,
+  onRetry,
+}: {
+  message: string;
+  onRetry: () => void;
+}) {
+  return (
+    <div className="flex h-full flex-col items-center justify-center gap-4 bg-white">
+      <div className="rounded-full bg-red-50 p-3">
+        <svg
+          className="h-6 w-6 text-red-500"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
+          />
+        </svg>
+      </div>
+      <div className="text-center">
+        <h3 className="text-sm font-semibold text-[#18181b]">
+          Failed to load calendar
+        </h3>
+        <p className="mt-1 text-xs text-[#60606a]">{message}</p>
+      </div>
+      <button
+        onClick={onRetry}
+        className="rounded-lg border border-[#e6e6eb] px-4 py-2 text-xs font-medium text-[#60606a] transition-colors hover:bg-gray-50 hover:text-[#18181b]"
+      >
+        Retry
+      </button>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Main component
+// ---------------------------------------------------------------------------
+
 export default function CalendarPage() {
   const [weekStart, setWeekStart] = useState(() => getMonday(new Date()));
   const [activeView, setActiveView] = useState<'day' | 'week' | 'month'>('week');
+
+  // Data state
+  const [installers, setInstallers] = useState<Installer[]>([]);
+  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [activeInstallers, setActiveInstallers] = useState<Set<string>>(
-    () => new Set(installers.map((i) => i.id)),
+    new Set<string>(),
   );
 
+  // -----------------------------------------------------------------------
+  // Fetch work orders
+  // -----------------------------------------------------------------------
+
+  const fetchWorkOrders = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const data = await api.get<WorkOrderListResponse>(
+        '/api/work-orders?limit=100',
+      );
+
+      // Build installer list from work orders
+      const extractedInstallers = extractInstallers(data.items);
+      setInstallers(extractedInstallers);
+
+      // Build lookup map
+      const installerMap = new Map<string, Installer>();
+      for (const inst of extractedInstallers) {
+        installerMap.set(inst.name, inst);
+      }
+
+      // Transform work orders to calendar events
+      const events = transformToCalendarEvents(data.items, installerMap);
+      setCalendarEvents(events);
+
+      // Activate all installers by default
+      setActiveInstallers(new Set(extractedInstallers.map((i) => i.id)));
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.message);
+      } else {
+        setError('An unexpected error occurred while loading work orders.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchWorkOrders();
+  }, [fetchWorkOrders]);
+
+  // -----------------------------------------------------------------------
+  // Week navigation
+  // -----------------------------------------------------------------------
+
   const weekDays = useMemo(() => {
-    const today = formatDate(new Date());
+    const today = formatDateStr(new Date());
     return Array.from({ length: 5 }, (_, i) => {
       const date = new Date(weekStart);
       date.setDate(weekStart.getDate() + i);
-      const dateStr = formatDate(date);
+      const dateStr = formatDateStr(date);
       return {
         date,
         label: date.toLocaleDateString('en-US', { weekday: 'short' }),
@@ -92,13 +417,28 @@ export default function CalendarPage() {
     });
   }, []);
 
-  // Summary metrics
+  // -----------------------------------------------------------------------
+  // Summary metrics (derived from loaded events for visible week)
+  // -----------------------------------------------------------------------
+
   const weekEvents = calendarEvents.filter((e) =>
     weekDays.some((d) => d.dateStr === e.date),
   );
   const totalJobs = weekEvents.length;
   const shopJobs = weekEvents.filter((e) => e.location === 'shop').length;
   const onsiteJobs = weekEvents.filter((e) => e.location === 'on-site').length;
+
+  // -----------------------------------------------------------------------
+  // Render
+  // -----------------------------------------------------------------------
+
+  if (isLoading) {
+    return <CalendarSkeleton />;
+  }
+
+  if (error) {
+    return <CalendarError message={error} onRetry={fetchWorkOrders} />;
+  }
 
   return (
     <div className="flex h-full flex-col">
