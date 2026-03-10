@@ -7,6 +7,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
+from app.db import engine
 from app.models.user import User
 from app.schemas.ai_assistant import QueryResponse
 
@@ -107,12 +108,23 @@ RULES:
 """
 
 
+def _strip_sql_comments(sql: str) -> str:
+    """Remove SQL comments (both -- line comments and /* block comments */)."""
+    # Remove block comments
+    sql = re.sub(r"/\*.*?\*/", " ", sql, flags=re.DOTALL)
+    # Remove line comments
+    sql = re.sub(r"--[^\n]*", " ", sql)
+    return sql
+
+
 def validate_sql(sql: str) -> str | None:
     """Validate that SQL is safe to execute.
 
     Returns an error message if the SQL is unsafe, or None if it is valid.
     """
-    stripped = sql.strip().rstrip(";").strip()
+    # Strip comments before validation to prevent bypass
+    cleaned = _strip_sql_comments(sql)
+    stripped = cleaned.strip().rstrip(";").strip()
 
     # Must be a SELECT statement
     if not stripped.upper().startswith("SELECT"):
@@ -186,16 +198,21 @@ class AIAssistantService:
                 conversation_id=conversation_id,
             )
 
+        # Strip comments from SQL before LIMIT check and execution
+        sql = _strip_sql_comments(sql).strip().rstrip(";").strip()
+
         # Ensure LIMIT exists
         if "limit" not in sql.lower():
-            sql = sql.rstrip(";").strip() + " LIMIT 100"
+            sql = sql + " LIMIT 100"
 
-        # Execute the query
+        # Execute the query using a read-only connection for safety
         try:
-            result = await session.execute(
-                text(sql), {"org_id": str(user.organization_id)}
-            )
-            rows = [dict(row._mapping) for row in result.fetchall()]
+            async with engine.connect() as conn:
+                await conn.execute(text("SET TRANSACTION READ ONLY"))
+                result = await conn.execute(
+                    text(sql), {"org_id": str(user.organization_id)}
+                )
+                rows = [dict(row._mapping) for row in result.fetchall()]
         except Exception as exc:
             return QueryResponse(
                 answer=f"I tried to query the database but encountered an error: {exc}",

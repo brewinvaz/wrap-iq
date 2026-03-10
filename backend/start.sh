@@ -2,7 +2,7 @@
 set -e
 
 echo "Running database migrations..."
-uv run alembic upgrade head || echo "No migrations to run or alembic not configured yet"
+uv run alembic upgrade head
 
 echo "Starting uvicorn..."
 if [ "${DEBUG:-false}" = "true" ]; then

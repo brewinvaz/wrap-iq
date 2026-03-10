@@ -280,7 +280,6 @@ export default function DashboardPage() {
       } else {
         setError('An unexpected error occurred while loading dashboard data.');
       }
-      console.error('Dashboard fetch error:', err);
     } finally {
       setLoading(false);
     }
@@ -357,7 +356,6 @@ export default function DashboardPage() {
           return computeKPIs(updatedOrders, stages) || prevKpis;
         });
       } catch (err) {
-        console.error('Failed to update work order status:', err);
         // Revert optimistic update by re-fetching
         fetchData();
       }

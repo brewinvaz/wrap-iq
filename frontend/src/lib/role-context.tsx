@@ -1,7 +1,8 @@
 'use client';
 
-import { createContext, useContext, useState, useSyncExternalStore, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useSyncExternalStore, useCallback, type ReactNode } from 'react';
 import { ROLES, type RoleKey, type RoleConfig } from './roles';
+import { api } from './api-client';
 
 interface RoleContextValue {
   currentRole: RoleKey;
@@ -32,6 +33,29 @@ export function RoleProvider({ children }: { children: ReactNode }) {
   );
 
   const [currentRole, setCurrentRole] = useState<RoleKey>(getStoredRole);
+
+  // Validate role from API on mount
+  useEffect(() => {
+    let cancelled = false;
+
+    api
+      .get<{ role: string }>('/api/users/me')
+      .then((user) => {
+        if (cancelled) return;
+        const apiRole = user.role as string;
+        if (apiRole && apiRole in ROLES && apiRole !== currentRole) {
+          setCurrentRole(apiRole as RoleKey);
+          localStorage.setItem(STORAGE_KEY, apiRole);
+        }
+      })
+      .catch(() => {
+        // API unavailable — keep using cached localStorage value
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const setRole = useCallback((role: RoleKey) => {
     setCurrentRole(role);

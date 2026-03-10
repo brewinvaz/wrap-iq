@@ -121,18 +121,17 @@ class AuthService:
         if not token_record:
             raise ValueError("Invalid or expired refresh token")
 
+        # Revoke the old refresh token
+        token_record.revoked_at = datetime.now(UTC)
+
         result = await self.session.execute(
             select(User).where(User.id == token_record.user_id)
         )
         user = result.scalar_one()
 
-        access_token = create_access_token(
-            user_id=user.id,
-            organization_id=user.organization_id,
-            role=user.role.value,
-            is_superadmin=user.is_superadmin,
-        )
-        return {"access_token": access_token}
+        tokens = await self._create_tokens(user)
+        await self.session.commit()
+        return tokens
 
     async def logout(self, refresh_token_str: str) -> None:
         result = await self.session.execute(

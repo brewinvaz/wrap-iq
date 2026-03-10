@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from app.services.ai_assistant import AIAssistantService, validate_sql
+from app.services.ai_assistant import AIAssistantService, validate_sql, _strip_sql_comments
 
 
 def _mock_user(org_id=None):
@@ -120,6 +120,27 @@ def test_validate_sql_rejects_select_with_embedded_delete():
     assert result is not None
 
 
+def test_strip_sql_comments_removes_line_comments():
+    sql = "SELECT * FROM work_orders -- DROP TABLE work_orders\nWHERE organization_id = :org_id"
+    cleaned = _strip_sql_comments(sql)
+    assert "DROP" not in cleaned
+    assert "SELECT" in cleaned
+
+
+def test_strip_sql_comments_removes_block_comments():
+    sql = "SELECT * FROM work_orders /* DELETE FROM work_orders */ WHERE organization_id = :org_id"
+    cleaned = _strip_sql_comments(sql)
+    assert "DELETE" not in cleaned
+    assert "SELECT" in cleaned
+
+
+def test_validate_sql_rejects_dangerous_keyword_in_comment_bypass():
+    # Attempt to hide DELETE after a line comment trick
+    sql = "SELECT * FROM work_orders WHERE organization_id = :org_id\n-- safe\n; DELETE FROM work_orders"
+    result = validate_sql(sql)
+    assert result is not None
+
+
 # --- Service tests ---
 
 
@@ -155,9 +176,12 @@ async def test_answer_question_text_response(mock_genai_cls, mock_settings):
     assert result.conversation_id is not None
 
 
+@patch("app.services.ai_assistant.engine")
 @patch("app.services.ai_assistant.settings")
 @patch("app.services.ai_assistant.genai.Client")
-async def test_answer_question_with_sql_execution(mock_genai_cls, mock_settings):
+async def test_answer_question_with_sql_execution(
+    mock_genai_cls, mock_settings, mock_engine
+):
     mock_settings.gemini_api_key = "test-key"
     mock_client = MagicMock()
     mock_genai_cls.return_value = mock_client
@@ -175,16 +199,20 @@ async def test_answer_question_with_sql_execution(mock_genai_cls, mock_settings)
     service = AIAssistantService()
     user = _mock_user()
 
-    # Mock DB session
+    # Mock DB connection (read-only engine.connect)
     mock_row_1 = MagicMock()
     mock_row_1._mapping = {"job_number": "JOB-001"}
     mock_row_2 = MagicMock()
     mock_row_2._mapping = {"job_number": "JOB-002"}
 
-    session = AsyncMock()
+    mock_conn = AsyncMock()
     mock_result = MagicMock()
     mock_result.fetchall.return_value = [mock_row_1, mock_row_2]
-    session.execute.return_value = mock_result
+    mock_conn.execute.return_value = mock_result
+    mock_engine.connect.return_value.__aenter__ = AsyncMock(return_value=mock_conn)
+    mock_engine.connect.return_value.__aexit__ = AsyncMock(return_value=False)
+
+    session = AsyncMock()
 
     result = await service.answer_question("Show me all jobs", user, session)
 
@@ -243,9 +271,12 @@ async def test_answer_question_sql_without_org_id_rejected(
     session.execute.assert_not_called()
 
 
+@patch("app.services.ai_assistant.engine")
 @patch("app.services.ai_assistant.settings")
 @patch("app.services.ai_assistant.genai.Client")
-async def test_answer_question_sql_error_handled(mock_genai_cls, mock_settings):
+async def test_answer_question_sql_error_handled(
+    mock_genai_cls, mock_settings, mock_engine
+):
     mock_settings.gemini_api_key = "test-key"
     mock_client = MagicMock()
     mock_genai_cls.return_value = mock_client
@@ -258,8 +289,13 @@ async def test_answer_question_sql_error_handled(mock_genai_cls, mock_settings):
 
     service = AIAssistantService()
     user = _mock_user()
+
+    mock_conn = AsyncMock()
+    mock_conn.execute.side_effect = Exception("relation does not exist")
+    mock_engine.connect.return_value.__aenter__ = AsyncMock(return_value=mock_conn)
+    mock_engine.connect.return_value.__aexit__ = AsyncMock(return_value=False)
+
     session = AsyncMock()
-    session.execute.side_effect = Exception("relation does not exist")
 
     result = await service.answer_question("Show jobs", user, session)
 

@@ -87,7 +87,11 @@ async def test_refresh_token(client):
         json={"refresh_token": refresh},
     )
     assert resp.status_code == 200
-    assert "access_token" in resp.json()
+    data = resp.json()
+    assert "access_token" in data
+    assert "refresh_token" in data
+    # Old refresh token should be revoked after rotation
+    assert data["refresh_token"] != refresh
 
 
 async def test_logout(client):

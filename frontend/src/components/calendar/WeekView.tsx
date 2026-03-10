@@ -140,7 +140,7 @@ function DayCell({
       ))}
       {events.length === 0 && (
         <button
-          onClick={() => console.log('Add event')}
+          onClick={() => {}}
           className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100"
         >
           <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 text-xs text-[#a8a8b4] transition-colors hover:bg-gray-200 hover:text-[#60606a]">
@@ -155,7 +155,7 @@ function DayCell({
 function EventBlock({ event }: { event: CalendarEvent }) {
   return (
     <button
-      onClick={() => console.log('Open project:', event.projectId, event)}
+      onClick={() => {}}
       className="mb-1 w-full cursor-pointer rounded-lg p-2 text-left transition-all hover:-translate-y-0.5 hover:shadow-md"
       style={{
         backgroundColor: colorWithOpacity(event.color, 0.1),
