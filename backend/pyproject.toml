@@ -19,6 +19,7 @@ dependencies = [
     "bcrypt>=4.2.0",
     "resend>=2.5.0",
     "python-multipart>=0.0.9",
+    "anthropic>=0.42.0",
 ]
 
 [tool.uv]
