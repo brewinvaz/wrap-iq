@@ -15,6 +15,7 @@ class WorkOrderCreate(BaseModel):
     estimated_completion_date: datetime | None = None
     internal_notes: str | None = None
     vehicle_ids: list[uuid.UUID] = []
+    client_id: uuid.UUID | None = None
 
 
 class WorkOrderUpdate(BaseModel):
@@ -23,6 +24,7 @@ class WorkOrderUpdate(BaseModel):
     priority: Priority | None = None
     estimated_completion_date: datetime | None = None
     internal_notes: str | None = None
+    client_id: uuid.UUID | None = None
 
 
 class StatusUpdate(BaseModel):
@@ -60,6 +62,8 @@ class WorkOrderResponse(BaseModel):
     internal_notes: str | None = None
     status: KanbanStageResponse | None = None
     vehicles: list[VehicleInWorkOrder] = []
+    client_id: uuid.UUID | None = None
+    client_name: str | None = None
     created_at: datetime
     updated_at: datetime
 

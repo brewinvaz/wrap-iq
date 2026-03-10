@@ -48,6 +48,8 @@ def _to_response(wo) -> WorkOrderResponse:
         internal_notes=wo.internal_notes,
         status=wo.status,
         vehicles=vehicles,
+        client_id=wo.client_id,
+        client_name=wo.client.name if wo.client else None,
         created_at=wo.created_at,
         updated_at=wo.updated_at,
     )
