@@ -57,10 +57,7 @@ _ANALYSIS_PROMPT = (
     'and "suggested_updates" to an empty array.'
 )
 
-_SYSTEM_INSTRUCTION = (
-    "You are a JSON-only responder. "
-    "Return only valid JSON."
-)
+_SYSTEM_INSTRUCTION = "You are a JSON-only responder. Return only valid JSON."
 
 
 class ChatMonitoringService:
@@ -100,8 +97,7 @@ class ChatMonitoringService:
         for wo in work_orders:
             notes_preview = (wo.internal_notes or "")[:100]
             wo_lines.append(
-                f"- ID: {wo.id}, Job#: {wo.job_number}, "
-                f"Notes: {notes_preview}"
+                f"- ID: {wo.id}, Job#: {wo.job_number}, Notes: {notes_preview}"
             )
         work_orders_context = "\n".join(wo_lines)
 
@@ -135,8 +131,7 @@ class ChatMonitoringService:
             return ApplyUpdateResponse(
                 success=False,
                 message=(
-                    f"Field '{request.field_to_update}' "
-                    "is not allowed for updates."
+                    f"Field '{request.field_to_update}' is not allowed for updates."
                 ),
             )
 
@@ -151,26 +146,19 @@ class ChatMonitoringService:
             return ApplyUpdateResponse(
                 success=False,
                 message=(
-                    "Work order not found or does not "
-                    "belong to your organization."
+                    "Work order not found or does not belong to your organization."
                 ),
             )
 
         if request.field_to_update == "internal_notes":
-            ts = datetime.now(tz=UTC).strftime(
-                "%Y-%m-%d %H:%M UTC"
-            )
-            note_entry = (
-                f"\n[{ts}] [AI suggested] {request.value}"
-            )
+            ts = datetime.now(tz=UTC).strftime("%Y-%m-%d %H:%M UTC")
+            note_entry = f"\n[{ts}] [AI suggested] {request.value}"
             current_notes = work_order.internal_notes or ""
             work_order.internal_notes = current_notes + note_entry
         elif request.field_to_update == "priority":
             work_order.priority = request.value
         elif request.field_to_update == "estimated_completion_date":
-            work_order.estimated_completion_date = (
-                datetime.fromisoformat(request.value)
-            )
+            work_order.estimated_completion_date = datetime.fromisoformat(request.value)
 
         await session.commit()
 
@@ -178,10 +166,7 @@ class ChatMonitoringService:
         field = request.field_to_update
         return ApplyUpdateResponse(
             success=True,
-            message=(
-                f"Successfully updated '{field}' "
-                f"on work order {job_num}."
-            ),
+            message=(f"Successfully updated '{field}' on work order {job_num}."),
         )
 
 
@@ -205,9 +190,7 @@ def _parse_analysis_response(raw_text: str) -> ChatAnalysisResponse:
             suggested_updates.append(
                 SuggestedUpdate(
                     work_order_id=item["work_order_id"],
-                    work_order_job_number=item[
-                        "work_order_job_number"
-                    ],
+                    work_order_job_number=item["work_order_job_number"],
                     field_to_update=item["field_to_update"],
                     suggested_value=item["suggested_value"],
                     reason=item["reason"],
@@ -218,9 +201,7 @@ def _parse_analysis_response(raw_text: str) -> ChatAnalysisResponse:
                 )
             )
         except (KeyError, ValueError) as exc:
-            logger.warning(
-                "Skipping malformed suggested update: %s", exc
-            )
+            logger.warning("Skipping malformed suggested update: %s", exc)
             continue
 
     return ChatAnalysisResponse(
