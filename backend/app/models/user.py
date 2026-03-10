@@ -26,7 +26,10 @@ class User(Base, TimestampMixin):
     )
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     password_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    role: Mapped[Role] = mapped_column(Enum(Role), default=Role.ADMIN)
+    role: Mapped[Role] = mapped_column(
+        Enum(Role, values_callable=lambda e: [m.value for m in e]),
+        default=Role.ADMIN,
+    )
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_superadmin: Mapped[bool] = mapped_column(Boolean, default=False)
 
