@@ -1,13 +1,12 @@
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_current_user, get_session
 from app.models.user import User
 from app.schemas.auth import MessageResponse
 from app.schemas.subscription import (
-    InvoiceListResponse,
     PaymentMethodCreate,
     PaymentMethodResponse,
     PlanResponse,
@@ -55,9 +54,7 @@ async def create_or_update_subscription(
     service = SubscriptionService(session)
     existing = await service.get_subscription(user.organization_id)
     if existing:
-        updated = await service.update_subscription(
-            user.organization_id, body.plan_id
-        )
+        updated = await service.update_subscription(user.organization_id, body.plan_id)
         return updated
     return await service.create_subscription(user.organization_id, body.plan_id)
 
@@ -100,9 +97,7 @@ async def add_payment_method(
     session: AsyncSession = Depends(get_session),
 ):
     service = SubscriptionService(session)
-    return await service.add_payment_method(
-        user.organization_id, body.model_dump()
-    )
+    return await service.add_payment_method(user.organization_id, body.model_dump())
 
 
 @router.delete("/payment-methods/{pm_id}", response_model=MessageResponse)
@@ -121,9 +116,7 @@ async def remove_payment_method(
     return MessageResponse(message="Payment method removed")
 
 
-@router.put(
-    "/payment-methods/{pm_id}/default", response_model=PaymentMethodResponse
-)
+@router.put("/payment-methods/{pm_id}/default", response_model=PaymentMethodResponse)
 async def set_default_payment_method(
     pm_id: uuid.UUID,
     user: User = Depends(get_current_user),
@@ -137,23 +130,6 @@ async def set_default_payment_method(
             detail="Payment method not found",
         )
     return pm
-
-
-# --- Invoices ---
-
-
-@router.get("/invoices", response_model=InvoiceListResponse)
-async def list_invoices(
-    skip: int = Query(0, ge=0),
-    limit: int = Query(50, ge=1, le=100),
-    user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_session),
-):
-    service = SubscriptionService(session)
-    items, total = await service.list_invoices(
-        user.organization_id, skip, limit
-    )
-    return InvoiceListResponse(items=items, total=total)
 
 
 # --- Usage ---
