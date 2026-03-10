@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { useSidebar } from '@/lib/sidebar-context';
 
 const ROUTE_TITLES: Record<string, string> = {
   '/dashboard': 'Jobs Board',
@@ -27,9 +28,21 @@ interface TopbarProps {
 
 export default function Topbar({ subtitle, actionLabel, onAction }: TopbarProps) {
   const pathname = usePathname();
+  const { toggleMobile } = useSidebar();
   const title = ROUTE_TITLES[pathname] ?? 'Dashboard';
   return (
-    <header className="flex h-[54px] shrink-0 items-center border-b border-[#e6e6eb] bg-white px-5">
+    <header className="flex h-[54px] shrink-0 items-center border-b border-[#e6e6eb] bg-white px-3 md:px-5">
+      {/* Hamburger menu - mobile only */}
+      <button
+        onClick={toggleMobile}
+        className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg text-[#60606a] transition-colors hover:bg-[#f4f4f6] hover:text-[#18181b] md:hidden"
+        aria-label="Open sidebar menu"
+      >
+        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+        </svg>
+      </button>
+
       {/* Left: Title */}
       <div className="flex-1">
         <h1 className="text-[16px] font-semibold text-[#18181b]">{title}</h1>
@@ -38,8 +51,8 @@ export default function Topbar({ subtitle, actionLabel, onAction }: TopbarProps)
         )}
       </div>
 
-      {/* Center-right: Search */}
-      <div className="relative">
+      {/* Center-right: Search (hidden on mobile) */}
+      <div className="relative hidden sm:block">
         <svg
           className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#a8a8b4]"
           fill="none"
