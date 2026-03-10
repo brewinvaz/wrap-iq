@@ -100,8 +100,12 @@ async def verify_magic_link(
 
 
 @router.post("/token/refresh", response_model=TokenResponse)
+@limiter.limit("10/minute")
 async def refresh_token(
-    body: TokenRefreshRequest, session: AsyncSession = Depends(get_session)
+    request: Request,
+    response: Response,
+    body: TokenRefreshRequest,
+    session: AsyncSession = Depends(get_session),
 ):
     service = AuthService(session)
     try:

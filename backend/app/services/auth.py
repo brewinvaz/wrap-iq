@@ -6,7 +6,7 @@ from datetime import UTC, datetime, timedelta
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.jwt import create_access_token, create_refresh_token
+from app.auth.jwt import create_access_token, create_refresh_token, decode_token
 from app.auth.passwords import hash_password, verify_password
 from app.models.magic_link import MagicLink
 from app.models.organization import Organization
@@ -110,6 +110,15 @@ class AuthService:
         return tokens
 
     async def refresh(self, refresh_token_str: str) -> dict[str, str]:
+        # Validate JWT signature and claims before checking the database
+        try:
+            payload = decode_token(refresh_token_str)
+        except Exception as e:
+            raise ValueError("Invalid or expired refresh token") from e
+
+        if payload.get("type") != "refresh":
+            raise ValueError("Invalid token type")
+
         result = await self.session.execute(
             select(RefreshToken).where(
                 RefreshToken.token == refresh_token_str,
