@@ -2,11 +2,23 @@
 
 import { useState, useCallback } from 'react';
 import { KanbanColumn as KanbanColumnType } from '@/lib/types';
-import { kanbanColumns as initialColumns } from '@/lib/mock-data';
+import { kanbanColumns as mockColumns } from '@/lib/mock-data';
 import KanbanColumn from './KanbanColumn';
 
-export default function KanbanBoard() {
-  const [columns, setColumns] = useState<KanbanColumnType[]>(initialColumns);
+interface KanbanBoardProps {
+  /** If provided, uses these columns instead of mock data. */
+  columns?: KanbanColumnType[];
+  /** Called after a card is moved to a new column (drag-drop or advance). */
+  onStatusChange?: (cardId: string, targetColumnId: string) => void;
+}
+
+export default function KanbanBoard({ columns: externalColumns, onStatusChange }: KanbanBoardProps = {}) {
+  const isControlled = externalColumns !== undefined;
+
+  const [internalColumns, setInternalColumns] = useState<KanbanColumnType[]>(mockColumns);
+
+  const columns = isControlled ? externalColumns : internalColumns;
+
   const [dragOverColumnId, setDragOverColumnId] = useState<string | null>(null);
   const [dragSourceColumnId, setDragSourceColumnId] = useState<string | null>(null);
 
@@ -43,33 +55,39 @@ export default function KanbanBoard() {
 
   const moveCard = useCallback(
     (cardId: string, targetColumnId: string) => {
-      setColumns((prev) => {
-        let movedCard = null;
-        let sourceFound = false;
+      // Notify parent for API persistence
+      onStatusChange?.(cardId, targetColumnId);
 
-        for (const col of prev) {
-          const card = col.cards.find((c) => c.id === cardId);
-          if (card) {
-            movedCard = card;
-            sourceFound = true;
-            break;
-          }
-        }
+      if (!isControlled) {
+        // Only mutate local state when in uncontrolled (mock) mode
+        setInternalColumns((prev) => {
+          let movedCard = null;
+          let sourceFound = false;
 
-        if (!movedCard || !sourceFound) return prev;
+          for (const col of prev) {
+            const card = col.cards.find((c) => c.id === cardId);
+            if (card) {
+              movedCard = card;
+              sourceFound = true;
+              break;
+            }
+          }
 
-        return prev.map((col) => {
-          if (col.cards.some((c) => c.id === cardId)) {
-            return { ...col, cards: col.cards.filter((c) => c.id !== cardId) };
-          }
-          if (col.id === targetColumnId) {
-            return { ...col, cards: [...col.cards, movedCard!] };
-          }
-          return col;
+          if (!movedCard || !sourceFound) return prev;
+
+          return prev.map((col) => {
+            if (col.cards.some((c) => c.id === cardId)) {
+              return { ...col, cards: col.cards.filter((c) => c.id !== cardId) };
+            }
+            if (col.id === targetColumnId) {
+              return { ...col, cards: [...col.cards, movedCard!] };
+            }
+            return col;
+          });
         });
-      });
+      }
     },
-    []
+    [onStatusChange, isControlled]
   );
 
   const handleDrop = useCallback(
