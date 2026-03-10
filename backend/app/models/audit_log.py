@@ -28,6 +28,11 @@ class ActionType(enum.StrEnum):
     # System events
     SYSTEM_EVENT = "system_event"
 
+    # Superadmin actions
+    IMPERSONATION_STARTED = "impersonation_started"
+    IMPERSONATION_STOPPED = "impersonation_stopped"
+    SUPERADMIN_ACTION = "superadmin_action"
+
 
 class AuditLog(Base, TenantMixin, TimestampMixin):
     __tablename__ = "audit_logs"
