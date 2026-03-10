@@ -13,13 +13,17 @@ export default function InsightsTable({ data }: InsightsTableProps) {
   const [sortKey, setSortKey] = useState<SortKey>('installs');
   const [sortAsc, setSortAsc] = useState(false);
 
-  const maxInstalls = Math.max(...data.map((d) => d.installs));
+  const maxInstalls = data.length > 0 ? Math.max(...data.map((d) => d.installs)) : 0;
 
   const sorted = [...data].sort((a, b) => {
     const dir = sortAsc ? 1 : -1;
     if (sortKey === 'name') return dir * a.name.localeCompare(b.name);
     if (sortKey === 'installs') return dir * (a.installs - b.installs);
-    if (sortKey === 'avgTime') return dir * (parseFloat(a.avgTime) - parseFloat(b.avgTime));
+    if (sortKey === 'avgTime') {
+      const aVal = parseFloat(a.avgTime) || 0;
+      const bVal = parseFloat(b.avgTime) || 0;
+      return dir * (aVal - bVal);
+    }
     if (sortKey === 'rating') return dir * (a.rating - b.rating);
     return 0;
   });
@@ -99,7 +103,7 @@ export default function InsightsTable({ data }: InsightsTableProps) {
                 <div className="h-2 w-24 overflow-hidden rounded-full bg-gray-100">
                   <div
                     className="h-full rounded-full bg-blue-500 transition-all duration-500"
-                    style={{ width: `${(installer.installs / maxInstalls) * 100}%` }}
+                    style={{ width: `${maxInstalls > 0 ? (installer.installs / maxInstalls) * 100 : 0}%` }}
                   />
                 </div>
               </td>

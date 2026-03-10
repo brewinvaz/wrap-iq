@@ -9,12 +9,26 @@ interface RevenueChartProps {
 
 export default function RevenueChart({ data }: RevenueChartProps) {
   const [mounted, setMounted] = useState(false);
-  const maxValue = Math.max(...data.map((d) => d.value));
+  const maxValue = data.length > 0 ? Math.max(...data.map((d) => d.value)) : 0;
 
   useEffect(() => {
     const timer = setTimeout(() => setMounted(true), 50);
     return () => clearTimeout(timer);
   }, []);
+
+  if (data.length === 0) {
+    return (
+      <div className="overflow-hidden rounded-lg border border-[#e6e6eb] bg-white">
+        <div className="px-5 py-4 border-b border-[#e6e6eb]">
+          <h3 className="text-sm font-semibold text-[#18181b]">Revenue Trend</h3>
+          <p className="mt-0.5 text-[11px] text-[#a8a8b4]">Last 6 months</p>
+        </div>
+        <div className="px-5 py-5 text-center text-sm text-[#a8a8b4]" style={{ height: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          No revenue data available
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="overflow-hidden rounded-lg border border-[#e6e6eb] bg-white">
@@ -25,7 +39,7 @@ export default function RevenueChart({ data }: RevenueChartProps) {
       <div className="px-5 py-5">
         <div className="flex items-end justify-between gap-3" style={{ height: '160px' }}>
           {data.map((point) => {
-            const pct = (point.value / maxValue) * 100;
+            const pct = maxValue > 0 ? (point.value / maxValue) * 100 : 0;
             return (
               <div key={point.month} className="group flex flex-1 flex-col items-center gap-2">
                 <div className="relative w-full flex justify-center" style={{ height: '130px' }}>
