@@ -71,7 +71,7 @@ class OnboardingSubmission(BaseModel):
     company_name: str | None = None
     address: str | None = None
     vehicle: VehicleInput
-    job_type: JobType = JobType.PERSONAL
+    job_type: JobType = JobType.personal
     project_description: str | None = None
     referral_source: str | None = None
     file_keys: list[FileKeyEntry] = []
