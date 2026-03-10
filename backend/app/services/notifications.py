@@ -44,9 +44,13 @@ class NotificationService:
             Notification.user_id == user_id,
             Notification.organization_id == organization_id,
         )
-        count_query = select(func.count()).select_from(Notification).where(
-            Notification.user_id == user_id,
-            Notification.organization_id == organization_id,
+        count_query = (
+            select(func.count())
+            .select_from(Notification)
+            .where(
+                Notification.user_id == user_id,
+                Notification.organization_id == organization_id,
+            )
         )
 
         if unread_only:
@@ -111,9 +115,7 @@ class NotificationService:
         )
         return result.scalar()
 
-    async def delete(
-        self, notification_id: uuid.UUID, user_id: uuid.UUID
-    ) -> bool:
+    async def delete(self, notification_id: uuid.UUID, user_id: uuid.UUID) -> bool:
         result = await self.session.execute(
             select(Notification).where(
                 Notification.id == notification_id,
