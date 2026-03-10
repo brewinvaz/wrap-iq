@@ -8,7 +8,7 @@ from app.db import Base
 from app.models.base import TimestampMixin
 
 
-class Role(str, enum.Enum):
+class Role(enum.StrEnum):
     ADMIN = "admin"
     PROJECT_MANAGER = "project_manager"
     INSTALLER = "installer"
