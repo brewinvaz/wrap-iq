@@ -49,8 +49,12 @@ class WorkOrder(Base, TenantMixin, TimestampMixin):
     before_photos: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     after_photos: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     status_timestamps: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    client_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid, ForeignKey("clients.id"), nullable=True, index=True
+    )
 
     status = relationship("KanbanStage", lazy="selectin")
+    client = relationship("Client", back_populates="work_orders", lazy="selectin")
     work_order_vehicles = relationship(
         "WorkOrderVehicle", back_populates="work_order", lazy="selectin"
     )

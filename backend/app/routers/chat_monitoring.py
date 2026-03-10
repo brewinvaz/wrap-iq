@@ -1,0 +1,59 @@
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.auth.dependencies import get_current_user, get_session
+from app.config import settings
+from app.models.user import User
+from app.schemas.chat_monitoring import (
+    ApplyUpdateRequest,
+    ApplyUpdateResponse,
+    ChatAnalysisResponse,
+    ChatMessage,
+)
+from app.services.chat_monitoring import ChatMonitoringService
+
+router = APIRouter(prefix="/api/ai/chat", tags=["chat-monitoring"])
+
+
+@router.post("/analyze", response_model=ChatAnalysisResponse)
+async def analyze_chat_message(
+    data: ChatMessage,
+    session: AsyncSession = Depends(get_session),
+    user: User = Depends(get_current_user),
+):
+    if not settings.gemini_api_key:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Chat monitoring is not configured",
+        )
+
+    try:
+        service = ChatMonitoringService()
+        return await service.analyze_message(data, user, session)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Chat monitoring error: {exc}",
+        ) from exc
+
+
+@router.post("/apply", response_model=ApplyUpdateResponse)
+async def apply_chat_update(
+    data: ApplyUpdateRequest,
+    session: AsyncSession = Depends(get_session),
+    user: User = Depends(get_current_user),
+):
+    if not settings.gemini_api_key:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Chat monitoring is not configured",
+        )
+
+    try:
+        service = ChatMonitoringService()
+        return await service.apply_update(data, user, session)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Chat monitoring error: {exc}",
+        ) from exc

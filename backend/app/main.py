@@ -5,14 +5,24 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.routers.admin import router as admin_router
+from app.routers.ai_assistant import router as ai_assistant_router
+from app.routers.api_keys import router as api_keys_router
 from app.routers.audit_logs import router as audit_logs_router
 from app.routers.auth import router as auth_router
+from app.routers.chat_monitoring import router as chat_monitoring_router
 from app.routers.client_portal import router as client_portal_router
+from app.routers.clients import router as clients_router
 from app.routers.csv_upload import router as csv_upload_router
+from app.routers.discrepancy_detection import router as discrepancy_detection_router
+from app.routers.estimates import router as estimates_router
+from app.routers.invoices import router as invoices_router
 from app.routers.kanban_stages import router as kanban_stages_router
 from app.routers.message_templates import router as message_templates_router
 from app.routers.notifications import router as notifications_router
+from app.routers.subscriptions import router as subscriptions_router
+from app.routers.superadmin import router as superadmin_router
 from app.routers.users import router as users_router
+from app.routers.vehicle_detection import router as vehicle_detection_router
 from app.routers.vehicles import router as vehicles_router
 from app.routers.vin import router as vin_router
 from app.routers.work_orders import router as work_orders_router
@@ -40,15 +50,25 @@ app.add_middleware(
 )
 
 
+app.include_router(ai_assistant_router)
+app.include_router(api_keys_router)
+app.include_router(chat_monitoring_router)
 app.include_router(admin_router)
 app.include_router(audit_logs_router)
 app.include_router(auth_router)
 app.include_router(client_portal_router)
+app.include_router(clients_router)
 app.include_router(csv_upload_router)
+app.include_router(discrepancy_detection_router)
+app.include_router(estimates_router)
+app.include_router(invoices_router)
 app.include_router(kanban_stages_router)
 app.include_router(message_templates_router)
 app.include_router(notifications_router)
+app.include_router(subscriptions_router)
+app.include_router(superadmin_router)
 app.include_router(users_router)
+app.include_router(vehicle_detection_router)
 app.include_router(vehicles_router)
 app.include_router(vin_router)
 app.include_router(work_orders_router)

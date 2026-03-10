@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 30
 
+    # AI / Gemini
+    gemini_api_key: str = ""
+
     # Email
     resend_api_key: str = ""
     email_from: str = "WrapFlow <noreply@wrapflow.io>"
