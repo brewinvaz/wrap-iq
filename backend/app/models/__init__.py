@@ -10,6 +10,8 @@ from app.models.install_details import (
 )
 from app.models.kanban_stage import KanbanStage, SystemStatus
 from app.models.magic_link import MagicLink
+from app.models.message_log import MessageLog, MessageStatus
+from app.models.message_template import ChannelType, MessageTemplate, TriggerType
 from app.models.notification import Notification, NotificationType
 from app.models.organization import Organization
 from app.models.plan import Plan
@@ -30,6 +32,7 @@ __all__ = [
     "ActionType",
     "AuditLog",
     "BumperCoverage",
+    "ChannelType",
     "CoverageLevel",
     "DesignDetails",
     "InstallDetails",
@@ -40,6 +43,9 @@ __all__ = [
     "KanbanStage",
     "LogType",
     "MagicLink",
+    "MessageLog",
+    "MessageStatus",
+    "MessageTemplate",
     "Notification",
     "NotificationType",
     "Organization",
@@ -51,6 +57,7 @@ __all__ = [
     "SystemStatus",
     "TenantMixin",
     "TimestampMixin",
+    "TriggerType",
     "User",
     "Vehicle",
     "VehicleType",
