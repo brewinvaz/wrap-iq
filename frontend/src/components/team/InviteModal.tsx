@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { roleLabels } from '@/lib/mock-team-data';
+import { roleLabels } from '@/lib/role-config';
 
 const invitableRoles = [
   'project_manager',

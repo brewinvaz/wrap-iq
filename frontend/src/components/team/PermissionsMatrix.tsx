@@ -1,7 +1,7 @@
 'use client';
 
 import { Permission } from '@/lib/types';
-import { roleLabels } from '@/lib/mock-team-data';
+import { roleLabels } from '@/lib/role-config';
 
 interface PermissionsMatrixProps {
   permissions: Permission[];
