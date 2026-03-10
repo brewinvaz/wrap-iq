@@ -11,6 +11,10 @@ from app.db import Base
 
 # All known tables that may have FK dependencies, in safe drop order
 _DROP_TABLES = [
+    "payments",
+    "estimate_line_items",
+    "invoices",
+    "estimates",
     "message_logs",
     "message_templates",
     "audit_logs",
@@ -44,6 +48,8 @@ _DROP_TYPES = [
     "triggertype",
     "channeltype",
     "messagestatus",
+    "estimatestatus",
+    "invoicestatus",
 ]
 
 
