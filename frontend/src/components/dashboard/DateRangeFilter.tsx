@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 const presets = ['7D', '30D', '90D', 'YTD', 'Custom'] as const;
 
-type Preset = (typeof presets)[number];
+export type Preset = (typeof presets)[number];
 
 interface DateRangeFilterProps {
   onChange?: (preset: Preset) => void;
