@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 interface ScheduleBlock {
   id: string;
@@ -11,27 +11,67 @@ interface ScheduleBlock {
   phase: 'design' | 'production' | 'install';
 }
 
-const days = ['Mon 3/9', 'Tue 3/10', 'Wed 3/11', 'Thu 3/12', 'Fri 3/13'];
+const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
 
-const scheduleData: Record<string, ScheduleBlock[]> = {
-  'Mon 3/9': [
+/**
+ * Returns the Monday of the week containing the given date.
+ */
+function getMonday(date: Date): Date {
+  const d = new Date(date);
+  const day = d.getDay(); // 0=Sun .. 6=Sat
+  const diff = day === 0 ? -6 : 1 - day; // shift to Monday
+  d.setDate(d.getDate() + diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+/**
+ * Build an array of 5 weekday labels (Mon–Fri) offset by `weekOffset` weeks
+ * from the current week. Each entry contains the label string and a date key
+ * used to look up mock schedule data.
+ */
+function getWeekDays(weekOffset: number): { label: string; key: string }[] {
+  const today = new Date();
+  const monday = getMonday(today);
+  monday.setDate(monday.getDate() + weekOffset * 7);
+
+  return Array.from({ length: 5 }, (_, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    const dayName = DAY_NAMES[d.getDay()];
+    const month = d.getMonth() + 1;
+    const date = d.getDate();
+    return {
+      label: `${dayName} ${month}/${date}`,
+      key: `${dayName} ${month}/${date}`,
+    };
+  });
+}
+
+/**
+ * Mock schedule data keyed by day-of-week index (0 = Monday .. 4 = Friday).
+ * When weekOffset === 0 these appear under the current week; for other weeks
+ * the columns still show correct dates but display "No jobs scheduled".
+ */
+const mockScheduleByDayIndex: Record<number, ScheduleBlock[]> = {
+  0: [
     { id: '1', jobName: 'Trailer — Full Wrap', client: 'Skyline Moving', team: 'Marcus, Devon', time: '8:00 AM – 4:00 PM', phase: 'install' },
     { id: '2', jobName: 'Sprinter — Color Change', client: 'CleanCo Services', team: 'Sarah', time: '9:00 AM – 12:00 PM', phase: 'design' },
   ],
-  'Tue 3/10': [
+  1: [
     { id: '3', jobName: 'Fleet Van #12', client: 'Metro Plumbing', team: 'Marcus, Taylor', time: '7:00 AM – 3:00 PM', phase: 'install' },
     { id: '4', jobName: 'Box Truck — Partial', client: 'FastFreight Inc.', team: 'Alex', time: '8:00 AM – 2:00 PM', phase: 'production' },
     { id: '5', jobName: 'Sedan — Accent Kit', client: 'Elite Auto Group', team: 'Jordan', time: '10:00 AM – 12:00 PM', phase: 'design' },
   ],
-  'Wed 3/11': [
+  2: [
     { id: '6', jobName: 'Fleet Van #12', client: 'Metro Plumbing', team: 'Marcus, Taylor', time: '7:00 AM – 12:00 PM', phase: 'install' },
     { id: '7', jobName: 'Pickup — Tailgate', client: 'Summit Electric', team: 'Alex', time: '1:00 PM – 4:00 PM', phase: 'production' },
   ],
-  'Thu 3/12': [
+  3: [
     { id: '8', jobName: 'Box Truck — Partial', client: 'FastFreight Inc.', team: 'Marcus, Devon', time: '7:00 AM – 4:00 PM', phase: 'install' },
     { id: '9', jobName: 'SUV — Hood & Roof', client: 'Greenfield Lawn Care', team: 'Sarah', time: '9:00 AM – 11:00 AM', phase: 'design' },
   ],
-  'Fri 3/13': [
+  4: [
     { id: '10', jobName: 'Cargo Van — Fleet', client: 'BrightPath Logistics', team: 'Jordan', time: '9:00 AM – 5:00 PM', phase: 'design' },
   ],
 };
@@ -45,6 +85,18 @@ const phaseColors: Record<ScheduleBlock['phase'], string> = {
 export default function SchedulePage() {
   const [weekOffset, setWeekOffset] = useState(0);
   const weekLabel = weekOffset === 0 ? 'This Week' : weekOffset > 0 ? `+${weekOffset} week${weekOffset > 1 ? 's' : ''}` : `${weekOffset} week${weekOffset < -1 ? 's' : ''}`;
+
+  const weekDays = useMemo(() => getWeekDays(weekOffset), [weekOffset]);
+
+  // Only show mock data for the current week (offset 0). Other weeks show
+  // empty columns until a real API is wired up.
+  const scheduleData = useMemo(() => {
+    const data: Record<string, ScheduleBlock[]> = {};
+    weekDays.forEach((day, index) => {
+      data[day.key] = weekOffset === 0 ? (mockScheduleByDayIndex[index] ?? []) : [];
+    });
+    return data;
+  }, [weekDays, weekOffset]);
 
   return (
     <div className="flex h-full flex-col">
@@ -81,13 +133,13 @@ export default function SchedulePage() {
 
       <div className="flex-1 overflow-auto p-6">
         <div className="grid grid-cols-5 gap-4">
-          {days.map((day) => (
-            <div key={day}>
+          {weekDays.map((day) => (
+            <div key={day.key}>
               <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#a8a8b4]">
-                {day}
+                {day.label}
               </h3>
               <div className="space-y-2">
-                {(scheduleData[day] ?? []).map((block) => (
+                {(scheduleData[day.key] ?? []).map((block) => (
                   <div
                     key={block.id}
                     className={`rounded-lg border-l-[3px] p-3 ${phaseColors[block.phase]}`}
@@ -98,7 +150,7 @@ export default function SchedulePage() {
                     <p className="mt-0.5 text-[10px] text-[#a8a8b4]">{block.team}</p>
                   </div>
                 ))}
-                {!(scheduleData[day]?.length) && (
+                {!(scheduleData[day.key]?.length) && (
                   <div className="rounded-lg border border-dashed border-[#e6e6eb] p-4 text-center text-xs text-[#a8a8b4]">
                     No jobs scheduled
                   </div>
