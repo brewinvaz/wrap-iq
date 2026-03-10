@@ -1,58 +1,204 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import TeamList from '@/components/team/TeamList';
 import PermissionsMatrix from '@/components/team/PermissionsMatrix';
 import InviteModal from '@/components/team/InviteModal';
-import { TeamMemberDetail } from '@/lib/types';
-import {
-  teamMembers as initialMembers,
-  permissionsMatrix,
-} from '@/lib/mock-team-data';
+import { TeamMemberDetail, Permission } from '@/lib/types';
+import { api, ApiError } from '@/lib/api-client';
+import { permissionsMatrix } from '@/lib/mock-team-data';
+
+// --- API response types ---
+
+interface ApiUserResponse {
+  id: string;
+  email: string;
+  role: string;
+  organization_id: string | null;
+  is_active: boolean;
+  is_superadmin: boolean;
+}
+
+interface ApiInviteResponse extends ApiUserResponse {
+  created_at: string;
+  updated_at: string;
+}
+
+// --- Transform API user to TeamMemberDetail ---
+
+const avatarColors = [
+  'bg-blue-500',
+  'bg-violet-500',
+  'bg-emerald-500',
+  'bg-amber-500',
+  'bg-rose-500',
+  'bg-slate-500',
+  'bg-cyan-500',
+  'bg-indigo-500',
+];
+
+function getInitials(email: string): string {
+  const name = email.split('@')[0];
+  if (name.includes('.')) {
+    const parts = name.split('.');
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return name.slice(0, 2).toUpperCase();
+}
+
+function transformApiUser(user: ApiUserResponse, index: number): TeamMemberDetail {
+  return {
+    id: user.id,
+    email: user.email,
+    role: user.role,
+    isActive: user.is_active,
+    isSuperadmin: user.is_superadmin,
+    initials: getInitials(user.email),
+    color: avatarColors[index % avatarColors.length],
+    joinedDate: '',
+  };
+}
+
+// --- Loading skeleton ---
+
+function LoadingSkeleton() {
+  return (
+    <div className="flex h-full flex-col">
+      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-7 w-48 animate-pulse rounded bg-gray-200" />
+            <div className="h-5 w-20 animate-pulse rounded-full bg-gray-100" />
+          </div>
+          <div className="h-9 w-32 animate-pulse rounded-lg bg-gray-200" />
+        </div>
+      </header>
+      <div className="flex-1 space-y-6 overflow-auto p-6">
+        <div className="space-y-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex animate-pulse items-center gap-4 rounded-xl border border-[#e6e6eb] bg-white p-4">
+              <div className="h-10 w-10 rounded-full bg-gray-200" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 w-48 rounded bg-gray-200" />
+                <div className="h-3 w-32 rounded bg-gray-100" />
+              </div>
+              <div className="h-6 w-24 rounded-full bg-gray-100" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// --- Error state ---
+
+function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div className="flex h-full flex-col">
+      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+        <h1 className="text-xl font-bold text-[#18181b]">Team Management</h1>
+      </header>
+      <div className="flex flex-1 flex-col items-center justify-center gap-4">
+        <div className="rounded-full bg-red-100 p-3">
+          <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.072 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          </svg>
+        </div>
+        <p className="text-sm font-medium text-[#18181b]">Failed to load team members</p>
+        <p className="text-xs text-[#60606a]">{message}</p>
+        <button
+          onClick={onRetry}
+          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+        >
+          Retry
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default function TeamPage() {
-  const [members, setMembers] = useState<TeamMemberDetail[]>(initialMembers);
+  const [members, setMembers] = useState<TeamMemberDetail[]>([]);
+  const [permissions] = useState<Permission[]>(permissionsMatrix);
   const [showInvite, setShowInvite] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  function handleRoleChange(memberId: string, newRole: string) {
-    setMembers((prev) =>
-      prev.map((m) => (m.id === memberId ? { ...m, role: newRole } : m)),
-    );
+  const fetchTeam = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const users = await api.get<ApiUserResponse[]>('/api/admin/users');
+      setMembers(users.map((u, i) => transformApiUser(u, i)));
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 403) {
+        // Non-admin user: show only self
+        try {
+          const me = await api.get<ApiUserResponse>('/api/users/me');
+          setMembers([transformApiUser(me, 0)]);
+        } catch (meErr) {
+          const message = meErr instanceof ApiError ? meErr.message : 'An unexpected error occurred';
+          setError(message);
+        }
+      } else {
+        const message = err instanceof ApiError ? err.message : 'An unexpected error occurred';
+        setError(message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchTeam();
+  }, [fetchTeam]);
+
+  async function handleRoleChange(memberId: string, newRole: string) {
+    try {
+      await api.patch<ApiUserResponse>(`/api/admin/users/${memberId}/role`, { role: newRole });
+      setMembers((prev) =>
+        prev.map((m) => (m.id === memberId ? { ...m, role: newRole } : m)),
+      );
+    } catch (err) {
+      // Optimistic rollback not needed since we only update on success
+      const message = err instanceof ApiError ? err.message : 'Failed to update role';
+      alert(message);
+    }
   }
 
-  function handleToggleActive(memberId: string) {
-    setMembers((prev) =>
-      prev.map((m) =>
-        m.id === memberId ? { ...m, isActive: !m.isActive } : m,
-      ),
-    );
+  async function handleToggleActive(memberId: string) {
+    const member = members.find((m) => m.id === memberId);
+    if (!member) return;
+
+    try {
+      await api.patch<ApiUserResponse>(`/api/admin/users/${memberId}/active`, {
+        is_active: !member.isActive,
+      });
+      setMembers((prev) =>
+        prev.map((m) =>
+          m.id === memberId ? { ...m, isActive: !m.isActive } : m,
+        ),
+      );
+    } catch (err) {
+      const message = err instanceof ApiError ? err.message : 'Failed to toggle status';
+      alert(message);
+    }
   }
 
-  function handleInvite(email: string, role: string) {
-    const initials = email
-      .split('@')[0]
-      .slice(0, 2)
-      .toUpperCase();
-    const colors = [
-      'bg-blue-500',
-      'bg-violet-500',
-      'bg-emerald-500',
-      'bg-amber-500',
-      'bg-rose-500',
-      'bg-slate-500',
-    ];
-    const newMember: TeamMemberDetail = {
-      id: crypto.randomUUID(),
-      email,
-      role,
-      isActive: true,
-      isSuperadmin: false,
-      initials,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      joinedDate: new Date().toISOString().split('T')[0],
-    };
-    setMembers((prev) => [...prev, newMember]);
+  async function handleInvite(email: string, role: string) {
+    try {
+      const newUser = await api.post<ApiInviteResponse>('/api/admin/users/invite', { email, role });
+      const newMember = transformApiUser(newUser, members.length);
+      setMembers((prev) => [...prev, newMember]);
+    } catch (err) {
+      const message = err instanceof ApiError ? err.message : 'Failed to invite user';
+      alert(message);
+    }
   }
+
+  if (loading) return <LoadingSkeleton />;
+  if (error) return <ErrorState message={error} onRetry={fetchTeam} />;
 
   return (
     <div className="flex h-full flex-col">
@@ -82,7 +228,7 @@ export default function TeamPage() {
           onRoleChange={handleRoleChange}
           onToggleActive={handleToggleActive}
         />
-        <PermissionsMatrix permissions={permissionsMatrix} />
+        <PermissionsMatrix permissions={permissions} />
       </div>
 
       <InviteModal

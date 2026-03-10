@@ -1,9 +1,121 @@
 'use client';
 
-import { useState, use } from 'react';
+import { useState, useEffect, useCallback, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { mockProjectDetails } from '@/lib/mock-project-detail';
+import { api, ApiError } from '@/lib/api-client';
 import { ProjectDetail, Note, ProjectPhoto } from '@/lib/types';
+
+// --- API response types ---
+
+interface ApiKanbanStage {
+  id: string;
+  name: string;
+  color: string;
+  system_status: string | null;
+}
+
+interface ApiVehicleInWorkOrder {
+  id: string;
+  make: string | null;
+  model: string | null;
+  year: number | null;
+  vin: string | null;
+}
+
+interface ApiWorkOrderResponse {
+  id: string;
+  job_number: string;
+  job_type: string;
+  job_value: number;
+  priority: string;
+  date_in: string;
+  estimated_completion_date: string | null;
+  completion_date: string | null;
+  internal_notes: string | null;
+  status: ApiKanbanStage | null;
+  vehicles: ApiVehicleInWorkOrder[];
+  client_id: string | null;
+  client_name: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// --- Transform API response to ProjectDetail ---
+
+function transformWorkOrderToProject(wo: ApiWorkOrderResponse): ProjectDetail {
+  const vehicle = wo.vehicles[0];
+  const vehicleStr = vehicle
+    ? `${vehicle.year ?? ''} ${vehicle.make ?? ''} ${vehicle.model ?? ''}`.trim()
+    : 'No vehicle assigned';
+
+  const statusName = wo.status?.name ?? 'Unknown';
+
+  // Build a minimal statusHistory from what we know
+  const statusHistory = [
+    { status: statusName, timestamp: wo.created_at, changedBy: 'System' },
+  ];
+
+  // Map priority string to expected type
+  const priority = (['high', 'medium', 'low'].includes(wo.priority) ? wo.priority : 'medium') as 'high' | 'medium' | 'low';
+
+  return {
+    id: wo.job_number,
+    name: `${wo.job_type.charAt(0).toUpperCase() + wo.job_type.slice(1)} — ${vehicleStr}`,
+    vehicle: vehicleStr,
+    vehicleSummary: vehicleStr,
+    client: wo.client_name ?? 'Unknown Client',
+    value: wo.job_value,
+    date: wo.date_in.split('T')[0],
+    priority,
+    tags: [],
+    team: [],
+    progress: wo.completion_date ? 100 : 0,
+    tasks: [],
+    vehicleDetails: {
+      vin: vehicle?.vin ?? 'N/A',
+      year: vehicle?.year ? String(vehicle.year) : 'N/A',
+      make: vehicle?.make ?? 'N/A',
+      model: vehicle?.model ?? 'N/A',
+      vehicleType: 'N/A',
+    },
+    wrapDetails: {
+      coverage: 'N/A',
+      roofCoverage: 'N/A',
+      windowCoverage: 'N/A',
+      bumperCoverage: 'N/A',
+      doorHandles: 'N/A',
+      miscItems: [],
+    },
+    designDetails: {
+      designHours: 0,
+      versionCount: 0,
+      revisionCount: 0,
+    },
+    productionDetails: {
+      equipment: 'N/A',
+      mediaBrand: 'N/A',
+      mediaWidth: 'N/A',
+      laminateBrand: 'N/A',
+      printLength: 0,
+    },
+    installDetails: {
+      location: 'N/A',
+      difficulty: 'N/A',
+      startDate: wo.estimated_completion_date?.split('T')[0] ?? 'TBD',
+      endDate: wo.completion_date?.split('T')[0] ?? 'TBD',
+      timeLogs: [],
+    },
+    statusHistory,
+    notes: wo.internal_notes
+      ? [{ id: 'n1', text: wo.internal_notes, author: 'System', timestamp: wo.created_at }]
+      : [],
+    photos: [],
+    estimatedHours: 0,
+    actualHours: 0,
+    revenue: wo.job_value,
+    cost: 0,
+  };
+}
 
 type Tab = 'overview' | 'checklist' | 'notes' | 'photos' | 'timeline';
 
@@ -38,6 +150,7 @@ function formatCurrency(value: number): string {
 }
 
 function formatDate(dateStr: string): string {
+  if (dateStr === 'TBD' || dateStr === 'N/A') return dateStr;
   const date = new Date(dateStr);
   return date.toLocaleDateString('en-US', {
     month: 'short',
@@ -55,6 +168,85 @@ function formatTimestamp(ts: string): string {
     hour: 'numeric',
     minute: '2-digit',
   });
+}
+
+// ---- Loading Skeleton ----
+function LoadingSkeleton() {
+  return (
+    <div className="flex h-full flex-col">
+      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+        <div className="mb-3">
+          <div className="h-5 w-32 animate-pulse rounded bg-gray-200" />
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-7 w-64 animate-pulse rounded bg-gray-200" />
+            <div className="h-5 w-20 animate-pulse rounded bg-gray-100" />
+          </div>
+          <div className="text-right space-y-1">
+            <div className="h-4 w-32 animate-pulse rounded bg-gray-100" />
+            <div className="h-6 w-20 animate-pulse rounded bg-gray-200" />
+          </div>
+        </div>
+        <div className="mt-4 flex items-center gap-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="flex items-center gap-1">
+              {i > 0 && <div className="h-0.5 w-6 bg-[#e6e6eb]" />}
+              <div className="h-6 w-6 animate-pulse rounded-full bg-gray-200" />
+            </div>
+          ))}
+        </div>
+      </header>
+      <div className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-3">
+        <div className="flex gap-4">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="h-4 w-16 animate-pulse rounded bg-gray-200" />
+          ))}
+        </div>
+      </div>
+      <div className="flex-1 overflow-auto px-6 py-6">
+        <div className="grid grid-cols-3 gap-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="h-24 animate-pulse rounded-xl bg-gray-200" />
+          ))}
+        </div>
+        <div className="mt-6 grid grid-cols-2 gap-6">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-48 animate-pulse rounded-xl bg-gray-200" />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---- Error State ----
+function ErrorState({ message, onRetry, onBack }: { message: string; onRetry: () => void; onBack: () => void }) {
+  return (
+    <div className="flex h-full flex-col items-center justify-center gap-4">
+      <div className="rounded-full bg-red-100 p-3">
+        <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.072 16.5c-.77.833.192 2.5 1.732 2.5z" />
+        </svg>
+      </div>
+      <p className="text-lg font-semibold text-[#18181b]">Failed to load project</p>
+      <p className="text-sm text-[#60606a]">{message}</p>
+      <div className="flex gap-3">
+        <button
+          onClick={onBack}
+          className="rounded-lg border border-[#e6e6eb] bg-white px-4 py-2 text-sm font-medium text-[#60606a] transition-colors hover:bg-gray-50"
+        >
+          Back to Dashboard
+        </button>
+        <button
+          onClick={onRetry}
+          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+        >
+          Retry
+        </button>
+      </div>
+    </div>
+  );
 }
 
 // ---- Field Row Component ----
@@ -212,53 +404,59 @@ function OverviewTab({ project }: { project: ProjectDetail }) {
         </InfoCard>
 
         {/* Wrap Details */}
-        <InfoCard title="Wrap Details">
-          <FieldRow label="Coverage" value={project.wrapDetails.coverage} />
-          <FieldRow label="Roof" value={project.wrapDetails.roofCoverage} />
-          <FieldRow label="Windows" value={project.wrapDetails.windowCoverage} />
-          <FieldRow label="Bumpers" value={project.wrapDetails.bumperCoverage} />
-          <FieldRow label="Door Handles" value={project.wrapDetails.doorHandles} />
-          {project.wrapDetails.miscItems.length > 0 && (
-            <FieldRow
-              label="Misc Items"
-              value={project.wrapDetails.miscItems.join(', ')}
-            />
-          )}
-          {project.wrapDetails.specialInstructions && (
-            <FieldRow
-              label="Special Notes"
-              value={project.wrapDetails.specialInstructions}
-            />
-          )}
-        </InfoCard>
+        {project.wrapDetails.coverage !== 'N/A' && (
+          <InfoCard title="Wrap Details">
+            <FieldRow label="Coverage" value={project.wrapDetails.coverage} />
+            <FieldRow label="Roof" value={project.wrapDetails.roofCoverage} />
+            <FieldRow label="Windows" value={project.wrapDetails.windowCoverage} />
+            <FieldRow label="Bumpers" value={project.wrapDetails.bumperCoverage} />
+            <FieldRow label="Door Handles" value={project.wrapDetails.doorHandles} />
+            {project.wrapDetails.miscItems.length > 0 && (
+              <FieldRow
+                label="Misc Items"
+                value={project.wrapDetails.miscItems.join(', ')}
+              />
+            )}
+            {project.wrapDetails.specialInstructions && (
+              <FieldRow
+                label="Special Notes"
+                value={project.wrapDetails.specialInstructions}
+              />
+            )}
+          </InfoCard>
+        )}
 
         {/* Design */}
-        <InfoCard title="Design">
-          <FieldRow
-            label="Design Hours"
-            value={`${project.designDetails.designHours}h`}
-          />
-          <FieldRow
-            label="Versions"
-            value={String(project.designDetails.versionCount)}
-          />
-          <FieldRow
-            label="Revisions"
-            value={String(project.designDetails.revisionCount)}
-          />
-        </InfoCard>
+        {project.designDetails.designHours > 0 && (
+          <InfoCard title="Design">
+            <FieldRow
+              label="Design Hours"
+              value={`${project.designDetails.designHours}h`}
+            />
+            <FieldRow
+              label="Versions"
+              value={String(project.designDetails.versionCount)}
+            />
+            <FieldRow
+              label="Revisions"
+              value={String(project.designDetails.revisionCount)}
+            />
+          </InfoCard>
+        )}
 
         {/* Production */}
-        <InfoCard title="Production">
-          <FieldRow label="Equipment" value={project.productionDetails.equipment} />
-          <FieldRow label="Media" value={project.productionDetails.mediaBrand} />
-          <FieldRow label="Media Width" value={project.productionDetails.mediaWidth} />
-          <FieldRow label="Laminate" value={project.productionDetails.laminateBrand} />
-          <FieldRow
-            label="Print Length"
-            value={`${project.productionDetails.printLength} ft`}
-          />
-        </InfoCard>
+        {project.productionDetails.equipment !== 'N/A' && (
+          <InfoCard title="Production">
+            <FieldRow label="Equipment" value={project.productionDetails.equipment} />
+            <FieldRow label="Media" value={project.productionDetails.mediaBrand} />
+            <FieldRow label="Media Width" value={project.productionDetails.mediaWidth} />
+            <FieldRow label="Laminate" value={project.productionDetails.laminateBrand} />
+            <FieldRow
+              label="Print Length"
+              value={`${project.productionDetails.printLength} ft`}
+            />
+          </InfoCard>
+        )}
 
         {/* Install */}
         <InfoCard title="Install">
@@ -272,85 +470,93 @@ function OverviewTab({ project }: { project: ProjectDetail }) {
             label="End Date"
             value={formatDate(project.installDetails.endDate)}
           />
-          <div className="mt-3 border-t border-[#e6e6eb] pt-3">
-            <p className="mb-2 font-mono text-[10px] uppercase tracking-wider text-[#a8a8b4]">
-              Time Logs
-            </p>
-            <div className="space-y-1.5">
-              {project.installDetails.timeLogs.map((log, i) => (
-                <div
-                  key={i}
-                  className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 text-xs"
-                >
-                  <span className="font-medium text-[#18181b]">
-                    {log.installer}
-                  </span>
-                  <span className="text-[#60606a]">{log.task}</span>
-                  <span className="font-mono text-[#18181b]">{log.hours}h</span>
-                </div>
-              ))}
+          {project.installDetails.timeLogs.length > 0 && (
+            <div className="mt-3 border-t border-[#e6e6eb] pt-3">
+              <p className="mb-2 font-mono text-[10px] uppercase tracking-wider text-[#a8a8b4]">
+                Time Logs
+              </p>
+              <div className="space-y-1.5">
+                {project.installDetails.timeLogs.map((log, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 text-xs"
+                  >
+                    <span className="font-medium text-[#18181b]">
+                      {log.installer}
+                    </span>
+                    <span className="text-[#60606a]">{log.task}</span>
+                    <span className="font-mono text-[#18181b]">{log.hours}h</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </InfoCard>
 
         {/* Hours */}
-        <InfoCard title="Hours Tracking">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="font-mono text-[10px] uppercase tracking-wider text-[#a8a8b4]">
-                Estimated
-              </p>
-              <p className="mt-1 text-xl font-bold text-[#18181b]">
-                {project.estimatedHours}h
-              </p>
+        {(project.estimatedHours > 0 || project.actualHours > 0) && (
+          <InfoCard title="Hours Tracking">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-wider text-[#a8a8b4]">
+                  Estimated
+                </p>
+                <p className="mt-1 text-xl font-bold text-[#18181b]">
+                  {project.estimatedHours}h
+                </p>
+              </div>
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-wider text-[#a8a8b4]">
+                  Actual
+                </p>
+                <p className="mt-1 text-xl font-bold text-[#18181b]">
+                  {project.actualHours}h
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="font-mono text-[10px] uppercase tracking-wider text-[#a8a8b4]">
-                Actual
-              </p>
-              <p className="mt-1 text-xl font-bold text-[#18181b]">
-                {project.actualHours}h
-              </p>
-            </div>
-          </div>
-          <div className="mt-3">
-            <div className="mb-1 flex justify-between text-[10px] text-[#60606a]">
-              <span>Progress</span>
-              <span>
-                {Math.round((project.actualHours / project.estimatedHours) * 100)}%
-              </span>
-            </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
-              <div
-                className="h-full rounded-full bg-blue-500 transition-all duration-300"
-                style={{
-                  width: `${Math.min(
-                    100,
-                    (project.actualHours / project.estimatedHours) * 100
-                  )}%`,
-                }}
-              />
-            </div>
-          </div>
-        </InfoCard>
+            {project.estimatedHours > 0 && (
+              <div className="mt-3">
+                <div className="mb-1 flex justify-between text-[10px] text-[#60606a]">
+                  <span>Progress</span>
+                  <span>
+                    {Math.round((project.actualHours / project.estimatedHours) * 100)}%
+                  </span>
+                </div>
+                <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
+                  <div
+                    className="h-full rounded-full bg-blue-500 transition-all duration-300"
+                    style={{
+                      width: `${Math.min(
+                        100,
+                        (project.actualHours / project.estimatedHours) * 100
+                      )}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+          </InfoCard>
+        )}
       </div>
 
       {/* Team */}
-      <InfoCard title="Assigned Team">
-        <div className="flex gap-3">
-          {project.team.map((member) => (
-            <div key={member.initials} className="flex flex-col items-center gap-1.5">
-              <div
-                className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-semibold text-white"
-                style={{ backgroundColor: member.color }}
-              >
-                {member.initials}
+      {project.team.length > 0 && (
+        <InfoCard title="Assigned Team">
+          <div className="flex gap-3">
+            {project.team.map((member) => (
+              <div key={member.initials} className="flex flex-col items-center gap-1.5">
+                <div
+                  className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-semibold text-white"
+                  style={{ backgroundColor: member.color }}
+                >
+                  {member.initials}
+                </div>
+                <span className="text-[11px] text-[#60606a]">{member.initials}</span>
               </div>
-              <span className="text-[11px] text-[#60606a]">{member.initials}</span>
-            </div>
-          ))}
-        </div>
-      </InfoCard>
+            ))}
+          </div>
+        </InfoCard>
+      )}
     </div>
   );
 }
@@ -678,23 +884,41 @@ export default function ProjectDetailPage({
   const { id } = use(params);
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<Tab>('overview');
+  const [project, setProject] = useState<ProjectDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const project = mockProjectDetails[id];
+  const fetchProject = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const wo = await api.get<ApiWorkOrderResponse>(`/api/work-orders/${id}`);
+      setProject(transformWorkOrderToProject(wo));
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 404) {
+        setError('Project not found');
+      } else {
+        const message = err instanceof ApiError ? err.message : 'An unexpected error occurred';
+        setError(message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
 
-  if (!project) {
+  useEffect(() => {
+    fetchProject();
+  }, [fetchProject]);
+
+  if (loading) return <LoadingSkeleton />;
+
+  if (error || !project) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-4">
-        <p className="text-lg font-semibold text-[#18181b]">Project not found</p>
-        <p className="text-sm text-[#60606a]">
-          No detail data available for project {id}
-        </p>
-        <button
-          onClick={() => router.push('/dashboard')}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
-        >
-          Back to Dashboard
-        </button>
-      </div>
+      <ErrorState
+        message={error ?? `No detail data available for project ${id}`}
+        onRetry={fetchProject}
+        onBack={() => router.push('/dashboard')}
+      />
     );
   }
 
