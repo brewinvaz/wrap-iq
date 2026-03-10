@@ -1,26 +1,62 @@
 from app.models.audit_log import ActionType, AuditLog
 from app.models.base import TenantMixin, TimestampMixin
+from app.models.design_details import DesignDetails
+from app.models.install_details import (
+    InstallDetails,
+    InstallDifficulty,
+    InstallLocation,
+    InstallTimeLog,
+    LogType,
+)
 from app.models.kanban_stage import KanbanStage, SystemStatus
 from app.models.magic_link import MagicLink
 from app.models.notification import Notification, NotificationType
 from app.models.organization import Organization
 from app.models.plan import Plan
+from app.models.production_details import ProductionDetails
 from app.models.refresh_token import RefreshToken
 from app.models.user import Role, User
+from app.models.vehicle import Vehicle, VehicleType
+from app.models.work_order import JobType, Priority, WorkOrder, WorkOrderVehicle
+from app.models.wrap_details import (
+    BumperCoverage,
+    CoverageLevel,
+    WindowCoverage,
+    WrapCoverage,
+    WrapDetails,
+)
 
 __all__ = [
     "ActionType",
     "AuditLog",
+    "BumperCoverage",
+    "CoverageLevel",
+    "DesignDetails",
+    "InstallDetails",
+    "InstallDifficulty",
+    "InstallLocation",
+    "InstallTimeLog",
+    "JobType",
     "KanbanStage",
+    "LogType",
     "MagicLink",
     "Notification",
     "NotificationType",
     "Organization",
     "Plan",
+    "Priority",
+    "ProductionDetails",
     "RefreshToken",
     "Role",
     "SystemStatus",
     "TenantMixin",
     "TimestampMixin",
     "User",
+    "Vehicle",
+    "VehicleType",
+    "WindowCoverage",
+    "WorkOrder",
+    "WorkOrderVehicle",
+    "WrapCoverage",
+    "WrapDetails",
 ]

@@ -17,9 +17,7 @@ async def seed_data(db_session):
     db_session.add(plan)
     await db_session.flush()
 
-    org = Organization(
-        id=uuid.uuid4(), name="Shop", slug="shop", plan_id=plan.id
-    )
+    org = Organization(id=uuid.uuid4(), name="Shop", slug="shop", plan_id=plan.id)
     db_session.add(org)
     await db_session.flush()
 

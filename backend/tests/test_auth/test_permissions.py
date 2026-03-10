@@ -19,9 +19,7 @@ async def plan(db_session):
 
 @pytest.fixture
 async def org(db_session, plan):
-    org = Organization(
-        id=uuid.uuid4(), name="Shop", slug="shop", plan_id=plan.id
-    )
+    org = Organization(id=uuid.uuid4(), name="Shop", slug="shop", plan_id=plan.id)
     db_session.add(org)
     await db_session.flush()
     return org
@@ -66,9 +64,7 @@ async def test_require_role_denies_wrong_role(org):
 
 async def test_require_role_allows_superadmin(org):
     checker = require_role(Role.ADMIN)
-    user = make_user(
-        org_id=org.id, role=Role.INSTALLER, is_superadmin=True
-    )
+    user = make_user(org_id=org.id, role=Role.INSTALLER, is_superadmin=True)
     result = await checker(user=user)
     assert result.is_superadmin is True
 

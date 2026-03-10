@@ -10,7 +10,9 @@ from app.routers.auth import router as auth_router
 from app.routers.kanban_stages import router as kanban_stages_router
 from app.routers.notifications import router as notifications_router
 from app.routers.users import router as users_router
+from app.routers.vehicles import router as vehicles_router
 from app.routers.vin import router as vin_router
+from app.routers.work_orders import router as work_orders_router
 
 
 @asynccontextmanager
@@ -41,7 +43,9 @@ app.include_router(auth_router)
 app.include_router(kanban_stages_router)
 app.include_router(notifications_router)
 app.include_router(users_router)
+app.include_router(vehicles_router)
 app.include_router(vin_router)
+app.include_router(work_orders_router)
 
 
 @app.get("/health")
