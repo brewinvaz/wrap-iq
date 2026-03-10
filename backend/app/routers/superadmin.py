@@ -1,3 +1,4 @@
+import logging
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -24,6 +25,8 @@ from app.schemas.superadmin import (
 )
 from app.services.audit_log import AuditLogService
 from app.services.superadmin import SuperadminService
+
+logger = logging.getLogger("wrapiq")
 
 router = APIRouter(prefix="/api/superadmin", tags=["superadmin"])
 
@@ -188,6 +191,11 @@ async def create_superadmin_user(
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
+    except Exception as e:
+        logger.exception("Failed to create superadmin user")
+        raise HTTPException(
+            status_code=500, detail="An unexpected error occurred"
+        ) from e
     await session.commit()
     await session.refresh(user)
     return user

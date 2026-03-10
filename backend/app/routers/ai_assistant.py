@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import Response
@@ -8,6 +10,8 @@ from app.middleware.rate_limit import limiter
 from app.models.user import User
 from app.schemas.ai_assistant import QueryRequest, QueryResponse
 from app.services.ai_assistant import AIAssistantService
+
+logger = logging.getLogger("wrapiq")
 
 router = APIRouter(prefix="/api/ai", tags=["ai-assistant"])
 
@@ -31,11 +35,8 @@ async def query_assistant(
         service = AIAssistantService()
         return await service.answer_question(data.question, user, session)
     except Exception as exc:
+        logger.exception("AI assistant query failed")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=(
-                str(exc)
-                if settings.debug
-                else "An error occurred processing your request"
-            ),
+            detail="An error occurred processing your request",
         ) from exc

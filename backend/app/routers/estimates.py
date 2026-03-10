@@ -1,3 +1,4 @@
+import logging
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -16,6 +17,8 @@ from app.schemas.estimates import (
     LineItemResponse,
 )
 from app.services.estimates import EstimateService
+
+logger = logging.getLogger("wrapiq")
 
 router = APIRouter(prefix="/api/estimates", tags=["estimates"])
 
@@ -146,6 +149,11 @@ async def convert_to_invoice(
         invoice = await service.convert_to_invoice(estimate_id, user.organization_id)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.exception("Failed to convert estimate %s to invoice", estimate_id)
+        raise HTTPException(
+            status_code=500, detail="An unexpected error occurred"
+        ) from e
     if not invoice:
         raise HTTPException(status_code=404, detail="Estimate not found")
 

@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -14,6 +16,8 @@ from app.services.email import send_magic_link_email
 from app.services.onboarding import OnboardingService
 from app.services.r2 import generate_object_key, generate_upload_url
 from app.services.vin import decode_vin
+
+logger = logging.getLogger("wrapiq")
 
 router = APIRouter(prefix="/api/portal/onboarding", tags=["onboarding"])
 
@@ -52,11 +56,17 @@ async def decode_vin_endpoint(
     await _get_valid_invite(token, session)
     try:
         info = await decode_vin(vin)
-    except Exception as e:
+    except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e),
         )
+    except Exception as e:
+        logger.exception("Failed to decode VIN %s", vin)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred",
+        ) from e
     return info
 
 
