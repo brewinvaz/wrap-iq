@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import KanbanBoard from '@/components/kanban/KanbanBoard';
-import { dashboardStats } from '@/lib/mock-data';
+import MetricsBar from '@/components/dashboard/MetricsBar';
+import { topLevelKPIs } from '@/lib/mock-kpi-data';
 
 type ViewMode = 'kanban' | 'list' | 'calendar';
 type FilterMode = 'all' | 'my-jobs' | 'urgent';
@@ -36,22 +37,8 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {/* Stats bar */}
-      <div className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-3">
-        <div className="flex gap-6">
-          {dashboardStats.map((stat) => (
-            <div key={stat.label} className="flex items-center gap-3 rounded-lg border border-[#e6e6eb] px-4 py-2.5">
-              <div>
-                <p className="text-xs text-[#a8a8b4]">{stat.label}</p>
-                <p className="text-lg font-semibold text-[#18181b]">{stat.value}</p>
-              </div>
-              <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-600">
-                {stat.change}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* Stats bar — reusable MetricsBar */}
+      <MetricsBar metrics={topLevelKPIs.slice(0, 4)} />
 
       {/* View toggle and filters */}
       <div className="shrink-0 flex items-center justify-between px-6 py-3">
