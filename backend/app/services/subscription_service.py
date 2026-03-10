@@ -6,7 +6,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.plan import Plan
 from app.models.subscription import (
-    Invoice,
     PaymentMethod,
     Subscription,
     SubscriptionStatus,
@@ -81,9 +80,7 @@ class SubscriptionService:
         )
         return list(result.scalars().all())
 
-    async def add_payment_method(
-        self, org_id: uuid.UUID, data: dict
-    ) -> PaymentMethod:
+    async def add_payment_method(self, org_id: uuid.UUID, data: dict) -> PaymentMethod:
         pm = PaymentMethod(
             id=uuid.uuid4(),
             organization_id=org_id,
@@ -97,9 +94,7 @@ class SubscriptionService:
         await self.session.refresh(pm)
         return pm
 
-    async def remove_payment_method(
-        self, pm_id: uuid.UUID, org_id: uuid.UUID
-    ) -> bool:
+    async def remove_payment_method(self, pm_id: uuid.UUID, org_id: uuid.UUID) -> bool:
         result = await self.session.execute(
             select(PaymentMethod).where(
                 PaymentMethod.id == pm_id,
@@ -142,30 +137,6 @@ class SubscriptionService:
             pm.is_default = False
         await self.session.flush()
 
-    # --- Invoices ---
-
-    async def list_invoices(
-        self,
-        org_id: uuid.UUID,
-        skip: int = 0,
-        limit: int = 50,
-    ) -> tuple[list[Invoice], int]:
-        count_result = await self.session.execute(
-            select(func.count(Invoice.id)).where(
-                Invoice.organization_id == org_id
-            )
-        )
-        total = count_result.scalar() or 0
-
-        result = await self.session.execute(
-            select(Invoice)
-            .where(Invoice.organization_id == org_id)
-            .order_by(Invoice.invoice_date.desc())
-            .offset(skip)
-            .limit(limit)
-        )
-        return list(result.scalars().all()), total
-
     # --- Usage Metrics ---
 
     async def get_usage_metrics(self, org_id: uuid.UUID) -> dict:
@@ -180,9 +151,7 @@ class SubscriptionService:
 
         # Projects count
         projects_result = await self.session.execute(
-            select(func.count(WorkOrder.id)).where(
-                WorkOrder.organization_id == org_id
-            )
+            select(func.count(WorkOrder.id)).where(WorkOrder.organization_id == org_id)
         )
         projects_count = projects_result.scalar() or 0
 

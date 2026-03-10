@@ -4,7 +4,6 @@ from datetime import datetime
 from pydantic import BaseModel
 
 from app.models.subscription import (
-    InvoiceStatus,
     PaymentMethodType,
     SubscriptionStatus,
 )
@@ -70,30 +69,6 @@ class PaymentMethodResponse(BaseModel):
     updated_at: datetime
 
     model_config = {"from_attributes": True}
-
-
-# --- Invoice ---
-
-
-class InvoiceResponse(BaseModel):
-    id: uuid.UUID
-    organization_id: uuid.UUID
-    subscription_id: uuid.UUID | None = None
-    amount_cents: int
-    status: InvoiceStatus
-    invoice_date: datetime
-    paid_at: datetime | None = None
-    description: str
-    invoice_number: str
-    created_at: datetime
-    updated_at: datetime
-
-    model_config = {"from_attributes": True}
-
-
-class InvoiceListResponse(BaseModel):
-    items: list[InvoiceResponse]
-    total: int
 
 
 # --- Usage Metrics ---

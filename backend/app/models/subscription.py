@@ -9,7 +9,6 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     String,
-    Text,
     Uuid,
     func,
 )
@@ -29,13 +28,6 @@ class SubscriptionStatus(enum.StrEnum):
 class PaymentMethodType(enum.StrEnum):
     CARD = "card"
     BANK = "bank"
-
-
-class InvoiceStatus(enum.StrEnum):
-    PAID = "paid"
-    PENDING = "pending"
-    FAILED = "failed"
-    REFUNDED = "refunded"
 
 
 class Subscription(Base, TimestampMixin):
@@ -77,27 +69,3 @@ class PaymentMethod(Base, TimestampMixin):
     exp_month: Mapped[int] = mapped_column(Integer, default=0)
     exp_year: Mapped[int] = mapped_column(Integer, default=0)
     is_default: Mapped[bool] = mapped_column(Boolean, default=False)
-
-
-class Invoice(Base, TimestampMixin):
-    __tablename__ = "invoices"
-
-    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
-    organization_id: Mapped[uuid.UUID] = mapped_column(
-        Uuid, ForeignKey("organizations.id"), index=True
-    )
-    subscription_id: Mapped[uuid.UUID | None] = mapped_column(
-        Uuid, ForeignKey("subscriptions.id"), nullable=True
-    )
-    amount_cents: Mapped[int] = mapped_column(Integer, default=0)
-    status: Mapped[InvoiceStatus] = mapped_column(
-        Enum(InvoiceStatus), default=InvoiceStatus.PENDING
-    )
-    invoice_date: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
-    )
-    paid_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
-    description: Mapped[str] = mapped_column(Text, default="")
-    invoice_number: Mapped[str] = mapped_column(String(50), unique=True, index=True)

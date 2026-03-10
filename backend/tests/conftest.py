@@ -1,7 +1,7 @@
 from collections.abc import AsyncGenerator
 
 import pytest
-from sqlalchemy import text
+from sqlalchemy import NullPool, text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 # Import all models so Base.metadata knows about them
@@ -56,7 +56,6 @@ _DROP_TYPES = [
     "channeltype",
     "messagestatus",
     "estimatestatus",
-    "invoicestatus",
 ]
 
 
@@ -69,15 +68,16 @@ async def _cleanup(conn):
 
 @pytest.fixture(autouse=True)
 async def setup_db():
-    engine = create_async_engine(settings.test_database_url, echo=False)
+    engine = create_async_engine(
+        settings.test_database_url, echo=False, poolclass=NullPool
+    )
     async with engine.begin() as conn:
         await _cleanup(conn)
-        await conn.run_sync(Base.metadata.drop_all)
+    async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield engine
     async with engine.begin() as conn:
         await _cleanup(conn)
-        await conn.run_sync(Base.metadata.drop_all)
     await engine.dispose()
 
 

@@ -254,18 +254,6 @@ async def test_set_default_payment_method(client):
     assert defaults[0]["last_four"] == "2222"
 
 
-async def test_invoices_empty(client):
-    token = await _register_user(client)
-    resp = await client.get(
-        "/api/subscriptions/invoices",
-        headers={"Authorization": f"Bearer {token}"},
-    )
-    assert resp.status_code == 200
-    data = resp.json()
-    assert data["items"] == []
-    assert data["total"] == 0
-
-
 async def test_usage_metrics(client):
     token = await _register_user(client)
     resp = await client.get(
