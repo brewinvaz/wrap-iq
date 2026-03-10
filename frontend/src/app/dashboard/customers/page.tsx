@@ -1,7 +1,7 @@
+'use client';
+
+import ClientsPage from '@/components/clients/ClientsPage';
+
 export default function CustomersPage() {
-  return (
-    <div className="flex h-full items-center justify-center">
-      <h1 className="text-xl font-semibold text-[#18181b]">Customers</h1>
-    </div>
-  );
+  return <ClientsPage />;
 }
