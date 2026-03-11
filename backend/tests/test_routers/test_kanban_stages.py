@@ -178,3 +178,94 @@ async def test_reorder_stages(client):
 async def test_kanban_stages_require_auth(client):
     resp = await client.get("/api/kanban-stages")
     assert resp.status_code in (401, 403)
+
+
+async def test_delete_stage_reassigns_work_orders(client):
+    """Deleting a stage with work orders reassigns them to fallback."""
+    token = await _register_user(client)
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # Seed default stages via list
+    await client.get("/api/kanban-stages", headers=headers)
+
+    # Create a custom stage
+    create_resp = await client.post(
+        "/api/kanban-stages",
+        json={"name": "Temp Stage", "position": 50},
+        headers=headers,
+    )
+    assert create_resp.status_code == 201
+    temp_stage_id = create_resp.json()["id"]
+
+    # Create a work order in the temp stage
+    wo_resp = await client.post(
+        "/api/work-orders",
+        json={"vehicle_ids": []},
+        headers=headers,
+    )
+    assert wo_resp.status_code == 201
+    wo_id = wo_resp.json()["id"]
+
+    # Move work order to the temp stage
+    status_resp = await client.patch(
+        f"/api/work-orders/{wo_id}/status",
+        json={"status_id": temp_stage_id},
+        headers=headers,
+    )
+    assert status_resp.status_code == 200
+
+    # Delete the temp stage
+    del_resp = await client.delete(
+        f"/api/kanban-stages/{temp_stage_id}",
+        headers=headers,
+    )
+    assert del_resp.status_code == 204
+
+    # Verify work order was reassigned (not orphaned)
+    wo_detail = await client.get(
+        f"/api/work-orders/{wo_id}",
+        headers=headers,
+    )
+    assert wo_detail.status_code == 200
+    assert wo_detail.json()["status"]["id"] != temp_stage_id
+
+    # Verify the stage is no longer listed
+    stages_resp2 = await client.get("/api/kanban-stages", headers=headers)
+    stage_ids = [s["id"] for s in stages_resp2.json()]
+    assert temp_stage_id not in stage_ids
+
+
+async def test_status_change_to_inactive_stage_fails(client):
+    """Cannot move a work order to an inactive/deleted stage."""
+    token = await _register_user(client)
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # Seed default stages
+    await client.get("/api/kanban-stages", headers=headers)
+
+    # Create a custom stage
+    create_resp = await client.post(
+        "/api/kanban-stages",
+        json={"name": "Soon Gone", "position": 50},
+        headers=headers,
+    )
+    stage_id = create_resp.json()["id"]
+
+    # Delete it
+    await client.delete(f"/api/kanban-stages/{stage_id}", headers=headers)
+
+    # Create a work order
+    wo_resp = await client.post(
+        "/api/work-orders",
+        json={"vehicle_ids": []},
+        headers=headers,
+    )
+    wo_id = wo_resp.json()["id"]
+
+    # Try to move work order to the deleted stage
+    resp = await client.patch(
+        f"/api/work-orders/{wo_id}/status",
+        json={"status_id": stage_id},
+        headers=headers,
+    )
+    assert resp.status_code == 404

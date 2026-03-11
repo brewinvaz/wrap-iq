@@ -78,7 +78,8 @@ async def delete_stage(
     admin: User = Depends(require_admin),
     session: AsyncSession = Depends(get_session),
 ):
-    """Soft-delete a Kanban stage. Admin only. Cannot delete system-mapped stages."""
+    """Soft-delete a Kanban stage. Admin only. Cannot delete
+    system-mapped stages. Reassigns work orders to fallback stage."""
     service = KanbanStageService(session)
     stage = await service.get_by_id(stage_id, admin.organization_id)
     if not stage:
@@ -91,8 +92,13 @@ async def delete_stage(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Cannot delete a stage with a system status mapping",
         )
-    stage.is_active = False
-    await session.commit()
+    try:
+        await service.delete_stage(stage_id, admin.organization_id)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        ) from e
 
 
 @router.post("/reorder", response_model=list[KanbanStageResponse])

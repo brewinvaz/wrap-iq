@@ -1,9 +1,10 @@
 import uuid
 
-from sqlalchemy import select, update
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.kanban_stage import KanbanStage, SystemStatus
+from app.models.work_order import WorkOrder
 
 DEFAULT_STAGES: list[dict] = [
     {
@@ -148,16 +149,61 @@ class KanbanStageService:
         await self.session.refresh(stage)
         return stage
 
+    async def get_active_by_id(
+        self, stage_id: uuid.UUID, organization_id: uuid.UUID
+    ) -> KanbanStage | None:
+        """Get a stage only if it is active."""
+        result = await self.session.execute(
+            select(KanbanStage).where(
+                KanbanStage.id == stage_id,
+                KanbanStage.organization_id == organization_id,
+                KanbanStage.is_active.is_(True),
+            )
+        )
+        return result.scalar_one_or_none()
+
     async def delete_stage(
         self, stage_id: uuid.UUID, organization_id: uuid.UUID
     ) -> KanbanStage | None:
-        """Soft-delete (deactivate) a stage. Cannot delete system-mapped stages."""
+        """Soft-delete a stage, reassigning its work orders to the
+        first active stage. Cannot delete system-mapped stages."""
         stage = await self.get_by_id(stage_id, organization_id)
         if not stage:
             return None
 
         if stage.system_status is not None:
             return None
+
+        # Count work orders in this stage
+        count_result = await self.session.execute(
+            select(func.count(WorkOrder.id)).where(WorkOrder.status_id == stage_id)
+        )
+        wo_count = count_result.scalar() or 0
+
+        if wo_count > 0:
+            # Find the first active stage to reassign to
+            fallback_result = await self.session.execute(
+                select(KanbanStage)
+                .where(
+                    KanbanStage.organization_id == organization_id,
+                    KanbanStage.is_active.is_(True),
+                    KanbanStage.id != stage_id,
+                )
+                .order_by(KanbanStage.position)
+                .limit(1)
+            )
+            fallback = fallback_result.scalar_one_or_none()
+            if not fallback:
+                raise ValueError(
+                    "Cannot delete: no other active stage to reassign work orders to"
+                )
+
+            # Reassign all work orders to the fallback stage
+            await self.session.execute(
+                update(WorkOrder)
+                .where(WorkOrder.status_id == stage_id)
+                .values(status_id=fallback.id)
+            )
 
         stage.is_active = False
         await self.session.commit()

@@ -136,11 +136,12 @@ async def change_status(
     if not wo:
         raise HTTPException(status_code=404, detail="Work order not found")
 
-    # Verify the target stage belongs to the user's org
+    # Verify the target stage belongs to the user's org and is active
     stage_result = await session.execute(
         select(KanbanStage).where(
             KanbanStage.id == data.status_id,
             KanbanStage.organization_id == user.organization_id,
+            KanbanStage.is_active.is_(True),
         )
     )
     if not stage_result.scalar_one_or_none():
