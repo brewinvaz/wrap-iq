@@ -11,5 +11,6 @@ class UserResponse(BaseModel):
     role: Role
     organization_id: uuid.UUID | None
     is_superadmin: bool
+    full_name: str | None = None
 
     model_config = {"from_attributes": True}

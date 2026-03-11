@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 import { useRole } from '@/lib/role-context';
 import { useSidebar } from '@/lib/sidebar-context';
+import { useUser } from '@/lib/user-context';
 import { ROLES, type RoleKey } from '@/lib/roles';
 import { getRefreshToken, clearTokens } from '@/lib/auth';
 import { api } from '@/lib/api-client';
@@ -17,7 +18,18 @@ export default function Sidebar() {
   const router = useRouter();
   const { currentRole, setRole, roleConfig } = useRole();
   const { mobileOpen, setMobileOpen } = useSidebar();
+  const { user } = useUser();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  // Derive avatar initials from user's full name when available
+  const avatarInitials = user?.fullName
+    ? user.fullName
+        .split(' ')
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2)
+    : roleConfig.avatarText;
   const [loggingOut, setLoggingOut] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -79,11 +91,11 @@ export default function Sidebar() {
           <div
             className={`flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full text-[10px] font-semibold text-white ${roleConfig.avatarBg}`}
           >
-            {roleConfig.avatarText}
+            {avatarInitials}
           </div>
           <div className="min-w-0 flex-1 md:hidden lg:block">
-            <p className="truncate text-[12.5px] font-medium text-[#18181b]">{roleConfig.name}</p>
-            <p className="truncate text-[10.5px] text-[#a8a8b4]">{roleConfig.title}</p>
+            <p className="truncate text-[12.5px] font-medium text-[#18181b]">{user?.fullName || roleConfig.name}</p>
+            <p className="truncate text-[10.5px] text-[#a8a8b4]">{user?.email || roleConfig.title}</p>
           </div>
           <svg className="h-3.5 w-3.5 shrink-0 text-[#a8a8b4] md:hidden lg:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
