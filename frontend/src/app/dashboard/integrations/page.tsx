@@ -70,12 +70,12 @@ export default function IntegrationsPage() {
     (async () => {
       try {
         const [webhooksData, apiKeysData] = await Promise.all([
-          api.get<Webhook[]>('/api/webhooks'),
-          api.get<ApiKey[]>('/api/api-keys'),
+          api.get<{ items: Webhook[]; total: number }>('/api/webhooks'),
+          api.get<{ items: ApiKey[]; total: number }>('/api/api-keys'),
         ]);
         if (!cancelled) {
-          setWebhooks(webhooksData ?? []);
-          setApiKeys(apiKeysData ?? []);
+          setWebhooks(webhooksData?.items ?? []);
+          setApiKeys(apiKeysData?.items ?? []);
         }
       } catch (err) {
         if (!cancelled) {
