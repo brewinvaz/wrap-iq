@@ -13,6 +13,7 @@ interface KanbanColumnProps {
   onDragLeave: (e: React.DragEvent) => void;
   dragOverColumnId: string | null;
   onAdvanceCard?: (cardId: string) => void;
+  pendingCards?: Set<string>;
 }
 
 export default function KanbanColumn({
@@ -25,6 +26,7 @@ export default function KanbanColumn({
   onDragLeave,
   dragOverColumnId,
   onAdvanceCard,
+  pendingCards,
 }: KanbanColumnProps) {
   const isDragOver = dragOverColumnId === column.id;
 
@@ -65,6 +67,7 @@ export default function KanbanColumn({
             card={card}
             onDragStart={(e, cardId) => onDragStart(e, cardId, column.id)}
             onAdvance={!isLastColumn ? onAdvanceCard : undefined}
+            isPending={pendingCards?.has(card.id)}
           />
         ))}
 
