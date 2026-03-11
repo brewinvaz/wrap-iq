@@ -89,9 +89,15 @@ class TestRenderSchemas:
         with pytest.raises(Exception):
             RenderUploadRequest(
                 files=[
-                    FileInfo(filename="a.jpg", content_type="image/jpeg", size_bytes=100),
-                    FileInfo(filename="b.jpg", content_type="image/jpeg", size_bytes=100),
-                    FileInfo(filename="c.jpg", content_type="image/jpeg", size_bytes=100),
+                    FileInfo(
+                        filename="a.jpg", content_type="image/jpeg", size_bytes=100
+                    ),
+                    FileInfo(
+                        filename="b.jpg", content_type="image/jpeg", size_bytes=100
+                    ),
+                    FileInfo(
+                        filename="c.jpg", content_type="image/jpeg", size_bytes=100
+                    ),
                 ]
             )
 
@@ -99,7 +105,9 @@ class TestRenderSchemas:
         with pytest.raises(Exception):
             RenderUploadRequest(
                 files=[
-                    FileInfo(filename="a.exe", content_type="application/exe", size_bytes=100),
+                    FileInfo(
+                        filename="a.exe", content_type="application/exe", size_bytes=100
+                    ),
                 ]
             )
 
@@ -142,8 +150,12 @@ class TestBuildRenderResponse:
             mock_dl.side_effect = lambda key: f"https://r2.example.com/{key}"
             response = render_service.build_render_response(render)
 
-        assert response.vehicle_photo_url == "https://r2.example.com/org/renders/photo.jpg"
-        assert response.result_image_url == "https://r2.example.com/org/renders/result.jpg"
+        assert (
+            response.vehicle_photo_url == "https://r2.example.com/org/renders/photo.jpg"
+        )
+        assert (
+            response.result_image_url == "https://r2.example.com/org/renders/result.jpg"
+        )
         assert response.created_by_name == "Test User"
 
     def test_uses_email_when_no_full_name(self):
@@ -188,16 +200,25 @@ class TestBuildPrompt:
 
 class TestMimeTypeFromKey:
     def test_jpeg(self):
-        assert render_service._mime_type_from_key("org/renders/photo.jpg") == "image/jpeg"
+        assert (
+            render_service._mime_type_from_key("org/renders/photo.jpg") == "image/jpeg"
+        )
 
     def test_png(self):
-        assert render_service._mime_type_from_key("org/renders/design.png") == "image/png"
+        assert (
+            render_service._mime_type_from_key("org/renders/design.png") == "image/png"
+        )
 
     def test_webp(self):
-        assert render_service._mime_type_from_key("org/renders/photo.webp") == "image/webp"
+        assert (
+            render_service._mime_type_from_key("org/renders/photo.webp") == "image/webp"
+        )
 
     def test_pdf(self):
-        assert render_service._mime_type_from_key("org/renders/design.pdf") == "application/pdf"
+        assert (
+            render_service._mime_type_from_key("org/renders/design.pdf")
+            == "application/pdf"
+        )
 
     def test_default_jpeg(self):
         assert render_service._mime_type_from_key("org/renders/unknown") == "image/jpeg"
@@ -266,7 +287,11 @@ class TestRendersRouter:
             "/api/renders/upload-urls",
             json={
                 "files": [
-                    {"filename": "bad.exe", "content_type": "application/exe", "size_bytes": 100}
+                    {
+                        "filename": "bad.exe",
+                        "content_type": "application/exe",
+                        "size_bytes": 100,
+                    }
                 ]
             },
             headers={"Authorization": f"Bearer {token}"},

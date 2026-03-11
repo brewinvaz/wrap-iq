@@ -174,7 +174,9 @@ async def create_render(
     if not wrap_design_key.startswith(org_prefix):
         raise ValueError("Invalid wrap design key")
 
-    await validate_ownership(session, user.organization_id, work_order_id, client_id, vehicle_id)
+    await validate_ownership(
+        session, user.organization_id, work_order_id, client_id, vehicle_id
+    )
 
     render = Render(
         organization_id=user.organization_id,
@@ -226,9 +228,7 @@ async def list_renders(
 ) -> tuple[list[Render], int]:
     query = select(Render).where(Render.organization_id == org_id)
     count_query = (
-        select(func.count())
-        .select_from(Render)
-        .where(Render.organization_id == org_id)
+        select(func.count()).select_from(Render).where(Render.organization_id == org_id)
     )
 
     if status_filter:
@@ -267,10 +267,12 @@ async def get_render(
     return result.scalar_one_or_none()
 
 
-async def delete_render(
-    session: AsyncSession, render: Render
-) -> None:
-    for key in [render.vehicle_photo_key, render.wrap_design_key, render.result_image_key]:
+async def delete_render(session: AsyncSession, render: Render) -> None:
+    for key in [
+        render.vehicle_photo_key,
+        render.wrap_design_key,
+        render.result_image_key,
+    ]:
         if key:
             try:
                 delete_object(key)
@@ -320,9 +322,7 @@ async def regenerate_render(
     return render
 
 
-async def generate_share_token(
-    session: AsyncSession, render: Render
-) -> str:
+async def generate_share_token(session: AsyncSession, render: Render) -> str:
     if render.share_token:
         return render.share_token
 
@@ -333,10 +333,6 @@ async def generate_share_token(
     return token
 
 
-async def get_render_by_share_token(
-    session: AsyncSession, token: str
-) -> Render | None:
-    result = await session.execute(
-        select(Render).where(Render.share_token == token)
-    )
+async def get_render_by_share_token(session: AsyncSession, token: str) -> Render | None:
+    result = await session.execute(select(Render).where(Render.share_token == token))
     return result.scalar_one_or_none()
