@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import KanbanBoard from '@/components/kanban/KanbanBoard';
 import MetricsBar from '@/components/dashboard/MetricsBar';
 import { api, ApiError } from '@/lib/api-client';
@@ -224,9 +224,21 @@ function ErrorBanner({ message, onRetry }: { message: string; onRetry: () => voi
 type ViewMode = 'kanban' | 'list' | 'calendar';
 type FilterMode = 'all' | 'my-jobs' | 'urgent';
 
+interface FilterCriteria {
+  priority: ('high' | 'medium' | 'low')[];
+  jobType: ('commercial' | 'personal')[];
+}
+
 export default function DashboardPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('kanban');
   const [filter, setFilter] = useState<FilterMode>('all');
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>({
+    priority: [],
+    jobType: [],
+  });
+  const filterRef = useRef<HTMLDivElement>(null);
+  const filterBtnRef = useRef<HTMLButtonElement>(null);
 
   // Data state
   const [columns, setColumns] = useState<KanbanColumn[]>([]);
@@ -245,6 +257,23 @@ export default function DashboardPage() {
   // Keep raw API data for KPI computation and status-change lookups
   const [stages, setStages] = useState<KanbanStageResponse[]>([]);
   const [workOrders, setWorkOrders] = useState<WorkOrderResponse[]>([]);
+
+  // Close filter dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        filterOpen &&
+        filterRef.current &&
+        filterBtnRef.current &&
+        !filterRef.current.contains(e.target as Node) &&
+        !filterBtnRef.current.contains(e.target as Node)
+      ) {
+        setFilterOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [filterOpen]);
 
   // ------ Data fetching ------
 
@@ -291,6 +320,44 @@ export default function DashboardPage() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // ------ Filtered columns (apply quick-filter + dropdown filters) ------
+
+  const activeFilterCount =
+    filterCriteria.priority.length + filterCriteria.jobType.length;
+
+  const filteredColumns = useMemo(() => {
+    // Determine which work orders pass the active filters
+    const matchesFilter = (wo: WorkOrderResponse): boolean => {
+      // Quick-filter
+      if (filter === 'urgent' && wo.priority !== 'high') return false;
+      // Dropdown filters
+      if (
+        filterCriteria.priority.length > 0 &&
+        !filterCriteria.priority.includes(wo.priority)
+      )
+        return false;
+      if (
+        filterCriteria.jobType.length > 0 &&
+        !filterCriteria.jobType.includes(wo.job_type)
+      )
+        return false;
+      return true;
+    };
+
+    const hasAnyFilter =
+      filter !== 'all' || activeFilterCount > 0;
+
+    if (!hasAnyFilter) return columns;
+
+    return columns.map((col) => ({
+      ...col,
+      cards: col.cards.filter((card) => {
+        const wo = workOrders.find((w) => w.job_number === card.id);
+        return wo ? matchesFilter(wo) : true;
+      }),
+    }));
+  }, [columns, filter, filterCriteria, workOrders, activeFilterCount]);
 
   // ------ Drag-and-drop status change ------
 
@@ -415,12 +482,100 @@ export default function DashboardPage() {
             </span>
           </div>
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 rounded-lg border border-[#e6e6eb] bg-white px-3.5 py-2 text-sm font-medium text-[#60606a] transition-colors hover:bg-gray-50">
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
-              </svg>
-              Filter
-            </button>
+            <div className="relative">
+              <button
+                ref={filterBtnRef}
+                onClick={() => setFilterOpen((o) => !o)}
+                className={`flex items-center gap-2 rounded-lg border px-3.5 py-2 text-sm font-medium transition-colors ${
+                  activeFilterCount > 0
+                    ? 'border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100'
+                    : 'border-[#e6e6eb] bg-white text-[#60606a] hover:bg-gray-50'
+                }`}
+              >
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
+                </svg>
+                Filter
+                {activeFilterCount > 0 && (
+                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-blue-600 px-1 text-[11px] font-semibold text-white">
+                    {activeFilterCount}
+                  </span>
+                )}
+              </button>
+
+              {filterOpen && (
+                <div
+                  ref={filterRef}
+                  className="absolute right-0 top-11 z-50 w-64 rounded-xl border border-[#e6e6eb] bg-white shadow-lg"
+                >
+                  <div className="border-b border-[#e6e6eb] px-4 py-3">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-[14px] font-semibold text-[#18181b]">Filters</h3>
+                      {activeFilterCount > 0 && (
+                        <button
+                          onClick={() => setFilterCriteria({ priority: [], jobType: [] })}
+                          className="text-[12px] font-medium text-blue-600 hover:text-blue-700"
+                        >
+                          Clear all
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="p-4 space-y-4">
+                    {/* Priority filter */}
+                    <div>
+                      <p className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-[#a8a8b4]">Priority</p>
+                      <div className="space-y-1.5">
+                        {(['high', 'medium', 'low'] as const).map((p) => (
+                          <label key={p} className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-[#18181b] hover:bg-[#f4f4f6]">
+                            <input
+                              type="checkbox"
+                              checked={filterCriteria.priority.includes(p)}
+                              onChange={() =>
+                                setFilterCriteria((prev) => ({
+                                  ...prev,
+                                  priority: prev.priority.includes(p)
+                                    ? prev.priority.filter((x) => x !== p)
+                                    : [...prev.priority, p],
+                                }))
+                              }
+                              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            />
+                            <span className="capitalize">{p}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Job type filter */}
+                    <div>
+                      <p className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-[#a8a8b4]">Job Type</p>
+                      <div className="space-y-1.5">
+                        {(['commercial', 'personal'] as const).map((t) => (
+                          <label key={t} className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-[#18181b] hover:bg-[#f4f4f6]">
+                            <input
+                              type="checkbox"
+                              checked={filterCriteria.jobType.includes(t)}
+                              onChange={() =>
+                                setFilterCriteria((prev) => ({
+                                  ...prev,
+                                  jobType: prev.jobType.includes(t)
+                                    ? prev.jobType.filter((x) => x !== t)
+                                    : [...prev.jobType, t],
+                                }))
+                              }
+                              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            />
+                            <span className="capitalize">{t}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
             <button className="rounded-lg bg-blue-600 px-3.5 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700">
               + New Project
             </button>
@@ -502,7 +657,7 @@ export default function DashboardPage() {
           loading ? (
             <KanbanBoardSkeleton />
           ) : (
-            <KanbanBoard columns={columns} onStatusChange={handleStatusChange} pendingCards={pendingCards} />
+            <KanbanBoard columns={filteredColumns} onStatusChange={handleStatusChange} pendingCards={pendingCards} />
           )
         )}
         {viewMode === 'list' && (

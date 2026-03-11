@@ -1,10 +1,11 @@
 import uuid
 from datetime import UTC, datetime
 
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.models.client import Client
 from app.models.work_order import WorkOrder, WorkOrderVehicle
 
 
@@ -66,6 +67,7 @@ async def list_work_orders(
     status_id: uuid.UUID | None = None,
     skip: int = 0,
     limit: int = 50,
+    search: str | None = None,
 ) -> tuple[list[WorkOrder], int]:
     query = select(WorkOrder).where(WorkOrder.organization_id == org_id)
     count_query = select(func.count(WorkOrder.id)).where(
@@ -75,6 +77,22 @@ async def list_work_orders(
     if status_id:
         query = query.where(WorkOrder.status_id == status_id)
         count_query = count_query.where(WorkOrder.status_id == status_id)
+
+    if search:
+        pattern = f"%{search}%"
+        search_filter = or_(
+            WorkOrder.job_number.ilike(pattern),
+            WorkOrder.client.has(Client.name.ilike(pattern)),
+        )
+        query = query.where(search_filter)
+        count_query = count_query.where(
+            or_(
+                WorkOrder.job_number.ilike(pattern),
+                WorkOrder.client_id.in_(
+                    select(Client.id).where(Client.name.ilike(pattern))
+                ),
+            )
+        )
 
     total_result = await session.execute(count_query)
     total = total_result.scalar() or 0

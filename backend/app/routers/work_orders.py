@@ -137,13 +137,14 @@ async def create(
 @router.get("", response_model=WorkOrderListResponse)
 async def list_all(
     status_id: uuid.UUID | None = Query(None),
+    search: str | None = Query(None, max_length=200),
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=100),
     session: AsyncSession = Depends(get_session),
     user: User = Depends(get_current_user),
 ):
     items, total = await list_work_orders(
-        session, user.organization_id, status_id, skip, limit
+        session, user.organization_id, status_id, skip, limit, search=search
     )
     return WorkOrderListResponse(
         items=[_to_response(wo) for wo in items],
