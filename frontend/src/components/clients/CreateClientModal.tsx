@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { api, ApiError } from '@/lib/api-client';
+import { useModalAccessibility } from '@/hooks/useModalAccessibility';
 
 interface CreateClientModalProps {
   isOpen: boolean;
@@ -36,6 +37,7 @@ export default function CreateClientModal({
   const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const modalRef = useModalAccessibility(isOpen, onClose);
 
   if (!isOpen) return null;
 
@@ -100,9 +102,15 @@ export default function CreateClientModal({
         onClick={onClose}
       />
 
-      <div className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
+      <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="create-client-title"
+        className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
+      >
         <div className="mb-6 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-[#18181b]">
+          <h3 id="create-client-title" className="text-lg font-semibold text-[#18181b]">
             Create New Client
           </h3>
           <button
