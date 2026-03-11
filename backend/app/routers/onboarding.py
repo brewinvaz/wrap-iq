@@ -14,7 +14,7 @@ from app.schemas.onboarding import (
 )
 from app.services.email import send_magic_link_email
 from app.services.onboarding import OnboardingService
-from app.services.r2 import generate_object_key, generate_upload_url
+from app.services.r2 import generate_object_key, generate_upload_url, validate_file_keys
 from app.services.vin import decode_vin
 
 logger = logging.getLogger("wrapiq")
@@ -104,6 +104,16 @@ async def submit_onboarding(
     invite = await _get_valid_invite(token, session)
     service = OnboardingService(session)
 
+    # Validate file keys belong to the invite's organization before processing
+    file_key_dicts = [fk.model_dump() for fk in body.file_keys]
+    try:
+        validate_file_keys(invite.organization_id, file_key_dicts)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
+
     try:
         result = await service.submit_onboarding(
             invite=invite,
@@ -116,7 +126,7 @@ async def submit_onboarding(
             job_type=body.job_type,
             project_description=body.project_description,
             referral_source=body.referral_source,
-            file_keys=[fk.model_dump() for fk in body.file_keys],
+            file_keys=file_key_dicts,
         )
     except ValueError as e:
         raise HTTPException(
