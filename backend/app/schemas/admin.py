@@ -24,6 +24,8 @@ class UserDetailResponse(UserListResponse):
 
 
 class InviteUserResponse(UserDetailResponse):
+    """Response for user invitation that includes the temporary password."""
+
     temp_password: str
 
 
