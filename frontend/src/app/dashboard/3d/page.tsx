@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useModalAccessibility } from '@/hooks/useModalAccessibility';
 
 type RenderStatus = 'all' | 'rendering' | 'ready' | 'draft';
 
@@ -29,8 +30,170 @@ const statusStyles: Record<RenderPreview['status'], { bg: string; text: string; 
   draft: { bg: 'bg-gray-100', text: 'text-gray-600', label: 'Draft' },
 };
 
+function NewRenderModal({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) {
+  const [designName, setDesignName] = useState('');
+  const [vehicle, setVehicle] = useState('');
+  const [client, setClient] = useState('');
+  const [notes, setNotes] = useState('');
+  const modalRef = useModalAccessibility(isOpen, onClose);
+
+  if (!isOpen) return null;
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    // Placeholder: no backend endpoint exists yet for 3D renders.
+    // When the backend is ready, submit payload here.
+    alert('Render request submitted! This feature is coming soon.');
+    setDesignName('');
+    setVehicle('');
+    setClient('');
+    setNotes('');
+    onClose();
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        onClick={onClose}
+      />
+
+      <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="new-render-title"
+        className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
+      >
+        <div className="mb-6 flex items-center justify-between">
+          <h3 id="new-render-title" className="text-lg font-semibold text-[#18181b]">
+            New 3D Render
+          </h3>
+          <button
+            onClick={onClose}
+            className="rounded-lg p-1 text-[#a8a8b4] transition-colors hover:bg-gray-100 hover:text-[#18181b]"
+          >
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+          3D rendering backend is not yet available. This form is a placeholder for the upcoming feature.
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label
+              htmlFor="design-name"
+              className="mb-1.5 block text-sm font-medium text-[#18181b]"
+            >
+              Design Name
+            </label>
+            <input
+              id="design-name"
+              type="text"
+              value={designName}
+              onChange={(e) => setDesignName(e.target.value)}
+              placeholder="e.g. Fleet Branding v2"
+              required
+              className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] placeholder-[#a8a8b4] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="vehicle"
+              className="mb-1.5 block text-sm font-medium text-[#18181b]"
+            >
+              Vehicle
+            </label>
+            <input
+              id="vehicle"
+              type="text"
+              value={vehicle}
+              onChange={(e) => setVehicle(e.target.value)}
+              placeholder="e.g. 2024 Ford Transit"
+              required
+              className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] placeholder-[#a8a8b4] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="client-name"
+              className="mb-1.5 block text-sm font-medium text-[#18181b]"
+            >
+              Client
+            </label>
+            <input
+              id="client-name"
+              type="text"
+              value={client}
+              onChange={(e) => setClient(e.target.value)}
+              placeholder="e.g. Metro Plumbing"
+              className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] placeholder-[#a8a8b4] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="render-notes"
+              className="mb-1.5 block text-sm font-medium text-[#18181b]"
+            >
+              Notes
+            </label>
+            <textarea
+              id="render-notes"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Optional notes about the render..."
+              rows={3}
+              className="w-full resize-none rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] placeholder-[#a8a8b4] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
+          </div>
+
+          <div className="flex items-center gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 rounded-lg border border-[#e6e6eb] px-4 py-2.5 text-sm font-medium text-[#60606a] transition-colors hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+            >
+              Create Render
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 export default function ThreeDPage() {
   const [filter, setFilter] = useState<RenderStatus>('all');
+  const [showNewRender, setShowNewRender] = useState(false);
   const filtered = filter === 'all' ? renders : renders.filter((r) => r.status === filter);
 
   return (
@@ -43,7 +206,10 @@ export default function ThreeDPage() {
               {renders.length} renders
             </span>
           </div>
-          <button className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700">
+          <button
+            onClick={() => setShowNewRender(true)}
+            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+          >
             + New Render
           </button>
         </div>
@@ -93,6 +259,8 @@ export default function ThreeDPage() {
           })}
         </div>
       </div>
+
+      <NewRenderModal isOpen={showNewRender} onClose={() => setShowNewRender(false)} />
     </div>
   );
 }
