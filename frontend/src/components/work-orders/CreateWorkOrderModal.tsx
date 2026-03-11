@@ -1,19 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { api, ApiError } from '@/lib/api-client';
+
+interface Client {
+  id: string;
+  name: string;
+}
+
+interface ClientListResponse {
+  items: Client[];
+  total: number;
+}
 
 interface CreateWorkOrderModalProps {
   isOpen: boolean;
   onClose: () => void;
   onCreate: () => void;
-}
-
-const UUID_RE =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-function isValidUUID(value: string): boolean {
-  return UUID_RE.test(value);
 }
 
 function todayString() {
@@ -32,8 +35,30 @@ export default function CreateWorkOrderModal({
   const [estimatedCompletionDate, setEstimatedCompletionDate] = useState('');
   const [internalNotes, setInternalNotes] = useState('');
   const [clientId, setClientId] = useState('');
+  const [clients, setClients] = useState<Client[]>([]);
+  const [isLoadingClients, setIsLoadingClients] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!isOpen) return;
+    let cancelled = false;
+    setIsLoadingClients(true);
+    api
+      .get<ClientListResponse>('/api/clients?limit=500')
+      .then((data) => {
+        if (!cancelled) setClients(data.items);
+      })
+      .catch(() => {
+        /* clients will remain empty; user can still type a UUID */
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingClients(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -69,13 +94,8 @@ export default function CreateWorkOrderModal({
       if (internalNotes.trim()) {
         payload.internal_notes = internalNotes.trim();
       }
-      if (clientId.trim()) {
-        if (!isValidUUID(clientId.trim())) {
-          setError('Client ID must be a valid UUID.');
-          setIsSubmitting(false);
-          return;
-        }
-        payload.client_id = clientId.trim();
+      if (clientId) {
+        payload.client_id = clientId;
       }
 
       await api.post('/api/work-orders', payload);
@@ -234,16 +254,24 @@ export default function CreateWorkOrderModal({
               htmlFor="client-id"
               className="mb-1.5 block text-sm font-medium text-[#18181b]"
             >
-              Client ID
+              Client
             </label>
-            <input
+            <select
               id="client-id"
-              type="text"
               value={clientId}
               onChange={(e) => setClientId(e.target.value)}
-              placeholder="UUID (optional)"
-              className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] placeholder-[#a8a8b4] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            />
+              disabled={isLoadingClients}
+              className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+            >
+              <option value="">
+                {isLoadingClients ? 'Loading clients...' : 'None (optional)'}
+              </option>
+              {clients.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>
