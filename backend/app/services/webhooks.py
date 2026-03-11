@@ -173,8 +173,8 @@ class WebhookService:
 
             delivery = WebhookDelivery(
                 id=uuid.uuid4(),
+                organization_id=org_id,
                 webhook_id=webhook.id,
-                organization_id=webhook.organization_id,
                 event_type=event_type,
                 payload=full_payload,
             )
@@ -220,8 +220,8 @@ class WebhookService:
 
         delivery = WebhookDelivery(
             id=uuid.uuid4(),
+            organization_id=org_id,
             webhook_id=webhook.id,
-            organization_id=webhook.organization_id,
             event_type="webhook.test",
             payload=test_payload,
         )

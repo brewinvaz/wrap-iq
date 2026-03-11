@@ -23,12 +23,6 @@ class UserDetailResponse(UserListResponse):
     updated_at: datetime
 
 
-class InviteUserResponse(UserDetailResponse):
-    """Response for user invitation that includes the temporary password."""
-
-    temp_password: str
-
-
 class UpdateRoleRequest(BaseModel):
     role: Role
 

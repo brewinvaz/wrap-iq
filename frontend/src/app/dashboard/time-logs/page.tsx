@@ -1,6 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+const summaryStats = [
+  { label: 'Total Hours (This Week)', value: '142.5', accent: false },
+  { label: 'Pending Approval', value: '18.5 hrs', accent: true },
+  { label: 'Approved', value: '124.0 hrs', accent: false },
+  { label: 'Team Members Logged', value: '6 / 7', accent: false },
+];
 
 interface TimeLog {
   id: string;
@@ -14,52 +19,31 @@ interface TimeLog {
   status: 'submitted' | 'approved';
 }
 
-interface SummaryStat {
-  label: string;
-  value: string;
-  accent: boolean;
-}
-
-function computeStats(logs: TimeLog[]): SummaryStat[] {
-  const totalHours = logs.reduce((sum, l) => sum + l.hours, 0);
-  const pendingHours = logs
-    .filter((l) => l.status === 'submitted')
-    .reduce((sum, l) => sum + l.hours, 0);
-  const approvedHours = logs
-    .filter((l) => l.status === 'approved')
-    .reduce((sum, l) => sum + l.hours, 0);
-  const uniqueMembers = new Set(logs.map((l) => l.member)).size;
-
-  return [
-    { label: 'Total Hours (This Week)', value: totalHours > 0 ? totalHours.toFixed(1) : '0', accent: false },
-    { label: 'Pending Approval', value: pendingHours > 0 ? `${pendingHours.toFixed(1)} hrs` : '0 hrs', accent: pendingHours > 0 },
-    { label: 'Approved', value: approvedHours > 0 ? `${approvedHours.toFixed(1)} hrs` : '0 hrs', accent: false },
-    { label: 'Team Members Logged', value: `${uniqueMembers}`, accent: false },
-  ];
-}
+const timeLogs: TimeLog[] = [
+  { id: '1', member: 'Marcus Johnson', initials: 'MJ', color: 'bg-blue-500', project: 'Metro Plumbing Fleet #12', task: 'Installation', hours: 8.0, date: '2026-03-10', status: 'submitted' },
+  { id: '2', member: 'Sarah Chen', initials: 'SC', color: 'bg-violet-500', project: 'FastFreight Box Truck', task: 'Design — Side Panels', hours: 4.5, date: '2026-03-10', status: 'submitted' },
+  { id: '3', member: 'Alex Rivera', initials: 'AR', color: 'bg-emerald-500', project: 'CleanCo Sprinter', task: 'Print + Laminate', hours: 6.0, date: '2026-03-10', status: 'approved' },
+  { id: '4', member: 'Jordan Lee', initials: 'JL', color: 'bg-amber-500', project: 'Elite Auto Sedan', task: 'Design — Revision 2', hours: 3.0, date: '2026-03-10', status: 'approved' },
+  { id: '5', member: 'Taylor Wright', initials: 'TW', color: 'bg-rose-500', project: 'Skyline Trailer', task: 'Installation', hours: 8.0, date: '2026-03-09', status: 'approved' },
+  { id: '6', member: 'Devon Patel', initials: 'DP', color: 'bg-teal-500', project: 'Skyline Trailer', task: 'Installation (assist)', hours: 8.0, date: '2026-03-09', status: 'approved' },
+  { id: '7', member: 'Marcus Johnson', initials: 'MJ', color: 'bg-blue-500', project: 'Summit Electric Pickup', task: 'Installation', hours: 3.0, date: '2026-03-09', status: 'approved' },
+  { id: '8', member: 'Sarah Chen', initials: 'SC', color: 'bg-violet-500', project: 'Greenfield SUV', task: 'Design — Initial', hours: 5.0, date: '2026-03-09', status: 'submitted' },
+];
 
 export default function TimeLogsPage() {
-  const [timeLogs] = useState<TimeLog[]>([]);
-  const summaryStats = computeStats(timeLogs);
-
   return (
     <div className="flex h-full flex-col">
       <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <h1 className="text-xl font-bold text-[#18181b]">Time Logs</h1>
-          </div>
-          <div className="relative group">
-            <button
-              disabled
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white opacity-50 cursor-not-allowed"
-            >
-              Export CSV
-            </button>
-            <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
-              Coming soon
+            <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-[#60606a]">
+              Week of Mar 9
             </span>
           </div>
+          <button className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700">
+            Export CSV
+          </button>
         </div>
       </header>
 
@@ -79,76 +63,53 @@ export default function TimeLogsPage() {
           <div className="border-b border-[#e6e6eb] px-5 py-3">
             <h2 className="text-sm font-semibold text-[#18181b]">All Time Entries</h2>
           </div>
-
-          {timeLogs.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-              <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-                <svg className="h-6 w-6 text-[#a8a8b4]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                </svg>
-              </div>
-              <p className="text-sm font-medium text-[#18181b]">No time logs yet</p>
-              <p className="mt-1 max-w-sm text-sm text-[#a8a8b4]">
-                Time entries will appear here as team members log their hours.
-              </p>
-            </div>
-          ) : (
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-[#e6e6eb] bg-[#f4f4f6]">
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Team Member</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Project</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Task</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Hours</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Date</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Status</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {timeLogs.map((log) => (
-                  <tr key={log.id} className="border-b border-[#e6e6eb] last:border-0 hover:bg-[#f4f4f6]/50">
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <div className={`flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-semibold text-white ${log.color}`}>
-                          {log.initials}
-                        </div>
-                        <span className="font-medium text-[#18181b]">{log.member}</span>
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-[#e6e6eb] bg-[#f4f4f6]">
+                <th className="px-4 py-3 text-left font-medium text-[#60606a]">Team Member</th>
+                <th className="px-4 py-3 text-left font-medium text-[#60606a]">Project</th>
+                <th className="px-4 py-3 text-left font-medium text-[#60606a]">Task</th>
+                <th className="px-4 py-3 text-left font-medium text-[#60606a]">Hours</th>
+                <th className="px-4 py-3 text-left font-medium text-[#60606a]">Date</th>
+                <th className="px-4 py-3 text-left font-medium text-[#60606a]">Status</th>
+                <th className="px-4 py-3 text-left font-medium text-[#60606a]">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {timeLogs.map((log) => (
+                <tr key={log.id} className="border-b border-[#e6e6eb] last:border-0 hover:bg-[#f4f4f6]/50">
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <div className={`flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-semibold text-white ${log.color}`}>
+                        {log.initials}
                       </div>
-                    </td>
-                    <td className="px-4 py-3 text-[#60606a]">{log.project}</td>
-                    <td className="px-4 py-3 text-[#60606a]">{log.task}</td>
-                    <td className="px-4 py-3 font-medium text-[#18181b]">{log.hours}h</td>
-                    <td className="px-4 py-3 text-[#60606a]">{log.date}</td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-                        log.status === 'approved'
-                          ? 'bg-emerald-50 text-emerald-700'
-                          : 'bg-amber-50 text-amber-700'
-                      }`}>
-                        {log.status === 'approved' ? 'Approved' : 'Submitted'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      {log.status === 'submitted' && (
-                        <div className="relative group/approve">
-                          <button
-                            disabled
-                            className="text-xs font-medium text-emerald-600 opacity-50 cursor-not-allowed"
-                          >
-                            Approve
-                          </button>
-                          <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover/approve:opacity-100">
-                            Coming soon
-                          </span>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+                      <span className="font-medium text-[#18181b]">{log.member}</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-[#60606a]">{log.project}</td>
+                  <td className="px-4 py-3 text-[#60606a]">{log.task}</td>
+                  <td className="px-4 py-3 font-medium text-[#18181b]">{log.hours}h</td>
+                  <td className="px-4 py-3 text-[#60606a]">{log.date}</td>
+                  <td className="px-4 py-3">
+                    <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
+                      log.status === 'approved'
+                        ? 'bg-emerald-50 text-emerald-700'
+                        : 'bg-amber-50 text-amber-700'
+                    }`}>
+                      {log.status === 'approved' ? 'Approved' : 'Submitted'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    {log.status === 'submitted' && (
+                      <button className="text-xs font-medium text-emerald-600 hover:text-emerald-800">
+                        Approve
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

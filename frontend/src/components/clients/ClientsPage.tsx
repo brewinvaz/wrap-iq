@@ -178,7 +178,7 @@ export default function ClientsPage() {
           onSelect={setSelectedClient}
         />
         {selectedClient ? (
-          <ClientDetail client={selectedClient} onClientUpdated={fetchClients} />
+          <ClientDetail client={selectedClient} />
         ) : (
           <div className="flex flex-1 items-center justify-center bg-[#f4f4f6]">
             <p className="text-sm text-gray-400">
