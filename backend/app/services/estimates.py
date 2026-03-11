@@ -67,6 +67,7 @@ class EstimateService:
             item = EstimateLineItem(
                 id=uuid.uuid4(),
                 estimate_id=estimate.id,
+                organization_id=org_id,
                 description=li["description"],
                 quantity=quantity,
                 unit_price=unit_price,
@@ -160,6 +161,7 @@ class EstimateService:
         item = EstimateLineItem(
             id=uuid.uuid4(),
             estimate_id=estimate.id,
+            organization_id=org_id,
             description=description,
             quantity=quantity,
             unit_price=unit_price,

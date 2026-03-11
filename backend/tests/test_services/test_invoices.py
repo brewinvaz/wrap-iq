@@ -248,9 +248,7 @@ async def test_update_invoice_subtotal_recalculates(db_session):
     assert invoice.tax_amount == 1000
     assert invoice.total == 11000
 
-    updated = await service.update(
-        invoice.id, org.id, subtotal=20000
-    )
+    updated = await service.update(invoice.id, org.id, subtotal=20000)
     assert updated.subtotal == 20000
     assert updated.tax_amount == 2000
     assert updated.total == 22000
@@ -269,9 +267,7 @@ async def test_update_invoice_tax_rate_recalculates(db_session):
         tax_rate=Decimal("10"),
     )
 
-    updated = await service.update(
-        invoice.id, org.id, tax_rate=Decimal("20")
-    )
+    updated = await service.update(invoice.id, org.id, tax_rate=Decimal("20"))
     assert updated.tax_rate == Decimal("20")
     assert updated.tax_amount == 2000
     assert updated.total == 12000
@@ -292,9 +288,7 @@ async def test_update_invoice_preserves_amount_paid(db_session):
     # Pay 5000 of the 11000 total
     await service.record_payment(invoice.id, org.id, amount=5000)
 
-    updated = await service.update(
-        invoice.id, org.id, subtotal=20000
-    )
+    updated = await service.update(invoice.id, org.id, subtotal=20000)
     assert updated.total == 22000
     assert updated.amount_paid == 5000
     assert updated.balance_due == 17000
@@ -304,7 +298,5 @@ async def test_update_invoice_not_found(db_session):
     org = await _seed(db_session)
     service = InvoiceService(db_session)
 
-    result = await service.update(
-        uuid.uuid4(), org.id, client_name="X"
-    )
+    result = await service.update(uuid.uuid4(), org.id, client_name="X")
     assert result is None
