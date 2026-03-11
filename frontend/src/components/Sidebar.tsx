@@ -12,6 +12,12 @@ import { api } from '@/lib/api-client';
 const INTERNAL_ROLES: RoleKey[] = ['admin', 'pm', 'installer', 'designer', 'production'];
 const CLIENT_ROLES: RoleKey[] = ['client'];
 
+interface UserInfo {
+  email: string;
+  first_name: string | null;
+  last_name: string | null;
+}
+
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
@@ -19,6 +25,7 @@ export default function Sidebar() {
   const { mobileOpen, setMobileOpen } = useSidebar();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -37,6 +44,28 @@ export default function Sidebar() {
   useEffect(() => {
     setMobileOpen(false);
   }, [pathname, setMobileOpen]);
+
+  // Fetch current user's profile
+  useEffect(() => {
+    let cancelled = false;
+    api.get<UserInfo>('/api/users/me')
+      .then((data) => {
+        if (!cancelled) setUserInfo(data);
+      })
+      .catch(() => {
+        // Silently fail — sidebar will fall back to role defaults
+      });
+    return () => { cancelled = true; };
+  }, []);
+
+  // Derive display name and initials from user profile
+  const displayName = userInfo
+    ? [userInfo.first_name, userInfo.last_name].filter(Boolean).join(' ') || roleConfig.name
+    : roleConfig.name;
+  const displayEmail = userInfo?.email ?? roleConfig.title;
+  const displayInitials = userInfo?.first_name && userInfo?.last_name
+    ? `${userInfo.first_name[0]}${userInfo.last_name[0]}`.toUpperCase()
+    : roleConfig.avatarText;
 
   async function handleLogout() {
     setLoggingOut(true);
@@ -79,11 +108,11 @@ export default function Sidebar() {
           <div
             className={`flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full text-[10px] font-semibold text-white ${roleConfig.avatarBg}`}
           >
-            {roleConfig.avatarText}
+            {displayInitials}
           </div>
           <div className="min-w-0 flex-1 md:hidden lg:block">
-            <p className="truncate text-[12.5px] font-medium text-[#18181b]">{roleConfig.name}</p>
-            <p className="truncate text-[10.5px] text-[#a8a8b4]">{roleConfig.title}</p>
+            <p className="truncate text-[12.5px] font-medium text-[#18181b]">{displayName}</p>
+            <p className="truncate text-[10.5px] text-[#a8a8b4]">{displayEmail}</p>
           </div>
           <svg className="h-3.5 w-3.5 shrink-0 text-[#a8a8b4] md:hidden lg:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
