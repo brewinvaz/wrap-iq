@@ -34,7 +34,10 @@ async def register(
     service = AuthService(session)
     try:
         tokens = await service.register(
-            email=body.email, password=body.password, org_name=body.org_name
+            email=body.email,
+            password=body.password,
+            full_name=body.full_name,
+            org_name=body.org_name,
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))

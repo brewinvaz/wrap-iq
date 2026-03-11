@@ -34,6 +34,7 @@ async def test_register(client):
         json={
             "email": "new@shop.com",
             "password": "testpass123",
+            "full_name": "New Owner",
             "org_name": "New Shop",
         },
     )

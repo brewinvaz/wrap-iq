@@ -27,7 +27,11 @@ class AuthService:
         self.session = session
 
     async def register(
-        self, email: str, password: str, org_name: str
+        self,
+        email: str,
+        password: str,
+        org_name: str,
+        full_name: str = "",
     ) -> dict[str, str]:
         existing = await self.session.execute(select(User).where(User.email == email))
         if existing.scalar_one_or_none():
@@ -49,6 +53,7 @@ class AuthService:
             id=uuid.uuid4(),
             organization_id=org.id,
             email=email,
+            full_name=full_name or None,
             password_hash=hash_password(password),
             role=Role.ADMIN,
         )

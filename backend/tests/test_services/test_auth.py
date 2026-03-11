@@ -26,6 +26,7 @@ async def test_register(auth_service, default_plan):
         email="admin@newshop.com",
         password="securepass123",
         org_name="New Wrap Shop",
+        full_name="Admin User",
     )
     assert "access_token" in result
     assert "refresh_token" in result
@@ -36,6 +37,7 @@ async def test_register(auth_service, default_plan):
     user = user.scalar_one()
     assert user.role == Role.ADMIN
     assert user.organization_id is not None
+    assert user.full_name == "Admin User"
 
 
 async def test_register_duplicate_email(auth_service, default_plan):

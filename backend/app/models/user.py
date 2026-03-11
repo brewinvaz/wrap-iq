@@ -25,6 +25,9 @@ class User(Base, TimestampMixin):
         Uuid, ForeignKey("organizations.id"), index=True, nullable=True
     )
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
+    full_name: Mapped[str | None] = mapped_column(
+        String(255), nullable=True
+    )
     password_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
     role: Mapped[Role] = mapped_column(
         Enum(Role, values_callable=lambda e: [m.value for m in e]),
