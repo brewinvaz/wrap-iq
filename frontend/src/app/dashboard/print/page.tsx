@@ -1,9 +1,47 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { api, ApiError } from '@/lib/api-client';
 import { useModalAccessibility } from '@/hooks/useModalAccessibility';
 
 type PrintStatus = 'all' | 'queued' | 'printing' | 'laminating' | 'done';
+
+interface ApiKanbanStage {
+  id: string;
+  name: string;
+  color: string;
+  system_status: string | null;
+}
+
+interface ApiVehicle {
+  id: string;
+  make: string | null;
+  model: string | null;
+  year: number | null;
+}
+
+interface ApiWorkOrder {
+  id: string;
+  job_number: string;
+  job_type: string;
+  job_value: number;
+  priority: string;
+  date_in: string;
+  estimated_completion_date: string | null;
+  completion_date: string | null;
+  internal_notes: string | null;
+  status: ApiKanbanStage | null;
+  vehicles: ApiVehicle[];
+  client_id: string | null;
+  client_name: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+interface ApiWorkOrderListResponse {
+  items: ApiWorkOrder[];
+  total: number;
+}
 
 interface PrintJob {
   id: string;
@@ -17,15 +55,49 @@ interface PrintJob {
   notes?: string;
 }
 
-const SEED_JOBS: PrintJob[] = [
-  { id: '1', jobName: 'Fleet Van #12 — Full Wrap', client: 'Metro Plumbing', material: '3M IJ180Cv3', size: '4\' x 25\'', status: 'printing', dueDate: '2026-03-11', priority: 'high' },
-  { id: '2', jobName: 'Box Truck — Partial Wrap', client: 'FastFreight Inc.', material: 'Avery MPI 1105', size: '5\' x 20\'', status: 'queued', dueDate: '2026-03-12', priority: 'high' },
-  { id: '3', jobName: 'Sprinter — Color Change', client: 'CleanCo Services', material: 'Avery SW900', size: '5\' x 30\'', status: 'laminating', dueDate: '2026-03-12', priority: 'normal' },
-  { id: '4', jobName: 'Sedan — Accent Kit', client: 'Elite Auto Group', material: '3M IJ180Cv3', size: '2\' x 8\'', status: 'queued', dueDate: '2026-03-13', priority: 'normal' },
-  { id: '5', jobName: 'Trailer — Full Wrap', client: 'Skyline Moving', material: 'Oracal 3951RA', size: '8\' x 50\'', status: 'done', dueDate: '2026-03-10', priority: 'low' },
-  { id: '6', jobName: 'SUV — Hood & Roof', client: 'Greenfield Lawn Care', material: '3M IJ180Cv3', size: '3\' x 12\'', status: 'queued', dueDate: '2026-03-14', priority: 'normal' },
-  { id: '7', jobName: 'Pickup — Tailgate Wrap', client: 'Summit Electric', material: 'Avery MPI 1105', size: '2\' x 6\'', status: 'done', dueDate: '2026-03-09', priority: 'low' },
-];
+function derivePrintStatus(wo: ApiWorkOrder): PrintJob['status'] {
+  const statusName = wo.status?.name?.toLowerCase() ?? '';
+  const systemStatus = wo.status?.system_status?.toLowerCase() ?? '';
+
+  if (statusName.includes('laminat')) return 'laminating';
+  if (statusName.includes('print')) return 'printing';
+  if (systemStatus === 'completed' || statusName.includes('done') || statusName.includes('complete')) return 'done';
+  return 'queued';
+}
+
+function vehicleLabel(vehicles: ApiVehicle[]): string {
+  if (!vehicles.length) return '';
+  const v = vehicles[0];
+  const parts = [v.year, v.make, v.model].filter(Boolean);
+  return parts.length ? parts.join(' ') : '';
+}
+
+function toPrintJob(wo: ApiWorkOrder): PrintJob {
+  const vehicle = vehicleLabel(wo.vehicles);
+  const jobName = vehicle
+    ? `${wo.job_number} — ${vehicle}`
+    : wo.job_number;
+
+  return {
+    id: wo.id,
+    jobName,
+    client: wo.client_name ?? '—',
+    material: wo.job_type || '—',
+    size: '—',
+    status: derivePrintStatus(wo),
+    dueDate: wo.estimated_completion_date ?? wo.date_in,
+    priority: wo.priority === 'high' ? 'high' : wo.priority === 'low' ? 'low' : 'normal',
+    notes: wo.internal_notes ?? undefined,
+  };
+}
+
+function formatDate(dateStr: string | null): string {
+  if (!dateStr) return '—';
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+  });
+}
 
 const MATERIAL_OPTIONS = [
   { value: '', label: 'Select material...' },
@@ -73,6 +145,43 @@ function SuccessToast({ message, onDismiss }: { message: string; onDismiss: () =
           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Loading Skeleton                                                   */
+/* ------------------------------------------------------------------ */
+
+function LoadingSkeleton() {
+  return (
+    <div className="flex h-full flex-col">
+      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-7 w-56 animate-pulse rounded bg-gray-200" />
+            <div className="h-5 w-16 animate-pulse rounded-full bg-gray-100" />
+          </div>
+          <div className="h-9 w-32 animate-pulse rounded-lg bg-gray-200" />
+        </div>
+        <div className="mt-3 flex gap-1">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="h-8 w-24 animate-pulse rounded-lg bg-gray-200" />
+          ))}
+        </div>
+      </header>
+      <div className="flex-1 overflow-auto p-6">
+        <div className="overflow-hidden rounded-xl border border-[#e6e6eb] bg-white">
+          <div className="border-b border-[#e6e6eb] bg-[#f4f4f6] px-4 py-3">
+            <div className="h-4 w-full animate-pulse rounded bg-gray-200" />
+          </div>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="border-b border-[#e6e6eb] px-4 py-3">
+              <div className="h-5 w-full animate-pulse rounded bg-gray-100" />
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -183,10 +292,6 @@ function AddToQueueModal({ isOpen, onClose, onAdd }: AddToQueueModalProps) {
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
-        </div>
-
-        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-700">
-          Jobs added here are stored locally in your browser. They will persist until you refresh the page. Backend integration is coming soon.
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -326,23 +431,78 @@ function AddToQueueModal({ isOpen, onClose, onAdd }: AddToQueueModalProps) {
 
 export default function PrintPage() {
   const [filter, setFilter] = useState<PrintStatus>('all');
-  const [jobs, setJobs] = useState<PrintJob[]>(SEED_JOBS);
+  const [workOrders, setWorkOrders] = useState<ApiWorkOrder[]>([]);
+  const [localJobs, setLocalJobs] = useState<PrintJob[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [fetchKey, setFetchKey] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    (async () => {
+      try {
+        const resp = await api.get<ApiWorkOrderListResponse>('/api/work-orders?limit=100');
+        if (!cancelled) {
+          setWorkOrders(resp?.items ?? []);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof ApiError ? err.message : 'Failed to load print queue');
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [fetchKey]);
+
+  const apiJobs = useMemo(() => workOrders.map(toPrintJob), [workOrders]);
+  const jobs = useMemo(() => [...localJobs, ...apiJobs], [localJobs, apiJobs]);
+
+  const filtered = useMemo(
+    () => (filter === 'all' ? jobs : jobs.filter((j) => j.status === filter)),
+    [jobs, filter],
+  );
+
+  const counts = useMemo(() => {
+    const c: Record<PrintStatus, number> = { all: jobs.length, queued: 0, printing: 0, laminating: 0, done: 0 };
+    jobs.forEach((j) => { c[j.status]++; });
+    return c;
+  }, [jobs]);
 
   function handleAddJob(job: PrintJob) {
-    setJobs((prev) => [job, ...prev]);
+    setLocalJobs((prev) => [job, ...prev]);
     setToast(`"${job.jobName}" added to queue`);
   }
 
-  const filtered = filter === 'all' ? jobs : jobs.filter((j) => j.status === filter);
-  const tabs: { key: PrintStatus; label: string; count: number }[] = [
-    { key: 'all', label: 'All', count: jobs.length },
-    { key: 'queued', label: 'Queued', count: jobs.filter((j) => j.status === 'queued').length },
-    { key: 'printing', label: 'Printing', count: jobs.filter((j) => j.status === 'printing').length },
-    { key: 'laminating', label: 'Laminating', count: jobs.filter((j) => j.status === 'laminating').length },
-    { key: 'done', label: 'Done', count: jobs.filter((j) => j.status === 'done').length },
+  const tabs: { key: PrintStatus; label: string }[] = [
+    { key: 'all', label: 'All' },
+    { key: 'queued', label: 'Queued' },
+    { key: 'printing', label: 'Printing' },
+    { key: 'laminating', label: 'Laminating' },
+    { key: 'done', label: 'Done' },
   ];
+
+  if (loading) return <LoadingSkeleton />;
+
+  if (error) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-4">
+        <p className="text-sm font-medium text-[#18181b]">Failed to load print queue</p>
+        <p className="text-xs text-[#60606a]">{error}</p>
+        <button
+          onClick={() => setFetchKey((k) => k + 1)}
+          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-full flex-col">
@@ -372,50 +532,60 @@ export default function PrintPage() {
                   : 'text-[#60606a] hover:bg-gray-50'
               }`}
             >
-              {tab.label} ({tab.count})
+              {tab.label} ({counts[tab.key]})
             </button>
           ))}
         </div>
       </header>
 
       <div className="flex-1 overflow-auto p-6">
-        <div className="overflow-hidden rounded-xl border border-[#e6e6eb] bg-white">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-[#e6e6eb] bg-[#f4f4f6]">
-                <th className="px-4 py-3 text-left font-medium text-[#60606a]">Job</th>
-                <th className="px-4 py-3 text-left font-medium text-[#60606a]">Client</th>
-                <th className="px-4 py-3 text-left font-medium text-[#60606a]">Material</th>
-                <th className="px-4 py-3 text-left font-medium text-[#60606a]">Size</th>
-                <th className="px-4 py-3 text-left font-medium text-[#60606a]">Status</th>
-                <th className="px-4 py-3 text-left font-medium text-[#60606a]">Priority</th>
-                <th className="px-4 py-3 text-left font-medium text-[#60606a]">Due</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((job) => {
-                const style = statusStyles[job.status];
-                return (
-                  <tr key={job.id} className="border-b border-[#e6e6eb] last:border-0 hover:bg-[#f4f4f6]/50">
-                    <td className="px-4 py-3 font-medium text-[#18181b]">{job.jobName}</td>
-                    <td className="px-4 py-3 text-[#60606a]">{job.client}</td>
-                    <td className="px-4 py-3 text-[#60606a]">{job.material}</td>
-                    <td className="px-4 py-3 text-[#60606a]">{job.size}</td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${style.bg} ${style.text}`}>
-                        {style.label}
-                      </span>
-                    </td>
-                    <td className={`px-4 py-3 text-xs font-medium capitalize ${priorityStyles[job.priority]}`}>
-                      {job.priority}
-                    </td>
-                    <td className="px-4 py-3 text-[#60606a]">{job.dueDate}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        {filtered.length === 0 ? (
+          <div className="flex h-full flex-col items-center justify-center">
+            <svg className="mb-3 h-10 w-10 text-[#a8a8b4]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18.75 7.159l-.351.089" />
+            </svg>
+            <p className="text-sm font-medium text-[#60606a]">No items in this view</p>
+            <p className="mt-1 text-xs text-[#a8a8b4]">Print queue items will appear here as jobs come in.</p>
+          </div>
+        ) : (
+          <div className="overflow-hidden rounded-xl border border-[#e6e6eb] bg-white">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-[#e6e6eb] bg-[#f4f4f6]">
+                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Job</th>
+                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Client</th>
+                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Material</th>
+                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Size</th>
+                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Status</th>
+                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Priority</th>
+                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Due</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((job) => {
+                  const style = statusStyles[job.status];
+                  return (
+                    <tr key={job.id} className="border-b border-[#e6e6eb] last:border-0 hover:bg-[#f4f4f6]/50">
+                      <td className="px-4 py-3 font-medium text-[#18181b]">{job.jobName}</td>
+                      <td className="px-4 py-3 text-[#60606a]">{job.client}</td>
+                      <td className="px-4 py-3 text-[#60606a]">{job.material}</td>
+                      <td className="px-4 py-3 text-[#60606a]">{job.size}</td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${style.bg} ${style.text}`}>
+                          {style.label}
+                        </span>
+                      </td>
+                      <td className={`px-4 py-3 text-xs font-medium capitalize ${priorityStyles[job.priority]}`}>
+                        {job.priority}
+                      </td>
+                      <td className="px-4 py-3 text-[#60606a]">{formatDate(job.dueDate)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       <AddToQueueModal isOpen={modalOpen} onClose={() => setModalOpen(false)} onAdd={handleAddJob} />

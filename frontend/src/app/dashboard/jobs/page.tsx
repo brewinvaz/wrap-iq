@@ -1,32 +1,105 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { api, ApiError } from '@/lib/api-client';
 import CreateWorkOrderModal from '@/components/work-orders/CreateWorkOrderModal';
 
 type PhaseFilter = 'all' | 'work-order' | 'design' | 'production' | 'install';
 
-interface Job {
+interface ApiKanbanStage {
   id: string;
   name: string;
-  client: string;
-  team: string;
-  phase: 'work-order' | 'design' | 'production' | 'install';
-  status: string;
-  dueDate: string;
+  color: string;
+  system_status: string | null;
 }
 
-const jobs: Job[] = [
-  { id: '1', name: 'Fleet Van #12 — Full Wrap', client: 'Metro Plumbing', team: 'Marcus, Taylor', phase: 'install', status: 'Scheduled', dueDate: '2026-03-11' },
-  { id: '2', name: 'Box Truck — Partial Wrap', client: 'FastFreight Inc.', team: 'Sarah, Alex', phase: 'production', status: 'Printing', dueDate: '2026-03-12' },
-  { id: '3', name: 'Sprinter — Color Change', client: 'CleanCo Services', team: 'Sarah', phase: 'design', status: 'In Revision', dueDate: '2026-03-13' },
-  { id: '4', name: 'Sedan — Accent Kit', client: 'Elite Auto Group', team: 'Jordan', phase: 'design', status: 'Proof Sent', dueDate: '2026-03-14' },
-  { id: '5', name: 'Trailer — Full Wrap', client: 'Skyline Moving', team: 'Marcus, Devon', phase: 'install', status: 'In Progress', dueDate: '2026-03-10' },
-  { id: '6', name: 'SUV — Hood & Roof', client: 'Greenfield Lawn Care', team: 'Unassigned', phase: 'work-order', status: 'New', dueDate: '2026-03-15' },
-  { id: '7', name: 'Pickup — Tailgate Wrap', client: 'Summit Electric', team: 'Alex', phase: 'production', status: 'Laminating', dueDate: '2026-03-12' },
-  { id: '8', name: 'Cargo Van — Fleet Livery', client: 'BrightPath Logistics', team: 'Unassigned', phase: 'work-order', status: 'Estimate Sent', dueDate: '2026-03-16' },
-];
+interface ApiVehicle {
+  id: string;
+  make: string | null;
+  model: string | null;
+  year: number | null;
+}
 
-const phaseStyles: Record<Job['phase'], { bg: string; text: string; label: string }> = {
+interface ApiWorkOrder {
+  id: string;
+  job_number: string;
+  job_type: string;
+  job_value: number;
+  priority: string;
+  date_in: string;
+  estimated_completion_date: string | null;
+  completion_date: string | null;
+  internal_notes: string | null;
+  status: ApiKanbanStage | null;
+  vehicles: ApiVehicle[];
+  client_id: string | null;
+  client_name: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+interface ApiWorkOrderListResponse {
+  items: ApiWorkOrder[];
+  total: number;
+}
+
+interface Job {
+  id: string;
+  jobNumber: string;
+  jobType: string;
+  clientName: string;
+  vehicle: string;
+  phase: PhaseFilter;
+  status: string;
+  statusColor: string;
+  dueDate: string | null;
+}
+
+function vehicleLabel(vehicles: ApiVehicle[]): string {
+  if (!vehicles.length) return '—';
+  const v = vehicles[0];
+  const parts = [v.year, v.make, v.model].filter(Boolean);
+  return parts.length ? parts.join(' ') : '—';
+}
+
+function derivePhase(wo: ApiWorkOrder): PhaseFilter {
+  const statusName = wo.status?.name?.toLowerCase() ?? '';
+  const systemStatus = wo.status?.system_status?.toLowerCase() ?? '';
+
+  // Check for install-related statuses
+  if (statusName.includes('install') || statusName.includes('scheduled')) return 'install';
+  if (systemStatus === 'completed') return 'install';
+
+  // Check for production-related statuses
+  if (statusName.includes('print') || statusName.includes('laminat') || statusName.includes('production')) return 'production';
+
+  // Check for design-related statuses
+  if (statusName.includes('design') || statusName.includes('proof') || statusName.includes('revis') || statusName.includes('art')) return 'design';
+
+  // Check for work-order statuses
+  if (statusName.includes('new') || statusName.includes('estimate') || systemStatus === 'lead') return 'work-order';
+
+  // Fallback based on system_status
+  if (systemStatus === 'in_progress') return 'design';
+  return 'work-order';
+}
+
+function toJob(wo: ApiWorkOrder): Job {
+  return {
+    id: wo.id,
+    jobNumber: wo.job_number,
+    jobType: wo.job_type,
+    clientName: wo.client_name ?? '—',
+    vehicle: vehicleLabel(wo.vehicles),
+    phase: derivePhase(wo),
+    status: wo.status?.name ?? 'Unknown',
+    statusColor: wo.status?.color ?? '#6b7280',
+    dueDate: wo.estimated_completion_date,
+  };
+}
+
+const phaseStyles: Record<PhaseFilter, { bg: string; text: string; label: string }> = {
+  'all': { bg: '', text: '', label: '' },
   'work-order': { bg: 'bg-blue-50', text: 'text-blue-700', label: 'Work Order' },
   design: { bg: 'bg-violet-50', text: 'text-violet-700', label: 'Design' },
   production: { bg: 'bg-amber-50', text: 'text-amber-700', label: 'Production' },
@@ -41,10 +114,105 @@ const tabs: { key: PhaseFilter; label: string }[] = [
   { key: 'install', label: 'Install' },
 ];
 
+function formatDate(dateStr: string | null): string {
+  if (!dateStr) return '—';
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+  });
+}
+
+function LoadingSkeleton() {
+  return (
+    <div className="flex h-full flex-col">
+      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-7 w-40 animate-pulse rounded bg-gray-200" />
+            <div className="h-5 w-16 animate-pulse rounded-full bg-gray-100" />
+          </div>
+          <div className="h-9 w-24 animate-pulse rounded-lg bg-gray-200" />
+        </div>
+        <div className="mt-3 flex gap-1">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="h-8 w-24 animate-pulse rounded-lg bg-gray-200" />
+          ))}
+        </div>
+      </header>
+      <div className="flex-1 overflow-auto p-6">
+        <div className="overflow-hidden rounded-xl border border-[#e6e6eb] bg-white">
+          <div className="border-b border-[#e6e6eb] bg-[#f4f4f6] px-4 py-3">
+            <div className="h-4 w-full animate-pulse rounded bg-gray-200" />
+          </div>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="border-b border-[#e6e6eb] px-4 py-3">
+              <div className="h-5 w-full animate-pulse rounded bg-gray-100" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function JobsPage() {
+  const [workOrders, setWorkOrders] = useState<ApiWorkOrder[]>([]);
   const [filter, setFilter] = useState<PhaseFilter>('all');
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const filtered = filter === 'all' ? jobs : jobs.filter((j) => j.phase === filter);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchJobs = async (cancelled = false) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const resp = await api.get<ApiWorkOrderListResponse>('/api/work-orders?limit=100');
+      if (!cancelled) setWorkOrders(resp?.items ?? []);
+    } catch (err) {
+      if (!cancelled) {
+        setError(err instanceof ApiError ? err.message : 'Failed to load jobs');
+      }
+    } finally {
+      if (!cancelled) setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchJobs(cancelled);
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const jobs = useMemo(() => workOrders.map(toJob), [workOrders]);
+
+  const filtered = useMemo(
+    () => (filter === 'all' ? jobs : jobs.filter((j) => j.phase === filter)),
+    [jobs, filter],
+  );
+
+  const counts = useMemo(() => {
+    const c: Record<PhaseFilter, number> = { all: jobs.length, 'work-order': 0, design: 0, production: 0, install: 0 };
+    jobs.forEach((j) => { c[j.phase]++; });
+    return c;
+  }, [jobs]);
+
+  if (loading) return <LoadingSkeleton />;
+
+  if (error) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-4">
+        <p className="text-sm font-medium text-[#18181b]">Failed to load jobs</p>
+        <p className="text-xs text-[#60606a]">{error}</p>
+        <button
+          onClick={() => fetchJobs()}
+          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-full flex-col">
@@ -73,51 +241,77 @@ export default function JobsPage() {
               }`}
             >
               {tab.label}
+              <span className="ml-1.5 opacity-60">{counts[tab.key]}</span>
             </button>
           ))}
         </div>
       </header>
 
       <div className="flex-1 overflow-auto p-6">
-        <div className="overflow-hidden rounded-xl border border-[#e6e6eb] bg-white">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-[#e6e6eb] bg-[#f4f4f6]">
-                <th className="px-4 py-3 text-left font-medium text-[#60606a]">Job</th>
-                <th className="px-4 py-3 text-left font-medium text-[#60606a]">Client</th>
-                <th className="px-4 py-3 text-left font-medium text-[#60606a]">Team</th>
-                <th className="px-4 py-3 text-left font-medium text-[#60606a]">Phase</th>
-                <th className="px-4 py-3 text-left font-medium text-[#60606a]">Status</th>
-                <th className="px-4 py-3 text-left font-medium text-[#60606a]">Due</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((job) => {
-                const phase = phaseStyles[job.phase];
-                return (
-                  <tr key={job.id} className="border-b border-[#e6e6eb] last:border-0 hover:bg-[#f4f4f6]/50">
-                    <td className="px-4 py-3 font-medium text-[#18181b]">{job.name}</td>
-                    <td className="px-4 py-3 text-[#60606a]">{job.client}</td>
-                    <td className="px-4 py-3 text-[#60606a]">{job.team}</td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${phase.bg} ${phase.text}`}>
-                        {phase.label}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-[#60606a]">{job.status}</td>
-                    <td className="px-4 py-3 text-[#60606a]">{job.dueDate}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        {filtered.length === 0 ? (
+          <div className="flex h-full flex-col items-center justify-center">
+            <svg className="mb-3 h-10 w-10 text-[#a8a8b4]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0" />
+            </svg>
+            <p className="text-sm font-medium text-[#60606a]">No jobs found</p>
+            <p className="mt-1 text-xs text-[#a8a8b4]">Jobs will appear here as work orders are created.</p>
+          </div>
+        ) : (
+          <div className="overflow-hidden rounded-xl border border-[#e6e6eb] bg-white">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-[#e6e6eb] bg-[#f4f4f6]">
+                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Job</th>
+                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Client</th>
+                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Vehicle</th>
+                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Phase</th>
+                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Status</th>
+                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Due</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((job) => {
+                  const phase = phaseStyles[job.phase];
+                  return (
+                    <tr key={job.id} className="border-b border-[#e6e6eb] last:border-0 hover:bg-[#f4f4f6]/50">
+                      <td className="px-4 py-3 font-medium text-[#18181b]">
+                        {job.jobNumber}
+                        {job.jobType && (
+                          <span className="ml-2 text-xs font-normal text-[#a8a8b4]">{job.jobType}</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-[#60606a]">{job.clientName}</td>
+                      <td className="px-4 py-3 text-[#60606a]">{job.vehicle}</td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${phase.bg} ${phase.text}`}>
+                          {phase.label}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span
+                          className="inline-block rounded-full px-2.5 py-0.5 text-xs font-medium"
+                          style={{
+                            backgroundColor: `${job.statusColor}15`,
+                            color: job.statusColor,
+                          }}
+                        >
+                          {job.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-[#60606a]">{formatDate(job.dueDate)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       <CreateWorkOrderModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
-        onCreate={() => { /* Jobs page uses static data — new work orders appear on Work Orders page */ }}
+        onCreate={() => { fetchJobs(); }}
       />
     </div>
   );
