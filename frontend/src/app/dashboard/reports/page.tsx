@@ -57,6 +57,17 @@ interface ApiWorkOrderListResponse {
 // --- Derive analytics from work orders ---
 
 function deriveKPIs(workOrders: ApiWorkOrder[]): KPIMetric[] {
+  if (!Array.isArray(workOrders) || workOrders.length === 0) {
+    return [
+      { label: 'Active Jobs', value: '0' },
+      { label: 'Pipeline Value', value: '$0' },
+      { label: 'Monthly Revenue', value: '$0' },
+      { label: 'Avg Completion Time', value: 'N/A' },
+      { label: 'Total Jobs', value: '0' },
+      { label: 'Completed', value: '0' },
+    ];
+  }
+
   const now = new Date();
   const thisMonth = now.getMonth();
   const thisYear = now.getFullYear();
@@ -102,6 +113,8 @@ function deriveKPIs(workOrders: ApiWorkOrder[]): KPIMetric[] {
 }
 
 function deriveDepartmentScorecards(workOrders: ApiWorkOrder[]): DepartmentScorecard[] {
+  if (!Array.isArray(workOrders)) return [];
+
   const activeJobs = workOrders.filter((wo) => {
     const statusName = wo.status?.name?.toLowerCase() ?? '';
     return !['complete', 'completed', 'cancelled'].includes(statusName);
@@ -142,6 +155,8 @@ function deriveDepartmentScorecards(workOrders: ApiWorkOrder[]): DepartmentScore
 }
 
 function deriveRevenueData(workOrders: ApiWorkOrder[]): RevenueDataPoint[] {
+  if (!Array.isArray(workOrders)) return [];
+
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const monthlyTotals = new Map<string, number>();
 
@@ -169,7 +184,7 @@ function deriveRevenueData(workOrders: ApiWorkOrder[]): RevenueDataPoint[] {
 function deriveInstallerInsights(workOrders: ApiWorkOrder[]): InstallerInsight[] {
   // Without installer assignment data in work orders, show a placeholder
   // This will be populated once the backend supports installer tracking
-  if (workOrders.length === 0) return [];
+  if (!Array.isArray(workOrders) || workOrders.length === 0) return [];
 
   return [
     {
@@ -186,6 +201,7 @@ function deriveInstallerInsights(workOrders: ApiWorkOrder[]): InstallerInsight[]
 // --- Date range filtering ---
 
 function filterByDateRange(workOrders: ApiWorkOrder[], preset: Preset): ApiWorkOrder[] {
+  if (!Array.isArray(workOrders)) return [];
   if (preset === 'Custom') return workOrders;
 
   const now = new Date();
@@ -204,6 +220,8 @@ function filterByDateRange(workOrders: ApiWorkOrder[], preset: Preset): ApiWorkO
     case 'YTD':
       startDate = new Date(now.getFullYear(), 0, 1);
       break;
+    default:
+      return workOrders;
   }
 
   return workOrders.filter((wo) => new Date(wo.date_in) >= startDate);
@@ -285,7 +303,7 @@ export default function ReportsPage() {
     setError(null);
     try {
       const response = await api.get<ApiWorkOrderListResponse>('/api/work-orders?limit=100');
-      setAllWorkOrders(response.items);
+      setAllWorkOrders(Array.isArray(response?.items) ? response.items : []);
     } catch (err) {
       const message = err instanceof ApiError ? err.message : 'An unexpected error occurred';
       setError(message);
