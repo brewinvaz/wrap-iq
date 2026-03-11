@@ -25,6 +25,7 @@ from app.models.payment import Payment
 from app.models.plan import Plan
 from app.models.production_details import ProductionDetails
 from app.models.refresh_token import RefreshToken
+from app.models.render import Render, RenderStatus
 from app.models.subscription import (
     PaymentMethod,
     PaymentMethodType,
@@ -84,6 +85,8 @@ __all__ = [
     "Priority",
     "ProductionDetails",
     "RefreshToken",
+    "Render",
+    "RenderStatus",
     "Role",
     "Subscription",
     "SubscriptionStatus",
