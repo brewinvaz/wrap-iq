@@ -7,6 +7,7 @@ import { useRole } from '@/lib/role-context';
 import { useSidebar } from '@/lib/sidebar-context';
 import { useUser } from '@/lib/user-context';
 import { ROLES, type RoleKey } from '@/lib/roles';
+import { useBadgeCounts } from '@/lib/use-badge-counts';
 import { getRefreshToken, clearTokens } from '@/lib/auth';
 import { api } from '@/lib/api-client';
 
@@ -19,6 +20,7 @@ export default function Sidebar() {
   const { currentRole, setRole, roleConfig } = useRole();
   const { mobileOpen, setMobileOpen } = useSidebar();
   const { user } = useUser();
+  const badgeCounts = useBadgeCounts();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -169,6 +171,9 @@ export default function Sidebar() {
                 const isActive =
                   pathname === item.href ||
                   (item.href !== '/dashboard' && pathname.startsWith(item.href + '/'));
+                const badgeValue = item.badgeKey
+                  ? badgeCounts[item.badgeKey]
+                  : item.badge;
                 return (
                   <li key={item.href}>
                     <Link
@@ -182,7 +187,7 @@ export default function Sidebar() {
                     >
                       <span className="text-[14px] leading-none md:text-[18px] lg:text-[14px]">{item.icon}</span>
                       <span className="flex-1 truncate md:hidden lg:inline">{item.label}</span>
-                      {item.badge !== undefined && (
+                      {badgeValue !== undefined && badgeValue > 0 && (
                         <span
                           className={`inline-flex min-w-[18px] items-center justify-center rounded-full px-1.5 font-mono text-[10px] font-medium md:hidden lg:inline-flex ${
                             item.badgeVariant === 'amber'
@@ -192,7 +197,7 @@ export default function Sidebar() {
                                 : 'bg-[#e6e6eb] text-[#60606a]'
                           }`}
                         >
-                          {item.badge}
+                          {badgeValue}
                         </span>
                       )}
                     </Link>

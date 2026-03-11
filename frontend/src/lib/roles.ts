@@ -2,11 +2,17 @@ export type RoleKey = 'admin' | 'pm' | 'installer' | 'designer' | 'production' |
 
 export type BadgeVariant = 'default' | 'amber';
 
+/** Keys that map to counts returned by GET /api/sidebar/badges. */
+export type BadgeKey = 'work_orders' | 'unread_notifications' | 'design_queue';
+
 export interface NavItem {
   icon: string;
   label: string;
   href: string;
+  /** Static badge value (ignored when badgeKey is set and a live count is available). */
   badge?: number;
+  /** Key used to look up a live count from the sidebar badges API. */
+  badgeKey?: BadgeKey;
   badgeVariant?: BadgeVariant;
 }
 
@@ -35,10 +41,10 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
       {
         label: 'Workspace',
         items: [
-          { icon: '📋', label: 'Jobs Board', href: '/dashboard', badge: 12 },
+          { icon: '📋', label: 'Jobs Board', href: '/dashboard', badgeKey: 'work_orders' },
           { icon: '📊', label: 'All Jobs Board', href: '/dashboard/jobs' },
           { icon: '📦', label: 'Work Orders', href: '/dashboard/work-orders' },
-          { icon: '📅', label: 'Calendar', href: '/dashboard/calendar', badge: 3, badgeVariant: 'amber' },
+          { icon: '📅', label: 'Calendar', href: '/dashboard/calendar', badgeKey: 'unread_notifications', badgeVariant: 'amber' },
           { icon: '💬', label: 'Communications', href: '/dashboard/comms' },
           { icon: '🗓️', label: 'Schedule', href: '/dashboard/schedule' },
           { icon: '👥', label: 'Customers', href: '/dashboard/customers' },
@@ -47,7 +53,7 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
       {
         label: 'Production',
         items: [
-          { icon: '🎨', label: 'Design Queue', href: '/dashboard/design-queue', badge: 4 },
+          { icon: '🎨', label: 'Design Queue', href: '/dashboard/design-queue', badgeKey: 'design_queue' },
           { icon: '🖨️', label: 'Print / Lam', href: '/dashboard/print' },
           { icon: '🔧', label: 'Install Schedule', href: '/dashboard/install-schedule' },
         ],
@@ -85,16 +91,16 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
       {
         label: 'Projects',
         items: [
-          { icon: '📋', label: 'My Jobs', href: '/dashboard', badge: 8 },
+          { icon: '📋', label: 'My Jobs', href: '/dashboard', badgeKey: 'work_orders' },
           { icon: '📊', label: 'All Jobs Board', href: '/dashboard/jobs' },
-          { icon: '📅', label: 'Schedule', href: '/dashboard/schedule', badge: 4 },
+          { icon: '📅', label: 'Schedule', href: '/dashboard/schedule' },
           { icon: '👥', label: 'Team Assignments', href: '/dashboard/team' },
         ],
       },
       {
         label: 'Clients',
         items: [
-          { icon: '💬', label: 'Client Comms', href: '/dashboard/comms', badge: 2, badgeVariant: 'amber' },
+          { icon: '💬', label: 'Client Comms', href: '/dashboard/comms', badgeKey: 'unread_notifications', badgeVariant: 'amber' },
           { icon: '📄', label: 'Contracts & Docs', href: '/dashboard/contracts' },
           { icon: '✅', label: 'Proof Approvals', href: '/dashboard/proofs' },
         ],
@@ -118,7 +124,7 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
       {
         label: 'My Work',
         items: [
-          { icon: '📋', label: 'My Jobs', href: '/dashboard', badge: 4 },
+          { icon: '📋', label: 'My Jobs', href: '/dashboard', badgeKey: 'work_orders' },
           { icon: '📅', label: 'My Schedule', href: '/dashboard/schedule' },
           { icon: '📸', label: 'Photos', href: '/dashboard/photos' },
           { icon: '⏱️', label: 'Time Tracking', href: '/dashboard/time-logs' },
@@ -146,8 +152,8 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
       {
         label: 'Design',
         items: [
-          { icon: '🎨', label: 'My Queue', href: '/dashboard', badge: 4 },
-          { icon: '📤', label: 'Proofs Sent', href: '/dashboard/proofs', badge: 2, badgeVariant: 'amber' },
+          { icon: '🎨', label: 'My Queue', href: '/dashboard', badgeKey: 'design_queue' },
+          { icon: '📤', label: 'Proofs Sent', href: '/dashboard/proofs', badgeKey: 'unread_notifications', badgeVariant: 'amber' },
           { icon: '⏱️', label: 'Design Hours', href: '/dashboard/hours' },
           { icon: '💬', label: 'Team Comms', href: '/dashboard/comms' },
         ],
@@ -172,7 +178,7 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
       {
         label: 'My Queue',
         items: [
-          { icon: '🖨️', label: 'Print Queue', href: '/dashboard', badge: 3 },
+          { icon: '🖨️', label: 'Print Queue', href: '/dashboard', badgeKey: 'work_orders' },
           { icon: '⚙️', label: 'My Equipment', href: '/dashboard/equipment' },
           { icon: '📦', label: 'Materials', href: '/dashboard/materials' },
           { icon: '⏱️', label: 'Time Tracking', href: '/dashboard/time-logs' },

@@ -145,6 +145,7 @@ async def invite_user(
     session.add(user)
     await session.commit()
     await session.refresh(user)
+
     return InviteUserResponse(
         id=user.id,
         email=user.email,
