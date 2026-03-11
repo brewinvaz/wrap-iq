@@ -10,6 +10,7 @@ from app.auth.organization import org_filter
 from app.auth.passwords import hash_password
 from app.auth.permissions import require_admin
 from app.models.user import User
+from app.models.user_profile import UserProfile
 from app.schemas.admin import (
     InviteUserRequest,
     ToggleActiveRequest,
@@ -21,16 +22,39 @@ from app.schemas.admin import (
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
 
+def _build_full_name(profile: UserProfile | None) -> str | None:
+    """Build full name from profile first/last name fields."""
+    if not profile:
+        return None
+    parts = [p for p in (profile.first_name, profile.last_name) if p]
+    return " ".join(parts) if parts else None
+
+
 @router.get("/users", response_model=list[UserListResponse])
 async def list_users(
     admin: User = Depends(require_admin),
     session: AsyncSession = Depends(get_session),
 ):
     """List all users in the admin's organization."""
-    query = select(User)
+    query = select(User, UserProfile).outerjoin(
+        UserProfile, User.id == UserProfile.user_id
+    )
     query = org_filter(query, admin)
     result = await session.execute(query)
-    return result.scalars().all()
+    rows = result.all()
+    return [
+        UserListResponse(
+            id=user.id,
+            email=user.email,
+            full_name=_build_full_name(profile),
+            role=user.role,
+            organization_id=user.organization_id,
+            is_active=user.is_active,
+            is_superadmin=user.is_superadmin,
+            created_at=user.created_at,
+        )
+        for user, profile in rows
+    ]
 
 
 @router.patch("/users/{user_id}/role", response_model=UserListResponse)
