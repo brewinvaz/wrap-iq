@@ -37,13 +37,6 @@ services:
       - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000}
       - DEBUG=${DEBUG:-true}
       - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
-      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
-      - RESEND_API_KEY=${RESEND_API_KEY:-}
-      - R2_ACCOUNT_ID=${R2_ACCOUNT_ID:-}
-      - R2_ACCESS_KEY_ID=${R2_ACCESS_KEY_ID:-}
-      - R2_SECRET_ACCESS_KEY=${R2_SECRET_ACCESS_KEY:-}
-      - R2_BUCKET_NAME=${R2_BUCKET_NAME:-wrapiq-uploads}
-      - R2_PUBLIC_URL=${R2_PUBLIC_URL:-}
     depends_on:
       db:
         condition: service_healthy
@@ -74,13 +67,6 @@ services:
       - DEBUG=${DEBUG:-true}
       - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000}
       - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
-      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
-      - RESEND_API_KEY=${RESEND_API_KEY:-}
-      - R2_ACCOUNT_ID=${R2_ACCOUNT_ID:-}
-      - R2_ACCESS_KEY_ID=${R2_ACCESS_KEY_ID:-}
-      - R2_SECRET_ACCESS_KEY=${R2_SECRET_ACCESS_KEY:-}
-      - R2_BUCKET_NAME=${R2_BUCKET_NAME:-wrapiq-uploads}
-      - R2_PUBLIC_URL=${R2_PUBLIC_URL:-}
     depends_on:
       db:
         condition: service_healthy
