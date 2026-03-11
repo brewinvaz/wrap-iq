@@ -7,6 +7,11 @@ from app.models.kanban_stage import SystemStatus
 from app.models.work_order import JobType, Priority
 
 
+class ChecklistItem(BaseModel):
+    label: str
+    done: bool = False
+
+
 class WorkOrderCreate(BaseModel):
     job_type: JobType = JobType.personal
     job_value: int = 0
@@ -14,6 +19,7 @@ class WorkOrderCreate(BaseModel):
     date_in: datetime
     estimated_completion_date: datetime | None = None
     internal_notes: str | None = None
+    checklist: list[ChecklistItem] | None = None
     vehicle_ids: list[uuid.UUID] = []
     client_id: uuid.UUID | None = None
 
@@ -36,6 +42,7 @@ class WorkOrderUpdate(BaseModel):
     priority: Priority | None = None
     estimated_completion_date: datetime | None = None
     internal_notes: str | None = None
+    checklist: list[ChecklistItem] | None = None
     client_id: uuid.UUID | None = None
 
     @field_validator("client_id", mode="before")
@@ -84,6 +91,7 @@ class WorkOrderResponse(BaseModel):
     estimated_completion_date: datetime | None = None
     completion_date: datetime | None = None
     internal_notes: str | None = None
+    checklist: list[ChecklistItem] | None = None
     status: KanbanStageResponse | None = None
     vehicles: list[VehicleInWorkOrder] = []
     client_id: uuid.UUID | None = None

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, use } from 'react';
+import { useState, useEffect, useCallback, useRef, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { api, ApiError } from '@/lib/api-client';
 import { ProjectDetail, Note, ProjectPhoto } from '@/lib/types';
@@ -32,6 +32,7 @@ interface ApiWorkOrderResponse {
   estimated_completion_date: string | null;
   completion_date: string | null;
   internal_notes: string | null;
+  checklist: { label: string; done: boolean }[] | null;
   status: ApiKanbanStage | null;
   vehicles: ApiVehicleInWorkOrder[];
   client_id: string | null;
@@ -70,7 +71,7 @@ function transformWorkOrderToProject(wo: ApiWorkOrderResponse): ProjectDetail {
     tags: [],
     team: [],
     progress: wo.completion_date ? 100 : 0,
-    tasks: [],
+    tasks: wo.checklist ?? [],
     vehicleDetails: {
       vin: vehicle?.vin ?? 'N/A',
       year: vehicle?.year ? String(vehicle.year) : 'N/A',
@@ -168,6 +169,74 @@ function formatTimestamp(ts: string): string {
     hour: 'numeric',
     minute: '2-digit',
   });
+}
+
+// ---- Save Status Types ----
+type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
+
+function SaveIndicator({ status }: { status: SaveStatus }) {
+  if (status === 'idle') return null;
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium ${
+        status === 'saving'
+          ? 'bg-amber-50 text-amber-600'
+          : status === 'saved'
+            ? 'bg-emerald-50 text-emerald-600'
+            : 'bg-red-50 text-red-600'
+      }`}
+    >
+      {status === 'saving' && (
+        <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+        </svg>
+      )}
+      {status === 'saving' ? 'Saving...' : status === 'saved' ? 'Saved' : 'Save failed'}
+    </span>
+  );
+}
+
+// ---- Debounced save hook ----
+function useDebouncedSave(
+  workOrderId: string,
+  field: string,
+  delayMs = 1000,
+) {
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const save = useCallback(
+    (value: unknown) => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
+      setSaveStatus('saving');
+
+      timerRef.current = setTimeout(async () => {
+        try {
+          await api.patch(`/api/work-orders/${workOrderId}`, {
+            [field]: value,
+          });
+          setSaveStatus('saved');
+          savedTimerRef.current = setTimeout(() => setSaveStatus('idle'), 2000);
+        } catch {
+          setSaveStatus('error');
+        }
+      }, delayMs);
+    },
+    [workOrderId, field, delayMs],
+  );
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
+    };
+  }, []);
+
+  return { saveStatus, save };
 }
 
 // ---- Loading Skeleton ----
@@ -562,17 +631,20 @@ function OverviewTab({ project }: { project: ProjectDetail }) {
 }
 
 // ---- Checklist Tab ----
-function ChecklistTab({ project }: { project: ProjectDetail }) {
+function ChecklistTab({ project, workOrderId }: { project: ProjectDetail; workOrderId: string }) {
   const [tasks, setTasks] = useState(project.tasks ?? []);
+  const { saveStatus, save } = useDebouncedSave(workOrderId, 'checklist', 500);
   const completedCount = tasks.filter((t) => t.done).length;
   const totalCount = tasks.length;
   const progress =
     totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
   const toggleTask = (index: number) => {
-    setTasks((prev) =>
-      prev.map((t, i) => (i === index ? { ...t, done: !t.done } : t))
-    );
+    setTasks((prev) => {
+      const updated = prev.map((t, i) => (i === index ? { ...t, done: !t.done } : t));
+      save(updated);
+      return updated;
+    });
   };
 
   return (
@@ -580,9 +652,12 @@ function ChecklistTab({ project }: { project: ProjectDetail }) {
       {/* Progress header */}
       <div className="mb-6 rounded-xl border border-[#e6e6eb] bg-white p-5">
         <div className="mb-2 flex items-center justify-between">
-          <span className="text-sm font-semibold text-[#18181b]">
-            {completedCount} of {totalCount} tasks completed
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-semibold text-[#18181b]">
+              {completedCount} of {totalCount} tasks completed
+            </span>
+            <SaveIndicator status={saveStatus} />
+          </div>
           <span className="font-mono text-sm font-medium text-[#60606a]">
             {progress}%
           </span>
@@ -653,21 +728,56 @@ function ChecklistTab({ project }: { project: ProjectDetail }) {
 }
 
 // ---- Notes Tab ----
-function NotesTab({ project }: { project: ProjectDetail }) {
-  const [notes, setNotes] = useState<Note[]>(project.notes);
+function NotesTab({ project, workOrderId }: { project: ProjectDetail; workOrderId: string }) {
+  const [notes] = useState<Note[]>(project.notes);
   const [newNote, setNewNote] = useState('');
+  const [addSaveStatus, setAddSaveStatus] = useState<SaveStatus>('idle');
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const addNote = () => {
-    if (!newNote.trim()) return;
-    const note: Note = {
-      id: `n${Date.now()}`,
-      text: newNote.trim(),
-      author: 'You',
-      timestamp: new Date().toISOString(),
-    };
-    setNotes((prev) => [note, ...prev]);
-    setNewNote('');
+  // The internal_notes field is a single text string on the backend.
+  // We concatenate notes with a separator so they persist as one field.
+  // For the primary use-case, we treat internal_notes as the editable content area.
+  const [internalNotes, setInternalNotes] = useState(
+    project.notes.map((n) => n.text).join('\n\n') || '',
+  );
+  const { saveStatus: autoSaveStatus, save: autoSave } = useDebouncedSave(
+    workOrderId,
+    'internal_notes',
+    1000,
+  );
+
+  const handleNotesChange = (value: string) => {
+    setInternalNotes(value);
+    autoSave(value);
   };
+
+  const addNote = async () => {
+    if (!newNote.trim()) return;
+    const separator = internalNotes.trim() ? '\n\n' : '';
+    const updatedNotes = newNote.trim() + separator + internalNotes;
+    setInternalNotes(updatedNotes);
+    setNewNote('');
+    setAddSaveStatus('saving');
+
+    try {
+      await api.patch(`/api/work-orders/${workOrderId}`, {
+        internal_notes: updatedNotes,
+      });
+      setAddSaveStatus('saved');
+      if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
+      savedTimerRef.current = setTimeout(() => setAddSaveStatus('idle'), 2000);
+    } catch {
+      setAddSaveStatus('error');
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
+    };
+  }, []);
+
+  const displayStatus = addSaveStatus !== 'idle' ? addSaveStatus : autoSaveStatus;
 
   return (
     <div className="mx-auto max-w-2xl space-y-4">
@@ -680,10 +790,11 @@ function NotesTab({ project }: { project: ProjectDetail }) {
           rows={3}
           className="w-full resize-none rounded-lg border-0 bg-gray-50 p-3 text-sm text-[#18181b] placeholder-[#a8a8b4] outline-none focus:ring-2 focus:ring-blue-200"
         />
-        <div className="mt-2 flex justify-end">
+        <div className="mt-2 flex items-center justify-between">
+          <SaveIndicator status={displayStatus} />
           <button
             onClick={addNote}
-            disabled={!newNote.trim()}
+            disabled={!newNote.trim() || addSaveStatus === 'saving'}
             className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
           >
             Add Note
@@ -691,28 +802,56 @@ function NotesTab({ project }: { project: ProjectDetail }) {
         </div>
       </div>
 
-      {/* Notes list */}
-      {notes.map((note) => (
-        <div
-          key={note.id}
-          className="rounded-xl border border-[#e6e6eb] bg-white p-5"
-        >
-          <div className="mb-2 flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-100 text-[10px] font-semibold text-blue-700">
-              {note.author.slice(0, 2).toUpperCase()}
-            </div>
-            <span className="text-sm font-medium text-[#18181b]">
-              {note.author}
-            </span>
-            <span className="text-xs text-[#a8a8b4]">
-              {formatTimestamp(note.timestamp)}
+      {/* Editable notes area (auto-saved) */}
+      <div className="rounded-xl border border-[#e6e6eb] bg-white p-4">
+        <div className="mb-2 flex items-center justify-between">
+          <span className="font-mono text-[10px] uppercase tracking-wider text-[#a8a8b4]">
+            Internal Notes
+          </span>
+          <SaveIndicator status={autoSaveStatus} />
+        </div>
+        <textarea
+          value={internalNotes}
+          onChange={(e) => handleNotesChange(e.target.value)}
+          placeholder="Type your notes here... changes are auto-saved."
+          rows={8}
+          className="w-full resize-none rounded-lg border-0 bg-gray-50 p-3 text-sm leading-relaxed text-[#18181b] placeholder-[#a8a8b4] outline-none focus:ring-2 focus:ring-blue-200"
+        />
+      </div>
+
+      {/* Legacy notes display (read-only, from initial load) */}
+      {notes.length > 0 && notes[0].author !== 'System' && (
+        <>
+          <div className="mt-6 border-t border-[#e6e6eb] pt-4">
+            <span className="font-mono text-[10px] uppercase tracking-wider text-[#a8a8b4]">
+              Previous Notes
             </span>
           </div>
-          <p className="text-sm leading-relaxed text-[#60606a]">{note.text}</p>
-        </div>
-      ))}
+          {notes
+            .filter((n) => n.author !== 'System')
+            .map((note) => (
+              <div
+                key={note.id}
+                className="rounded-xl border border-[#e6e6eb] bg-white p-5"
+              >
+                <div className="mb-2 flex items-center gap-2">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-100 text-[10px] font-semibold text-blue-700">
+                    {note.author.slice(0, 2).toUpperCase()}
+                  </div>
+                  <span className="text-sm font-medium text-[#18181b]">
+                    {note.author}
+                  </span>
+                  <span className="text-xs text-[#a8a8b4]">
+                    {formatTimestamp(note.timestamp)}
+                  </span>
+                </div>
+                <p className="text-sm leading-relaxed text-[#60606a]">{note.text}</p>
+              </div>
+            ))}
+        </>
+      )}
 
-      {notes.length === 0 && (
+      {notes.length === 0 && !internalNotes && (
         <div className="py-12 text-center text-sm text-[#a8a8b4]">
           No notes yet. Add the first one above.
         </div>
@@ -885,6 +1024,7 @@ export default function ProjectDetailPage({
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [project, setProject] = useState<ProjectDetail | null>(null);
+  const [workOrderId, setWorkOrderId] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -893,6 +1033,7 @@ export default function ProjectDetailPage({
     setError(null);
     try {
       const wo = await api.get<ApiWorkOrderResponse>(`/api/work-orders/${id}`);
+      setWorkOrderId(wo.id);
       setProject(transformWorkOrderToProject(wo));
     } catch (err) {
       if (err instanceof ApiError && err.status === 404) {
@@ -1006,8 +1147,8 @@ export default function ProjectDetailPage({
       {/* Tab content */}
       <div className="flex-1 overflow-auto px-6 py-6">
         {activeTab === 'overview' && <OverviewTab project={project} />}
-        {activeTab === 'checklist' && <ChecklistTab project={project} />}
-        {activeTab === 'notes' && <NotesTab project={project} />}
+        {activeTab === 'checklist' && <ChecklistTab project={project} workOrderId={workOrderId} />}
+        {activeTab === 'notes' && <NotesTab project={project} workOrderId={workOrderId} />}
         {activeTab === 'photos' && <PhotosTab project={project} />}
         {activeTab === 'timeline' && <TimelineTab project={project} />}
       </div>

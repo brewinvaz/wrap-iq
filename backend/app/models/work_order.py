@@ -52,6 +52,7 @@ class WorkOrder(Base, TenantMixin, TimestampMixin):
         DateTime(timezone=True), nullable=True
     )
     internal_notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    checklist: Mapped[list | None] = mapped_column(JSONB, nullable=True)
     before_photos: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     after_photos: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     status_timestamps: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
