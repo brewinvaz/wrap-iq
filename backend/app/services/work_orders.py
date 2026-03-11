@@ -79,7 +79,16 @@ async def list_work_orders(
     total_result = await session.execute(count_query)
     total = total_result.scalar() or 0
 
-    query = query.order_by(WorkOrder.created_at.desc()).offset(skip).limit(limit)
+    query = (
+        query.options(
+            selectinload(WorkOrder.work_order_vehicles),
+            selectinload(WorkOrder.status),
+            selectinload(WorkOrder.client),
+        )
+        .order_by(WorkOrder.created_at.desc())
+        .offset(skip)
+        .limit(limit)
+    )
     result = await session.execute(query)
     return list(result.scalars().all()), total
 
