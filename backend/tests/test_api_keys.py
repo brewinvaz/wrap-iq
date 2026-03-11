@@ -34,7 +34,7 @@ async def _register_and_get_token(client):
         "/api/auth/register",
         json={
             "email": "admin@shop.com",
-            "password": "testpass123",
+            "password": "TestPass123",
             "org_name": "My Shop",
         },
     )
