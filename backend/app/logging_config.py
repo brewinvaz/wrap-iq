@@ -55,7 +55,8 @@ def setup_logging(*, debug: bool) -> None:
     wrapiq_logger.setLevel(level)
     wrapiq_logger.handlers.clear()
     wrapiq_logger.addHandler(handler)
-    wrapiq_logger.propagate = False
+    # Allow propagation so pytest's caplog can capture log output
+    wrapiq_logger.propagate = True
 
     # Also configure uvicorn loggers so their output matches our format
     for name in ("uvicorn", "uvicorn.error", "uvicorn.access"):
