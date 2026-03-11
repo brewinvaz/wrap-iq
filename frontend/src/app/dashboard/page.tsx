@@ -72,6 +72,7 @@ function toProjectCard(wo: WorkOrderResponse): ProjectCard {
 
   return {
     id: wo.job_number,
+    workOrderId: wo.id,
     name: wo.job_number,
     vehicle: vehicleSummary,
     client: wo.client_name ?? 'Unknown Client',
