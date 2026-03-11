@@ -31,7 +31,7 @@ async def client(db_session, seed_plan):
 async def test_get_me(client):
     reg = await client.post(
         "/api/auth/register",
-        json={"email": "me@shop.com", "password": "Testpass123", "org_name": "My Shop"},
+        json={"email": "me@shop.com", "password": "TestPass123", "org_name": "My Shop"},
     )
     token = reg.json()["access_token"]
     resp = await client.get(
