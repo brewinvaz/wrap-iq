@@ -1,9 +1,10 @@
 import uuid
 
-from sqlalchemy import select, update
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.kanban_stage import KanbanStage, SystemStatus
+from app.models.work_order import WorkOrder
 
 DEFAULT_STAGES: list[dict] = [
     {
@@ -147,6 +148,53 @@ class KanbanStageService:
         await self.session.commit()
         await self.session.refresh(stage)
         return stage
+
+    async def get_first_active_stage(
+        self,
+        organization_id: uuid.UUID,
+        exclude_id: uuid.UUID | None = None,
+    ) -> KanbanStage | None:
+        """Return the first active stage by position, optionally excluding a stage."""
+        query = select(KanbanStage).where(
+            KanbanStage.organization_id == organization_id,
+            KanbanStage.is_active.is_(True),
+        )
+        if exclude_id is not None:
+            query = query.where(KanbanStage.id != exclude_id)
+        query = query.order_by(KanbanStage.position).limit(1)
+        result = await self.session.execute(query)
+        return result.scalar_one_or_none()
+
+    async def count_work_orders(
+        self, stage_id: uuid.UUID, organization_id: uuid.UUID
+    ) -> int:
+        """Count work orders assigned to a given stage."""
+        result = await self.session.execute(
+            select(func.count())
+            .select_from(WorkOrder)
+            .where(
+                WorkOrder.status_id == stage_id,
+                WorkOrder.organization_id == organization_id,
+            )
+        )
+        return result.scalar_one()
+
+    async def reassign_work_orders(
+        self,
+        from_stage_id: uuid.UUID,
+        to_stage_id: uuid.UUID,
+        organization_id: uuid.UUID,
+    ) -> int:
+        """Move all work orders from one stage to another. Returns count moved."""
+        result = await self.session.execute(
+            update(WorkOrder)
+            .where(
+                WorkOrder.status_id == from_stage_id,
+                WorkOrder.organization_id == organization_id,
+            )
+            .values(status_id=to_stage_id)
+        )
+        return result.rowcount  # type: ignore[return-value]
 
     async def delete_stage(
         self, stage_id: uuid.UUID, organization_id: uuid.UUID
