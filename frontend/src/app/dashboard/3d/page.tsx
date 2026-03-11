@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { api, ApiError } from '@/lib/api-client';
+import NewRenderModal from '@/components/renders/NewRenderModal';
 
 // --- API response types ---
 
@@ -423,8 +424,11 @@ export default function ThreeDPage() {
         )}
       </div>
 
-      {/* Modal placeholder — Task 8 will create the real modal component */}
-      {showNewRender && <div>Modal placeholder</div>}
+      <NewRenderModal
+        isOpen={showNewRender}
+        onClose={() => setShowNewRender(false)}
+        onCreate={() => { fetchRenders(); setToast('Render created successfully'); }}
+      />
     </div>
   );
 }
