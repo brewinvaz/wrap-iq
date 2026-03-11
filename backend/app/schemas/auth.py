@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field, field_validator
 class RegisterRequest(BaseModel):
     email: str
     password: str = Field(min_length=8)
+    org_name: str
 
     @field_validator("password")
     @classmethod
@@ -20,8 +21,6 @@ class RegisterRequest(BaseModel):
         if errors:
             raise ValueError("Password must contain " + ", ".join(errors) + ".")
         return v
-
-    org_name: str
 
 
 class LoginRequest(BaseModel):

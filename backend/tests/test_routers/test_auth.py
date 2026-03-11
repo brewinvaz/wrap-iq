@@ -139,3 +139,38 @@ async def test_logout(client):
         json={"refresh_token": refresh},
     )
     assert resp.status_code == 401
+
+
+@pytest.mark.parametrize(
+    "weak_password",
+    [
+        "abcdefgh",  # no uppercase, no digit
+        "ABCDEFGH",  # no lowercase, no digit
+        "12345678",  # no letters at all
+        "abcdefg1",  # no uppercase
+        "ABCDEFG1",  # no lowercase
+        "Abcdefgh",  # no digit
+    ],
+)
+async def test_register_rejects_weak_password(client, weak_password):
+    resp = await client.post(
+        "/api/auth/register",
+        json={
+            "email": "weak@shop.com",
+            "password": weak_password,
+            "org_name": "Weak Shop",
+        },
+    )
+    assert resp.status_code == 422
+
+
+async def test_register_accepts_strong_password(client):
+    resp = await client.post(
+        "/api/auth/register",
+        json={
+            "email": "strong@shop.com",
+            "password": "Strong1pass",
+            "org_name": "Strong Shop",
+        },
+    )
+    assert resp.status_code == 200
