@@ -31,6 +31,7 @@ from app.models.subscription import (
     Subscription,
     SubscriptionStatus,
 )
+from app.models.time_log import TimeLog, TimeLogStatus
 from app.models.user import Role, User
 from app.models.user_profile import UserProfile
 from app.models.vehicle import Vehicle, VehicleType
@@ -88,6 +89,8 @@ __all__ = [
     "SubscriptionStatus",
     "SystemStatus",
     "TenantMixin",
+    "TimeLog",
+    "TimeLogStatus",
     "TimestampMixin",
     "TriggerType",
     "User",

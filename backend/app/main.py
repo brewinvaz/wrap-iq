@@ -35,6 +35,7 @@ from app.routers.pay import router as pay_router
 from app.routers.sidebar import router as sidebar_router
 from app.routers.subscriptions import router as subscriptions_router
 from app.routers.superadmin import router as superadmin_router
+from app.routers.time_logs import router as time_logs_router
 from app.routers.users import router as users_router
 from app.routers.vehicle_detection import router as vehicle_detection_router
 from app.routers.vehicles import router as vehicles_router
@@ -175,6 +176,7 @@ app.include_router(pay_router)
 app.include_router(sidebar_router)
 app.include_router(subscriptions_router)
 app.include_router(superadmin_router)
+app.include_router(time_logs_router)
 app.include_router(users_router)
 app.include_router(vehicle_detection_router)
 app.include_router(vehicles_router)
