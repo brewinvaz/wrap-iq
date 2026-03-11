@@ -38,7 +38,7 @@ class Webhook(Base, TenantMixin, TimestampMixin):
     )
 
 
-class WebhookDelivery(Base, TimestampMixin):
+class WebhookDelivery(Base, TenantMixin, TimestampMixin):
     __tablename__ = "webhook_deliveries"
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)

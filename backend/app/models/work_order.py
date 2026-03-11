@@ -77,7 +77,7 @@ class WorkOrder(Base, TenantMixin, TimestampMixin):
     )
 
 
-class WorkOrderVehicle(Base):
+class WorkOrderVehicle(Base, TenantMixin):
     __tablename__ = "work_order_vehicles"
 
     work_order_id: Mapped[uuid.UUID] = mapped_column(

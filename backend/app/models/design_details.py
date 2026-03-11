@@ -6,10 +6,10 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db import Base
-from app.models.base import TimestampMixin
+from app.models.base import TenantMixin, TimestampMixin
 
 
-class DesignDetails(Base, TimestampMixin):
+class DesignDetails(Base, TenantMixin, TimestampMixin):
     __tablename__ = "design_details"
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)

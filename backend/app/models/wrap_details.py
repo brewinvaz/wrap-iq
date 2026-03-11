@@ -6,7 +6,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
-from app.models.base import TimestampMixin
+from app.models.base import TenantMixin, TimestampMixin
 
 
 class WrapCoverage(enum.StrEnum):
@@ -36,7 +36,7 @@ class BumperCoverage(enum.StrEnum):
     BOTH = "both"
 
 
-class WrapDetails(Base, TimestampMixin):
+class WrapDetails(Base, TenantMixin, TimestampMixin):
     __tablename__ = "wrap_details"
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
