@@ -36,7 +36,13 @@ async def create_work_order(
 
     if vehicle_ids:
         for vid in vehicle_ids:
-            session.add(WorkOrderVehicle(work_order_id=wo.id, vehicle_id=vid))
+            session.add(
+                WorkOrderVehicle(
+                    work_order_id=wo.id,
+                    vehicle_id=vid,
+                    organization_id=org_id,
+                )
+            )
         await session.flush()
 
     await session.commit()
