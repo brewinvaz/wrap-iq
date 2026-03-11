@@ -75,7 +75,7 @@ async def get_photo_upload_url(
     return {"upload_url": url, "r2_key": r2_key}
 
 
-@router.post("", status_code=status.HTTP_201_CREATED)
+@router.post("", status_code=status.HTTP_201_CREATED, response_model=list[PhotoResponse])
 async def register_photos(
     work_order_id: uuid.UUID,
     body: PhotoRegisterRequest,

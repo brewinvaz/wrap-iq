@@ -196,6 +196,11 @@ class TestRegisterPhotos:
 
 
 class TestListPhotos:
+    @patch("app.routers.work_order_photos.is_r2_configured", return_value=False)
+    async def test_returns_503_when_r2_not_configured(self, mock_r2, client):
+        resp = await client.get(BASE_URL)
+        assert resp.status_code == 503
+
     @patch("app.routers.work_order_photos.is_r2_configured", return_value=True)
     async def test_returns_empty_list(self, mock_r2, client, mock_session):
         # Mock the query result to return empty list
@@ -212,6 +217,14 @@ class TestListPhotos:
 
 
 class TestUpdatePhoto:
+    @patch("app.routers.work_order_photos.is_r2_configured", return_value=False)
+    async def test_returns_503_when_r2_not_configured(self, mock_r2, client):
+        resp = await client.patch(
+            f"{BASE_URL}/{PHOTO_ID}",
+            json={"photo_type": "before"},
+        )
+        assert resp.status_code == 503
+
     @patch("app.routers.work_order_photos.is_r2_configured", return_value=True)
     @patch(
         "app.routers.work_order_photos.generate_download_url",
@@ -259,6 +272,11 @@ class TestUpdatePhoto:
 
 
 class TestDeletePhoto:
+    @patch("app.routers.work_order_photos.is_r2_configured", return_value=False)
+    async def test_returns_503_when_r2_not_configured(self, mock_r2, client):
+        resp = await client.delete(f"{BASE_URL}/{PHOTO_ID}")
+        assert resp.status_code == 503
+
     @patch("app.routers.work_order_photos.is_r2_configured", return_value=True)
     @patch("app.routers.work_order_photos.delete_object")
     async def test_deletes_photo(
