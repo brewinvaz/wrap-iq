@@ -1,3 +1,4 @@
+import json
 import uuid
 
 import pytest
@@ -9,6 +10,7 @@ from app.main import app
 from app.models.organization import Organization
 from app.models.plan import Plan
 from app.models.user import Role, User
+from app.services.webhooks import WebhookService
 
 
 @pytest.fixture
@@ -218,3 +220,96 @@ async def test_non_admin_forbidden(client, seed_data):
 async def test_unauthorized_returns_401(client, seed_data):
     resp = await client.get("/api/webhooks")
     assert resp.status_code == 401
+
+
+# --- Incoming webhook signature verification tests ---
+
+
+async def test_incoming_missing_signature_returns_401(client, seed_data):
+    org_id = seed_data["org"].id
+    resp = await client.post(
+        f"/api/webhooks/incoming/{org_id}",
+        json={"event": "project.created", "data": {}},
+    )
+    assert resp.status_code == 401
+    assert "Missing webhook signature" in resp.json()["detail"]
+
+
+async def test_incoming_invalid_org_returns_404(client, seed_data):
+    fake_org_id = uuid.uuid4()
+    payload = json.dumps({"event": "project.created", "data": {}}).encode()
+    resp = await client.post(
+        f"/api/webhooks/incoming/{fake_org_id}",
+        content=payload,
+        headers={
+            "Content-Type": "application/json",
+            "X-Webhook-Signature": "invalidsig",
+        },
+    )
+    assert resp.status_code == 404
+    assert "Organization not found" in resp.json()["detail"]
+
+
+async def test_incoming_no_webhooks_returns_404(client, seed_data):
+    """Org exists but has no registered webhooks."""
+    org_id = seed_data["org"].id
+    payload = json.dumps({"event": "project.created", "data": {}}).encode()
+    resp = await client.post(
+        f"/api/webhooks/incoming/{org_id}",
+        content=payload,
+        headers={
+            "Content-Type": "application/json",
+            "X-Webhook-Signature": "invalidsig",
+        },
+    )
+    assert resp.status_code == 404
+    assert "No active webhooks" in resp.json()["detail"]
+
+
+async def test_incoming_invalid_signature_returns_401(
+    client,
+    seed_data,
+):
+    """Org has webhooks but signature doesn't match."""
+    headers = make_token(seed_data["admin"])
+    await _create_webhook(client, headers)
+
+    org_id = seed_data["org"].id
+    payload = json.dumps({"event": "project.created", "data": {}}).encode()
+    resp = await client.post(
+        f"/api/webhooks/incoming/{org_id}",
+        content=payload,
+        headers={
+            "Content-Type": "application/json",
+            "X-Webhook-Signature": "badsignature",
+        },
+    )
+    assert resp.status_code == 401
+    assert "Invalid webhook signature" in resp.json()["detail"]
+
+
+async def test_incoming_valid_signature_succeeds(
+    client,
+    seed_data,
+):
+    """Valid signature is accepted and payload processed."""
+    admin_headers = make_token(seed_data["admin"])
+    create_resp = await _create_webhook(client, admin_headers)
+    secret = create_resp.json()["secret"]
+
+    org_id = seed_data["org"].id
+    payload = json.dumps({"event": "project.created", "data": {"id": "123"}}).encode()
+    signature = WebhookService.compute_signature(payload, secret)
+
+    resp = await client.post(
+        f"/api/webhooks/incoming/{org_id}",
+        content=payload,
+        headers={
+            "Content-Type": "application/json",
+            "X-Webhook-Signature": signature,
+        },
+    )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["status"] == "received"
+    assert data["event"] == "project.created"

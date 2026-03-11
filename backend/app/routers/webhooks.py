@@ -180,7 +180,6 @@ async def test_webhook(
 @router.post("/incoming/{org_id}")
 async def incoming_webhook(
     org_id: uuid.UUID,
-    body: IncomingWebhookPayload,
     request: Request,
     session: AsyncSession = Depends(get_session),
 ):
@@ -188,6 +187,16 @@ async def incoming_webhook(
     if not signature:
         raise HTTPException(status_code=401, detail="Missing webhook signature")
 
+    raw_body = await request.body()
+    body = IncomingWebhookPayload.model_validate_json(raw_body)
+
     service = WebhookService(session)
-    result = await service.handle_incoming(org_id, body.event, body.data)
+    try:
+        result = await service.handle_incoming(
+            org_id, body.event, body.data, raw_body, signature
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e)) from e
+    except PermissionError as e:
+        raise HTTPException(status_code=401, detail=str(e)) from e
     return result

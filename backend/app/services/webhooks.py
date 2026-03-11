@@ -11,6 +11,7 @@ import httpx
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models.organization import Organization
 from app.models.webhook import Webhook, WebhookDelivery, WebhookEventType
 from app.schemas.webhooks import WebhookCreate, WebhookUpdate
 
@@ -248,7 +249,42 @@ class WebhookService:
         await self.session.refresh(delivery)
         return delivery
 
-    async def handle_incoming(self, org_id: uuid.UUID, event: str, data: dict) -> dict:
+    async def handle_incoming(
+        self,
+        org_id: uuid.UUID,
+        event: str,
+        data: dict,
+        raw_body: bytes,
+        signature: str,
+    ) -> dict:
+        # Validate org exists
+        org_result = await self.session.execute(
+            select(Organization).where(Organization.id == org_id)
+        )
+        if not org_result.scalar_one_or_none():
+            raise ValueError("Organization not found")
+
+        # Find active webhooks for this org
+        result = await self.session.execute(
+            select(Webhook).where(
+                Webhook.organization_id == org_id,
+                Webhook.is_active.is_(True),
+            )
+        )
+        webhooks = list(result.scalars().all())
+        if not webhooks:
+            raise ValueError("No active webhooks registered for this organization")
+
+        # Verify signature against any registered webhook secret
+        verified = False
+        for webhook in webhooks:
+            if self.verify_signature(raw_body, webhook.secret, signature):
+                verified = True
+                break
+
+        if not verified:
+            raise PermissionError("Invalid webhook signature")
+
         return {
             "status": "received",
             "event": event,
