@@ -76,3 +76,15 @@ class InvoiceResponse(BaseModel):
 class InvoiceListResponse(BaseModel):
     items: list[InvoiceResponse]
     total: int
+
+
+class PaymentPageResponse(BaseModel):
+    invoice_number: str
+    client_name: str
+    status: InvoiceStatus
+    total: int
+    amount_paid: int
+    balance_due: int
+    due_date: datetime | None = None
+
+    model_config = {"from_attributes": True}
