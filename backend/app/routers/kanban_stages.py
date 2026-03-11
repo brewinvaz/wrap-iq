@@ -78,7 +78,10 @@ async def delete_stage(
     admin: User = Depends(require_admin),
     session: AsyncSession = Depends(get_session),
 ):
-    """Soft-delete a Kanban stage. Admin only. Cannot delete system-mapped stages."""
+    """Soft-delete a Kanban stage. Admin only. Cannot delete system-mapped stages.
+
+    Any work orders on this stage are reassigned to the first remaining active stage.
+    """
     service = KanbanStageService(session)
     stage = await service.get_by_id(stage_id, admin.organization_id)
     if not stage:
@@ -91,6 +94,20 @@ async def delete_stage(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Cannot delete a stage with a system status mapping",
         )
+
+    # Reassign orphaned work orders to the first remaining active stage
+    wo_count = await service.count_work_orders(stage_id, admin.organization_id)
+    if wo_count > 0:
+        fallback = await service.get_first_active_stage(
+            admin.organization_id, exclude_id=stage_id
+        )
+        if not fallback:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Cannot delete the only active stage while work orders exist",
+            )
+        await service.reassign_work_orders(stage_id, fallback.id, admin.organization_id)
+
     stage.is_active = False
     await session.commit()
 
