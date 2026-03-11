@@ -13,14 +13,15 @@ import { permissionsMatrix } from '@/lib/role-config';
 interface ApiUserResponse {
   id: string;
   email: string;
+  full_name: string | null;
   role: string;
   organization_id: string | null;
   is_active: boolean;
   is_superadmin: boolean;
+  created_at: string;
 }
 
 interface ApiInviteResponse extends ApiUserResponse {
-  created_at: string;
   updated_at: string;
 }
 
@@ -37,13 +38,30 @@ const avatarColors = [
   'bg-indigo-500',
 ];
 
-function getInitials(email: string): string {
+function getInitials(fullName: string | null, email: string): string {
+  if (fullName) {
+    const parts = fullName.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return fullName.trim().slice(0, 2).toUpperCase();
+  }
+  // Fallback to email-based initials
   const name = email.split('@')[0];
   if (name.includes('.')) {
-    const parts = name.split('.');
-    return (parts[0][0] + parts[1][0]).toUpperCase();
+    const emailParts = name.split('.');
+    return (emailParts[0][0] + emailParts[1][0]).toUpperCase();
   }
   return name.slice(0, 2).toUpperCase();
+}
+
+function formatJoinedDate(isoDate: string): string {
+  const date = new Date(isoDate);
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
 }
 
 function transformApiUser(user: ApiUserResponse, index: number): TeamMemberDetail {
@@ -53,9 +71,9 @@ function transformApiUser(user: ApiUserResponse, index: number): TeamMemberDetai
     role: user.role,
     isActive: user.is_active,
     isSuperadmin: user.is_superadmin,
-    initials: getInitials(user.email),
+    initials: getInitials(user.full_name, user.email),
     color: avatarColors[index % avatarColors.length],
-    joinedDate: '',
+    joinedDate: user.created_at ? formatJoinedDate(user.created_at) : '',
   };
 }
 

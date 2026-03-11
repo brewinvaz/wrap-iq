@@ -9,16 +9,17 @@ from app.models.user import Role
 class UserListResponse(BaseModel):
     id: uuid.UUID
     email: str
+    full_name: str | None = None
     role: Role
     organization_id: uuid.UUID | None
     is_active: bool
     is_superadmin: bool
+    created_at: datetime
 
     model_config = {"from_attributes": True}
 
 
 class UserDetailResponse(UserListResponse):
-    created_at: datetime
     updated_at: datetime
 
 
