@@ -1,6 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import { Client } from '@/lib/types';
+import { api, ApiError } from '@/lib/api-client';
 
 const tagColors: Record<string, string> = {
   VIP: 'bg-amber-100 text-amber-700',
@@ -37,6 +39,34 @@ interface ClientDetailProps {
 }
 
 export default function ClientDetail({ client }: ClientDetailProps) {
+  const [notes, setNotes] = useState(client.notes ?? '');
+  const [saving, setSaving] = useState(false);
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  // Reset notes when the selected client changes
+  const [prevClientId, setPrevClientId] = useState(client.id);
+  if (client.id !== prevClientId) {
+    setPrevClientId(client.id);
+    setNotes(client.notes ?? '');
+    setFeedback(null);
+  }
+
+  const isDirty = notes !== (client.notes ?? '');
+
+  async function handleSaveNotes() {
+    setSaving(true);
+    setFeedback(null);
+    try {
+      await api.patch(`/api/clients/${client.id}`, { notes });
+      setFeedback({ type: 'success', message: 'Notes saved' });
+    } catch (err) {
+      const message = err instanceof ApiError ? err.message : 'Failed to save notes';
+      setFeedback({ type: 'error', message });
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
     <div className="flex-1 overflow-y-auto bg-[#f4f4f6]">
       {/* Header */}
@@ -214,9 +244,31 @@ export default function ClientDetail({ client }: ClientDetailProps) {
           <textarea
             className="w-full resize-none rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm text-[#18181b] placeholder-gray-400 outline-none focus:border-blue-300 focus:ring-1 focus:ring-blue-300"
             rows={4}
-            defaultValue={client.notes ?? ''}
+            value={notes}
+            onChange={(e) => {
+              setNotes(e.target.value);
+              setFeedback(null);
+            }}
             placeholder="Add notes about this client..."
           />
+          <div className="mt-2 flex items-center gap-3">
+            <button
+              onClick={handleSaveNotes}
+              disabled={saving || !isDirty}
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {saving ? 'Saving...' : 'Save Notes'}
+            </button>
+            {feedback && (
+              <span
+                className={`text-sm font-medium ${
+                  feedback.type === 'success' ? 'text-emerald-600' : 'text-red-600'
+                }`}
+              >
+                {feedback.message}
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </div>
