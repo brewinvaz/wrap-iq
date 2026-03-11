@@ -252,7 +252,7 @@ async def test_create_superadmin_user(client, seed_data):
         headers=headers,
         json={
             "email": "new-sa@wrapflow.io",
-            "password": "secure123",
+            "password": "Secure123",
             "is_superadmin": True,
         },
     )
@@ -269,7 +269,7 @@ async def test_create_superadmin_user_duplicate_email(client, seed_data):
         headers=headers,
         json={
             "email": "sa@wrapflow.io",
-            "password": "testpass123",
+            "password": "Testpass123",
             "is_superadmin": True,
         },
     )
