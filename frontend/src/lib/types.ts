@@ -17,6 +17,7 @@ export interface TeamMember {
 
 export interface ProjectCard {
   id: string;
+  workOrderId?: string;
   name: string;
   vehicle: string;
   client: string;

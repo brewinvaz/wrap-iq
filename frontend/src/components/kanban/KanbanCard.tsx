@@ -49,7 +49,7 @@ export default function KanbanCard({ card, onDragStart, onAdvance, isPending }: 
         }
         onDragStart(e, card.id);
       }}
-      onClick={() => router.push(`/dashboard/projects/${card.id}`)}
+      onClick={() => router.push(`/dashboard/projects/${card.workOrderId ?? card.id}`)}
       className={`group relative rounded-lg border border-[#e6e6eb] bg-white p-3.5 shadow-[0_1px_4px_rgba(0,0,0,.06)] transition-all duration-200 ${
         isPending
           ? 'cursor-default opacity-70'
