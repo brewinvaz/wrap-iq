@@ -7,13 +7,14 @@ from app.config import settings
 logger = logging.getLogger("wrapiq")
 
 
-async def send_magic_link_email(to_email: str, token: str) -> None:
+async def send_magic_link_email(to_email: str, token: str) -> bool:
+    """Send a magic-link email. Returns True on success, False on failure."""
     magic_url = f"{settings.frontend_url}/auth/magic-link?token={token}"
 
     if not settings.resend_api_key:
         logger.warning("Resend not configured — magic link email will not be sent")
         logger.info("[DEV] Magic link for %s: %s", to_email, magic_url)
-        return
+        return False
 
     resend.api_key = settings.resend_api_key
     try:
@@ -30,18 +31,22 @@ async def send_magic_link_email(to_email: str, token: str) -> None:
             }
         )
     except Exception:
-        logger.exception("Failed to send email to %s", to_email)
+        logger.exception("Failed to send magic link email to %s", to_email)
+        return False
+    else:
+        return True
 
 
 async def send_onboarding_invite_email(
     to_email: str, token: str, org_name: str
-) -> None:
+) -> bool:
+    """Send an onboarding invite email. Returns True on success, False on failure."""
     onboarding_url = f"{settings.frontend_url}/onboard?token={token}"
 
     if not settings.resend_api_key:
         logger.warning("Resend not configured — onboarding invite will not be sent")
         logger.info("[DEV] Onboarding invite for %s: %s", to_email, onboarding_url)
-        return
+        return False
 
     resend.api_key = settings.resend_api_key
     try:
@@ -59,4 +64,7 @@ async def send_onboarding_invite_email(
             }
         )
     except Exception:
-        logger.exception("Failed to send email to %s", to_email)
+        logger.exception("Failed to send onboarding invite email to %s", to_email)
+        return False
+    else:
+        return True
