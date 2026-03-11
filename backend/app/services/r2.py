@@ -40,7 +40,9 @@ def _get_client():
     )
 
 
-def generate_object_key(org_id: uuid.UUID, filename: str, prefix: str = "onboarding") -> str:
+def generate_object_key(
+    org_id: uuid.UUID, filename: str, prefix: str = "onboarding"
+) -> str:
     safe_filename = filename.replace("/", "_").replace("\\", "_").replace("..", "")
     unique = uuid.uuid4().hex[:8]
     return f"{org_id}/{prefix}/{unique}_{safe_filename}"
