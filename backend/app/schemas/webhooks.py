@@ -46,6 +46,7 @@ class WebhookResponse(BaseModel):
 
 class WebhookCreateResponse(BaseModel):
     """Returned only at creation time and secret regeneration — shows full secret."""
+
     model_config = {"from_attributes": True}
 
     id: uuid.UUID
