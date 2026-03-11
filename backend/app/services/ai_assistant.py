@@ -1,6 +1,7 @@
 import re
 import uuid
 
+import sqlparse
 from google import genai
 from google.genai import types
 from sqlalchemy import text
@@ -141,6 +142,102 @@ def validate_sql(sql: str) -> str | None:
     return None
 
 
+_MAX_LIMIT = 1000
+_DEFAULT_LIMIT = 100
+
+
+def _get_outermost_limit(sql: str) -> int | None:
+    """Return the LIMIT value of the outermost SELECT, or None if absent.
+
+    Uses sqlparse to find the LIMIT clause at the top level of the statement,
+    skipping any LIMIT clauses inside parenthesized subqueries or UNION
+    members so they cannot bypass the check.
+    """
+    parsed = sqlparse.parse(sql)
+    if not parsed:
+        return None
+    stmt = parsed[-1]  # last (and typically only) statement
+
+    # Collect only top-level (non-parenthesized) tokens by walking
+    # the statement's direct children and skipping Parenthesis groups.
+    top_tokens: list[sqlparse.sql.Token] = []
+    for token in stmt.tokens:
+        if isinstance(token, sqlparse.sql.Parenthesis):
+            continue  # skip subqueries wrapped in parentheses
+        if token.ttype is not None:
+            top_tokens.append(token)
+        else:
+            # For non-leaf groups (e.g. Identifier, Where, etc.)
+            # flatten them but they are still at the outer level
+            top_tokens.extend(token.flatten())
+
+    # Walk in reverse to find the last LIMIT keyword at top level
+    for i in range(len(top_tokens) - 1, -1, -1):
+        tok = top_tokens[i]
+        if tok.ttype is sqlparse.tokens.Keyword and tok.normalized == "LIMIT":
+            # Next non-whitespace token should be the limit value
+            for j in range(i + 1, len(top_tokens)):
+                next_tok = top_tokens[j]
+                if next_tok.ttype in (
+                    sqlparse.tokens.Literal.Number.Integer,
+                    sqlparse.tokens.Literal.Number.Float,
+                ):
+                    try:
+                        return int(next_tok.value)
+                    except ValueError:
+                        return None
+                if next_tok.ttype not in (
+                    sqlparse.tokens.Whitespace,
+                    sqlparse.tokens.Newline,
+                ):
+                    break
+            return None
+    return None
+
+
+def ensure_outer_limit(sql: str) -> str:
+    """Ensure the outermost query has a reasonable LIMIT clause.
+
+    - If no LIMIT exists on the outermost query, appends LIMIT 100.
+    - If the LIMIT exceeds _MAX_LIMIT, replaces it with _MAX_LIMIT.
+    - Returns the (possibly modified) SQL string.
+    """
+    cleaned = sql.strip().rstrip(";").strip()
+    limit_value = _get_outermost_limit(cleaned)
+
+    if limit_value is None:
+        return cleaned + f" LIMIT {_DEFAULT_LIMIT}"
+
+    if limit_value > _MAX_LIMIT:
+        # Replace the excessive limit with the maximum allowed
+        # We use sqlparse to locate and rewrite only the outermost LIMIT
+        parsed = sqlparse.parse(cleaned)
+        stmt = parsed[-1]
+        tokens = list(stmt.flatten())
+        for i in range(len(tokens) - 1, -1, -1):
+            tok = tokens[i]
+            if tok.ttype is sqlparse.tokens.Keyword and tok.normalized == "LIMIT":
+                for j in range(i + 1, len(tokens)):
+                    next_tok = tokens[j]
+                    if next_tok.ttype in (
+                        sqlparse.tokens.Literal.Number.Integer,
+                        sqlparse.tokens.Literal.Number.Float,
+                    ):
+                        next_tok.value = str(_MAX_LIMIT)
+                        # Rebuild the SQL from the modified token list
+                        return str(stmt)
+                break
+        # Fallback: regex replacement for the last LIMIT N
+        return re.sub(
+            r"LIMIT\s+\d+\s*$",
+            f"LIMIT {_MAX_LIMIT}",
+            cleaned,
+            flags=re.IGNORECASE,
+        )
+
+    return cleaned
+
+
 class AIAssistantService:
     def __init__(self) -> None:
         if not settings.gemini_api_key:
@@ -201,9 +298,8 @@ class AIAssistantService:
         # Strip comments from SQL before LIMIT check and execution
         sql = _strip_sql_comments(sql).strip().rstrip(";").strip()
 
-        # Ensure LIMIT exists
-        if "limit" not in sql.lower():
-            sql = sql + " LIMIT 100"
+        # Ensure the outermost query has a reasonable LIMIT
+        sql = ensure_outer_limit(sql)
 
         # Execute the query using a read-only connection for safety
         try:
