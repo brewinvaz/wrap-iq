@@ -1,11 +1,6 @@
 'use client';
 
-const summaryStats = [
-  { label: 'Total Hours (This Week)', value: '142.5', accent: false },
-  { label: 'Pending Approval', value: '18.5 hrs', accent: true },
-  { label: 'Approved', value: '124.0 hrs', accent: false },
-  { label: 'Team Members Logged', value: '6 / 7', accent: false },
-];
+import { useState, useCallback } from 'react';
 
 interface TimeLog {
   id: string;
@@ -19,7 +14,7 @@ interface TimeLog {
   status: 'submitted' | 'approved';
 }
 
-const timeLogs: TimeLog[] = [
+const initialTimeLogs: TimeLog[] = [
   { id: '1', member: 'Marcus Johnson', initials: 'MJ', color: 'bg-blue-500', project: 'Metro Plumbing Fleet #12', task: 'Installation', hours: 8.0, date: '2026-03-10', status: 'submitted' },
   { id: '2', member: 'Sarah Chen', initials: 'SC', color: 'bg-violet-500', project: 'FastFreight Box Truck', task: 'Design — Side Panels', hours: 4.5, date: '2026-03-10', status: 'submitted' },
   { id: '3', member: 'Alex Rivera', initials: 'AR', color: 'bg-emerald-500', project: 'CleanCo Sprinter', task: 'Print + Laminate', hours: 6.0, date: '2026-03-10', status: 'approved' },
@@ -30,9 +25,83 @@ const timeLogs: TimeLog[] = [
   { id: '8', member: 'Sarah Chen', initials: 'SC', color: 'bg-violet-500', project: 'Greenfield SUV', task: 'Design — Initial', hours: 5.0, date: '2026-03-09', status: 'submitted' },
 ];
 
+function computeSummaryStats(logs: TimeLog[]) {
+  const totalHours = logs.reduce((sum, l) => sum + l.hours, 0);
+  const pendingHours = logs.filter((l) => l.status === 'submitted').reduce((sum, l) => sum + l.hours, 0);
+  const approvedHours = logs.filter((l) => l.status === 'approved').reduce((sum, l) => sum + l.hours, 0);
+  const uniqueMembers = new Set(logs.map((l) => l.member)).size;
+
+  return [
+    { label: 'Total Hours (This Week)', value: totalHours.toFixed(1), accent: false },
+    { label: 'Pending Approval', value: `${pendingHours.toFixed(1)} hrs`, accent: pendingHours > 0 },
+    { label: 'Approved', value: `${approvedHours.toFixed(1)} hrs`, accent: false },
+    { label: 'Team Members Logged', value: `${uniqueMembers} / 7`, accent: false },
+  ];
+}
+
+function exportTimeLogsCsv(logs: TimeLog[]) {
+  const headers = ['Team Member', 'Project', 'Task', 'Hours', 'Date', 'Status'];
+  const rows = logs.map((log) => [
+    log.member,
+    log.project,
+    log.task,
+    log.hours.toString(),
+    log.date,
+    log.status === 'approved' ? 'Approved' : 'Submitted',
+  ]);
+
+  const csvContent = [headers, ...rows]
+    .map((row) => row.map((cell) => `"${cell.replace(/"/g, '""')}"`).join(','))
+    .join('\n');
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `time-logs-${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
 export default function TimeLogsPage() {
+  const [logs, setLogs] = useState<TimeLog[]>(initialTimeLogs);
+  const [toast, setToast] = useState<string | null>(null);
+
+  const summaryStats = computeSummaryStats(logs);
+
+  const showToast = useCallback((message: string) => {
+    setToast(message);
+    setTimeout(() => setToast(null), 3000);
+  }, []);
+
+  const handleApprove = useCallback(
+    (id: string) => {
+      setLogs((prev) =>
+        prev.map((log) => (log.id === id ? { ...log, status: 'approved' as const } : log))
+      );
+      const entry = logs.find((l) => l.id === id);
+      if (entry) {
+        showToast(`Approved ${entry.hours}h for ${entry.member}`);
+      }
+    },
+    [logs, showToast]
+  );
+
+  const handleExportCsv = useCallback(() => {
+    exportTimeLogsCsv(logs);
+    showToast('CSV exported successfully');
+  }, [logs, showToast]);
+
   return (
     <div className="flex h-full flex-col">
+      {toast && (
+        <div className="fixed right-6 top-6 z-50 animate-fade-in rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 shadow-lg">
+          {toast}
+        </div>
+      )}
+
       <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -41,7 +110,10 @@ export default function TimeLogsPage() {
               Week of Mar 9
             </span>
           </div>
-          <button className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700">
+          <button
+            onClick={handleExportCsv}
+            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+          >
             Export CSV
           </button>
         </div>
@@ -76,7 +148,7 @@ export default function TimeLogsPage() {
               </tr>
             </thead>
             <tbody>
-              {timeLogs.map((log) => (
+              {logs.map((log) => (
                 <tr key={log.id} className="border-b border-[#e6e6eb] last:border-0 hover:bg-[#f4f4f6]/50">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
@@ -101,7 +173,10 @@ export default function TimeLogsPage() {
                   </td>
                   <td className="px-4 py-3">
                     {log.status === 'submitted' && (
-                      <button className="text-xs font-medium text-emerald-600 hover:text-emerald-800">
+                      <button
+                        onClick={() => handleApprove(log.id)}
+                        className="text-xs font-medium text-emerald-600 hover:text-emerald-800"
+                      >
                         Approve
                       </button>
                     )}
