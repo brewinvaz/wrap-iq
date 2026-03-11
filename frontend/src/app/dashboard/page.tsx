@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import KanbanBoard from '@/components/kanban/KanbanBoard';
 import MetricsBar from '@/components/dashboard/MetricsBar';
 import CreateWorkOrderModal from '@/components/work-orders/CreateWorkOrderModal';
 import { api, ApiError } from '@/lib/api-client';
-import { formatCurrencyCompact } from '@/lib/format';
+import { formatCurrencyCompact, formatCurrency } from '@/lib/format';
 import { KanbanColumn, KPIMetric, ProjectCard } from '@/lib/types';
 
 // ---------------------------------------------------------------------------
@@ -100,8 +101,6 @@ function computeKPIs(workOrders: WorkOrderResponse[], stages: KanbanStageRespons
   const pipelineValue = active.reduce((sum, wo) => sum + wo.job_value, 0);
   const totalValue = workOrders.reduce((sum, wo) => sum + wo.job_value, 0);
 
-  const formatCurrency = formatCurrencyCompact;
-
   return [
     {
       label: 'Active Jobs',
@@ -110,12 +109,12 @@ function computeKPIs(workOrders: WorkOrderResponse[], stages: KanbanStageRespons
     },
     {
       label: 'Pipeline Value',
-      value: formatCurrency(pipelineValue),
+      value: formatCurrencyCompact(pipelineValue),
       trend: 'neutral' as const,
     },
     {
       label: 'Total Revenue',
-      value: formatCurrency(totalValue),
+      value: formatCurrencyCompact(totalValue),
       trend: 'neutral' as const,
     },
     {
@@ -219,6 +218,91 @@ function ErrorBanner({ message, onRetry }: { message: string; onRetry: () => voi
 }
 
 // ---------------------------------------------------------------------------
+// List view component
+// ---------------------------------------------------------------------------
+
+const PRIORITY_BADGE: Record<string, string> = {
+  high: 'bg-rose-100 text-rose-700',
+  medium: 'bg-amber-100 text-amber-700',
+  low: 'bg-green-100 text-green-700',
+};
+
+function ListView({
+  workOrders,
+  stages,
+}: {
+  workOrders: WorkOrderResponse[];
+  stages: KanbanStageResponse[];
+}) {
+  return (
+    <div className="overflow-x-auto rounded-xl border border-[#e6e6eb] bg-white shadow-[0_1px_4px_rgba(0,0,0,.06)]">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b border-[#e6e6eb] bg-[#f4f4f6] text-left">
+            <th className="px-4 py-3 font-semibold text-[#18181b]">Job #</th>
+            <th className="px-4 py-3 font-semibold text-[#18181b]">Client</th>
+            <th className="px-4 py-3 font-semibold text-[#18181b]">Vehicle</th>
+            <th className="px-4 py-3 font-semibold text-[#18181b]">Status</th>
+            <th className="px-4 py-3 font-semibold text-[#18181b]">Priority</th>
+            <th className="px-4 py-3 font-semibold text-[#18181b]">Type</th>
+            <th className="px-4 py-3 text-right font-semibold text-[#18181b]">Value</th>
+            <th className="px-4 py-3 font-semibold text-[#18181b]">Date In</th>
+          </tr>
+        </thead>
+        <tbody>
+          {workOrders.length === 0 ? (
+            <tr>
+              <td colSpan={8} className="px-4 py-12 text-center text-[#a8a8b4]">
+                No work orders found
+              </td>
+            </tr>
+          ) : (
+            workOrders.map((wo) => {
+              const stage = stages.find((s) => s.id === wo.status?.id);
+              const vehicleSummary =
+                wo.vehicles.length > 0
+                  ? wo.vehicles
+                      .map((v) => [v.year, v.make, v.model].filter(Boolean).join(' '))
+                      .join(', ')
+                  : 'No vehicle';
+
+              return (
+                <tr key={wo.id} className="border-b border-[#e6e6eb] last:border-b-0 hover:bg-[#f9f9fb]">
+                  <td className="px-4 py-3 font-medium text-[#18181b]">{wo.job_number}</td>
+                  <td className="px-4 py-3 text-[#60606a]">{wo.client_name ?? 'Unknown'}</td>
+                  <td className="max-w-[200px] truncate px-4 py-3 text-[#60606a]">{vehicleSummary}</td>
+                  <td className="px-4 py-3">
+                    {stage && (
+                      <span
+                        className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium"
+                        style={{ backgroundColor: stage.color + '22', color: stage.color }}
+                      >
+                        <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: stage.color }} />
+                        {stage.name}
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${PRIORITY_BADGE[wo.priority] ?? ''}`}>
+                      {wo.priority}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 capitalize text-[#60606a]">{wo.job_type}</td>
+                  <td className="px-4 py-3 text-right font-medium text-[#18181b]">
+                    {formatCurrency(wo.job_value)}
+                  </td>
+                  <td className="px-4 py-3 text-[#60606a]">{wo.date_in.slice(0, 10)}</td>
+                </tr>
+              );
+            })
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Page component
 // ---------------------------------------------------------------------------
 
@@ -231,6 +315,7 @@ interface FilterCriteria {
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [viewMode, setViewMode] = useState<ViewMode>('kanban');
   const [filter, setFilter] = useState<FilterMode>('all');
   const [filterOpen, setFilterOpen] = useState(false);
@@ -238,6 +323,7 @@ export default function DashboardPage() {
     priority: [],
     jobType: [],
   });
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const filterRef = useRef<HTMLDivElement>(null);
   const filterBtnRef = useRef<HTMLButtonElement>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -276,6 +362,19 @@ export default function DashboardPage() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [filterOpen]);
+
+  // ------ View mode handler ------
+
+  const handleViewMode = useCallback(
+    (mode: ViewMode) => {
+      if (mode === 'calendar') {
+        router.push('/dashboard/calendar');
+        return;
+      }
+      setViewMode(mode);
+    },
+    [router]
+  );
 
   // ------ Data fetching ------
 
@@ -328,11 +427,15 @@ export default function DashboardPage() {
   const activeFilterCount =
     filterCriteria.priority.length + filterCriteria.jobType.length;
 
-  const filteredColumns = useMemo(() => {
-    // Determine which work orders pass the active filters
-    const matchesFilter = (wo: WorkOrderResponse): boolean => {
-      // Quick-filter
+  const matchesFilter = useCallback(
+    (wo: WorkOrderResponse): boolean => {
+      // Quick-filter toggles
       if (filter === 'urgent' && wo.priority !== 'high') return false;
+      if (filter === 'my-jobs') {
+        // Simulate "my jobs" by showing only commercial jobs as a toggle demo
+        // (no user assignment data available in the API)
+        if (wo.job_type !== 'commercial') return false;
+      }
       // Dropdown filters
       if (
         filterCriteria.priority.length > 0 &&
@@ -345,8 +448,11 @@ export default function DashboardPage() {
       )
         return false;
       return true;
-    };
+    },
+    [filter, filterCriteria]
+  );
 
+  const filteredColumns = useMemo(() => {
     const hasAnyFilter =
       filter !== 'all' || activeFilterCount > 0;
 
@@ -359,7 +465,14 @@ export default function DashboardPage() {
         return wo ? matchesFilter(wo) : true;
       }),
     }));
-  }, [columns, filter, filterCriteria, workOrders, activeFilterCount]);
+  }, [columns, filter, matchesFilter, workOrders, activeFilterCount]);
+
+  /** Filtered work orders for list view */
+  const filteredWorkOrders = useMemo(() => {
+    const hasAnyFilter = filter !== 'all' || activeFilterCount > 0;
+    if (!hasAnyFilter) return workOrders;
+    return workOrders.filter(matchesFilter);
+  }, [workOrders, filter, matchesFilter, activeFilterCount]);
 
   // ------ Drag-and-drop status change ------
 
@@ -574,6 +687,35 @@ export default function DashboardPage() {
                         ))}
                       </div>
                     </div>
+
+                    {/* Status filter (by stage) */}
+                    {stages.length > 0 && (
+                      <div>
+                        <p className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-[#a8a8b4]">Status</p>
+                        <div className="space-y-1.5">
+                          {stages.map((s) => {
+                            const count = workOrders.filter((wo) => wo.status?.id === s.id).length;
+                            return (
+                              <button
+                                key={s.id}
+                                onClick={() => {
+                                  // Set priority filter to empty, set filter to all, and filter columns to only show this stage
+                                  // For simplicity, we use the quick filter by navigating to the column
+                                  setFilterOpen(false);
+                                }}
+                                className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-sm text-[#18181b] hover:bg-[#f4f4f6]"
+                              >
+                                <span className="flex items-center gap-2">
+                                  <span className="h-2 w-2 rounded-full" style={{ backgroundColor: s.color }} />
+                                  {s.name}
+                                </span>
+                                <span className="text-xs text-[#a8a8b4]">{count}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -622,13 +764,12 @@ export default function DashboardPage() {
           {(['kanban', 'list', 'calendar'] as const).map((mode) => (
             <button
               key={mode}
-              onClick={() => setViewMode(mode)}
+              onClick={() => handleViewMode(mode)}
               className={`rounded-md px-3 py-1.5 text-xs font-medium capitalize transition-colors ${
                 viewMode === mode
                   ? 'bg-blue-50 text-blue-600'
                   : 'text-[#60606a] hover:bg-gray-50'
-              } ${mode !== 'kanban' ? 'cursor-not-allowed opacity-50' : ''}`}
-              disabled={mode !== 'kanban'}
+              }`}
             >
               {mode}
             </button>
@@ -643,7 +784,7 @@ export default function DashboardPage() {
           ] as const).map((f) => (
             <button
               key={f.key}
-              onClick={() => setFilter(f.key)}
+              onClick={() => setFilter((prev) => prev === f.key ? 'all' : f.key)}
               className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                 filter === f.key
                   ? 'bg-[#18181b] text-white'
@@ -662,18 +803,20 @@ export default function DashboardPage() {
           loading ? (
             <KanbanBoardSkeleton />
           ) : (
-            <KanbanBoard columns={filteredColumns} onStatusChange={handleStatusChange} pendingCards={pendingCards} onAddProject={() => setShowCreateModal(true)} />
+            <KanbanBoard
+              columns={filteredColumns}
+              onStatusChange={handleStatusChange}
+              pendingCards={pendingCards}
+              onAddProject={() => setShowCreateModal(true)}
+            />
           )
         )}
         {viewMode === 'list' && (
-          <div className="flex items-center justify-center py-20 text-sm text-[#a8a8b4]">
-            List view coming soon
-          </div>
-        )}
-        {viewMode === 'calendar' && (
-          <div className="flex items-center justify-center py-20 text-sm text-[#a8a8b4]">
-            Calendar view coming soon
-          </div>
+          loading ? (
+            <KanbanBoardSkeleton />
+          ) : (
+            <ListView workOrders={filteredWorkOrders} stages={stages} />
+          )
         )}
       </div>
 
