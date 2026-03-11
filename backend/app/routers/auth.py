@@ -66,7 +66,7 @@ async def login(
 
 
 @router.post("/magic-link/request", response_model=MessageResponse)
-@limiter.limit("10/minute")
+@limiter.limit("5/minute")
 async def request_magic_link(
     request: Request,
     response: Response,
@@ -81,7 +81,7 @@ async def request_magic_link(
 
 
 @router.post("/magic-link/verify", response_model=TokenResponse)
-@limiter.limit("10/minute")
+@limiter.limit("5/minute")
 async def verify_magic_link(
     request: Request,
     response: Response,
