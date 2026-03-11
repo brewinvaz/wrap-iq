@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback, useRef, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { api, ApiError } from '@/lib/api-client';
 import { formatCurrency } from '@/lib/format';
-import { ProjectDetail, Note, ProjectPhoto } from '@/lib/types';
+import { ProjectDetail, Note, WorkOrderPhoto } from '@/lib/types';
+import PhotoUploadZone from '@/components/PhotoUploadZone';
 
 // --- API response types ---
 
@@ -853,45 +854,61 @@ function NotesTab({ project, workOrderId }: { project: ProjectDetail; workOrderI
   );
 }
 
-// ---- Photo Grid ----
-function PhotoGrid({
-  photos,
+// ---- Photo Section ----
+function PhotoSection({
   label,
+  photos,
+  onCategoryChange,
+  onCaptionChange,
+  onDelete,
 }: {
-  photos: ProjectPhoto[];
   label: string;
+  photos: WorkOrderPhoto[];
+  onCategoryChange: (id: string, type: 'before' | 'after' | null) => void;
+  onCaptionChange: (id: string, caption: string) => void;
+  onDelete: (id: string) => void;
 }) {
   return (
     <div>
-      <h3 className="mb-3 font-mono text-[11px] uppercase tracking-wider text-[#a8a8b4]">
-        {label}
-      </h3>
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-        {photos.map((photo, i) => (
-          <div
-            key={i}
-            className="group overflow-hidden rounded-xl border border-[#e6e6eb] bg-white"
-          >
-            <div className="flex h-40 items-center justify-center bg-gray-100 text-sm text-[#a8a8b4]">
-              <svg
-                className="h-8 w-8"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1.5}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z"
-                />
-              </svg>
+      <h3 className="mb-3 text-sm font-semibold text-[#1a1a2e]">{label}</h3>
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        {photos.map((photo) => (
+          <div key={photo.id} className="group relative overflow-hidden rounded-lg border border-[#e6e6eb] bg-white">
+            <div className="aspect-square">
+              <img
+                src={photo.url}
+                alt={photo.filename}
+                className="h-full w-full object-cover"
+              />
             </div>
-            {photo.caption && (
-              <div className="px-3 py-2">
-                <p className="text-xs text-[#60606a]">{photo.caption}</p>
-              </div>
-            )}
+            <div className="p-2">
+              <p className="truncate text-xs text-[#60606a]">{photo.filename}</p>
+              <select
+                value={photo.photo_type ?? ''}
+                onChange={(e) => onCategoryChange(photo.id, (e.target.value || null) as 'before' | 'after' | null)}
+                className="mt-1 w-full rounded border border-[#e6e6eb] bg-white px-2 py-1 text-xs text-[#60606a]"
+              >
+                <option value="">Uncategorized</option>
+                <option value="before">Before</option>
+                <option value="after">After</option>
+              </select>
+              <input
+                type="text"
+                defaultValue={photo.caption ?? ''}
+                placeholder="Add caption..."
+                onBlur={(e) => onCaptionChange(photo.id, e.target.value)}
+                className="mt-1 w-full rounded border border-[#e6e6eb] bg-white px-2 py-1 text-xs text-[#60606a] placeholder:text-[#c4c4cc]"
+                maxLength={500}
+              />
+            </div>
+            <button
+              onClick={() => onDelete(photo.id)}
+              className="absolute right-1 top-1 rounded-full bg-black/50 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
+            >
+              <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
         ))}
       </div>
@@ -900,43 +917,96 @@ function PhotoGrid({
 }
 
 // ---- Photos Tab ----
-function PhotosTab({ project }: { project: ProjectDetail }) {
-  const beforePhotos = project.photos.filter((p) => p.type === 'before');
-  const afterPhotos = project.photos.filter((p) => p.type === 'after');
+function PhotosTab({ workOrderId }: { workOrderId: string }) {
+  const [photos, setPhotos] = useState<WorkOrderPhoto[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchPhotos = useCallback(async () => {
+    try {
+      const data = await api.get<{ photos: WorkOrderPhoto[] }>(
+        `/api/work-orders/${workOrderId}/photos`,
+      );
+      setPhotos(data.photos);
+    } catch {
+      // Silently fail — empty state is fine
+    } finally {
+      setLoading(false);
+    }
+  }, [workOrderId]);
+
+  useEffect(() => {
+    fetchPhotos();
+  }, [fetchPhotos]);
+
+  const beforePhotos = photos.filter((p) => p.photo_type === 'before');
+  const afterPhotos = photos.filter((p) => p.photo_type === 'after');
+  const uncategorizedPhotos = photos.filter((p) => p.photo_type === null);
+
+  const handleCategoryChange = async (photoId: string, photoType: 'before' | 'after' | null) => {
+    setPhotos((prev) => prev.map((p) => (p.id === photoId ? { ...p, photo_type: photoType } : p)));
+    try {
+      await api.patch(`/api/work-orders/${workOrderId}/photos/${photoId}`, { photo_type: photoType });
+    } catch {
+      fetchPhotos();
+    }
+  };
+
+  const handleCaptionChange = async (photoId: string, caption: string) => {
+    setPhotos((prev) => prev.map((p) => (p.id === photoId ? { ...p, caption } : p)));
+    try {
+      await api.patch(`/api/work-orders/${workOrderId}/photos/${photoId}`, { caption });
+    } catch {
+      fetchPhotos();
+    }
+  };
+
+  const handleDelete = async (photoId: string) => {
+    if (!confirm('Delete this photo?')) return;
+    setPhotos((prev) => prev.filter((p) => p.id !== photoId));
+    try {
+      await api.delete(`/api/work-orders/${workOrderId}/photos/${photoId}`);
+    } catch {
+      fetchPhotos();
+    }
+  };
+
+  if (loading) {
+    return <div className="py-12 text-center text-sm text-[#a8a8b4]">Loading photos...</div>;
+  }
 
   return (
     <div className="space-y-8">
+      <PhotoUploadZone workOrderId={workOrderId} onUploadComplete={fetchPhotos} />
+
       {beforePhotos.length > 0 && (
-        <PhotoGrid photos={beforePhotos} label="Before" />
+        <PhotoSection
+          label="Before"
+          photos={beforePhotos}
+          onCategoryChange={handleCategoryChange}
+          onCaptionChange={handleCaptionChange}
+          onDelete={handleDelete}
+        />
       )}
       {afterPhotos.length > 0 && (
-        <PhotoGrid photos={afterPhotos} label="After" />
+        <PhotoSection
+          label="After"
+          photos={afterPhotos}
+          onCategoryChange={handleCategoryChange}
+          onCaptionChange={handleCaptionChange}
+          onDelete={handleDelete}
+        />
+      )}
+      {uncategorizedPhotos.length > 0 && (
+        <PhotoSection
+          label="Uncategorized"
+          photos={uncategorizedPhotos}
+          onCategoryChange={handleCategoryChange}
+          onCaptionChange={handleCaptionChange}
+          onDelete={handleDelete}
+        />
       )}
 
-      {/* Upload zone placeholder */}
-      <div className="rounded-xl border-2 border-dashed border-[#e6e6eb] bg-white p-10 text-center transition-colors hover:border-blue-300 hover:bg-blue-50/30">
-        <svg
-          className="mx-auto mb-3 h-10 w-10 text-[#a8a8b4]"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={1.5}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"
-          />
-        </svg>
-        <p className="text-sm font-medium text-[#60606a]">
-          Drop photos here or click to upload
-        </p>
-        <p className="mt-1 text-xs text-[#a8a8b4]">
-          PNG, JPG up to 10MB
-        </p>
-      </div>
-
-      {project.photos.length === 0 && (
+      {photos.length === 0 && (
         <div className="py-12 text-center text-sm text-[#a8a8b4]">
           No photos uploaded yet.
         </div>
@@ -1142,7 +1212,7 @@ export default function ProjectDetailPage({
         {activeTab === 'overview' && <OverviewTab project={project} />}
         {activeTab === 'checklist' && <ChecklistTab project={project} workOrderId={workOrderId} />}
         {activeTab === 'notes' && <NotesTab project={project} workOrderId={workOrderId} />}
-        {activeTab === 'photos' && <PhotosTab project={project} />}
+        {activeTab === 'photos' && <PhotosTab workOrderId={workOrderId} />}
         {activeTab === 'timeline' && <TimelineTab project={project} />}
       </div>
     </div>
