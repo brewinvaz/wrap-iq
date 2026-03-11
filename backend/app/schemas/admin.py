@@ -23,6 +23,10 @@ class UserDetailResponse(UserListResponse):
     updated_at: datetime
 
 
+class InviteUserResponse(UserDetailResponse):
+    temp_password: str
+
+
 class UpdateRoleRequest(BaseModel):
     role: Role
 
