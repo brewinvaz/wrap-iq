@@ -71,9 +71,9 @@ async def test_wrap_details(db_session):
 
     wd = WrapDetails(
         id=uuid.uuid4(),
+        organization_id=org.id,
         work_order_id=wo.id,
         vehicle_id=vehicle.id,
-        organization_id=org.id,
         wrap_coverage=WrapCoverage.FULL,
         misc_items=["mirrors", "door_jambs"],
         special_wrap_instructions="Match PMS 186C red",
@@ -95,8 +95,8 @@ async def test_design_details(db_session):
 
     dd = DesignDetails(
         id=uuid.uuid4(),
-        work_order_id=wo.id,
         organization_id=org.id,
+        work_order_id=wo.id,
         design_hours=Decimal("12.50"),
         design_version_count=3,
         revision_count=2,
@@ -119,8 +119,8 @@ async def test_production_details(db_session):
 
     pd = ProductionDetails(
         id=uuid.uuid4(),
-        work_order_id=wo.id,
         organization_id=org.id,
+        work_order_id=wo.id,
         assigned_equipment="Roland TrueVIS VG3-640",
         print_media_brand_type="3M IJ180Cv3",
         print_media_width="54in",
@@ -154,8 +154,8 @@ async def test_install_details_with_time_log(db_session):
 
     inst = InstallDetails(
         id=uuid.uuid4(),
-        work_order_id=wo.id,
         organization_id=org.id,
+        work_order_id=wo.id,
         install_location=InstallLocation.IN_SHOP,
         install_difficulty=InstallDifficulty.COMPLEX,
         install_start_date=datetime.now(UTC),

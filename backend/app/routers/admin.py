@@ -13,9 +13,9 @@ from app.models.user import User
 from app.models.user_profile import UserProfile
 from app.schemas.admin import (
     InviteUserRequest,
-    InviteUserResponse,
     ToggleActiveRequest,
     UpdateRoleRequest,
+    UserDetailResponse,
     UserListResponse,
 )
 
@@ -118,7 +118,7 @@ async def deactivate_user(
 
 @router.post(
     "/users/invite",
-    response_model=InviteUserResponse,
+    response_model=UserDetailResponse,
     status_code=status.HTTP_201_CREATED,
 )
 async def invite_user(
@@ -145,20 +145,7 @@ async def invite_user(
     session.add(user)
     await session.commit()
     await session.refresh(user)
-
-    # Return user data with the temporary password so the admin
-    # can share it with the invited user
-    return InviteUserResponse(
-        id=user.id,
-        email=user.email,
-        role=user.role,
-        organization_id=user.organization_id,
-        is_active=user.is_active,
-        is_superadmin=user.is_superadmin,
-        created_at=user.created_at,
-        updated_at=user.updated_at,
-        temp_password=temp_password,
-    )
+    return user
 
 
 @router.patch("/users/{user_id}/active", response_model=UserListResponse)

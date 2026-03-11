@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { Client } from '@/lib/types';
 import { api, ApiError } from '@/lib/api-client';
 import { formatCurrency } from '@/lib/format';
-import EditClientModal from './EditClientModal';
 
 const tagColors: Record<string, string> = {
   VIP: 'bg-amber-100 text-amber-700',
@@ -38,14 +37,12 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 
 interface ClientDetailProps {
   client: Client;
-  onClientUpdated?: () => void;
 }
 
-export default function ClientDetail({ client, onClientUpdated }: ClientDetailProps) {
+export default function ClientDetail({ client }: ClientDetailProps) {
   const [notes, setNotes] = useState(client.notes ?? '');
   const [saving, setSaving] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   // Reset notes when the selected client changes
   const [prevClientId, setPrevClientId] = useState(client.id);
@@ -68,12 +65,6 @@ export default function ClientDetail({ client, onClientUpdated }: ClientDetailPr
       setFeedback({ type: 'error', message });
     } finally {
       setSaving(false);
-    }
-  }
-
-  function handleEmail() {
-    if (client.email) {
-      window.location.href = `mailto:${client.email}`;
     }
   }
 
@@ -111,17 +102,10 @@ export default function ClientDetail({ client, onClientUpdated }: ClientDetailPr
             </p>
           </div>
           <div className="flex gap-2">
-            <button
-              onClick={() => setIsEditModalOpen(true)}
-              className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-[#18181b] shadow-sm transition-colors hover:bg-gray-50"
-            >
+            <button className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-[#18181b] shadow-sm transition-colors hover:bg-gray-50">
               Edit
             </button>
-            <button
-              onClick={handleEmail}
-              disabled={!client.email}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-            >
+            <button className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700">
               Email
             </button>
           </div>
@@ -288,17 +272,6 @@ export default function ClientDetail({ client, onClientUpdated }: ClientDetailPr
           </div>
         </div>
       </div>
-
-      {/* Edit Modal */}
-      <EditClientModal
-        client={client}
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        onSaved={() => {
-          setIsEditModalOpen(false);
-          onClientUpdated?.();
-        }}
-      />
     </div>
   );
 }

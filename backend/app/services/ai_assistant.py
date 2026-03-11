@@ -239,10 +239,6 @@ def ensure_outer_limit(sql: str) -> str:
 
 
 class AIAssistantService:
-    # In-memory conversation history keyed by conversation_id.
-    # Each entry is a list of Content objects representing the chat turns.
-    _conversations: dict[uuid.UUID, list[types.Content]] = {}
-
     def __init__(self) -> None:
         if not settings.gemini_api_key:
             msg = "Gemini API key is not configured"
@@ -254,30 +250,14 @@ class AIAssistantService:
         question: str,
         user: User,
         session: AsyncSession,
-        *,
-        conversation_id: uuid.UUID | None = None,
     ) -> QueryResponse:
-        # Reuse existing conversation or start a new one
-        if conversation_id and conversation_id in self._conversations:
-            history = self._conversations[conversation_id]
-        else:
-            conversation_id = conversation_id or uuid.uuid4()
-            history = []
-            self._conversations[conversation_id] = history
-
+        conversation_id = uuid.uuid4()
         system_prompt = _build_system_prompt(user)
-
-        # Append the new user message to conversation history
-        user_content = types.Content(
-            role="user",
-            parts=[types.Part.from_text(text=question)],
-        )
-        history.append(user_content)
 
         # First call: ask Gemini to answer or generate SQL via function calling
         response = await self._client.aio.models.generate_content(
             model="gemini-2.5-flash",
-            contents=history,
+            contents=question,
             config=types.GenerateContentConfig(
                 system_instruction=system_prompt,
                 tools=[types.Tool(function_declarations=[_EXECUTE_SQL_TOOL])],
@@ -295,20 +275,12 @@ class AIAssistantService:
 
         # If no function call, return the text answer directly
         if function_call is None:
-            answer_text = (
-                "\n".join(text_parts)
-                if text_parts
-                else "I could not generate an answer."
-            )
-            # Store model response in conversation history
-            history.append(
-                types.Content(
-                    role="model",
-                    parts=[types.Part.from_text(text=answer_text)],
-                )
-            )
             return QueryResponse(
-                answer=answer_text,
+                answer=(
+                    "\n".join(text_parts)
+                    if text_parts
+                    else "I could not generate an answer."
+                ),
                 conversation_id=conversation_id,
             )
 
@@ -366,20 +338,8 @@ class AIAssistantService:
             if part.text:
                 answer_parts.append(part.text)
 
-        final_answer = (
-            "\n".join(answer_parts) if answer_parts else "No summary available."
-        )
-
-        # Store model response in conversation history
-        history.append(
-            types.Content(
-                role="model",
-                parts=[types.Part.from_text(text=final_answer)],
-            )
-        )
-
         return QueryResponse(
-            answer=final_answer,
+            answer="\n".join(answer_parts) if answer_parts else "No summary available.",
             query_executed=sql,
             data=rows if rows else None,
             conversation_id=conversation_id,

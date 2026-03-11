@@ -33,9 +33,7 @@ async def query_assistant(
 
     try:
         service = AIAssistantService()
-        return await service.answer_question(
-            data.question, user, session, conversation_id=data.conversation_id
-        )
+        return await service.answer_question(data.question, user, session)
     except Exception as exc:
         logger.exception("AI assistant query failed")
         raise HTTPException(

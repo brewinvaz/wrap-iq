@@ -2,25 +2,76 @@
 
 import { useState } from 'react';
 
-interface Brief {
-  id: string;
-  jobName: string;
-  client: string;
-  status: string;
-  dueDate: string;
-  vehicleInfo: string;
-  wrapType: string;
-  specialInstructions: string;
-}
-
 const STATUS_STYLES: Record<string, string> = {
   New: 'bg-blue-100 text-blue-700',
   'In Progress': 'bg-violet-100 text-violet-700',
   Completed: 'bg-emerald-100 text-emerald-700',
 };
 
+const briefs = [
+  {
+    id: '1',
+    jobName: 'MTA Bus Fleet Wrap - Route 42',
+    client: 'Metro Transit Authority',
+    status: 'In Progress',
+    dueDate: '2026-03-18',
+    vehicleInfo: '2024 New Flyer XD40 (40-ft transit bus)',
+    wrapType: 'Full Wrap',
+    specialInstructions: 'Must follow ADA signage clearance zones. Do not cover emergency exit markings. Use reflective vinyl for route numbers. Artwork must be approved by the city branding committee before print.',
+  },
+  {
+    id: '2',
+    jobName: 'Coastal Brewing Delivery Van',
+    client: 'Coastal Brewing Co.',
+    status: 'New',
+    dueDate: '2026-03-22',
+    vehicleInfo: '2025 Ford Transit 250 Cargo Van (High Roof)',
+    wrapType: 'Full Wrap',
+    specialInstructions: 'Client wants a "beach sunset" gradient background. Incorporate new seasonal IPA branding. Leave rear door handles and fuel cap unwrapped. Provide mockup from 3 angles before production.',
+  },
+  {
+    id: '3',
+    jobName: 'Summit Electric Service Trucks',
+    client: 'Summit Electric',
+    status: 'In Progress',
+    dueDate: '2026-03-15',
+    vehicleInfo: '2024 Ram ProMaster 1500 (x3 units)',
+    wrapType: 'Partial Wrap',
+    specialInstructions: 'Fleet of 3 identical trucks. Partial wrap covering sides and rear only. Use brand yellow (#FFD700) as primary. Include 24/7 emergency number in large text on both sides. License and DOT number placement required.',
+  },
+  {
+    id: '4',
+    jobName: 'Jade Garden Restaurant Signage',
+    client: 'Jade Garden Restaurant',
+    status: 'Completed',
+    dueDate: '2026-03-05',
+    vehicleInfo: 'N/A — Wall-mounted signage panel (8ft x 4ft)',
+    wrapType: 'Printed Panel',
+    specialInstructions: 'Exterior-grade laminate required. Design must include updated menu highlights and QR code to online ordering. Use waterproof substrate for outdoor installation.',
+  },
+  {
+    id: '5',
+    jobName: 'MTA Light Rail Station Graphics',
+    client: 'Metro Transit Authority',
+    status: 'New',
+    dueDate: '2026-03-28',
+    vehicleInfo: 'N/A — Station platform panels (12 panels, 6ft x 3ft each)',
+    wrapType: 'Wall Graphics',
+    specialInstructions: 'Anti-graffiti laminate required. Each panel features a different neighborhood landmark. Must coordinate with station architecture team for exact dimensions. Install window is overnight only.',
+  },
+  {
+    id: '6',
+    jobName: 'Coastal Brewing Trailer Wrap',
+    client: 'Coastal Brewing Co.',
+    status: 'New',
+    dueDate: '2026-04-02',
+    vehicleInfo: '2023 Utility Trailer 53-ft Reefer',
+    wrapType: 'Full Wrap',
+    specialInstructions: 'Large-scale trailer wrap for trade show presence. Feature all 4 flagship beers. Include social media handles prominently. Riveted panels — need special adhesive vinyl for textured surface.',
+  },
+];
+
 export default function BriefsPage() {
-  const [briefs] = useState<Brief[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   return (
@@ -37,119 +88,83 @@ export default function BriefsPage() {
       </header>
 
       <div className="flex-1 overflow-auto p-6">
-        {briefs.length === 0 ? (
-          <div className="flex h-64 flex-col items-center justify-center text-center">
-            <svg
-              width="48"
-              height="48"
-              fill="none"
-              viewBox="0 0 24 24"
-              className="mb-4 text-[#d4d4d8]"
-            >
-              <path
-                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <rect
-                x="9"
-                y="3"
-                width="6"
-                height="4"
-                rx="1"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              />
-              <path
-                d="M9 12h6M9 16h4"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-            </svg>
-            <p className="text-sm text-[#a8a8b4]">
-              No job briefs yet. Briefs will appear here when created for projects.
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {briefs.map((brief) => {
-              const isExpanded = expandedId === brief.id;
-              return (
-                <div
-                  key={brief.id}
-                  className="rounded-lg border border-[#e6e6eb] bg-white transition-shadow hover:shadow-sm"
+        <div className="space-y-3">
+          {briefs.map((brief) => {
+            const isExpanded = expandedId === brief.id;
+            return (
+              <div
+                key={brief.id}
+                className="rounded-lg border border-[#e6e6eb] bg-white transition-shadow hover:shadow-sm"
+              >
+                {/* Brief header row */}
+                <button
+                  onClick={() => setExpandedId(isExpanded ? null : brief.id)}
+                  className="flex w-full items-center justify-between px-5 py-4 text-left"
                 >
-                  <button
-                    onClick={() => setExpandedId(isExpanded ? null : brief.id)}
-                    className="flex w-full items-center justify-between px-5 py-4 text-left"
-                  >
-                    <div className="flex min-w-0 items-center gap-4">
-                      <div className="shrink-0">
-                        <svg
-                          className={`h-4 w-4 text-[#a8a8b4] transition-transform ${isExpanded ? 'rotate-90' : ''}`}
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                        </svg>
-                      </div>
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-medium text-[#18181b]">{brief.jobName}</p>
-                        <p className="mt-0.5 text-xs text-[#a8a8b4]">{brief.client}</p>
-                      </div>
-                    </div>
-                    <div className="flex shrink-0 items-center gap-4">
-                      <span
-                        className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[brief.status] ?? 'bg-gray-100 text-gray-600'}`}
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className="shrink-0">
+                      <svg
+                        className={`h-4 w-4 text-[#a8a8b4] transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
                       >
-                        {brief.status}
-                      </span>
-                      <span className="font-mono text-xs text-[#a8a8b4]">Due {brief.dueDate}</span>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                      </svg>
                     </div>
-                  </button>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-[#18181b]">{brief.jobName}</p>
+                      <p className="mt-0.5 text-xs text-[#a8a8b4]">{brief.client}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4 shrink-0">
+                    <span
+                      className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[brief.status] ?? 'bg-gray-100 text-gray-600'}`}
+                    >
+                      {brief.status}
+                    </span>
+                    <span className="font-mono text-xs text-[#a8a8b4]">Due {brief.dueDate}</span>
+                  </div>
+                </button>
 
-                  {isExpanded && (
-                    <div className="border-t border-[#e6e6eb] bg-gray-50 px-5 py-4">
-                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                        <div>
-                          <p className="font-mono text-[9.5px] uppercase tracking-wider text-[#a8a8b4]">
-                            Vehicle / Surface
-                          </p>
-                          <p className="mt-1 text-sm text-[#18181b]">{brief.vehicleInfo}</p>
-                        </div>
-                        <div>
-                          <p className="font-mono text-[9.5px] uppercase tracking-wider text-[#a8a8b4]">
-                            Wrap Type
-                          </p>
-                          <p className="mt-1 text-sm text-[#18181b]">{brief.wrapType}</p>
-                        </div>
-                        <div>
-                          <p className="font-mono text-[9.5px] uppercase tracking-wider text-[#a8a8b4]">
-                            Due Date
-                          </p>
-                          <p className="mt-1 text-sm text-[#18181b]">{brief.dueDate}</p>
-                        </div>
-                      </div>
-                      <div className="mt-4">
+                {/* Expanded details */}
+                {isExpanded && (
+                  <div className="border-t border-[#e6e6eb] bg-gray-50 px-5 py-4">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                      <div>
                         <p className="font-mono text-[9.5px] uppercase tracking-wider text-[#a8a8b4]">
-                          Special Instructions
+                          Vehicle / Surface
                         </p>
-                        <p className="mt-1 text-sm leading-relaxed text-[#60606a]">
-                          {brief.specialInstructions}
+                        <p className="mt-1 text-sm text-[#18181b]">{brief.vehicleInfo}</p>
+                      </div>
+                      <div>
+                        <p className="font-mono text-[9.5px] uppercase tracking-wider text-[#a8a8b4]">
+                          Wrap Type
                         </p>
+                        <p className="mt-1 text-sm text-[#18181b]">{brief.wrapType}</p>
+                      </div>
+                      <div>
+                        <p className="font-mono text-[9.5px] uppercase tracking-wider text-[#a8a8b4]">
+                          Due Date
+                        </p>
+                        <p className="mt-1 text-sm text-[#18181b]">{brief.dueDate}</p>
                       </div>
                     </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
+                    <div className="mt-4">
+                      <p className="font-mono text-[9.5px] uppercase tracking-wider text-[#a8a8b4]">
+                        Special Instructions
+                      </p>
+                      <p className="mt-1 text-sm leading-relaxed text-[#60606a]">
+                        {brief.specialInstructions}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
