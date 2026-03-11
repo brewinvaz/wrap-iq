@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { api, ApiError } from '@/lib/api-client';
 import { formatCurrency } from '@/lib/format';
@@ -181,6 +182,12 @@ export default function WorkOrdersPage() {
               onChange={(e) => setSearch(e.target.value)}
               className="h-9 w-56 rounded-lg border border-[#e6e6eb] bg-[#f4f4f6] px-3 text-sm text-[#18181b] placeholder-[#a8a8b4] outline-none focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
             />
+            <Link
+              href="/dashboard/work-orders/import"
+              className="rounded-lg border border-[#e6e6eb] bg-white px-4 py-2 text-sm font-medium text-[#18181b] transition-colors hover:bg-[#f4f4f6]"
+            >
+              Import CSV
+            </Link>
             <button
               onClick={() => setShowCreateModal(true)}
               className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
