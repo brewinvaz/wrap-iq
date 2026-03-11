@@ -2,7 +2,11 @@ import uuid
 from unittest.mock import MagicMock, patch
 
 import pytest
+from httpx import ASGITransport, AsyncClient
 
+from app.auth.dependencies import get_session
+from app.main import app
+from app.models.plan import Plan
 from app.models.render import Render, RenderStatus
 from app.schemas.renders import FileInfo, RenderCreate, RenderUploadRequest
 from app.services import renders as render_service
@@ -11,12 +15,6 @@ from app.services.r2 import (
     generate_object_key,
     upload_object,
 )
-
-
-# Override the autouse setup_db fixture so these unit tests don't need a DB connection.
-@pytest.fixture(autouse=True)
-def setup_db():
-    yield None
 
 
 class TestGenerateObjectKey:
@@ -203,3 +201,74 @@ class TestMimeTypeFromKey:
 
     def test_default_jpeg(self):
         assert render_service._mime_type_from_key("org/renders/unknown") == "image/jpeg"
+
+
+@pytest.fixture
+async def seed_plan(db_session):
+    plan = Plan(id=uuid.uuid4(), name="Free", price_cents=0, is_default=True)
+    db_session.add(plan)
+    await db_session.commit()
+    return plan
+
+
+@pytest.fixture
+async def http_client(db_session, seed_plan):
+    async def override_session():
+        yield db_session
+
+    app.dependency_overrides[get_session] = override_session
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as c:
+        yield c
+    app.dependency_overrides.clear()
+
+
+async def _register(http_client) -> str:
+    resp = await http_client.post(
+        "/api/auth/register",
+        json={
+            "email": "staff@shop.com",
+            "password": "TestPass123",
+            "org_name": "Test Shop",
+        },
+    )
+    return resp.json()["access_token"]
+
+
+class TestRendersRouter:
+    async def test_list_requires_auth(self, http_client):
+        resp = await http_client.get("/api/renders")
+        assert resp.status_code == 401
+
+    async def test_list_empty(self, http_client):
+        token = await _register(http_client)
+        resp = await http_client.get(
+            "/api/renders",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["items"] == []
+        assert data["total"] == 0
+
+    async def test_get_nonexistent_returns_404(self, http_client):
+        token = await _register(http_client)
+        fake_id = str(uuid.uuid4())
+        resp = await http_client.get(
+            f"/api/renders/{fake_id}",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert resp.status_code == 404
+
+    async def test_upload_urls_validates_content_type(self, http_client):
+        token = await _register(http_client)
+        resp = await http_client.post(
+            "/api/renders/upload-urls",
+            json={
+                "files": [
+                    {"filename": "bad.exe", "content_type": "application/exe", "size_bytes": 100}
+                ]
+            },
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert resp.status_code == 422
