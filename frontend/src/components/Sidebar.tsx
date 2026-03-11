@@ -63,15 +63,11 @@ export default function Sidebar() {
   const showRoleSwitcher = isDev || user?.role === 'admin';
 
   // Resolve live badge counts from badgeKey on each nav item
-  const badgeMap: Record<string, number | null> = {
-    workOrders: badgeCounts.workOrders,
-  };
-
   const navGroupsWithBadges = roleConfig.navGroups.map((group) => ({
     ...group,
     items: group.items.map((item) => {
-      if (item.badgeKey && badgeMap[item.badgeKey] != null) {
-        return { ...item, badge: badgeMap[item.badgeKey] as number };
+      if (item.badgeKey && badgeCounts[item.badgeKey]) {
+        return { ...item, badge: badgeCounts[item.badgeKey] };
       }
       return item;
     }),
