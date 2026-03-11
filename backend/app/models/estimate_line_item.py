@@ -5,10 +5,10 @@ from sqlalchemy import ForeignKey, Integer, Numeric, String, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db import Base
-from app.models.base import TimestampMixin
+from app.models.base import TenantMixin, TimestampMixin
 
 
-class EstimateLineItem(Base, TimestampMixin):
+class EstimateLineItem(Base, TenantMixin, TimestampMixin):
     __tablename__ = "estimate_line_items"
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)

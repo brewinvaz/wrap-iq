@@ -7,7 +7,7 @@ from sqlalchemy import DateTime, Enum, ForeignKey, Numeric, Text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db import Base
-from app.models.base import TimestampMixin
+from app.models.base import TenantMixin, TimestampMixin
 
 
 class InstallLocation(enum.StrEnum):
@@ -27,7 +27,7 @@ class LogType(enum.StrEnum):
     INSTALL = "install"
 
 
-class InstallDetails(Base, TimestampMixin):
+class InstallDetails(Base, TenantMixin, TimestampMixin):
     __tablename__ = "install_details"
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
