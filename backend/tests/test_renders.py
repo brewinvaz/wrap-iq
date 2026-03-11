@@ -3,7 +3,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from app.models.render import Render, RenderStatus
 from app.schemas.renders import FileInfo, RenderCreate, RenderUploadRequest
+from app.services import renders as render_service
 from app.services.r2 import (
     download_object,
     generate_object_key,
@@ -114,3 +116,90 @@ class TestRenderSchemas:
                     ),
                 ]
             )
+
+
+class TestBuildRenderResponse:
+    def test_builds_response_with_urls(self):
+        render = MagicMock(spec=Render)
+        render.id = uuid.uuid4()
+        render.design_name = "Test"
+        render.description = None
+        render.status = RenderStatus.COMPLETED
+        render.vehicle_photo_key = "org/renders/photo.jpg"
+        render.wrap_design_key = "org/renders/design.png"
+        render.result_image_key = "org/renders/result.jpg"
+        render.share_token = None
+        render.error_message = None
+        render.work_order_id = None
+        render.client_id = None
+        render.vehicle_id = None
+        render.created_by = uuid.uuid4()
+        render.creator = MagicMock()
+        render.creator.full_name = "Test User"
+        render.creator.email = "test@test.com"
+        render.created_at = "2026-03-11T00:00:00Z"
+        render.updated_at = "2026-03-11T00:00:00Z"
+
+        with patch("app.services.renders.generate_download_url") as mock_dl:
+            mock_dl.side_effect = lambda key: f"https://r2.example.com/{key}"
+            response = render_service.build_render_response(render)
+
+        assert response.vehicle_photo_url == "https://r2.example.com/org/renders/photo.jpg"
+        assert response.result_image_url == "https://r2.example.com/org/renders/result.jpg"
+        assert response.created_by_name == "Test User"
+
+    def test_uses_email_when_no_full_name(self):
+        render = MagicMock(spec=Render)
+        render.id = uuid.uuid4()
+        render.design_name = "Test"
+        render.description = None
+        render.status = RenderStatus.PENDING
+        render.vehicle_photo_key = "k1"
+        render.wrap_design_key = "k2"
+        render.result_image_key = None
+        render.share_token = None
+        render.error_message = None
+        render.work_order_id = None
+        render.client_id = None
+        render.vehicle_id = None
+        render.created_by = uuid.uuid4()
+        render.creator = MagicMock()
+        render.creator.full_name = None
+        render.creator.email = "test@test.com"
+        render.created_at = "2026-03-11T00:00:00Z"
+        render.updated_at = "2026-03-11T00:00:00Z"
+
+        with patch("app.services.renders.generate_download_url") as mock_dl:
+            mock_dl.side_effect = lambda key: f"https://r2/{key}"
+            response = render_service.build_render_response(render)
+
+        assert response.created_by_name == "test@test.com"
+        assert response.result_image_url is None
+
+
+class TestBuildPrompt:
+    def test_prompt_with_description(self):
+        prompt = render_service.build_prompt("Full wrap, all panels")
+        assert "Full wrap, all panels" in prompt
+        assert "vehicle wrap design" in prompt.lower()
+
+    def test_prompt_without_description(self):
+        prompt = render_service.build_prompt(None)
+        assert "vehicle wrap design" in prompt.lower()
+
+
+class TestMimeTypeFromKey:
+    def test_jpeg(self):
+        assert render_service._mime_type_from_key("org/renders/photo.jpg") == "image/jpeg"
+
+    def test_png(self):
+        assert render_service._mime_type_from_key("org/renders/design.png") == "image/png"
+
+    def test_webp(self):
+        assert render_service._mime_type_from_key("org/renders/photo.webp") == "image/webp"
+
+    def test_pdf(self):
+        assert render_service._mime_type_from_key("org/renders/design.pdf") == "application/pdf"
+
+    def test_default_jpeg(self):
+        assert render_service._mime_type_from_key("org/renders/unknown") == "image/jpeg"
