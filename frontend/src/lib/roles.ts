@@ -100,7 +100,7 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
       {
         label: 'Reports',
         items: [
-          { icon: '⏱️', label: 'Time Logs', href: '/dashboard/time-logs' },
+          { icon: '⏱️', label: 'Time Tracking', href: '/dashboard/time-logs' },
           { icon: '📈', label: 'Job Reports', href: '/dashboard/reports' },
         ],
       },
@@ -173,7 +173,7 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
           { icon: '🖨️', label: 'Print Queue', href: '/dashboard', badge: 3 },
           { icon: '⚙️', label: 'My Equipment', href: '/dashboard/equipment' },
           { icon: '📦', label: 'Materials', href: '/dashboard/materials' },
-          { icon: '⏱️', label: 'Time Log', href: '/dashboard/time-logs' },
+          { icon: '⏱️', label: 'Time Tracking', href: '/dashboard/time-logs' },
         ],
       },
       {
