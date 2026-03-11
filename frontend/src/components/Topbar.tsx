@@ -14,6 +14,8 @@ const ROUTE_TITLES: Record<string, string> = {
   '/dashboard/print': 'Print / Lam',
   '/dashboard/install-schedule': 'Install Schedule',
   '/dashboard/financials': 'Financials',
+  '/dashboard/estimates': 'Estimates',
+  '/dashboard/invoices': 'Invoices',
   '/dashboard/time-logs': 'Time Tracking',
   '/dashboard/team': 'User Management',
   '/dashboard/comms': 'Communications',

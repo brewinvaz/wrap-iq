@@ -56,6 +56,8 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
         label: 'Business',
         items: [
           { icon: '💰', label: 'Financials', href: '/dashboard/financials' },
+          { icon: '📝', label: 'Estimates', href: '/dashboard/estimates' },
+          { icon: '🧾', label: 'Invoices', href: '/dashboard/invoices' },
           { icon: '📈', label: 'Reports', href: '/dashboard/reports' },
           { icon: '⏱️', label: 'Time Tracking', href: '/dashboard/time-logs' },
           { icon: '👤', label: 'User Management', href: '/dashboard/team' },
