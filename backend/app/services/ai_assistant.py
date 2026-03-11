@@ -250,16 +250,12 @@ class AIAssistantService:
             msg = "Gemini API key is not configured"
             raise ValueError(msg)
         self._client = genai.Client(api_key=settings.gemini_api_key)
-        self._redis = aioredis.from_url(
-            settings.redis_url, decode_responses=True
-        )
+        self._redis = aioredis.from_url(settings.redis_url, decode_responses=True)
 
     def _redis_key(self, conversation_id: uuid.UUID) -> str:
         return f"ai:conversation:{conversation_id}"
 
-    async def _get_history(
-        self, conversation_id: uuid.UUID
-    ) -> list[types.Content]:
+    async def _get_history(self, conversation_id: uuid.UUID) -> list[types.Content]:
         """Retrieve conversation history from Redis."""
         raw = await self._redis.get(self._redis_key(conversation_id))
         if not raw:
@@ -357,9 +353,7 @@ class AIAssistantService:
                 if text_parts
                 else "I could not generate an answer."
             )
-            await self._save_history(
-                conversation_id, history, question, answer
-            )
+            await self._save_history(conversation_id, history, question, answer)
             return QueryResponse(
                 answer=answer,
                 conversation_id=conversation_id,
@@ -372,12 +366,9 @@ class AIAssistantService:
         validation_error = validate_sql(sql)
         if validation_error:
             error_answer = (
-                "I generated an unsafe query and caught it: "
-                f"{validation_error}"
+                f"I generated an unsafe query and caught it: {validation_error}"
             )
-            await self._save_history(
-                conversation_id, history, question, error_answer
-            )
+            await self._save_history(conversation_id, history, question, error_answer)
             return QueryResponse(
                 answer=error_answer,
                 conversation_id=conversation_id,
@@ -399,12 +390,9 @@ class AIAssistantService:
                 rows = [dict(row._mapping) for row in result.fetchall()]
         except Exception as exc:
             error_answer = (
-                "I tried to query the database but encountered "
-                f"an error: {exc}"
+                f"I tried to query the database but encountered an error: {exc}"
             )
-            await self._save_history(
-                conversation_id, history, question, error_answer
-            )
+            await self._save_history(conversation_id, history, question, error_answer)
             return QueryResponse(
                 answer=error_answer,
                 query_executed=sql,
@@ -433,14 +421,8 @@ class AIAssistantService:
             if part.text:
                 answer_parts.append(part.text)
 
-        answer = (
-            "\n".join(answer_parts)
-            if answer_parts
-            else "No summary available."
-        )
-        await self._save_history(
-            conversation_id, history, question, answer
-        )
+        answer = "\n".join(answer_parts) if answer_parts else "No summary available."
+        await self._save_history(conversation_id, history, question, answer)
         return QueryResponse(
             answer=answer,
             query_executed=sql,
