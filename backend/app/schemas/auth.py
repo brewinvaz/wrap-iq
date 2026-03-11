@@ -18,10 +18,9 @@ class RegisterRequest(BaseModel):
         if not re.search(r"\d", v):
             errors.append("at least one digit")
         if errors:
-            raise ValueError(
-                "Password must contain " + ", ".join(errors) + "."
-            )
+            raise ValueError("Password must contain " + ", ".join(errors) + ".")
         return v
+
     org_name: str
 
 
