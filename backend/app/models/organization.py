@@ -17,7 +17,7 @@ class Organization(Base, TimestampMixin):
     plan_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("plans.id"), index=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     default_tax_rate: Mapped[Decimal | None] = mapped_column(
-        Numeric(5, 4), nullable=True
+        Numeric(5, 2), nullable=True
     )
 
     plan = relationship("Plan", lazy="selectin")

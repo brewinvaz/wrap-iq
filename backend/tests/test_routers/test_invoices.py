@@ -20,7 +20,7 @@ async def test_create_invoice(client, db_session):
             "client_name": "Jane Doe",
             "client_email": "jane@example.com",
             "subtotal": 100000,
-            "tax_rate": "0.08",
+            "tax_rate": "8",
             "notes": "Net 30",
         },
         headers={"Authorization": f"Bearer {token}"},

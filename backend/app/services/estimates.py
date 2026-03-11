@@ -29,7 +29,7 @@ class EstimateService:
         self, line_items: list[EstimateLineItem], tax_rate: Decimal
     ) -> tuple[int, int, int]:
         subtotal = sum(item.total for item in line_items)
-        tax_amount = round(subtotal * tax_rate)
+        tax_amount = round(subtotal * tax_rate / Decimal("100"))
         total = subtotal + tax_amount
         return subtotal, tax_amount, total
 
