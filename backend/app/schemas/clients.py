@@ -1,15 +1,15 @@
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 from app.models.client import ClientType
 
 
 class ClientCreate(BaseModel):
-    name: str
+    name: str = Field(..., min_length=1, max_length=255)
     client_type: ClientType = ClientType.personal
-    email: str | None = None
+    email: EmailStr | None = None
     phone: str | None = None
     address: str | None = None
     tags: list[str] = []
@@ -17,17 +17,35 @@ class ClientCreate(BaseModel):
     notes: str | None = None
     parent_id: uuid.UUID | None = None
 
+    @field_validator("name")
+    @classmethod
+    def name_must_not_be_blank(cls, v: str) -> str:
+        stripped = v.strip()
+        if not stripped:
+            raise ValueError("Name must not be empty or whitespace-only")
+        return stripped
+
 
 class ClientUpdate(BaseModel):
-    name: str | None = None
+    name: str | None = Field(default=None, max_length=255)
     client_type: ClientType | None = None
-    email: str | None = None
+    email: EmailStr | None = None
     phone: str | None = None
     address: str | None = None
     tags: list[str] | None = None
     referral_source: str | None = None
     notes: str | None = None
     is_active: bool | None = None
+
+    @field_validator("name")
+    @classmethod
+    def name_must_not_be_blank(cls, v: str | None) -> str | None:
+        if v is None:
+            return v
+        stripped = v.strip()
+        if not stripped:
+            raise ValueError("Name must not be empty or whitespace-only")
+        return stripped
 
 
 class ClientResponse(BaseModel):
