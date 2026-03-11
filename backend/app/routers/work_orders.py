@@ -5,8 +5,10 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_current_user, get_session
+from app.models.client import Client
 from app.models.kanban_stage import KanbanStage
 from app.models.user import User
+from app.models.vehicle import Vehicle
 from app.schemas.work_orders import (
     StatusUpdate,
     WorkOrderCreate,
@@ -23,6 +25,51 @@ from app.services.work_orders import (
 )
 
 router = APIRouter(prefix="/api/work-orders", tags=["work-orders"])
+
+
+async def _validate_vehicle_ownership(
+    session: AsyncSession,
+    vehicle_ids: list[uuid.UUID],
+    org_id: uuid.UUID,
+) -> None:
+    """Verify all vehicles belong to the user's organization."""
+    if not vehicle_ids:
+        return
+    result = await session.execute(
+        select(Vehicle.id).where(
+            Vehicle.id.in_(vehicle_ids),
+            Vehicle.organization_id == org_id,
+        )
+    )
+    found_ids = {row[0] for row in result.all()}
+    missing = set(vehicle_ids) - found_ids
+    if missing:
+        raise HTTPException(
+            status_code=403,
+            detail="Vehicles not found in your organization: "
+            f"{sorted(str(v) for v in missing)}",
+        )
+
+
+async def _validate_client_ownership(
+    session: AsyncSession,
+    client_id: uuid.UUID | None,
+    org_id: uuid.UUID,
+) -> None:
+    """Verify the client belongs to the user's organization."""
+    if client_id is None:
+        return
+    result = await session.execute(
+        select(Client.id).where(
+            Client.id == client_id,
+            Client.organization_id == org_id,
+        )
+    )
+    if result.scalar_one_or_none() is None:
+        raise HTTPException(
+            status_code=403,
+            detail="Client not found in your organization",
+        )
 
 
 def _to_response(wo) -> WorkOrderResponse:
@@ -75,6 +122,10 @@ async def create(
     if not stage:
         raise HTTPException(status_code=400, detail="No Kanban stages configured")
 
+    # Validate tenant ownership of vehicles and client
+    await _validate_vehicle_ownership(session, data.vehicle_ids, user.organization_id)
+    await _validate_client_ownership(session, data.client_id, user.organization_id)
+
     wo_data = data.model_dump(exclude={"vehicle_ids"})
     wo = await create_work_order(
         session, user.organization_id, stage.id, wo_data, data.vehicle_ids
@@ -121,6 +172,11 @@ async def update(
     wo = await get_work_order(session, work_order_id, user.organization_id)
     if not wo:
         raise HTTPException(status_code=404, detail="Work order not found")
+
+    # Validate tenant ownership of client if being updated
+    if data.client_id is not None:
+        await _validate_client_ownership(session, data.client_id, user.organization_id)
+
     updated = await update_work_order(session, wo, data.model_dump(exclude_unset=True))
     return _to_response(updated)
 
