@@ -31,7 +31,7 @@ async def client(db_session, seed_plan):
 async def _register_user(client, email="admin@shop.com", org_name="Shop"):
     resp = await client.post(
         "/api/auth/register",
-        json={"email": email, "password": "testpass123", "org_name": org_name},
+        json={"email": email, "password": "Testpass123", "org_name": org_name},
     )
     return resp.json()
 

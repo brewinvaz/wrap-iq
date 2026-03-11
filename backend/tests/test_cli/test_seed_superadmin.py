@@ -10,7 +10,7 @@ async def test_seed_creates_superadmin(db_session, monkeypatch):
     from app.auth.passwords import hash_password
 
     email = "sa@test.com"
-    password = "testpass123"
+    password = "Testpass123"
 
     # Simulate what seed_superadmin does
     result = await db_session.execute(select(User).where(User.email == email))
@@ -45,7 +45,7 @@ async def test_seed_is_idempotent(db_session):
         id=uuid.uuid4(),
         organization_id=None,
         email=email,
-        password_hash=hash_password("testpass123"),
+        password_hash=hash_password("Testpass123"),
         role=Role.ADMIN,
         is_superadmin=True,
     )
@@ -69,7 +69,7 @@ async def test_seed_upgrades_existing_user(db_session):
         id=uuid.uuid4(),
         organization_id=None,
         email=email,
-        password_hash=hash_password("testpass123"),
+        password_hash=hash_password("Testpass123"),
         role=Role.ADMIN,
         is_superadmin=False,
     )

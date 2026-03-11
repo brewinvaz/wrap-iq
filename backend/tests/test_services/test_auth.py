@@ -40,7 +40,7 @@ async def test_register(auth_service, default_plan):
 
 async def test_register_duplicate_email(auth_service, default_plan):
     await auth_service.register(
-        email="dupe@shop.com", password="testpass123", org_name="Shop 1"
+        email="dupe@shop.com", password="Testpass123", org_name="Shop 1"
     )
     with pytest.raises(ValueError, match="already registered"):
         await auth_service.register(
@@ -50,9 +50,9 @@ async def test_register_duplicate_email(auth_service, default_plan):
 
 async def test_login(auth_service, default_plan):
     await auth_service.register(
-        email="login@shop.com", password="testpass123", org_name="Login Shop"
+        email="login@shop.com", password="Testpass123", org_name="Login Shop"
     )
-    result = await auth_service.login(email="login@shop.com", password="testpass123")
+    result = await auth_service.login(email="login@shop.com", password="Testpass123")
     assert "access_token" in result
     assert "refresh_token" in result
 
