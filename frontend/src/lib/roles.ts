@@ -36,8 +36,11 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
         label: 'Workspace',
         items: [
           { icon: '📋', label: 'Jobs Board', href: '/dashboard', badge: 12 },
+          { icon: '📊', label: 'All Jobs Board', href: '/dashboard/jobs' },
           { icon: '📦', label: 'Work Orders', href: '/dashboard/work-orders' },
           { icon: '📅', label: 'Calendar', href: '/dashboard/calendar', badge: 3, badgeVariant: 'amber' },
+          { icon: '💬', label: 'Communications', href: '/dashboard/comms' },
+          { icon: '🗓️', label: 'Schedule', href: '/dashboard/schedule' },
           { icon: '👥', label: 'Customers', href: '/dashboard/customers' },
         ],
       },
@@ -53,9 +56,11 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
         label: 'Business',
         items: [
           { icon: '💰', label: 'Financials', href: '/dashboard/financials' },
+          { icon: '📈', label: 'Reports', href: '/dashboard/reports' },
           { icon: '⏱️', label: 'Time Tracking', href: '/dashboard/time-logs' },
           { icon: '👤', label: 'User Management', href: '/dashboard/team' },
           { icon: '💳', label: 'Billing & Settings', href: '/dashboard/settings/billing' },
+          { icon: '🔑', label: 'API Keys', href: '/dashboard/settings/api-keys' },
           { icon: '🔌', label: 'Integrations', href: '/dashboard/integrations' },
         ],
       },
@@ -115,6 +120,8 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
           { icon: '📅', label: 'My Schedule', href: '/dashboard/schedule' },
           { icon: '📸', label: 'Photos', href: '/dashboard/photos' },
           { icon: '⏱️', label: 'Time Tracking', href: '/dashboard/time-logs' },
+          { icon: '⚙️', label: 'Equipment', href: '/dashboard/equipment' },
+          { icon: '📦', label: 'Materials', href: '/dashboard/materials' },
         ],
       },
       {
