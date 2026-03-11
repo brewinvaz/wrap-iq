@@ -323,7 +323,6 @@ export default function DashboardPage() {
     priority: [],
     jobType: [],
   });
-  const [showCreateModal, setShowCreateModal] = useState(false);
   const filterRef = useRef<HTMLDivElement>(null);
   const filterBtnRef = useRef<HTMLButtonElement>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
