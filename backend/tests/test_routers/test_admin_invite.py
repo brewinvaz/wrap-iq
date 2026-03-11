@@ -2,9 +2,11 @@ import uuid
 
 import pytest
 from httpx import ASGITransport, AsyncClient
+from sqlalchemy import select as sa_select
 
 from app.auth.dependencies import get_session
 from app.auth.jwt import create_access_token
+from app.auth.passwords import verify_password
 from app.main import app
 from app.models.organization import Organization
 from app.models.plan import Plan
@@ -77,6 +79,29 @@ async def test_invite_creates_user_with_correct_role_and_org(client, seed_data):
     assert data["is_active"] is True
     assert "created_at" in data
     assert "updated_at" in data
+    assert "temp_password" in data
+    assert isinstance(data["temp_password"], str)
+    assert len(data["temp_password"]) > 0
+
+
+async def test_invite_temp_password_is_valid(client, seed_data, db_session):
+    """Verify the returned temp password matches the stored hash."""
+    headers = make_token(seed_data["admin"])
+    resp = await client.post(
+        "/api/admin/users/invite",
+        headers=headers,
+        json={"email": "pwcheck@shop.com", "role": "designer"},
+    )
+    assert resp.status_code == 201
+    data = resp.json()
+    temp_password = data["temp_password"]
+
+    # Fetch the newly created user and verify the password hash
+    result = await db_session.execute(
+        sa_select(User).where(User.email == "pwcheck@shop.com")
+    )
+    user = result.scalar_one()
+    assert verify_password(temp_password, user.password_hash)
 
 
 async def test_invite_duplicate_email_fails(client, seed_data):
