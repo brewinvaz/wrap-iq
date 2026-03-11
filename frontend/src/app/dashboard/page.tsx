@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import KanbanBoard from '@/components/kanban/KanbanBoard';
 import MetricsBar from '@/components/dashboard/MetricsBar';
+import CreateWorkOrderModal from '@/components/work-orders/CreateWorkOrderModal';
 import { api, ApiError } from '@/lib/api-client';
 import { formatCurrencyCompact } from '@/lib/format';
 import { KanbanColumn, KPIMetric, ProjectCard } from '@/lib/types';
@@ -239,6 +240,7 @@ export default function DashboardPage() {
   });
   const filterRef = useRef<HTMLDivElement>(null);
   const filterBtnRef = useRef<HTMLButtonElement>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   // Data state
   const [columns, setColumns] = useState<KanbanColumn[]>([]);
@@ -576,7 +578,10 @@ export default function DashboardPage() {
                 </div>
               )}
             </div>
-            <button className="rounded-lg bg-blue-600 px-3.5 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700">
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="rounded-lg bg-blue-600 px-3.5 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+            >
               + New Project
             </button>
           </div>
@@ -657,7 +662,7 @@ export default function DashboardPage() {
           loading ? (
             <KanbanBoardSkeleton />
           ) : (
-            <KanbanBoard columns={filteredColumns} onStatusChange={handleStatusChange} pendingCards={pendingCards} />
+            <KanbanBoard columns={filteredColumns} onStatusChange={handleStatusChange} pendingCards={pendingCards} onAddProject={() => setShowCreateModal(true)} />
           )
         )}
         {viewMode === 'list' && (
@@ -671,6 +676,12 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+
+      <CreateWorkOrderModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onCreate={() => { fetchData(); }}
+      />
     </div>
   );
 }

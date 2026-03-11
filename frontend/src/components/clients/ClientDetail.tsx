@@ -37,12 +37,21 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 
 interface ClientDetailProps {
   client: Client;
+  onClientUpdated?: (updatedClient: Client) => void;
 }
 
-export default function ClientDetail({ client }: ClientDetailProps) {
+export default function ClientDetail({ client, onClientUpdated }: ClientDetailProps) {
   const [notes, setNotes] = useState(client.notes ?? '');
   const [saving, setSaving] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  // Inline editing state
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState(client.name);
+  const [editEmail, setEditEmail] = useState(client.email);
+  const [editPhone, setEditPhone] = useState(client.phone);
+  const [editAddress, setEditAddress] = useState(client.address ?? '');
+  const [editSaving, setEditSaving] = useState(false);
 
   // Reset notes when the selected client changes
   const [prevClientId, setPrevClientId] = useState(client.id);
@@ -50,6 +59,11 @@ export default function ClientDetail({ client }: ClientDetailProps) {
     setPrevClientId(client.id);
     setNotes(client.notes ?? '');
     setFeedback(null);
+    setIsEditing(false);
+    setEditName(client.name);
+    setEditEmail(client.email);
+    setEditPhone(client.phone);
+    setEditAddress(client.address ?? '');
   }
 
   const isDirty = notes !== (client.notes ?? '');
@@ -65,6 +79,55 @@ export default function ClientDetail({ client }: ClientDetailProps) {
       setFeedback({ type: 'error', message });
     } finally {
       setSaving(false);
+    }
+  }
+
+  function handleStartEdit() {
+    setEditName(client.name);
+    setEditEmail(client.email);
+    setEditPhone(client.phone);
+    setEditAddress(client.address ?? '');
+    setIsEditing(true);
+    setFeedback(null);
+  }
+
+  function handleCancelEdit() {
+    setIsEditing(false);
+    setFeedback(null);
+  }
+
+  async function handleSaveEdit() {
+    setEditSaving(true);
+    setFeedback(null);
+    try {
+      await api.patch(`/api/clients/${client.id}`, {
+        name: editName,
+        email: editEmail || null,
+        phone: editPhone || null,
+        address: editAddress || null,
+      });
+      setFeedback({ type: 'success', message: 'Client updated' });
+      setIsEditing(false);
+      if (onClientUpdated) {
+        onClientUpdated({
+          ...client,
+          name: editName,
+          email: editEmail,
+          phone: editPhone,
+          address: editAddress || undefined,
+        });
+      }
+    } catch (err) {
+      const message = err instanceof ApiError ? err.message : 'Failed to update client';
+      setFeedback({ type: 'error', message });
+    } finally {
+      setEditSaving(false);
+    }
+  }
+
+  function handleEmail() {
+    if (client.email) {
+      window.location.href = `mailto:${client.email}`;
     }
   }
 
@@ -102,12 +165,40 @@ export default function ClientDetail({ client }: ClientDetailProps) {
             </p>
           </div>
           <div className="flex gap-2">
-            <button className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-[#18181b] shadow-sm transition-colors hover:bg-gray-50">
-              Edit
-            </button>
-            <button className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700">
-              Email
-            </button>
+            {isEditing ? (
+              <>
+                <button
+                  onClick={handleCancelEdit}
+                  disabled={editSaving}
+                  className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-[#18181b] shadow-sm transition-colors hover:bg-gray-50 disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveEdit}
+                  disabled={editSaving}
+                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {editSaving ? 'Saving...' : 'Save'}
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={handleStartEdit}
+                  className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-[#18181b] shadow-sm transition-colors hover:bg-gray-50"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={handleEmail}
+                  disabled={!client.email}
+                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 disabled:opacity-50"
+                >
+                  Email
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -119,11 +210,54 @@ export default function ClientDetail({ client }: ClientDetailProps) {
           {/* Contact Info */}
           <div className="rounded-xl border border-[#e6e6eb] bg-white p-5 shadow-sm">
             <CardHeader title="Contact Info" />
-            <InfoRow label="Email" value={client.email} />
-            <InfoRow label="Phone" value={client.phone} />
-            {client.address && <InfoRow label="Address" value={client.address} />}
-            {client.primaryContact && (
-              <InfoRow label="Primary Contact" value={client.primaryContact} />
+            {isEditing ? (
+              <div className="space-y-3">
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-gray-500">Name</label>
+                  <input
+                    type="text"
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-[#18181b] outline-none focus:border-blue-300 focus:ring-1 focus:ring-blue-300"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-gray-500">Email</label>
+                  <input
+                    type="email"
+                    value={editEmail}
+                    onChange={(e) => setEditEmail(e.target.value)}
+                    className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-[#18181b] outline-none focus:border-blue-300 focus:ring-1 focus:ring-blue-300"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-gray-500">Phone</label>
+                  <input
+                    type="tel"
+                    value={editPhone}
+                    onChange={(e) => setEditPhone(e.target.value)}
+                    className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-[#18181b] outline-none focus:border-blue-300 focus:ring-1 focus:ring-blue-300"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-gray-500">Address</label>
+                  <input
+                    type="text"
+                    value={editAddress}
+                    onChange={(e) => setEditAddress(e.target.value)}
+                    className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-[#18181b] outline-none focus:border-blue-300 focus:ring-1 focus:ring-blue-300"
+                  />
+                </div>
+              </div>
+            ) : (
+              <>
+                <InfoRow label="Email" value={client.email} />
+                <InfoRow label="Phone" value={client.phone} />
+                {client.address && <InfoRow label="Address" value={client.address} />}
+                {client.primaryContact && (
+                  <InfoRow label="Primary Contact" value={client.primaryContact} />
+                )}
+              </>
             )}
           </div>
 
