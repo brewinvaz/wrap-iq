@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_current_user, get_session
 from app.models.audit_log import ActionType
-from app.models.user import User
+from app.models.user import Role, User
 from app.schemas.audit_logs import AuditLogListResponse
 from app.services.audit_log import AuditLogService
 
@@ -23,6 +23,10 @@ async def list_audit_logs(
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ):
+    # Non-admin users can only view their own audit logs
+    if current_user.role != Role.ADMIN:
+        user_id = current_user.id
+
     service = AuditLogService(session)
     logs, total = await service.list_logs(
         organization_id=current_user.organization_id,
