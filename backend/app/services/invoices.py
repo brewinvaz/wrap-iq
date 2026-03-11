@@ -110,14 +110,10 @@ class InvoiceService:
         if "subtotal" in fields or "tax_rate" in fields:
             subtotal = invoice.subtotal
             tax_rate = invoice.tax_rate
-            tax_amount = int(
-                subtotal * tax_rate / Decimal("100")
-            )
+            tax_amount = int(subtotal * tax_rate / Decimal("100"))
             invoice.tax_amount = tax_amount
             invoice.total = subtotal + tax_amount
-            invoice.balance_due = (
-                invoice.total - invoice.amount_paid
-            )
+            invoice.balance_due = invoice.total - invoice.amount_paid
 
         await self.session.commit()
         await self.session.refresh(invoice)
