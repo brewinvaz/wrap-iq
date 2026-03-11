@@ -5,7 +5,9 @@ import pytest
 
 from app.services.ai_assistant import (
     AIAssistantService,
+    _get_outermost_limit,
     _strip_sql_comments,
+    ensure_outer_limit,
     validate_sql,
 )
 
@@ -125,14 +127,22 @@ def test_validate_sql_rejects_select_with_embedded_delete():
 
 
 def test_strip_sql_comments_removes_line_comments():
-    sql = "SELECT * FROM work_orders -- DROP TABLE work_orders\nWHERE organization_id = :org_id"
+    sql = (
+        "SELECT * FROM work_orders "
+        "-- DROP TABLE work_orders\n"
+        "WHERE organization_id = :org_id"
+    )
     cleaned = _strip_sql_comments(sql)
     assert "DROP" not in cleaned
     assert "SELECT" in cleaned
 
 
 def test_strip_sql_comments_removes_block_comments():
-    sql = "SELECT * FROM work_orders /* DELETE FROM work_orders */ WHERE organization_id = :org_id"
+    sql = (
+        "SELECT * FROM work_orders "
+        "/* DELETE FROM work_orders */ "
+        "WHERE organization_id = :org_id"
+    )
     cleaned = _strip_sql_comments(sql)
     assert "DELETE" not in cleaned
     assert "SELECT" in cleaned
@@ -140,9 +150,90 @@ def test_strip_sql_comments_removes_block_comments():
 
 def test_validate_sql_rejects_dangerous_keyword_in_comment_bypass():
     # Attempt to hide DELETE after a line comment trick
-    sql = "SELECT * FROM work_orders WHERE organization_id = :org_id\n-- safe\n; DELETE FROM work_orders"
+    sql = (
+        "SELECT * FROM work_orders "
+        "WHERE organization_id = :org_id\n"
+        "-- safe\n"
+        "; DELETE FROM work_orders"
+    )
     result = validate_sql(sql)
     assert result is not None
+
+
+# --- LIMIT validation tests ---
+
+
+def test_get_outermost_limit_simple():
+    sql = "SELECT * FROM work_orders WHERE organization_id = :org_id LIMIT 50"
+    assert _get_outermost_limit(sql) == 50
+
+
+def test_get_outermost_limit_none_when_absent():
+    sql = "SELECT * FROM work_orders WHERE organization_id = :org_id"
+    assert _get_outermost_limit(sql) is None
+
+
+def test_get_outermost_limit_union_with_limit_only_in_subquery():
+    """LIMIT in a subquery of a UNION does not count as an outermost LIMIT."""
+    sql = (
+        "(SELECT * FROM work_orders WHERE organization_id = :org_id LIMIT 10) "
+        "UNION ALL "
+        "SELECT * FROM work_orders WHERE organization_id = :org_id"
+    )
+    assert _get_outermost_limit(sql) is None
+
+
+def test_get_outermost_limit_union_with_outer_limit():
+    sql = (
+        "SELECT * FROM work_orders WHERE organization_id = :org_id "
+        "UNION ALL "
+        "SELECT * FROM work_orders WHERE organization_id = :org_id "
+        "LIMIT 200"
+    )
+    assert _get_outermost_limit(sql) == 200
+
+
+def test_ensure_outer_limit_appends_when_missing():
+    sql = "SELECT * FROM work_orders WHERE organization_id = :org_id"
+    result = ensure_outer_limit(sql)
+    assert result.endswith("LIMIT 100")
+
+
+def test_ensure_outer_limit_keeps_existing_reasonable_limit():
+    sql = "SELECT * FROM work_orders WHERE organization_id = :org_id LIMIT 50"
+    result = ensure_outer_limit(sql)
+    assert "LIMIT 50" in result
+    assert result.count("LIMIT") == 1
+
+
+def test_ensure_outer_limit_caps_excessive_limit():
+    sql = "SELECT * FROM work_orders WHERE organization_id = :org_id LIMIT 5000"
+    result = ensure_outer_limit(sql)
+    assert "1000" in result
+
+
+def test_ensure_outer_limit_union_bypass():
+    """UNION query where LIMIT only appears in a subquery should get outer LIMIT."""
+    sql = (
+        "(SELECT * FROM work_orders WHERE organization_id = :org_id LIMIT 10) "
+        "UNION ALL "
+        "SELECT * FROM work_orders WHERE organization_id = :org_id"
+    )
+    result = ensure_outer_limit(sql)
+    assert result.rstrip().endswith("LIMIT 100")
+
+
+def test_ensure_outer_limit_strips_trailing_semicolon():
+    sql = "SELECT * FROM work_orders WHERE organization_id = :org_id LIMIT 50;"
+    result = ensure_outer_limit(sql)
+    assert not result.endswith(";")
+    assert "LIMIT 50" in result
+
+
+def test_ensure_outer_limit_no_limit_at_all():
+    sql = "SELECT count(*) FROM work_orders WHERE organization_id = :org_id"
+    result = ensure_outer_limit(sql)
+    assert result.endswith("LIMIT 100")
 
 
 # --- Service tests ---
