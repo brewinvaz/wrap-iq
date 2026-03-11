@@ -5,17 +5,17 @@ Revises: 09c2a95d9019
 Create Date: 2026-03-10 02:33:14.318200
 
 """
-from typing import Sequence, Union
+from collections.abc import Sequence
 
-from alembic import op
 import sqlalchemy as sa
 
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = '41aa2436b506'
-down_revision: Union[str, Sequence[str], None] = '09c2a95d9019'
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | Sequence[str] | None = '09c2a95d9019'
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
@@ -25,9 +25,9 @@ def upgrade() -> None:
     sa.Column('name', sa.String(length=255), nullable=False),
     sa.Column('subject', sa.String(length=500), nullable=False),
     sa.Column('body', sa.Text(), nullable=False),
-    sa.Column('trigger_type', sa.Enum('MANUAL', 'STAGE_CHANGE', name='triggertype'), nullable=False),
+    sa.Column('trigger_type', sa.Enum('manual', 'stage_change', name='triggertype'), nullable=False),
     sa.Column('trigger_stage_id', sa.Uuid(), nullable=True),
-    sa.Column('channel', sa.Enum('EMAIL', 'IN_APP', 'BOTH', name='channeltype'), nullable=False),
+    sa.Column('channel', sa.Enum('email', 'in_app', 'both', name='channeltype'), nullable=False),
     sa.Column('is_active', sa.Boolean(), nullable=False),
     sa.Column('organization_id', sa.Uuid(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
@@ -44,8 +44,8 @@ def upgrade() -> None:
     sa.Column('recipient_user_id', sa.Uuid(), nullable=True),
     sa.Column('subject', sa.String(length=500), nullable=False),
     sa.Column('body', sa.Text(), nullable=False),
-    sa.Column('channel', sa.Enum('EMAIL', 'IN_APP', 'BOTH', name='channeltype', create_type=False), nullable=False),
-    sa.Column('status', sa.Enum('PENDING', 'SENT', 'FAILED', name='messagestatus'), nullable=False),
+    sa.Column('channel', sa.Enum('email', 'in_app', 'both', name='channeltype', create_type=False), nullable=False),
+    sa.Column('status', sa.Enum('pending', 'sent', 'failed', name='messagestatus'), nullable=False),
     sa.Column('sent_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('error_message', sa.Text(), nullable=True),
     sa.Column('organization_id', sa.Uuid(), nullable=False),
