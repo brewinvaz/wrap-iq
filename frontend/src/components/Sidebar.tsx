@@ -14,6 +14,8 @@ import { api } from '@/lib/api-client';
 const INTERNAL_ROLES: RoleKey[] = ['admin', 'pm', 'installer', 'designer', 'production'];
 const CLIENT_ROLES: RoleKey[] = ['client'];
 
+const isDev = process.env.NODE_ENV === 'development';
+
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
@@ -57,6 +59,24 @@ export default function Sidebar() {
     }
   }
 
+  // Show the role switcher only in dev mode or when the user is an admin
+  const showRoleSwitcher = isDev || user?.role === 'admin';
+
+  // Resolve live badge counts from badgeKey on each nav item
+  const badgeMap: Record<string, number | null> = {
+    workOrders: badgeCounts.workOrders,
+  };
+
+  const navGroupsWithBadges = roleConfig.navGroups.map((group) => ({
+    ...group,
+    items: group.items.map((item) => {
+      if (item.badgeKey && badgeMap[item.badgeKey] != null) {
+        return { ...item, badge: badgeMap[item.badgeKey] as number };
+      }
+      return item;
+    }),
+  }));
+
   // Hide sidebar for client role
   if (currentRole === 'client') {
     return null;
@@ -74,11 +94,11 @@ export default function Sidebar() {
         </span>
       </div>
 
-      {/* Role Switcher */}
+      {/* User info & Role Switcher */}
       <div className="relative px-3 pb-2 md:px-1.5 lg:px-3" ref={dropdownRef}>
         <button
-          onClick={() => setDropdownOpen(!dropdownOpen)}
-          className="flex w-full items-center gap-2 rounded-lg border border-[#e6e6eb] bg-[#f4f4f6] px-2.5 py-2 text-left transition-colors hover:bg-[#ebebef] md:justify-center md:px-1.5 lg:justify-start lg:px-2.5"
+          onClick={() => showRoleSwitcher && setDropdownOpen(!dropdownOpen)}
+          className={`flex w-full items-center gap-2 rounded-lg border border-[#e6e6eb] bg-[#f4f4f6] px-2.5 py-2 text-left transition-colors md:justify-center md:px-1.5 lg:justify-start lg:px-2.5 ${showRoleSwitcher ? 'hover:bg-[#ebebef] cursor-pointer' : 'cursor-default'}`}
         >
           <div
             className={`flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full text-[10px] font-semibold text-white ${roleConfig.avatarBg}`}
@@ -91,9 +111,11 @@ export default function Sidebar() {
             <p className="truncate text-[12.5px] font-medium text-[#18181b]">{user?.fullName || roleConfig.name}</p>
             <p className="truncate text-[10.5px] text-[#a8a8b4]">{user?.email || roleConfig.title}</p>
           </div>
-          <svg className="h-3.5 w-3.5 shrink-0 text-[#a8a8b4] md:hidden lg:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
-          </svg>
+          {showRoleSwitcher && (
+            <svg className="h-3.5 w-3.5 shrink-0 text-[#a8a8b4] md:hidden lg:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+            </svg>
+          )}
         </button>
 
         {dropdownOpen && (
@@ -161,7 +183,7 @@ export default function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-3 pt-1 pb-2 md:px-1.5 lg:px-3">
-        {roleConfig.navGroups.map((group) => (
+        {navGroupsWithBadges.map((group) => (
           <div key={group.label} className="mb-3">
             <h3 className="mb-1 px-2.5 font-mono text-[9.5px] uppercase tracking-wider text-[#a8a8b4] md:hidden lg:block">
               {group.label}

@@ -6,6 +6,7 @@ import { api } from './api-client';
 interface UserInfo {
   fullName: string | null;
   email: string;
+  role: string | null;
 }
 
 interface UserContextValue {
@@ -23,10 +24,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
 
     api
-      .get<{ email: string; full_name: string | null }>('/api/users/me')
+      .get<{ email: string; full_name: string | null; role: string | null }>('/api/users/me')
       .then((data) => {
         if (cancelled) return;
-        setUser({ fullName: data.full_name, email: data.email });
+        setUser({ fullName: data.full_name, email: data.email, role: data.role ?? null });
       })
       .catch(() => {
         // API unavailable — leave user as null
