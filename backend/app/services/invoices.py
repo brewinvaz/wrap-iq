@@ -161,6 +161,15 @@ class InvoiceService:
         await self.session.refresh(payment)
         return payment
 
+    async def get_by_payment_token(self, token: str) -> Invoice | None:
+        payment_link = f"/pay/{token}"
+        result = await self.session.execute(
+            select(Invoice)
+            .options(selectinload(Invoice.payments))
+            .where(Invoice.payment_link == payment_link)
+        )
+        return result.scalar_one_or_none()
+
     async def generate_payment_link(
         self, invoice_id: uuid.UUID, org_id: uuid.UUID
     ) -> str | None:
