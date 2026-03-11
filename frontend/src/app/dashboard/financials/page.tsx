@@ -1,5 +1,8 @@
 'use client';
 
+import { useState } from 'react';
+import CreateInvoiceModal from '@/components/financials/CreateInvoiceModal';
+
 const stats = [
   { label: 'Revenue (MTD)', value: '$48,320', change: '+12.4%', up: true },
   { label: 'Outstanding Invoices', value: '$18,750', change: '6 pending', up: false },
@@ -30,6 +33,13 @@ const statusStyle: Record<string, { bg: string; text: string }> = {
 };
 
 export default function FinancialsPage() {
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  function handleInvoiceCreated() {
+    // In a full implementation this would refresh the invoice list.
+    // For now the modal closes and the static list remains.
+  }
+
   return (
     <div className="flex h-full flex-col">
       <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
@@ -37,7 +47,10 @@ export default function FinancialsPage() {
           <div className="flex items-center gap-3">
             <h1 className="text-xl font-bold text-[#18181b]">Financials</h1>
           </div>
-          <button className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700">
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+          >
             + New Invoice
           </button>
         </div>
@@ -122,6 +135,12 @@ export default function FinancialsPage() {
           </table>
         </div>
       </div>
+
+      <CreateInvoiceModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onCreate={handleInvoiceCreated}
+      />
     </div>
   );
 }
