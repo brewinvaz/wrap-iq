@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans, DM_Mono } from "next/font/google";
+import AuthInit from "@/components/AuthInit";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -33,6 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${dmSans.variable} ${dmMono.variable} font-sans antialiased`}>
+        <AuthInit />
         {children}
       </body>
     </html>
