@@ -9,9 +9,11 @@ interface KanbanBoardProps {
   columns?: KanbanColumnType[];
   /** Called after a card is moved to a new column (drag-drop or advance). */
   onStatusChange?: (cardId: string, targetColumnId: string) => void;
+  /** Set of card IDs that have a pending status change in flight. */
+  pendingCards?: Set<string>;
 }
 
-export default function KanbanBoard({ columns: externalColumns, onStatusChange }: KanbanBoardProps = {}) {
+export default function KanbanBoard({ columns: externalColumns, onStatusChange, pendingCards }: KanbanBoardProps = {}) {
   const isControlled = externalColumns !== undefined;
 
   const [internalColumns, setInternalColumns] = useState<KanbanColumnType[]>([]);
@@ -129,6 +131,7 @@ export default function KanbanBoard({ columns: externalColumns, onStatusChange }
           onDragLeave={handleDragLeave}
           dragOverColumnId={dragOverColumnId}
           onAdvanceCard={handleAdvanceCard}
+          pendingCards={pendingCards}
         />
       ))}
     </div>

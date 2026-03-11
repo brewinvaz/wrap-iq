@@ -38,20 +38,37 @@ interface KanbanCardProps {
   card: ProjectCard;
   onDragStart: (e: React.DragEvent, cardId: string) => void;
   onAdvance?: (cardId: string) => void;
+  isPending?: boolean;
 }
 
-export default function KanbanCard({ card, onDragStart, onAdvance }: KanbanCardProps) {
+export default function KanbanCard({ card, onDragStart, onAdvance, isPending }: KanbanCardProps) {
   const router = useRouter();
   const completedTasks = card.tasks?.filter((t) => t.done).length ?? 0;
   const totalTasks = card.tasks?.length ?? 0;
 
   return (
     <div
-      draggable
-      onDragStart={(e) => onDragStart(e, card.id)}
+      draggable={!isPending}
+      onDragStart={(e) => {
+        if (isPending) {
+          e.preventDefault();
+          return;
+        }
+        onDragStart(e, card.id);
+      }}
       onClick={() => router.push(`/dashboard/projects/${card.id}`)}
-      className="group cursor-grab rounded-lg border border-[#e6e6eb] bg-white p-3.5 shadow-[0_1px_4px_rgba(0,0,0,.06)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,.1)] active:cursor-grabbing"
+      className={`group relative rounded-lg border border-[#e6e6eb] bg-white p-3.5 shadow-[0_1px_4px_rgba(0,0,0,.06)] transition-all duration-200 ${
+        isPending
+          ? 'cursor-default opacity-70'
+          : 'cursor-grab hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,.1)] active:cursor-grabbing'
+      }`}
     >
+      {/* Pending status change indicator */}
+      {isPending && (
+        <div className="absolute inset-x-0 top-0 flex justify-center">
+          <div className="h-0.5 w-full animate-pulse rounded-t-lg bg-blue-400" />
+        </div>
+      )}
       {/* Header: ID + Priority */}
       <div className="mb-2 flex items-center justify-between">
         <span className="font-mono text-xs tracking-wide text-[#a8a8b4]">{card.id}</span>
@@ -163,9 +180,14 @@ export default function KanbanCard({ card, onDragStart, onAdvance }: KanbanCardP
         <button
           onClick={(e) => {
             e.stopPropagation();
-            onAdvance(card.id);
+            if (!isPending) onAdvance(card.id);
           }}
-          className="mt-2.5 flex w-full items-center justify-center gap-1 rounded-md border border-[#e6e6eb] bg-gray-50 py-1.5 text-[11px] font-medium text-[#60606a] transition-colors hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600"
+          disabled={isPending}
+          className={`mt-2.5 flex w-full items-center justify-center gap-1 rounded-md border border-[#e6e6eb] bg-gray-50 py-1.5 text-[11px] font-medium text-[#60606a] transition-colors ${
+            isPending
+              ? 'cursor-not-allowed opacity-50'
+              : 'hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600'
+          }`}
         >
           Advance to next stage
           <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import KanbanBoard from '@/components/kanban/KanbanBoard';
 import MetricsBar from '@/components/dashboard/MetricsBar';
 import { api, ApiError } from '@/lib/api-client';
@@ -240,6 +240,11 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Drag-and-drop race condition prevention
+  const [pendingCards, setPendingCards] = useState<Set<string>>(new Set());
+  const [statusError, setStatusError] = useState<string | null>(null);
+  const inflightRequests = useRef<Map<string, AbortController>>(new Map());
+
   // Keep raw API data for KPI computation and status-change lookups
   const [stages, setStages] = useState<KanbanStageResponse[]>([]);
   const [workOrders, setWorkOrders] = useState<WorkOrderResponse[]>([]);
@@ -297,6 +302,22 @@ export default function DashboardPage() {
       // Find the work order by job_number (cardId is the job_number)
       const wo = workOrders.find((w) => w.job_number === cardId);
       if (!wo) return;
+
+      // Prevent concurrent drags on the same card
+      if (pendingCards.has(cardId)) return;
+
+      // Abort any previous in-flight request for this card
+      const existingController = inflightRequests.current.get(cardId);
+      if (existingController) {
+        existingController.abort();
+      }
+
+      // Mark card as pending
+      setPendingCards((prev) => new Set(prev).add(cardId));
+      setStatusError(null);
+
+      const abortController = new AbortController();
+      inflightRequests.current.set(cardId, abortController);
 
       // Optimistic UI update
       setColumns((prev) =>
@@ -356,12 +377,33 @@ export default function DashboardPage() {
           );
           return computeKPIs(updatedOrders, stages) || prevKpis;
         });
-      } catch {
+      } catch (err) {
+        // Ignore aborted requests (superseded by a newer drag)
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+
+        // Show error notification instead of silently re-fetching
+        const message =
+          err instanceof ApiError
+            ? `Failed to move ${cardId}: ${err.message}`
+            : `Failed to move ${cardId}. Please try again.`;
+        setStatusError(message);
+
         // Revert optimistic update by re-fetching
         fetchData();
+
+        // Auto-dismiss error after 5 seconds
+        setTimeout(() => setStatusError((prev) => (prev === message ? null : prev)), 5000);
+      } finally {
+        // Remove from pending set and clean up abort controller
+        inflightRequests.current.delete(cardId);
+        setPendingCards((prev) => {
+          const next = new Set(prev);
+          next.delete(cardId);
+          return next;
+        });
       }
     },
-    [workOrders, stages, fetchData]
+    [workOrders, stages, fetchData, pendingCards]
   );
 
   return (
@@ -394,6 +436,28 @@ export default function DashboardPage() {
 
       {/* Error banner */}
       {error && <ErrorBanner message={error} onRetry={fetchData} />}
+
+      {/* Status change error toast */}
+      {statusError && (
+        <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 shadow-lg">
+          <svg className="h-5 w-5 shrink-0 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
+            />
+          </svg>
+          <span className="text-sm text-rose-700">{statusError}</span>
+          <button
+            onClick={() => setStatusError(null)}
+            className="ml-2 rounded-md p-1 text-rose-400 transition-colors hover:bg-rose-100 hover:text-rose-600"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      )}
 
       {/* View toggle and filters */}
       <div className="shrink-0 flex items-center justify-between px-6 py-3">
@@ -441,7 +505,7 @@ export default function DashboardPage() {
           loading ? (
             <KanbanBoardSkeleton />
           ) : (
-            <KanbanBoard columns={columns} onStatusChange={handleStatusChange} />
+            <KanbanBoard columns={columns} onStatusChange={handleStatusChange} pendingCards={pendingCards} />
           )
         )}
         {viewMode === 'list' && (
