@@ -7,6 +7,7 @@ import InsightsTable from '@/components/dashboard/InsightsTable';
 import RevenueChart from '@/components/dashboard/RevenueChart';
 import DateRangeFilter, { type Preset } from '@/components/dashboard/DateRangeFilter';
 import { api, ApiError } from '@/lib/api-client';
+import { formatCurrencyCompact } from '@/lib/format';
 import {
   KPIMetric,
   DepartmentScorecard,
@@ -99,13 +100,10 @@ function deriveKPIs(workOrders: ApiWorkOrder[]): KPIMetric[] {
       }, 0) / completedWithDates.length).toFixed(1)
     : 'N/A';
 
-  const formatCurrency = (v: number) =>
-    v >= 1000 ? `$${(v / 1000).toFixed(1)}k` : `$${v}`;
-
   return [
     { label: 'Active Jobs', value: String(activeJobs.length) },
-    { label: 'Pipeline Value', value: formatCurrency(pipelineValue) },
-    { label: 'Monthly Revenue', value: formatCurrency(monthlyRevenue) },
+    { label: 'Pipeline Value', value: formatCurrencyCompact(pipelineValue) },
+    { label: 'Monthly Revenue', value: formatCurrencyCompact(monthlyRevenue) },
     { label: 'Avg Completion Time', value: avgDays !== 'N/A' ? `${avgDays} days` : 'N/A' },
     { label: 'Total Jobs', value: String(workOrders.length) },
     { label: 'Completed', value: String(completedOrders.length) },
@@ -127,9 +125,6 @@ function deriveDepartmentScorecards(workOrders: ApiWorkOrder[]): DepartmentScore
   const totalValue = workOrders.reduce((sum, wo) => sum + wo.job_value, 0);
   const avgDealSize = workOrders.length > 0 ? Math.round(totalValue / workOrders.length) : 0;
 
-  const formatCurrency = (v: number) =>
-    v >= 1000 ? `$${(v / 1000).toFixed(1)}k` : `$${v}`;
-
   return [
     {
       department: 'Sales',
@@ -137,8 +132,8 @@ function deriveDepartmentScorecards(workOrders: ApiWorkOrder[]): DepartmentScore
       metrics: [
         { label: 'Total Orders', value: String(workOrders.length), subtext: `${activeJobs.length} active` },
         { label: 'Completed', value: String(completedJobs.length) },
-        { label: 'Avg Deal Size', value: formatCurrency(avgDealSize) },
-        { label: 'Pipeline', value: formatCurrency(activeJobs.reduce((s, wo) => s + wo.job_value, 0)), subtext: `${activeJobs.length} open` },
+        { label: 'Avg Deal Size', value: formatCurrencyCompact(avgDealSize) },
+        { label: 'Pipeline', value: formatCurrencyCompact(activeJobs.reduce((s, wo) => s + wo.job_value, 0)), subtext: `${activeJobs.length} open` },
       ],
     },
     {

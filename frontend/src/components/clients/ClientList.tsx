@@ -1,6 +1,7 @@
 'use client';
 
 import { Client } from '@/lib/types';
+import { formatCurrency } from '@/lib/format';
 
 const tagColors: Record<string, string> = {
   VIP: 'bg-amber-100 text-amber-700',
@@ -97,8 +98,8 @@ export default function ClientList({
                 </span>
               </div>
               <p className="truncate font-[family-name:var(--font-dm-mono)] text-xs text-gray-400">
-                {client.projectCount} project{client.projectCount !== 1 ? 's' : ''} &middot; $
-                {client.totalSpent.toLocaleString()}
+                {client.projectCount} project{client.projectCount !== 1 ? 's' : ''} &middot;{' '}
+                {formatCurrency(client.totalSpent)}
               </p>
               {client.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1">

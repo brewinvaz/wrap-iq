@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Client } from '@/lib/types';
 import { api, ApiError } from '@/lib/api-client';
+import { formatCurrency } from '@/lib/format';
 
 const tagColors: Record<string, string> = {
   VIP: 'bg-amber-100 text-amber-700',
@@ -132,7 +133,7 @@ export default function ClientDetail({ client }: ClientDetailProps) {
             <InfoRow label="Total Projects" value={String(client.projectCount)} />
             <InfoRow
               label="Total Spent"
-              value={`$${client.totalSpent.toLocaleString()}`}
+              value={formatCurrency(client.totalSpent)}
             />
             {client.lastProject && (
               <InfoRow
