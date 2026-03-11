@@ -24,7 +24,7 @@ async def default_plan(db_session):
 async def test_register(auth_service, default_plan):
     result = await auth_service.register(
         email="admin@newshop.com",
-        password="securepass123",
+        password="SecurePass123",
         org_name="New Wrap Shop",
     )
     assert "access_token" in result
@@ -40,26 +40,26 @@ async def test_register(auth_service, default_plan):
 
 async def test_register_duplicate_email(auth_service, default_plan):
     await auth_service.register(
-        email="dupe@shop.com", password="Testpass123", org_name="Shop 1"
+        email="dupe@shop.com", password="TestPass123", org_name="Shop 1"
     )
     with pytest.raises(ValueError, match="already registered"):
         await auth_service.register(
-            email="dupe@shop.com", password="pass456", org_name="Shop 2"
+            email="dupe@shop.com", password="Pass456ab", org_name="Shop 2"
         )
 
 
 async def test_login(auth_service, default_plan):
     await auth_service.register(
-        email="login@shop.com", password="Testpass123", org_name="Login Shop"
+        email="login@shop.com", password="TestPass123", org_name="Login Shop"
     )
-    result = await auth_service.login(email="login@shop.com", password="Testpass123")
+    result = await auth_service.login(email="login@shop.com", password="TestPass123")
     assert "access_token" in result
     assert "refresh_token" in result
 
 
 async def test_login_wrong_password(auth_service, default_plan):
     await auth_service.register(
-        email="wrong@shop.com", password="correct", org_name="Wrong Shop"
+        email="wrong@shop.com", password="Correct1a", org_name="Wrong Shop"
     )
     with pytest.raises(ValueError, match="Invalid"):
         await auth_service.login(email="wrong@shop.com", password="incorrect")

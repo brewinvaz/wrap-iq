@@ -14,7 +14,7 @@ async def _register_user(client, db_session, role: Role = Role.ADMIN):
         "/api/auth/register",
         json={
             "email": "admin@shop.com",
-            "password": "Testpass123",
+            "password": "TestPass123",
             "org_name": "My Shop",
         },
     )
@@ -50,7 +50,7 @@ async def _register_non_admin(client, db_session, role: Role = Role.INSTALLER):
         "/api/auth/register",
         json={
             "email": "installer@shop.com",
-            "password": "Testpass123",
+            "password": "TestPass123",
             "org_name": "Installer Shop",
         },
     )

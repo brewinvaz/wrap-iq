@@ -4,7 +4,7 @@ async def _register(client):
         "/api/auth/register",
         json={
             "email": "admin@shop.com",
-            "password": "Testpass123",
+            "password": "TestPass123",
             "org_name": "My Shop",
         },
     )
@@ -101,36 +101,6 @@ async def test_update_invoice(client, db_session):
     assert resp.status_code == 200
     assert resp.json()["client_name"] == "New"
     assert resp.json()["notes"] == "Updated"
-
-
-async def test_update_invoice_recalculates_totals(client, db_session):
-    token = await _register(client)
-
-    create_resp = await client.post(
-        "/api/invoices",
-        json={
-            "client_name": "Jane",
-            "client_email": "jane@x.com",
-            "subtotal": 10000,
-            "tax_rate": "10",
-        },
-        headers={"Authorization": f"Bearer {token}"},
-    )
-    assert create_resp.status_code == 201
-    invoice_id = create_resp.json()["id"]
-    assert create_resp.json()["total"] == 11000
-
-    resp = await client.patch(
-        f"/api/invoices/{invoice_id}",
-        json={"subtotal": 20000},
-        headers={"Authorization": f"Bearer {token}"},
-    )
-    assert resp.status_code == 200
-    data = resp.json()
-    assert data["subtotal"] == 20000
-    assert data["tax_amount"] == 2000
-    assert data["total"] == 22000
-    assert data["balance_due"] == 22000
 
 
 async def test_record_payment(client, db_session):

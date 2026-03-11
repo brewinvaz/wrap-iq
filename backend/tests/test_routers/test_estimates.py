@@ -4,7 +4,7 @@ async def _register(client):
         "/api/auth/register",
         json={
             "email": "admin@shop.com",
-            "password": "Testpass123",
+            "password": "TestPass123",
             "org_name": "My Shop",
         },
     )
