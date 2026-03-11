@@ -42,6 +42,8 @@ class InvoiceCreate(BaseModel):
 class InvoiceUpdate(BaseModel):
     client_name: str | None = None
     client_email: str | None = None
+    subtotal: int | None = None
+    tax_rate: Decimal | None = None
     due_date: datetime | None = None
     notes: str | None = None
 

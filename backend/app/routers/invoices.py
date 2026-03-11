@@ -76,16 +76,13 @@ async def update_invoice(
     user: User = Depends(require_role(Role.ADMIN, Role.PROJECT_MANAGER)),
 ):
     service = InvoiceService(session)
-    invoice = await service.get(invoice_id, user.organization_id)
+    invoice = await service.update(
+        invoice_id,
+        user.organization_id,
+        **data.model_dump(exclude_unset=True),
+    )
     if not invoice:
         raise HTTPException(status_code=404, detail="Invoice not found")
-
-    for key, value in data.model_dump(exclude_unset=True).items():
-        if value is not None:
-            setattr(invoice, key, value)
-
-    await session.commit()
-    await session.refresh(invoice)
     return invoice
 
 

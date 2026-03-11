@@ -92,6 +92,37 @@ class InvoiceService:
         )
         return result.scalar_one_or_none()
 
+    async def update(
+        self,
+        invoice_id: uuid.UUID,
+        org_id: uuid.UUID,
+        **fields,
+    ) -> "Invoice | None":
+        invoice = await self.get(invoice_id, org_id)
+        if not invoice:
+            return None
+
+        for key, value in fields.items():
+            if value is not None:
+                setattr(invoice, key, value)
+
+        # Recalculate derived fields when subtotal or tax_rate changes
+        if "subtotal" in fields or "tax_rate" in fields:
+            subtotal = invoice.subtotal
+            tax_rate = invoice.tax_rate
+            tax_amount = int(
+                subtotal * tax_rate / Decimal("100")
+            )
+            invoice.tax_amount = tax_amount
+            invoice.total = subtotal + tax_amount
+            invoice.balance_due = (
+                invoice.total - invoice.amount_paid
+            )
+
+        await self.session.commit()
+        await self.session.refresh(invoice)
+        return invoice
+
     async def record_payment(
         self,
         invoice_id: uuid.UUID,
