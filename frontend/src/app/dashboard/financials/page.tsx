@@ -1,13 +1,24 @@
 'use client';
 
-const stats = [
-  { label: 'Revenue (MTD)', value: '$48,320', change: '+12.4%', up: true },
-  { label: 'Outstanding Invoices', value: '$18,750', change: '6 pending', up: false },
-  { label: 'Avg Job Value', value: '$3,210', change: '+5.2%', up: true },
-  { label: 'Expenses (MTD)', value: '$22,180', change: '-3.1%', up: true },
-];
+import { useState, useEffect, useCallback } from 'react';
+import { api } from '@/lib/api-client';
+import CreateInvoiceModal from '@/components/invoices/CreateInvoiceModal';
 
-const invoices = [
+interface Invoice {
+  id: string;
+  invoice_number: string;
+  client_name: string;
+  total: number;
+  status: string;
+  created_at: string;
+}
+
+interface InvoiceListResponse {
+  items: Invoice[];
+  total: number;
+}
+
+const fallbackInvoices = [
   { id: 'INV-1042', client: 'Metro Plumbing', amount: '$4,800', status: 'paid', date: '2026-03-08' },
   { id: 'INV-1041', client: 'FastFreight Inc.', amount: '$6,200', status: 'pending', date: '2026-03-06' },
   { id: 'INV-1040', client: 'CleanCo Services', amount: '$3,100', status: 'pending', date: '2026-03-05' },
@@ -15,6 +26,13 @@ const invoices = [
   { id: 'INV-1038', client: 'Skyline Moving', amount: '$8,500', status: 'overdue', date: '2026-02-25' },
   { id: 'INV-1037', client: 'Summit Electric', amount: '$2,400', status: 'paid', date: '2026-02-22' },
   { id: 'INV-1036', client: 'Greenfield Lawn Care', amount: '$1,900', status: 'paid', date: '2026-02-20' },
+];
+
+const stats = [
+  { label: 'Revenue (MTD)', value: '$48,320', change: '+12.4%', up: true },
+  { label: 'Outstanding Invoices', value: '$18,750', change: '6 pending', up: false },
+  { label: 'Avg Job Value', value: '$3,210', change: '+5.2%', up: true },
+  { label: 'Expenses (MTD)', value: '$22,180', change: '-3.1%', up: true },
 ];
 
 const monthlySummary = [
@@ -27,9 +45,36 @@ const statusStyle: Record<string, { bg: string; text: string }> = {
   paid: { bg: 'bg-emerald-50', text: 'text-emerald-700' },
   pending: { bg: 'bg-amber-50', text: 'text-amber-700' },
   overdue: { bg: 'bg-rose-50', text: 'text-rose-700' },
+  draft: { bg: 'bg-gray-50', text: 'text-gray-700' },
 };
 
+function formatCents(cents: number): string {
+  return `$${(cents / 100).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+}
+
 export default function FinancialsPage() {
+  const [showModal, setShowModal] = useState(false);
+  const [apiInvoices, setApiInvoices] = useState<Invoice[] | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        const data = await api.get<InvoiceListResponse>('/api/invoices');
+        if (!cancelled) setApiInvoices(data.items);
+      } catch {
+        if (!cancelled) setApiInvoices(null);
+      }
+    }
+    load();
+    return () => { cancelled = true; };
+  }, [refreshKey]);
+
+  const handleInvoiceCreated = useCallback(() => {
+    setRefreshKey((k) => k + 1);
+  }, []);
+
   return (
     <div className="flex h-full flex-col">
       <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
@@ -37,7 +82,10 @@ export default function FinancialsPage() {
           <div className="flex items-center gap-3">
             <h1 className="text-xl font-bold text-[#18181b]">Financials</h1>
           </div>
-          <button className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700">
+          <button
+            onClick={() => setShowModal(true)}
+            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+          >
             + New Invoice
           </button>
         </div>
@@ -102,26 +150,49 @@ export default function FinancialsPage() {
               </tr>
             </thead>
             <tbody>
-              {invoices.map((inv) => {
-                const s = statusStyle[inv.status];
-                return (
-                  <tr key={inv.id} className="border-b border-[#e6e6eb] last:border-0 hover:bg-[#f4f4f6]/50">
-                    <td className="px-4 py-3 font-medium text-[#18181b]">{inv.id}</td>
-                    <td className="px-4 py-3 text-[#60606a]">{inv.client}</td>
-                    <td className="px-4 py-3 font-medium text-[#18181b]">{inv.amount}</td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium capitalize ${s.bg} ${s.text}`}>
-                        {inv.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-[#60606a]">{inv.date}</td>
-                  </tr>
-                );
-              })}
+              {apiInvoices
+                ? apiInvoices.map((inv) => {
+                    const s = statusStyle[inv.status] ?? statusStyle.pending;
+                    return (
+                      <tr key={inv.id} className="border-b border-[#e6e6eb] last:border-0 hover:bg-[#f4f4f6]/50">
+                        <td className="px-4 py-3 font-medium text-[#18181b]">{inv.invoice_number}</td>
+                        <td className="px-4 py-3 text-[#60606a]">{inv.client_name}</td>
+                        <td className="px-4 py-3 font-medium text-[#18181b]">{formatCents(inv.total)}</td>
+                        <td className="px-4 py-3">
+                          <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium capitalize ${s.bg} ${s.text}`}>
+                            {inv.status}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-[#60606a]">{inv.created_at.slice(0, 10)}</td>
+                      </tr>
+                    );
+                  })
+                : fallbackInvoices.map((inv) => {
+                    const s = statusStyle[inv.status];
+                    return (
+                      <tr key={inv.id} className="border-b border-[#e6e6eb] last:border-0 hover:bg-[#f4f4f6]/50">
+                        <td className="px-4 py-3 font-medium text-[#18181b]">{inv.id}</td>
+                        <td className="px-4 py-3 text-[#60606a]">{inv.client}</td>
+                        <td className="px-4 py-3 font-medium text-[#18181b]">{inv.amount}</td>
+                        <td className="px-4 py-3">
+                          <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium capitalize ${s.bg} ${s.text}`}>
+                            {inv.status}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-[#60606a]">{inv.date}</td>
+                      </tr>
+                    );
+                  })}
             </tbody>
           </table>
         </div>
       </div>
+
+      <CreateInvoiceModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onCreate={handleInvoiceCreated}
+      />
     </div>
   );
 }
