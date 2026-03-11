@@ -32,7 +32,9 @@ class TestGenerateObjectKey:
         org_id = uuid.uuid4()
         key = generate_object_key(org_id, "../etc/passwd", prefix="renders")
         assert ".." not in key
-        assert "/" not in key.split("/renders/")[1] or "_" in key
+        suffix = key.split("/renders/")[1]
+        # suffix should be "{unique}_etcpasswd" — no slashes
+        assert suffix.count("/") == 0
 
 
 class TestUploadObject:
@@ -43,6 +45,7 @@ class TestUploadObject:
         upload_object("org/renders/test.jpg", b"image-data", "image/jpeg")
         mock_s3.put_object.assert_called_once()
         call_kwargs = mock_s3.put_object.call_args[1]
+        assert call_kwargs["Bucket"] is not None
         assert call_kwargs["Key"] == "org/renders/test.jpg"
         assert call_kwargs["Body"] == b"image-data"
         assert call_kwargs["ContentType"] == "image/jpeg"
@@ -58,4 +61,6 @@ class TestDownloadObject:
         mock_get_client.return_value = mock_s3
         result = download_object("org/renders/test.jpg")
         assert result == b"image-bytes"
-        mock_s3.get_object.assert_called_once()
+        call_kwargs = mock_s3.get_object.call_args[1]
+        assert call_kwargs["Bucket"] is not None
+        assert call_kwargs["Key"] == "org/renders/test.jpg"
