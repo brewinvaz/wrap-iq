@@ -226,8 +226,20 @@ async def test_non_admin_cannot_query_other_users_logs(client, db_session):
     )
     await db_session.commit()
 
-    # Create audit logs for this user and for a different user in the same org
-    other_user_id = uuid.uuid4()
+    # Create a second user in the same org to simulate cross-user audit logs
+    from app.auth.passwords import hash_password
+
+    other_user = User(
+        email="other@shop.com",
+        password_hash=hash_password("testpass123"),
+        role=Role.INSTALLER,
+        is_active=True,
+        organization_id=org_id,
+    )
+    db_session.add(other_user)
+    await db_session.flush()
+    other_user_id = other_user.id
+
     service = AuditLogService(db_session)
     await service.create_log(
         organization_id=org_id,
