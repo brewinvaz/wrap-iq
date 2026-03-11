@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import KanbanBoard from '@/components/kanban/KanbanBoard';
 import MetricsBar from '@/components/dashboard/MetricsBar';
 import { api, ApiError } from '@/lib/api-client';
+import { formatCurrencyCompact } from '@/lib/format';
 import { KanbanColumn, KPIMetric, ProjectCard } from '@/lib/types';
 
 // ---------------------------------------------------------------------------
@@ -98,11 +99,7 @@ function computeKPIs(workOrders: WorkOrderResponse[], stages: KanbanStageRespons
   const pipelineValue = active.reduce((sum, wo) => sum + wo.job_value, 0);
   const totalValue = workOrders.reduce((sum, wo) => sum + wo.job_value, 0);
 
-  const formatCurrency = (cents: number) => {
-    const dollars = cents / 100;
-    if (dollars >= 1000) return `$${(dollars / 1000).toFixed(1)}k`;
-    return `$${dollars.toLocaleString()}`;
-  };
+  const formatCurrency = formatCurrencyCompact;
 
   return [
     {

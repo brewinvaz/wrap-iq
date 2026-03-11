@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { formatCurrency } from '@/lib/format';
 import { ProjectCard } from '@/lib/types';
 
 const priorityColors: Record<string, string> = {
@@ -20,14 +21,6 @@ const tagStyles: Record<string, { bg: string; text: string }> = {
   install: { bg: 'bg-indigo-50 text-indigo-700', text: 'Install' },
 };
 
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
-}
 
 function formatDate(dateStr: string): string {
   const date = new Date(dateStr + 'T00:00:00');

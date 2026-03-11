@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { api, ApiError } from '@/lib/api-client';
+import { formatCurrency } from '@/lib/format';
 import CreateWorkOrderModal from '@/components/work-orders/CreateWorkOrderModal';
 
 // --- API response types ---
@@ -57,11 +58,6 @@ function formatDate(iso: string | null): string {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-function formatCurrency(cents: number): string {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(
-    cents / 100,
-  );
-}
 
 function vehicleSummary(vehicles: WorkOrder['vehicles']): string {
   if (vehicles.length === 0) return '—';

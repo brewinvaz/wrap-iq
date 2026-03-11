@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { api, ApiError } from '@/lib/api-client';
+import { formatCurrency } from '@/lib/format';
 import { ProjectDetail, Note, ProjectPhoto } from '@/lib/types';
 
 // --- API response types ---
@@ -140,14 +141,6 @@ const statusColors: Record<string, string> = {
   Complete: '#6b7280',
 };
 
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
-}
 
 function formatDate(dateStr: string): string {
   if (dateStr === 'TBD' || dateStr === 'N/A') return dateStr;
