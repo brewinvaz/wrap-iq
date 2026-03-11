@@ -49,11 +49,11 @@ async def list_time_logs(
     session: AsyncSession = Depends(get_session),
     user: User = Depends(get_current_user),
 ):
-    query = select(TimeLog).where(
-        TimeLog.organization_id == user.organization_id
-    )
-    count_query = select(func.count()).select_from(TimeLog).where(
-        TimeLog.organization_id == user.organization_id
+    query = select(TimeLog).where(TimeLog.organization_id == user.organization_id)
+    count_query = (
+        select(func.count())
+        .select_from(TimeLog)
+        .where(TimeLog.organization_id == user.organization_id)
     )
 
     if status_filter:

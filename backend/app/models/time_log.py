@@ -19,9 +19,7 @@ class TimeLog(Base, TenantMixin, TimestampMixin):
     __tablename__ = "time_logs"
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(
-        Uuid, ForeignKey("users.id"), index=True
-    )
+    user_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("users.id"), index=True)
     work_order_id: Mapped[uuid.UUID | None] = mapped_column(
         Uuid, ForeignKey("work_orders.id"), index=True, nullable=True
     )
