@@ -28,10 +28,10 @@ def upgrade() -> None:
         sa.Column(
             "system_status",
             sa.Enum(
-                "LEAD",
-                "IN_PROGRESS",
-                "COMPLETED",
-                "CANCELLED",
+                "lead",
+                "in_progress",
+                "completed",
+                "cancelled",
                 name="systemstatus",
             ),
             nullable=True,

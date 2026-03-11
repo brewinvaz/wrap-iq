@@ -25,7 +25,7 @@ def upgrade() -> None:
         sa.Column("message", sa.Text(), nullable=False),
         sa.Column(
             "notification_type",
-            sa.Enum("INFO", "WARNING", "SUCCESS", "ERROR", name="notificationtype"),
+            sa.Enum("info", "warning", "success", "error", name="notificationtype"),
             nullable=False,
         ),
         sa.Column("is_read", sa.Boolean(), nullable=False, server_default="false"),
