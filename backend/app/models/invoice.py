@@ -38,7 +38,7 @@ class Invoice(Base, TenantMixin, TimestampMixin):
         default=InvoiceStatus.DRAFT,
     )
     subtotal: Mapped[int] = mapped_column(Integer, default=0)
-    tax_rate: Mapped[Decimal] = mapped_column(Numeric(5, 4), default=Decimal("0"))
+    tax_rate: Mapped[Decimal] = mapped_column(Numeric(5, 2), default=Decimal("0"))
     tax_amount: Mapped[int] = mapped_column(Integer, default=0)
     total: Mapped[int] = mapped_column(Integer, default=0)
     amount_paid: Mapped[int] = mapped_column(Integer, default=0)

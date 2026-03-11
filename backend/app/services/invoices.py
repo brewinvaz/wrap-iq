@@ -33,7 +33,7 @@ class InvoiceService:
         notes: str | None = None,
     ) -> Invoice:
         invoice_number = await self._generate_invoice_number(org_id)
-        tax_amount = int(subtotal * tax_rate)
+        tax_amount = int(subtotal * tax_rate / Decimal("100"))
         total = subtotal + tax_amount
 
         invoice = Invoice(

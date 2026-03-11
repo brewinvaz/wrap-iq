@@ -19,7 +19,7 @@ async def test_create_estimate(client, db_session):
         json={
             "client_name": "John Doe",
             "client_email": "john@example.com",
-            "tax_rate": "0.08",
+            "tax_rate": "8",
             "notes": "Rush job",
             "line_items": [
                 {"description": "Full wrap", "unit_price": 250000},

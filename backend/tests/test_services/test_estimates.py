@@ -40,7 +40,7 @@ async def test_create_estimate(db_session):
                 "unit_price": 50000,
             },
         ],
-        tax_rate=Decimal("0.08"),
+        tax_rate=Decimal("8"),
         notes="Rush job",
     )
 
@@ -180,7 +180,7 @@ async def test_add_line_item(db_session):
         client_name="John",
         client_email="john@x.com",
         line_items=[{"description": "Item 1", "unit_price": 10000}],
-        tax_rate=Decimal("0.10"),
+        tax_rate=Decimal("10"),
     )
 
     item = await service.add_line_item(
@@ -231,7 +231,7 @@ async def test_recalculate(db_session):
         line_items=[
             {"description": "Item", "quantity": Decimal("2"), "unit_price": 10000},
         ],
-        tax_rate=Decimal("0.05"),
+        tax_rate=Decimal("5"),
     )
 
     assert estimate.subtotal == 20000
@@ -268,7 +268,7 @@ async def test_convert_to_invoice(db_session):
         client_name="John",
         client_email="john@x.com",
         line_items=[{"description": "Full wrap", "unit_price": 250000}],
-        tax_rate=Decimal("0.08"),
+        tax_rate=Decimal("8"),
     )
 
     # Must accept before converting
