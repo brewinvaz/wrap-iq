@@ -13,5 +13,6 @@ class UserResponse(BaseModel):
     is_superadmin: bool
     first_name: str | None = None
     last_name: str | None = None
+    full_name: str | None = None
 
     model_config = {"from_attributes": True}
