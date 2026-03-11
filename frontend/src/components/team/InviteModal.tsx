@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { roleLabels } from '@/lib/role-config';
+import { useModalAccessibility } from '@/hooks/useModalAccessibility';
 
 const invitableRoles = [
   'project_manager',
@@ -24,6 +25,7 @@ export default function InviteModal({
 }: InviteModalProps) {
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('installer');
+  const modalRef = useModalAccessibility(isOpen, onClose);
 
   if (!isOpen) return null;
 
@@ -45,9 +47,15 @@ export default function InviteModal({
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+      <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="invite-modal-title"
+        className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
+      >
         <div className="mb-6 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-[#18181b]">
+          <h3 id="invite-modal-title" className="text-lg font-semibold text-[#18181b]">
             Invite Team Member
           </h3>
           <button

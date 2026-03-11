@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { api, ApiError } from '@/lib/api-client';
+import { useModalAccessibility } from '@/hooks/useModalAccessibility';
 
 interface Client {
   id: string;
@@ -39,6 +40,7 @@ export default function CreateWorkOrderModal({
   const [isLoadingClients, setIsLoadingClients] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const modalRef = useModalAccessibility(isOpen, onClose);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -120,9 +122,15 @@ export default function CreateWorkOrderModal({
         onClick={onClose}
       />
 
-      <div className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
+      <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="create-work-order-title"
+        className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
+      >
         <div className="mb-6 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-[#18181b]">
+          <h3 id="create-work-order-title" className="text-lg font-semibold text-[#18181b]">
             Create Work Order
           </h3>
           <button

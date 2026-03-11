@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { APIKeyScope } from '@/lib/types';
 import ScopeSelector from './ScopeSelector';
+import { useModalAccessibility } from '@/hooks/useModalAccessibility';
 
 interface CreateKeyModalProps {
   isOpen: boolean;
@@ -26,6 +27,7 @@ export default function CreateKeyModal({
   const [scopes, setScopes] = useState<string[]>([]);
   const [rateLimitPerMinute, setRateLimitPerMinute] = useState(60);
   const [rateLimitPerDay, setRateLimitPerDay] = useState(10000);
+  const modalRef = useModalAccessibility(isOpen, onClose);
 
   if (!isOpen) return null;
 
@@ -52,9 +54,15 @@ export default function CreateKeyModal({
         onClick={onClose}
       />
 
-      <div className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
+      <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="create-key-title"
+        className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
+      >
         <div className="mb-6 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-[#18181b]">
+          <h3 id="create-key-title" className="text-lg font-semibold text-[#18181b]">
             Generate New API Key
           </h3>
           <button
