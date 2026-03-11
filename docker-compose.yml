@@ -28,6 +28,8 @@ services:
       - "8000:8000"
     volumes:
       - ./backend/app:/app/app
+    env_file:
+      - ./backend/.env
     environment:
       - DATABASE_URL=${DATABASE_URL:-postgresql+asyncpg://postgres:postgres@db:5432/wrapiq}
       - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
@@ -63,6 +65,8 @@ services:
     command: uv run python -m arq app.worker.WorkerSettings
     volumes:
       - ./backend/app:/app/app
+    env_file:
+      - ./backend/.env
     environment:
       - DATABASE_URL=${DATABASE_URL:-postgresql+asyncpg://postgres:postgres@db:5432/wrapiq}
       - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}

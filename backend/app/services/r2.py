@@ -40,10 +40,10 @@ def _get_client():
     )
 
 
-def generate_object_key(org_id: uuid.UUID, filename: str) -> str:
+def generate_object_key(org_id: uuid.UUID, filename: str, prefix: str = "onboarding") -> str:
     safe_filename = filename.replace("/", "_").replace("\\", "_").replace("..", "")
     unique = uuid.uuid4().hex[:8]
-    return f"{org_id}/onboarding/{unique}_{safe_filename}"
+    return f"{org_id}/{prefix}/{unique}_{safe_filename}"
 
 
 def generate_upload_url(key: str, content_type: str, expires_in: int = 900) -> str:
@@ -81,6 +81,24 @@ def delete_object(key: str) -> None:
     """Delete an object from R2."""
     client = _get_client()
     client.delete_object(Bucket=settings.r2_bucket_name, Key=key)
+
+
+def upload_object(key: str, data: bytes, content_type: str) -> None:
+    """Upload bytes directly to R2."""
+    client = _get_client()
+    client.put_object(
+        Bucket=settings.r2_bucket_name,
+        Key=key,
+        Body=data,
+        ContentType=content_type,
+    )
+
+
+def download_object(key: str) -> bytes:
+    """Download an object from R2 and return its bytes."""
+    client = _get_client()
+    response = client.get_object(Bucket=settings.r2_bucket_name, Key=key)
+    return response["Body"].read()
 
 
 def validate_file_keys(
