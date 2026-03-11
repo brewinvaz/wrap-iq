@@ -9,8 +9,11 @@ export class ApiError extends Error {
     public statusText: string,
     public body: unknown,
   ) {
-    const msg = typeof body === 'object' && body !== null && 'detail' in body
-      ? String((body as Record<string, unknown>).detail)
+    const detail = typeof body === 'object' && body !== null && 'detail' in body
+      ? (body as Record<string, unknown>).detail
+      : null;
+    const msg = detail !== null
+      ? (typeof detail === 'string' ? detail : JSON.stringify(detail))
       : statusText;
     super(msg);
     this.name = 'ApiError';
