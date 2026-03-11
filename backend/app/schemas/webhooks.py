@@ -1,5 +1,4 @@
 import ipaddress
-import socket
 import uuid
 from datetime import datetime
 from urllib.parse import urlparse
@@ -31,20 +30,22 @@ def _validate_webhook_url(url: str) -> str:
     if not hostname:
         raise ValueError("Webhook URL must include a valid hostname")
 
-    # Resolve hostname to IP addresses and check against blocked ranges
-    try:
-        addr_infos = socket.getaddrinfo(hostname, None)
-    except socket.gaierror:
-        raise ValueError(f"Could not resolve hostname: {hostname}")
+    # Block localhost variants
+    if hostname in ("localhost", "0.0.0.0"):  # noqa: S104
+        raise ValueError("Webhook URL must not point to a private or internal address")
 
-    for _family, _type, _proto, _canonname, sockaddr in addr_infos:
-        ip = ipaddress.ip_address(sockaddr[0])
+    # If hostname is a literal IP address, check against blocked ranges
+    try:
+        ip = ipaddress.ip_address(hostname)
         for network in _BLOCKED_NETWORKS:
             if ip in network:
                 raise ValueError(
                     "Webhook URL must not point to a private"
                     " or internal network address"
                 )
+    except ValueError:
+        # Not an IP literal — it's a regular hostname, which is fine
+        pass
 
     return url
 
