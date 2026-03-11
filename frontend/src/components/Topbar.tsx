@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useSidebar } from '@/lib/sidebar-context';
 import { api } from '@/lib/api-client';
 
@@ -86,9 +86,17 @@ const TYPE_COLORS: Record<string, string> = {
 export default function Topbar({ subtitle, actionLabel, onAction }: TopbarProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toggleMobile } = useSidebar();
   const [searchQuery, setSearchQuery] = useState('');
   const title = ROUTE_TITLES[pathname] ?? 'Dashboard';
+
+  // Sync search bar with URL query param when on work-orders page
+  useEffect(() => {
+    if (pathname === '/dashboard/work-orders') {
+      setSearchQuery(searchParams.get('q') ?? '');
+    }
+  }, [pathname, searchParams]);
 
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<Notification[]>([]);

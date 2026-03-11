@@ -105,6 +105,7 @@ export default function WorkOrdersPage() {
   const [stages, setStages] = useState<KanbanStageResponse[]>([]);
   const [activeStage, setActiveStage] = useState<string | null>(null);
   const [search, setSearch] = useState(searchParams.get('q') ?? '');
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(0);
@@ -126,6 +127,7 @@ export default function WorkOrdersPage() {
     try {
       const params = new URLSearchParams({ skip: String(page * limit), limit: String(limit) });
       if (activeStage) params.set('status_id', activeStage);
+      if (debouncedSearch) params.set('search', debouncedSearch);
       const data = await api.get<WorkOrderListResponse>(`/api/work-orders?${params}`);
       setWorkOrders(data.items);
       setTotal(data.total);
@@ -134,13 +136,21 @@ export default function WorkOrdersPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, activeStage]);
+  }, [page, activeStage, debouncedSearch]);
 
   // Sync search state when query param changes (e.g. from topbar search)
   useEffect(() => {
     const q = searchParams.get('q') ?? '';
     setSearch(q);
+    setDebouncedSearch(q);
+    setPage(0);
   }, [searchParams]);
+
+  // Debounce local search input (300ms)
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   useEffect(() => {
     fetchStages();
@@ -149,15 +159,6 @@ export default function WorkOrdersPage() {
   useEffect(() => {
     fetchWorkOrders();
   }, [fetchWorkOrders]);
-
-  // Client-side search filter
-  const filtered = search
-    ? workOrders.filter(
-        (wo) =>
-          wo.job_number.toLowerCase().includes(search.toLowerCase()) ||
-          (wo.client_name ?? '').toLowerCase().includes(search.toLowerCase()),
-      )
-    : workOrders;
 
   const totalPages = Math.ceil(total / limit);
 
@@ -179,7 +180,7 @@ export default function WorkOrdersPage() {
               type="text"
               placeholder="Search by job # or client..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => { setSearch(e.target.value); setPage(0); }}
               className="h-9 w-56 rounded-lg border border-[#e6e6eb] bg-[#f4f4f6] px-3 text-sm text-[#18181b] placeholder-[#a8a8b4] outline-none focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
             />
             <Link
@@ -234,7 +235,7 @@ export default function WorkOrdersPage() {
 
       {/* Table */}
       <div className="flex-1 overflow-auto p-6">
-        {filtered.length === 0 && !loading ? (
+        {workOrders.length === 0 && !loading ? (
           <div className="flex h-64 flex-col items-center justify-center rounded-xl border border-[#e6e6eb] bg-white">
             <p className="text-sm font-medium text-[#18181b]">No work orders found</p>
             <p className="mt-1 text-xs text-[#60606a]">
@@ -257,7 +258,7 @@ export default function WorkOrdersPage() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((wo) => {
+                {workOrders.map((wo) => {
                   const pStyle = priorityStyles[wo.priority] ?? priorityStyles.medium;
                   return (
                     <tr key={wo.id} className="border-b border-[#e6e6eb] last:border-0 hover:bg-[#f4f4f6]/50">
