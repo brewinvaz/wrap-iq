@@ -210,9 +210,21 @@ export interface Note {
 }
 
 export interface ProjectPhoto {
+  id: string;
   url: string;
-  type: 'before' | 'after';
+  type: 'before' | 'after' | null;
   caption?: string;
+}
+
+export interface WorkOrderPhoto {
+  id: string;
+  filename: string;
+  content_type: string;
+  size_bytes: number;
+  photo_type: 'before' | 'after' | null;
+  caption: string | null;
+  url: string;
+  created_at: string;
 }
 
 // --- Subscription & Billing ---
