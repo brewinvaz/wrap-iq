@@ -32,5 +32,6 @@ class User(Base, TimestampMixin):
     )
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_superadmin: Mapped[bool] = mapped_column(Boolean, default=False)
+    full_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     organization = relationship("Organization", back_populates="users", lazy="selectin")
