@@ -210,3 +210,101 @@ async def test_generate_payment_link(db_session):
 
     updated = await service.get(invoice.id, org.id)
     assert updated.payment_link == link
+
+
+async def test_update_invoice_basic_fields(db_session):
+    org = await _seed(db_session)
+    service = InvoiceService(db_session)
+
+    invoice = await service.create(
+        org_id=org.id,
+        client_name="Old",
+        client_email="old@x.com",
+        subtotal=1000,
+    )
+
+    updated = await service.update(
+        invoice.id, org.id, client_name="New", notes="Updated"
+    )
+    assert updated is not None
+    assert updated.client_name == "New"
+    assert updated.notes == "Updated"
+    # totals unchanged
+    assert updated.subtotal == 1000
+    assert updated.total == 1000
+
+
+async def test_update_invoice_subtotal_recalculates(db_session):
+    org = await _seed(db_session)
+    service = InvoiceService(db_session)
+
+    invoice = await service.create(
+        org_id=org.id,
+        client_name="Jane",
+        client_email="jane@x.com",
+        subtotal=10000,
+        tax_rate=Decimal("10"),
+    )
+    assert invoice.tax_amount == 1000
+    assert invoice.total == 11000
+
+    updated = await service.update(
+        invoice.id, org.id, subtotal=20000
+    )
+    assert updated.subtotal == 20000
+    assert updated.tax_amount == 2000
+    assert updated.total == 22000
+    assert updated.balance_due == 22000
+
+
+async def test_update_invoice_tax_rate_recalculates(db_session):
+    org = await _seed(db_session)
+    service = InvoiceService(db_session)
+
+    invoice = await service.create(
+        org_id=org.id,
+        client_name="Jane",
+        client_email="jane@x.com",
+        subtotal=10000,
+        tax_rate=Decimal("10"),
+    )
+
+    updated = await service.update(
+        invoice.id, org.id, tax_rate=Decimal("20")
+    )
+    assert updated.tax_rate == Decimal("20")
+    assert updated.tax_amount == 2000
+    assert updated.total == 12000
+    assert updated.balance_due == 12000
+
+
+async def test_update_invoice_preserves_amount_paid(db_session):
+    org = await _seed(db_session)
+    service = InvoiceService(db_session)
+
+    invoice = await service.create(
+        org_id=org.id,
+        client_name="Jane",
+        client_email="jane@x.com",
+        subtotal=10000,
+        tax_rate=Decimal("10"),
+    )
+    # Pay 5000 of the 11000 total
+    await service.record_payment(invoice.id, org.id, amount=5000)
+
+    updated = await service.update(
+        invoice.id, org.id, subtotal=20000
+    )
+    assert updated.total == 22000
+    assert updated.amount_paid == 5000
+    assert updated.balance_due == 17000
+
+
+async def test_update_invoice_not_found(db_session):
+    org = await _seed(db_session)
+    service = InvoiceService(db_session)
+
+    result = await service.update(
+        uuid.uuid4(), org.id, client_name="X"
+    )
+    assert result is None
