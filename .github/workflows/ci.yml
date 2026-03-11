@@ -35,6 +35,7 @@ jobs:
 
   backend-test:
     name: Backend Tests
+    needs: [backend-lint, frontend-lint, frontend-build]
     runs-on: ubuntu-latest
     defaults:
       run:
