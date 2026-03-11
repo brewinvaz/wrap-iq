@@ -18,6 +18,7 @@ interface RoleContextValue {
 const RoleContext = createContext<RoleContextValue | null>(null);
 
 const STORAGE_KEY = 'wrapiq_selected_role';
+const USER_CHOSEN_KEY = 'wrapiq_role_user_chosen';
 
 /**
  * Return the role stored in localStorage, falling back to the
@@ -30,6 +31,11 @@ function getStoredRole(): RoleKey {
     return stored as RoleKey;
   }
   return DEFAULT_ROLE;
+}
+
+function wasUserChosen(): boolean {
+  if (typeof window === 'undefined') return false;
+  return localStorage.getItem(USER_CHOSEN_KEY) === '1';
 }
 
 const emptySubscribe = () => () => {};
@@ -45,11 +51,17 @@ export function RoleProvider({ children }: { children: ReactNode }) {
   const hasToken = typeof window !== 'undefined' && !!getAccessToken();
   const [roleLoading, setRoleLoading] = useState<boolean>(hasToken);
 
-  // Fetch and enforce the role from the API on mount
+  // Sync role from API on mount, but only if the user hasn't explicitly
+  // picked a role via the sidebar switcher.  This prevents the sidebar from
+  // flickering between two different nav configs on every page load (see #341).
   useEffect(() => {
     if (!hasToken) return;
 
     let cancelled = false;
+
+    // If the user explicitly chose a role via the dropdown, respect that
+    // choice and don't override it with the API value.
+    if (wasUserChosen()) return;
 
     api
       .get<{ role: string }>('/api/users/me')
@@ -82,6 +94,7 @@ export function RoleProvider({ children }: { children: ReactNode }) {
   const setRole = useCallback((role: RoleKey) => {
     setCurrentRole(role);
     localStorage.setItem(STORAGE_KEY, role);
+    localStorage.setItem(USER_CHOSEN_KEY, '1');
   }, []);
 
   const roleConfig = ROLES[currentRole];
