@@ -19,7 +19,7 @@ from app.schemas.chat_monitoring import (
     SuggestedUpdate,
 )
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("wrapiq.services.chat_monitoring")
 
 _ANALYSIS_PROMPT = (
     "You are a chat monitoring assistant for WrapIQ, "

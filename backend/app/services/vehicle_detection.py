@@ -10,7 +10,7 @@ from app.schemas.vehicle_detection import (
     VehicleDetectionResponse,
 )
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("wrapiq.services.vehicle_detection")
 
 DETECTION_PROMPT = (
     "Analyze this vehicle image. Return ONLY valid JSON (no markdown, no code "

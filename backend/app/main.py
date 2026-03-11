@@ -12,6 +12,7 @@ from starlette.responses import JSONResponse
 
 from app.config import settings
 from app.db import async_session
+from app.logging_config import setup_logging
 from app.middleware.rate_limit import limiter
 from app.routers.admin import router as admin_router
 from app.routers.ai_assistant import router as ai_assistant_router
@@ -44,6 +45,8 @@ logger = logging.getLogger("wrapiq")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Apply centralized logging configuration at startup
+    setup_logging(debug=settings.debug)
     # Startup — log external service status
     logger.info(
         "Gemini AI: %s",

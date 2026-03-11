@@ -15,7 +15,7 @@ from app.schemas.discrepancy_detection import (
     Severity,
 )
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("wrapiq.services.discrepancy_detection")
 
 DISCREPANCY_PROMPT_TEMPLATE = (
     "Analyze this vehicle image and compare it against the following vehicle "
