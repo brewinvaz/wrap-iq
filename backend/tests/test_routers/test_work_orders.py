@@ -117,14 +117,14 @@ async def test_update_work_order_status(client, db_session):
     )
     wo_id = create_resp.json()["id"]
 
-    # Get stages to find an "in_progress" stage
+    # Get stages to find an "IN_PROGRESS" stage
     stages_resp = await client.get(
         "/api/kanban-stages",
         headers={"Authorization": f"Bearer {token}"},
     )
     stages = stages_resp.json()
     in_progress_stage = next(
-        s for s in stages if s.get("system_status") == "in_progress"
+        s for s in stages if s.get("system_status") == "IN_PROGRESS"
     )
 
     resp = await client.patch(
