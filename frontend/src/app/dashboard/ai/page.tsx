@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { api, ApiError } from '@/lib/api-client';
 import { useModalAccessibility } from '@/hooks/useModalAccessibility';
 
@@ -11,12 +11,47 @@ interface AIQueryResponse {
   conversation_id: string;
 }
 
-const aiStats = [
-  { label: 'Insights Generated', value: '1,247', sub: 'Last 30 days', icon: '🧠' },
-  { label: 'Vehicle Detections', value: '98.2%', sub: 'Accuracy rate', icon: '📸' },
-  { label: 'Discrepancies Found', value: '23', sub: 'This month', icon: '⚠️' },
-  { label: 'Chat Auto-Updates', value: '156', sub: 'Cards updated', icon: '💬' },
-];
+interface ApiKanbanStage {
+  id: string;
+  name: string;
+  color: string;
+  system_status: string | null;
+}
+
+interface ApiVehicle {
+  id: string;
+  make: string | null;
+  model: string | null;
+  year: number | null;
+}
+
+interface ApiWorkOrder {
+  id: string;
+  job_number: string;
+  job_type: string;
+  job_value: number;
+  priority: string;
+  date_in: string;
+  estimated_completion_date: string | null;
+  completion_date: string | null;
+  status: ApiKanbanStage | null;
+  vehicles: ApiVehicle[];
+  client_name: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+interface ApiWorkOrderListResponse {
+  items: ApiWorkOrder[];
+  total: number;
+}
+
+interface AIStat {
+  label: string;
+  value: string;
+  sub: string;
+  icon: string;
+}
 
 interface AIActivity {
   id: string;
@@ -26,23 +61,95 @@ interface AIActivity {
   confidence?: number;
 }
 
-const recentActivity: AIActivity[] = [
-  { id: '1', type: 'detection', message: 'Vehicle detected: 2024 Ford Transit — VIN matched to Metro Plumbing fleet order', timestamp: '2 min ago', confidence: 99 },
-  { id: '2', type: 'discrepancy', message: 'Color mismatch: Client specified "Matte Black" but uploaded photo shows "Gloss Black" on FastFreight truck', timestamp: '18 min ago', confidence: 94 },
-  { id: '3', type: 'chat-update', message: 'Job card #1042 updated: Install date moved to March 12 based on team chat discussion', timestamp: '45 min ago' },
-  { id: '4', type: 'insight', message: 'Trend: Average install time decreased 12% over last 4 weeks — recommend reviewing crew scheduling', timestamp: '1 hr ago' },
-  { id: '5', type: 'detection', message: 'Vehicle detected: 2025 RAM ProMaster — new work order auto-created for CleanCo Services', timestamp: '2 hrs ago', confidence: 97 },
-  { id: '6', type: 'discrepancy', message: 'Dimension mismatch: Submitted measurements don\'t match standard 2024 Sprinter specs', timestamp: '3 hrs ago', confidence: 88 },
-  { id: '7', type: 'chat-update', message: 'Job card #1039 updated: Material changed to 3M IJ180Cv3 per designer recommendation in chat', timestamp: '4 hrs ago' },
-  { id: '8', type: 'insight', message: 'Revenue forecast: March projected at $52K based on current pipeline velocity', timestamp: '5 hrs ago' },
-];
-
 const typeStyles: Record<AIActivity['type'], { bg: string; text: string; label: string }> = {
   detection: { bg: 'bg-blue-50', text: 'text-blue-700', label: 'Detection' },
   discrepancy: { bg: 'bg-amber-50', text: 'text-amber-700', label: 'Discrepancy' },
   insight: { bg: 'bg-violet-50', text: 'text-violet-700', label: 'Insight' },
   'chat-update': { bg: 'bg-emerald-50', text: 'text-emerald-700', label: 'Auto-Update' },
 };
+
+function vehicleLabel(vehicles: ApiVehicle[]): string {
+  if (!vehicles.length) return '';
+  const v = vehicles[0];
+  const parts = [v.year, v.make, v.model].filter(Boolean);
+  return parts.length ? parts.join(' ') : '';
+}
+
+function timeAgo(dateStr: string): string {
+  const now = new Date();
+  const date = new Date(dateStr);
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 1) return 'Just now';
+  if (diffMins < 60) return `${diffMins} min ago`;
+  const diffHrs = Math.floor(diffMins / 60);
+  if (diffHrs < 24) return `${diffHrs} hr${diffHrs > 1 ? 's' : ''} ago`;
+  const diffDays = Math.floor(diffHrs / 24);
+  return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+}
+
+function deriveStats(workOrders: ApiWorkOrder[]): AIStat[] {
+  const total = workOrders.length;
+  const active = workOrders.filter((wo) => {
+    const s = wo.status?.system_status?.toLowerCase() ?? '';
+    return s !== 'completed' && s !== 'cancelled';
+  }).length;
+  const completed = workOrders.filter(
+    (wo) => wo.status?.system_status?.toLowerCase() === 'completed',
+  ).length;
+  const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
+  const totalRevenue = workOrders.reduce((sum, wo) => sum + (wo.job_value || 0), 0);
+  const revenueStr =
+    totalRevenue >= 1000
+      ? `$${(totalRevenue / 1000).toFixed(totalRevenue >= 10000 ? 0 : 1)}K`
+      : `$${totalRevenue.toLocaleString()}`;
+
+  return [
+    { label: 'Total Work Orders', value: total.toLocaleString(), sub: 'All time', icon: '\uD83D\uDCCB' },
+    { label: 'Active Jobs', value: active.toLocaleString(), sub: 'In progress', icon: '\uD83D\uDD27' },
+    { label: 'Completion Rate', value: `${completionRate}%`, sub: `${completed} completed`, icon: '\u2705' },
+    { label: 'Pipeline Value', value: revenueStr, sub: 'Total job value', icon: '\uD83D\uDCB0' },
+  ];
+}
+
+function deriveActivity(workOrders: ApiWorkOrder[]): AIActivity[] {
+  // Sort by updated_at descending and take the 10 most recent
+  const sorted = [...workOrders]
+    .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+    .slice(0, 10);
+
+  return sorted.map((wo) => {
+    const vehicle = vehicleLabel(wo.vehicles);
+    const vehiclePart = vehicle ? ` — ${vehicle}` : '';
+    const clientPart = wo.client_name ? ` for ${wo.client_name}` : '';
+    const statusName = wo.status?.name ?? 'Unknown';
+    const systemStatus = wo.status?.system_status?.toLowerCase() ?? '';
+
+    let type: AIActivity['type'];
+    let message: string;
+
+    if (systemStatus === 'completed') {
+      type = 'insight';
+      message = `Job #${wo.job_number} completed${clientPart}${vehiclePart}`;
+    } else if (wo.priority === 'high') {
+      type = 'discrepancy';
+      message = `High priority: Job #${wo.job_number} (${statusName})${clientPart}${vehiclePart}`;
+    } else if (systemStatus === 'lead') {
+      type = 'detection';
+      message = `New job #${wo.job_number} received${clientPart}${vehiclePart}`;
+    } else {
+      type = 'chat-update';
+      message = `Job #${wo.job_number} updated to "${statusName}"${clientPart}${vehiclePart}`;
+    }
+
+    return {
+      id: wo.id,
+      type,
+      message,
+      timestamp: timeAgo(wo.updated_at),
+    };
+  });
+}
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -165,7 +272,7 @@ function AskAIModal({
         <div className="flex-1 overflow-y-auto px-6 py-4">
           {messages.length === 0 && (
             <div className="flex h-full flex-col items-center justify-center text-center">
-              <span className="text-4xl">🧠</span>
+              <span className="text-4xl">{'\uD83E\uDDE0'}</span>
               <p className="mt-3 text-sm font-medium text-[#18181b]">
                 Ask anything about your shop
               </p>
@@ -232,8 +339,93 @@ function AskAIModal({
   );
 }
 
+function LoadingSkeleton() {
+  return (
+    <div className="flex h-full flex-col">
+      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-7 w-48 animate-pulse rounded bg-gray-200" />
+            <div className="h-5 w-20 animate-pulse rounded-full bg-gray-100" />
+          </div>
+          <div className="h-9 w-20 animate-pulse rounded-lg bg-gray-200" />
+        </div>
+      </header>
+      <div className="flex-1 space-y-6 overflow-auto p-6">
+        <div className="grid grid-cols-4 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="rounded-xl border border-[#e6e6eb] bg-white p-4">
+              <div className="h-3 w-24 animate-pulse rounded bg-gray-200" />
+              <div className="mt-3 h-7 w-16 animate-pulse rounded bg-gray-200" />
+              <div className="mt-2 h-3 w-20 animate-pulse rounded bg-gray-100" />
+            </div>
+          ))}
+        </div>
+        <div className="rounded-xl border border-[#e6e6eb] bg-white">
+          <div className="border-b border-[#e6e6eb] px-5 py-3">
+            <div className="h-4 w-36 animate-pulse rounded bg-gray-200" />
+          </div>
+          <div className="divide-y divide-[#e6e6eb]">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="flex items-start gap-3 px-5 py-4">
+                <div className="h-5 w-20 animate-pulse rounded-full bg-gray-200" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 w-full animate-pulse rounded bg-gray-100" />
+                  <div className="h-3 w-24 animate-pulse rounded bg-gray-100" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AIPage() {
   const [showAskAI, setShowAskAI] = useState(false);
+  const [workOrders, setWorkOrders] = useState<ApiWorkOrder[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const resp = await api.get<ApiWorkOrderListResponse>('/api/work-orders?limit=100');
+        if (!cancelled) {
+          setWorkOrders(resp?.items ?? []);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof ApiError ? err.message : 'Failed to load shop intelligence data');
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  const aiStats = useMemo(() => deriveStats(workOrders), [workOrders]);
+  const recentActivity = useMemo(() => deriveActivity(workOrders), [workOrders]);
+
+  if (loading) return <LoadingSkeleton />;
+
+  if (error) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-4">
+        <p className="text-sm font-medium text-[#18181b]">Failed to load shop intelligence</p>
+        <p className="text-xs text-[#60606a]">{error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-full flex-col">
@@ -273,25 +465,31 @@ export default function AIPage() {
             <h2 className="text-sm font-semibold text-[#18181b]">Recent AI Activity</h2>
           </div>
           <div className="divide-y divide-[#e6e6eb]">
-            {recentActivity.map((a) => {
-              const style = typeStyles[a.type];
-              return (
-                <div key={a.id} className="flex items-start gap-3 px-5 py-4">
-                  <span className={`mt-0.5 inline-flex shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${style.bg} ${style.text}`}>
-                    {style.label}
-                  </span>
-                  <div className="flex-1">
-                    <p className="text-sm text-[#18181b]">{a.message}</p>
-                    <div className="mt-1 flex items-center gap-3">
-                      <span className="text-xs text-[#a8a8b4]">{a.timestamp}</span>
-                      {a.confidence && (
-                        <span className="text-xs text-[#a8a8b4]">{a.confidence}% confidence</span>
-                      )}
+            {recentActivity.length === 0 ? (
+              <div className="px-5 py-8 text-center">
+                <p className="text-sm text-[#a8a8b4]">No recent activity to display.</p>
+              </div>
+            ) : (
+              recentActivity.map((a) => {
+                const style = typeStyles[a.type];
+                return (
+                  <div key={a.id} className="flex items-start gap-3 px-5 py-4">
+                    <span className={`mt-0.5 inline-flex shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${style.bg} ${style.text}`}>
+                      {style.label}
+                    </span>
+                    <div className="flex-1">
+                      <p className="text-sm text-[#18181b]">{a.message}</p>
+                      <div className="mt-1 flex items-center gap-3">
+                        <span className="text-xs text-[#a8a8b4]">{a.timestamp}</span>
+                        {a.confidence && (
+                          <span className="text-xs text-[#a8a8b4]">{a.confidence}% confidence</span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         </div>
       </div>
