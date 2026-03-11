@@ -14,6 +14,7 @@ interface KanbanColumnProps {
   dragOverColumnId: string | null;
   onAdvanceCard?: (cardId: string) => void;
   pendingCards?: Set<string>;
+  onAddProject?: () => void;
 }
 
 export default function KanbanColumn({
@@ -27,6 +28,7 @@ export default function KanbanColumn({
   dragOverColumnId,
   onAdvanceCard,
   pendingCards,
+  onAddProject,
 }: KanbanColumnProps) {
   const isDragOver = dragOverColumnId === column.id;
 
@@ -72,7 +74,9 @@ export default function KanbanColumn({
         ))}
 
         {/* Add project button */}
-        <button className="flex items-center justify-center gap-1.5 rounded-lg border-2 border-dashed border-[#e6e6eb] py-3 text-xs font-medium text-[#a8a8b4] transition-colors hover:border-[#60606a] hover:text-[#60606a]">
+        <button
+          onClick={onAddProject}
+          className="flex items-center justify-center gap-1.5 rounded-lg border-2 border-dashed border-[#e6e6eb] py-3 text-xs font-medium text-[#a8a8b4] transition-colors hover:border-[#60606a] hover:text-[#60606a]">
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
           </svg>

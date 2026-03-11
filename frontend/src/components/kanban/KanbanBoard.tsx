@@ -11,9 +11,11 @@ interface KanbanBoardProps {
   onStatusChange?: (cardId: string, targetColumnId: string) => void;
   /** Set of card IDs that have a pending status change in flight. */
   pendingCards?: Set<string>;
+  /** Called when the "Add project" button is clicked in any column. */
+  onAddProject?: () => void;
 }
 
-export default function KanbanBoard({ columns: externalColumns, onStatusChange, pendingCards }: KanbanBoardProps = {}) {
+export default function KanbanBoard({ columns: externalColumns, onStatusChange, pendingCards, onAddProject }: KanbanBoardProps = {}) {
   const isControlled = externalColumns !== undefined;
 
   const [internalColumns, setInternalColumns] = useState<KanbanColumnType[]>([]);
@@ -132,6 +134,7 @@ export default function KanbanBoard({ columns: externalColumns, onStatusChange, 
           dragOverColumnId={dragOverColumnId}
           onAdvanceCard={handleAdvanceCard}
           pendingCards={pendingCards}
+          onAddProject={onAddProject}
         />
       ))}
     </div>
