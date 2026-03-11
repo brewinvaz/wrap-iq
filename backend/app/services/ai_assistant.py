@@ -1,6 +1,8 @@
+import json
 import re
 import uuid
 
+import redis.asyncio as aioredis
 import sqlparse
 from google import genai
 from google.genai import types
@@ -11,6 +13,10 @@ from app.config import settings
 from app.db import engine
 from app.models.user import User
 from app.schemas.ai_assistant import QueryResponse
+
+# Conversation history settings
+_HISTORY_TTL_SECONDS = 60 * 60  # 1 hour
+_MAX_HISTORY_MESSAGES = 20  # Keep last N message pairs
 
 # SQL keywords that indicate a write operation
 _DANGEROUS_KEYWORDS = re.compile(
@@ -239,15 +245,65 @@ def ensure_outer_limit(sql: str) -> str:
 
 
 class AIAssistantService:
-    # In-memory conversation history keyed by conversation_id.
-    # Each entry is a list of Content objects representing the chat turns.
-    _conversations: dict[uuid.UUID, list[types.Content]] = {}
-
     def __init__(self) -> None:
         if not settings.gemini_api_key:
             msg = "Gemini API key is not configured"
             raise ValueError(msg)
         self._client = genai.Client(api_key=settings.gemini_api_key)
+        self._redis = aioredis.from_url(
+            settings.redis_url, decode_responses=True
+        )
+
+    def _redis_key(self, conversation_id: uuid.UUID) -> str:
+        return f"ai:conversation:{conversation_id}"
+
+    async def _get_history(
+        self, conversation_id: uuid.UUID
+    ) -> list[types.Content]:
+        """Retrieve conversation history from Redis."""
+        raw = await self._redis.get(self._redis_key(conversation_id))
+        if not raw:
+            return []
+        entries = json.loads(raw)
+        contents: list[types.Content] = []
+        for entry in entries:
+            contents.append(
+                types.Content(
+                    role=entry["role"],
+                    parts=[types.Part.from_text(text=entry["text"])],
+                )
+            )
+        return contents
+
+    async def _save_history(
+        self,
+        conversation_id: uuid.UUID,
+        history: list[types.Content],
+        user_message: str,
+        assistant_message: str,
+    ) -> None:
+        """Append the latest exchange and persist to Redis."""
+        # Rebuild serialisable list from existing history + new pair
+        entries: list[dict[str, str]] = []
+        for content in history:
+            text_val = ""
+            for part in content.parts:
+                if part.text:
+                    text_val += part.text
+            entries.append({"role": content.role, "text": text_val})
+
+        entries.append({"role": "user", "text": user_message})
+        entries.append({"role": "model", "text": assistant_message})
+
+        # Trim to max history length (pairs)
+        if len(entries) > _MAX_HISTORY_MESSAGES * 2:
+            entries = entries[-_MAX_HISTORY_MESSAGES * 2 :]
+
+        await self._redis.set(
+            self._redis_key(conversation_id),
+            json.dumps(entries),
+            ex=_HISTORY_TTL_SECONDS,
+        )
 
     async def answer_question(
         self,
@@ -257,27 +313,28 @@ class AIAssistantService:
         *,
         conversation_id: uuid.UUID | None = None,
     ) -> QueryResponse:
-        # Reuse existing conversation or start a new one
-        if conversation_id and conversation_id in self._conversations:
-            history = self._conversations[conversation_id]
-        else:
-            conversation_id = conversation_id or uuid.uuid4()
-            history = []
-            self._conversations[conversation_id] = history
+        # Use the client-provided conversation_id, or generate a new one
+        if conversation_id is None:
+            conversation_id = uuid.uuid4()
 
         system_prompt = _build_system_prompt(user)
 
-        # Append the new user message to conversation history
-        user_content = types.Content(
-            role="user",
-            parts=[types.Part.from_text(text=question)],
-        )
-        history.append(user_content)
+        # Retrieve previous conversation history from Redis
+        history = await self._get_history(conversation_id)
+
+        # Build contents: history + current user message
+        contents = [
+            *history,
+            types.Content(
+                role="user",
+                parts=[types.Part.from_text(text=question)],
+            ),
+        ]
 
         # First call: ask Gemini to answer or generate SQL via function calling
         response = await self._client.aio.models.generate_content(
             model="gemini-2.5-flash",
-            contents=history,
+            contents=contents,
             config=types.GenerateContentConfig(
                 system_instruction=system_prompt,
                 tools=[types.Tool(function_declarations=[_EXECUTE_SQL_TOOL])],
@@ -295,20 +352,16 @@ class AIAssistantService:
 
         # If no function call, return the text answer directly
         if function_call is None:
-            answer_text = (
+            answer = (
                 "\n".join(text_parts)
                 if text_parts
                 else "I could not generate an answer."
             )
-            # Store model response in conversation history
-            history.append(
-                types.Content(
-                    role="model",
-                    parts=[types.Part.from_text(text=answer_text)],
-                )
+            await self._save_history(
+                conversation_id, history, question, answer
             )
             return QueryResponse(
-                answer=answer_text,
+                answer=answer,
                 conversation_id=conversation_id,
             )
 
@@ -318,8 +371,15 @@ class AIAssistantService:
         # Validate SQL safety
         validation_error = validate_sql(sql)
         if validation_error:
+            error_answer = (
+                "I generated an unsafe query and caught it: "
+                f"{validation_error}"
+            )
+            await self._save_history(
+                conversation_id, history, question, error_answer
+            )
             return QueryResponse(
-                answer=f"I generated an unsafe query and caught it: {validation_error}",
+                answer=error_answer,
                 conversation_id=conversation_id,
             )
 
@@ -338,8 +398,15 @@ class AIAssistantService:
                 )
                 rows = [dict(row._mapping) for row in result.fetchall()]
         except Exception as exc:
+            error_answer = (
+                "I tried to query the database but encountered "
+                f"an error: {exc}"
+            )
+            await self._save_history(
+                conversation_id, history, question, error_answer
+            )
             return QueryResponse(
-                answer=f"I tried to query the database but encountered an error: {exc}",
+                answer=error_answer,
                 query_executed=sql,
                 conversation_id=conversation_id,
             )
@@ -366,20 +433,16 @@ class AIAssistantService:
             if part.text:
                 answer_parts.append(part.text)
 
-        final_answer = (
-            "\n".join(answer_parts) if answer_parts else "No summary available."
+        answer = (
+            "\n".join(answer_parts)
+            if answer_parts
+            else "No summary available."
         )
-
-        # Store model response in conversation history
-        history.append(
-            types.Content(
-                role="model",
-                parts=[types.Part.from_text(text=final_answer)],
-            )
+        await self._save_history(
+            conversation_id, history, question, answer
         )
-
         return QueryResponse(
-            answer=final_answer,
+            answer=answer,
             query_executed=sql,
             data=rows if rows else None,
             conversation_id=conversation_id,

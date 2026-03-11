@@ -92,8 +92,16 @@ async def test_work_order_with_multiple_vehicles(db_session):
     db_session.add(wo)
     await db_session.flush()
 
-    db_session.add(WorkOrderVehicle(work_order_id=wo.id, vehicle_id=v1.id))
-    db_session.add(WorkOrderVehicle(work_order_id=wo.id, vehicle_id=v2.id))
+    db_session.add(
+        WorkOrderVehicle(
+            work_order_id=wo.id, vehicle_id=v1.id, organization_id=org.id
+        )
+    )
+    db_session.add(
+        WorkOrderVehicle(
+            work_order_id=wo.id, vehicle_id=v2.id, organization_id=org.id
+        )
+    )
     await db_session.commit()
 
     result = await db_session.execute(

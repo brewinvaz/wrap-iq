@@ -342,7 +342,11 @@ async def process_upload(
             # Link vehicle if created
             if vehicle_id:
                 session.add(
-                    WorkOrderVehicle(work_order_id=wo.id, vehicle_id=vehicle_id)
+                    WorkOrderVehicle(
+                        work_order_id=wo.id,
+                        vehicle_id=vehicle_id,
+                        organization_id=org_id,
+                    )
                 )
                 await session.flush()
 

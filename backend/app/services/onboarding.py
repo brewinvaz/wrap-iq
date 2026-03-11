@@ -191,6 +191,7 @@ class OnboardingService:
         wov = WorkOrderVehicle(
             work_order_id=work_order.id,
             vehicle_id=vehicle.id,
+            organization_id=org_id,
         )
         self.session.add(wov)
 
