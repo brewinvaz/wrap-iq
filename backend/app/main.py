@@ -12,6 +12,7 @@ from starlette.responses import JSONResponse
 
 from app.config import settings
 from app.db import async_session
+from app.logging_config import setup_logging
 from app.middleware.rate_limit import limiter
 from app.routers.admin import router as admin_router
 from app.routers.ai_assistant import router as ai_assistant_router
@@ -41,6 +42,9 @@ from app.routers.webhooks import router as webhooks_router
 from app.routers.work_orders import router as work_orders_router
 
 logger = logging.getLogger("wrapiq")
+
+
+setup_logging(debug=settings.debug)
 
 
 @asynccontextmanager
