@@ -33,7 +33,7 @@ async def test_register(client):
         "/api/auth/register",
         json={
             "email": "new@shop.com",
-            "password": "testpass123",
+            "password": "Testpass123",
             "org_name": "New Shop",
         },
     )
@@ -46,11 +46,19 @@ async def test_register(client):
 async def test_register_duplicate(client):
     await client.post(
         "/api/auth/register",
-        json={"email": "dup@shop.com", "password": "testpass123", "org_name": "Shop"},
+        json={
+            "email": "dup@shop.com",
+            "password": "Testpass123",
+            "org_name": "Shop",
+        },
     )
     resp = await client.post(
         "/api/auth/register",
-        json={"email": "dup@shop.com", "password": "testpass123", "org_name": "Shop 2"},
+        json={
+            "email": "dup@shop.com",
+            "password": "Testpass123",
+            "org_name": "Shop 2",
+        },
     )
     assert resp.status_code == 409
 
@@ -60,13 +68,13 @@ async def test_login(client):
         "/api/auth/register",
         json={
             "email": "log@shop.com",
-            "password": "testpass123",
+            "password": "Testpass123",
             "org_name": "Log Shop",
         },
     )
     resp = await client.post(
         "/api/auth/login",
-        json={"email": "log@shop.com", "password": "testpass123"},
+        json={"email": "log@shop.com", "password": "Testpass123"},
     )
     assert resp.status_code == 200
     assert "access_token" in resp.json()
@@ -77,13 +85,13 @@ async def test_login_wrong_password(client):
         "/api/auth/register",
         json={
             "email": "bad@shop.com",
-            "password": "rightpass1",
+            "password": "Rightpass1",
             "org_name": "Bad Shop",
         },
     )
     resp = await client.post(
         "/api/auth/login",
-        json={"email": "bad@shop.com", "password": "wrong"},
+        json={"email": "bad@shop.com", "password": "Wrongpass1"},
     )
     assert resp.status_code == 401
 
@@ -93,7 +101,7 @@ async def test_refresh_token(client):
         "/api/auth/register",
         json={
             "email": "ref@shop.com",
-            "password": "testpass123",
+            "password": "Testpass123",
             "org_name": "Ref Shop",
         },
     )
@@ -115,7 +123,7 @@ async def test_logout(client):
         "/api/auth/register",
         json={
             "email": "out@shop.com",
-            "password": "testpass123",
+            "password": "Testpass123",
             "org_name": "Out Shop",
         },
     )
