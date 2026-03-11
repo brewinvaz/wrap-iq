@@ -20,12 +20,18 @@ async def get_me(
     )
     profile = result.scalar_one_or_none()
 
+    first_name = profile.first_name if profile else None
+    last_name = profile.last_name if profile else None
+    parts = [first_name or "", last_name or ""]
+    joined = " ".join(p for p in parts if p)
+
     return UserResponse(
         id=user.id,
         email=user.email,
         role=user.role,
         organization_id=user.organization_id,
         is_superadmin=user.is_superadmin,
-        first_name=profile.first_name if profile else None,
-        last_name=profile.last_name if profile else None,
+        first_name=first_name,
+        last_name=last_name,
+        full_name=joined or None,
     )
