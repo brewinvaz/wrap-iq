@@ -35,10 +35,12 @@ Monorepo: `frontend/` (Next.js 15, React 19) + `backend/` (FastAPI, Python 3.13)
 ## Code Change Workflow
 All code changes MUST follow this workflow:
 1. **GitHub Issue** — Create a GH issue first and add it to the WrapIQ GitHub project board (#7, owner: brewinvaz)
-2. **Git Worktree** — Create a git worktree for the fix/feature branch (e.g. `.worktrees/<branch-name>`)
-3. **Tests** — Add new tests or update existing tests for any code changes
-4. **Pull Request** — Create a PR linking to the issue
-5. **CI** — Watch CI until all checks pass; fix any failures
-6. **Merge** — Rebase and merge the PR once CI is green
-7. **Close Issue** — Move the issue to Done on the project board
-8. **Sync Main** — Pull latest changes to local main branch and clean up worktree
+2. **In Progress** — Move the issue to "In Progress" on the project board when starting work
+3. **Git Worktree** — Create a git worktree for the fix/feature branch (e.g. `.worktrees/<branch-name>`)
+4. **Tests** — Add new tests or update existing tests for any code changes
+5. **Pull Request** — Create a PR linking to the issue
+6. **In Review** — Move the issue to "In Review" on the project board when the PR is created
+7. **CI** — Watch CI until all checks pass; fix any failures
+8. **Merge** — Rebase and merge the PR once CI is green
+9. **Done** — Move the issue to "Done" on the project board and close it
+10. **Sync Main** — Pull latest changes to local main branch and clean up worktree
