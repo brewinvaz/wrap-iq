@@ -26,6 +26,7 @@ htmlcov/
 # Next.js
 .next/
 out/
+*.tsbuildinfo
 
 # Environment
 .env
@@ -63,6 +64,9 @@ docker-compose.override.yml
 
 # Wrangler
 .wrangler/
+
+# Playwright
+.playwright-mcp/
 
 # Misc
 *.bak
