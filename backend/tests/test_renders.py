@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from app.schemas.renders import FileInfo, RenderCreate, RenderUploadRequest
 from app.services.r2 import (
     download_object,
     generate_object_key,
@@ -64,3 +65,52 @@ class TestDownloadObject:
         call_kwargs = mock_s3.get_object.call_args[1]
         assert call_kwargs["Bucket"] is not None
         assert call_kwargs["Key"] == "org/renders/test.jpg"
+
+
+class TestRenderSchemas:
+    def test_render_create_valid(self):
+        data = RenderCreate(
+            design_name="Test Wrap",
+            vehicle_photo_key="org/renders/abc_photo.jpg",
+            wrap_design_key="org/renders/def_design.png",
+        )
+        assert data.design_name == "Test Wrap"
+        assert data.work_order_id is None
+
+    def test_render_create_missing_design_name(self):
+        with pytest.raises(Exception):
+            RenderCreate(
+                design_name="",
+                vehicle_photo_key="key1",
+                wrap_design_key="key2",
+            )
+
+    def test_upload_request_max_two_files(self):
+        with pytest.raises(Exception):
+            RenderUploadRequest(
+                files=[
+                    FileInfo(filename="a.jpg", content_type="image/jpeg", size_bytes=100),
+                    FileInfo(filename="b.jpg", content_type="image/jpeg", size_bytes=100),
+                    FileInfo(filename="c.jpg", content_type="image/jpeg", size_bytes=100),
+                ]
+            )
+
+    def test_upload_request_validates_content_type(self):
+        with pytest.raises(Exception):
+            RenderUploadRequest(
+                files=[
+                    FileInfo(filename="a.exe", content_type="application/exe", size_bytes=100),
+                ]
+            )
+
+    def test_upload_request_validates_file_size(self):
+        with pytest.raises(Exception):
+            RenderUploadRequest(
+                files=[
+                    FileInfo(
+                        filename="huge.jpg",
+                        content_type="image/jpeg",
+                        size_bytes=11 * 1024 * 1024,
+                    ),
+                ]
+            )
