@@ -20,6 +20,12 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const hasMinLength = password.length >= 8;
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasLowercase = /[a-z]/.test(password);
+  const hasDigit = /\d/.test(password);
+  const isPasswordValid = hasMinLength && hasUppercase && hasLowercase && hasDigit;
+
   useEffect(() => {
     if (isAuthenticated()) {
       router.replace('/dashboard');
@@ -30,8 +36,8 @@ export default function RegisterPage() {
     e.preventDefault();
     setError('');
 
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters.');
+    if (!isPasswordValid) {
+      setError('Password does not meet complexity requirements.');
       return;
     }
 
@@ -137,6 +143,22 @@ export default function RegisterPage() {
                 placeholder="Create a password (min. 8 characters)"
                 className="h-10 w-full rounded-lg border border-[#e6e6eb] bg-[#f4f4f6] px-3 text-[14px] text-[#18181b] placeholder-[#a8a8b4] outline-none transition-colors focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
               />
+              {password.length > 0 && (
+                <ul className="mt-1.5 space-y-0.5 text-[12px]">
+                  <li className={hasMinLength ? 'text-green-600' : 'text-[#a8a8b4]'}>
+                    {hasMinLength ? '\u2713' : '\u2022'} At least 8 characters
+                  </li>
+                  <li className={hasUppercase ? 'text-green-600' : 'text-[#a8a8b4]'}>
+                    {hasUppercase ? '\u2713' : '\u2022'} At least one uppercase letter
+                  </li>
+                  <li className={hasLowercase ? 'text-green-600' : 'text-[#a8a8b4]'}>
+                    {hasLowercase ? '\u2713' : '\u2022'} At least one lowercase letter
+                  </li>
+                  <li className={hasDigit ? 'text-green-600' : 'text-[#a8a8b4]'}>
+                    {hasDigit ? '\u2713' : '\u2022'} At least one digit
+                  </li>
+                </ul>
+              )}
             </div>
 
             {error && (
