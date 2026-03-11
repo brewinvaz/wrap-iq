@@ -5,7 +5,7 @@ import MetricsBar from '@/components/dashboard/MetricsBar';
 import DepartmentCard from '@/components/dashboard/DepartmentCard';
 import InsightsTable from '@/components/dashboard/InsightsTable';
 import RevenueChart from '@/components/dashboard/RevenueChart';
-import DateRangeFilter, { type Preset } from '@/components/dashboard/DateRangeFilter';
+import DateRangeFilter, { type Preset, type CustomDateRange } from '@/components/dashboard/DateRangeFilter';
 import { api, ApiError } from '@/lib/api-client';
 import { formatCurrencyCompact } from '@/lib/format';
 import {
@@ -195,9 +195,24 @@ function deriveInstallerInsights(workOrders: ApiWorkOrder[]): InstallerInsight[]
 
 // --- Date range filtering ---
 
-function filterByDateRange(workOrders: ApiWorkOrder[], preset: Preset): ApiWorkOrder[] {
+function filterByDateRange(
+  workOrders: ApiWorkOrder[],
+  preset: Preset,
+  customRange?: CustomDateRange | null,
+): ApiWorkOrder[] {
   if (!Array.isArray(workOrders)) return [];
-  if (preset === 'Custom') return workOrders;
+
+  if (preset === 'Custom') {
+    if (!customRange) return workOrders;
+    const start = new Date(customRange.startDate);
+    // Set end date to end of day so the entire end date is included
+    const end = new Date(customRange.endDate);
+    end.setHours(23, 59, 59, 999);
+    return workOrders.filter((wo) => {
+      const d = new Date(wo.date_in);
+      return d >= start && d <= end;
+    });
+  }
 
   const now = new Date();
   let startDate: Date;
@@ -290,6 +305,7 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
 export default function ReportsPage() {
   const [allWorkOrders, setAllWorkOrders] = useState<ApiWorkOrder[]>([]);
   const [dateRange, setDateRange] = useState<Preset>('30D');
+  const [customRange, setCustomRange] = useState<CustomDateRange | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -311,7 +327,19 @@ export default function ReportsPage() {
     fetchReports();
   }, [fetchReports]);
 
-  const filtered = useMemo(() => filterByDateRange(allWorkOrders, dateRange), [allWorkOrders, dateRange]);
+  const handlePresetChange = useCallback((preset: Preset) => {
+    setDateRange(preset);
+    if (preset !== 'Custom') {
+      setCustomRange(null);
+    }
+  }, []);
+
+  const handleCustomRange = useCallback((range: CustomDateRange) => {
+    setDateRange('Custom');
+    setCustomRange(range);
+  }, []);
+
+  const filtered = useMemo(() => filterByDateRange(allWorkOrders, dateRange, customRange), [allWorkOrders, dateRange, customRange]);
   const kpis = useMemo(() => deriveKPIs(filtered), [filtered]);
   const scorecards = useMemo(() => deriveDepartmentScorecards(filtered), [filtered]);
   const insights = useMemo(() => deriveInstallerInsights(filtered), [filtered]);
@@ -331,7 +359,7 @@ export default function ReportsPage() {
               Business health overview and department performance
             </p>
           </div>
-          <DateRangeFilter onChange={setDateRange} />
+          <DateRangeFilter onChange={handlePresetChange} onCustomRange={handleCustomRange} />
         </div>
       </header>
 
