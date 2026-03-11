@@ -1,111 +1,42 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { api } from '@/lib/api-client';
 
 const PHASES = [
-  { key: 'work_order', label: 'Work Order', color: 'blue' },
+  { key: 'lead', label: 'Lead / Quote', color: 'blue' },
   { key: 'design', label: 'Design', color: 'violet' },
   { key: 'production', label: 'Production', color: 'amber' },
-  { key: 'install', label: 'Install', color: 'emerald' },
-  { key: 'complete', label: 'Complete', color: 'gray' },
+  { key: 'install', label: 'Installation', color: 'emerald' },
+  { key: 'completed', label: 'Completed', color: 'gray' },
 ];
 
-const MOCK_PROJECTS: Record<
-  string,
-  {
-    id: string;
-    job_number: string;
-    name: string;
-    vehicle: string;
-    vin: string;
-    status: string;
-    progress: number;
-    date_in: string;
-    estimated_completion: string;
-    notes: string;
-    current_phase: string;
-    timeline: { phase: string; completed: boolean; date: string | null }[];
-  }
-> = {
-  '1': {
-    id: '1',
-    job_number: 'WO-2024-0042',
-    name: 'Fleet Branding — Van #3',
-    vehicle: '2024 Ford Transit 250',
-    vin: '1FTBW2CM0RKA12345',
-    status: 'Design',
-    progress: 35,
-    date_in: '2026-02-28',
-    estimated_completion: '2026-03-18',
-    notes: 'Client requested matte finish. Proof revision 2 sent for approval.',
-    current_phase: 'design',
-    timeline: [
-      { phase: 'work_order', completed: true, date: '2026-02-28' },
-      { phase: 'design', completed: false, date: null },
-      { phase: 'production', completed: false, date: null },
-      { phase: 'install', completed: false, date: null },
-      { phase: 'complete', completed: false, date: null },
-    ],
-  },
-  '2': {
-    id: '2',
-    job_number: 'WO-2024-0039',
-    name: 'Box Truck Full Wrap',
-    vehicle: '2023 Isuzu NPR-HD',
-    vin: 'JALC4W163P7000987',
-    status: 'Production',
-    progress: 60,
-    date_in: '2026-02-15',
-    estimated_completion: '2026-03-12',
-    notes: 'Material ordered. Print scheduled for 03/08.',
-    current_phase: 'production',
-    timeline: [
-      { phase: 'work_order', completed: true, date: '2026-02-15' },
-      { phase: 'design', completed: true, date: '2026-02-22' },
-      { phase: 'production', completed: false, date: null },
-      { phase: 'install', completed: false, date: null },
-      { phase: 'complete', completed: false, date: null },
-    ],
-  },
-  '3': {
-    id: '3',
-    job_number: 'WO-2024-0036',
-    name: 'Partial Wrap — Driver Side',
-    vehicle: '2025 Ram ProMaster 1500',
-    vin: '3C6MRVJG1SE123456',
-    status: 'Install',
-    progress: 85,
-    date_in: '2026-02-01',
-    estimated_completion: '2026-03-05',
-    notes: 'Install in progress. Estimated 2 more days.',
-    current_phase: 'install',
-    timeline: [
-      { phase: 'work_order', completed: true, date: '2026-02-01' },
-      { phase: 'design', completed: true, date: '2026-02-08' },
-      { phase: 'production', completed: true, date: '2026-02-20' },
-      { phase: 'install', completed: false, date: null },
-      { phase: 'complete', completed: false, date: null },
-    ],
-  },
-  '4': {
-    id: '4',
-    job_number: 'WO-2024-0030',
-    name: 'Color Change Wrap',
-    vehicle: '2024 Tesla Model 3',
-    vin: '5YJ3E1EA0RF654321',
-    status: 'Complete',
-    progress: 100,
-    date_in: '2026-01-10',
-    estimated_completion: '2026-02-08',
-    notes: 'Job complete. Final photos uploaded.',
-    current_phase: 'complete',
-    timeline: [
-      { phase: 'work_order', completed: true, date: '2026-01-10' },
-      { phase: 'design', completed: true, date: '2026-01-17' },
-      { phase: 'production', completed: true, date: '2026-01-28' },
-      { phase: 'install', completed: true, date: '2026-02-05' },
-      { phase: 'complete', completed: true, date: '2026-02-08' },
-    ],
-  },
-};
+interface TimelineEntry {
+  phase: string;
+  label: string;
+  completed: boolean;
+  completed_at: string | null;
+}
+
+interface ProjectDetail {
+  id: string;
+  job_number: string;
+  status: string;
+  vehicle_summary: string;
+  date_in: string | null;
+  estimated_completion: string | null;
+  progress_pct: number;
+  status_timeline: TimelineEntry[];
+  notes: string | null;
+}
+
+function formatDate(dateStr: string | null): string {
+  if (!dateStr) return '--';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
 
 function getPhaseColorClasses(color: string, active: boolean, completed: boolean) {
   if (completed) {
@@ -135,15 +66,37 @@ function getLineColor(completed: boolean) {
   return completed ? 'bg-blue-500' : 'bg-[#e6e6eb]';
 }
 
-export default async function ProjectDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
-  const project = MOCK_PROJECTS[id];
+export default function ProjectDetailPage() {
+  const params = useParams<{ id: string }>();
+  const [project, setProject] = useState<ProjectDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [notFound, setNotFound] = useState(false);
 
-  if (!project) {
+  useEffect(() => {
+    if (!params.id) return;
+    api
+      .get<ProjectDetail>(`/api/portal/projects/${params.id}`)
+      .then((data) => setProject(data))
+      .catch((err) => {
+        if (err.status === 404) {
+          setNotFound(true);
+        } else {
+          setError(err.message || 'Failed to load project');
+        }
+      })
+      .finally(() => setLoading(false));
+  }, [params.id]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#e6e6eb] border-t-blue-500" />
+      </div>
+    );
+  }
+
+  if (notFound || (!project && !error)) {
     return (
       <div className="py-20 text-center">
         <h2 className="text-lg font-semibold text-[#18181b]">Project not found</h2>
@@ -157,7 +110,28 @@ export default async function ProjectDetailPage({
     );
   }
 
-  const currentPhaseIndex = PHASES.findIndex((p) => p.key === project.current_phase);
+  if (error) {
+    return (
+      <div className="py-20 text-center">
+        <h2 className="text-lg font-semibold text-[#18181b]">Something went wrong</h2>
+        <p className="mt-2 text-[14px] text-[#60606a]">{error}</p>
+        <Link href="/portal" className="mt-4 inline-block text-[14px] text-blue-600 hover:underline">
+          Back to dashboard
+        </Link>
+      </div>
+    );
+  }
+
+  // Build timeline using the backend data, with fallback to PHASES constant
+  const timeline = project!.status_timeline.length > 0
+    ? project!.status_timeline
+    : PHASES.map((p) => ({ phase: p.key, label: p.label, completed: false, completed_at: null }));
+
+  // Find current phase: first non-completed phase
+  const currentPhaseIndex = timeline.findIndex((t) => !t.completed);
+  const currentPhaseKey = currentPhaseIndex >= 0
+    ? timeline[currentPhaseIndex].phase
+    : timeline[timeline.length - 1]?.phase;
 
   return (
     <div>
@@ -175,54 +149,54 @@ export default async function ProjectDetailPage({
       {/* Title */}
       <div className="mb-6">
         <p className="text-[11px] font-medium uppercase tracking-wide text-[#a8a8b4]">
-          {project.job_number}
+          {project!.job_number}
         </p>
-        <h1 className="mt-1 text-2xl font-bold text-[#18181b]">{project.name}</h1>
+        <h1 className="mt-1 text-2xl font-bold text-[#18181b]">{project!.job_number}</h1>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Left column — timeline */}
+        {/* Left column -- timeline */}
         <div className="lg:col-span-2">
           <div className="rounded-xl border border-[#e6e6eb] bg-white p-6 shadow-sm">
             <h2 className="mb-5 text-[15px] font-semibold text-[#18181b]">Status Timeline</h2>
             <div className="space-y-0">
-              {PHASES.map((phase, idx) => {
-                const timelineEntry = project.timeline.find((t) => t.phase === phase.key);
-                const completed = timelineEntry?.completed ?? false;
-                const isActive = phase.key === project.current_phase;
-                const isLast = idx === PHASES.length - 1;
+              {timeline.map((entry, idx) => {
+                const phaseConfig = PHASES.find((p) => p.key === entry.phase);
+                const color = phaseConfig?.color ?? 'gray';
+                const isActive = entry.phase === currentPhaseKey;
+                const isLast = idx === timeline.length - 1;
 
                 return (
-                  <div key={phase.key} className="flex gap-4">
+                  <div key={entry.phase} className="flex gap-4">
                     {/* Stepper dot and line */}
                     <div className="flex flex-col items-center">
                       <div
-                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 ${getPhaseColorClasses(phase.color, isActive, completed)}`}
+                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 ${getPhaseColorClasses(color, isActive, entry.completed)}`}
                       >
-                        {completed && (
+                        {entry.completed && (
                           <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                           </svg>
                         )}
-                        {isActive && !completed && (
-                          <div className={`h-2.5 w-2.5 rounded-full ${phase.color === 'blue' ? 'bg-blue-500' : phase.color === 'violet' ? 'bg-violet-500' : phase.color === 'amber' ? 'bg-amber-500' : phase.color === 'emerald' ? 'bg-emerald-500' : 'bg-gray-400'}`} />
+                        {isActive && !entry.completed && (
+                          <div className={`h-2.5 w-2.5 rounded-full ${color === 'blue' ? 'bg-blue-500' : color === 'violet' ? 'bg-violet-500' : color === 'amber' ? 'bg-amber-500' : color === 'emerald' ? 'bg-emerald-500' : 'bg-gray-400'}`} />
                         )}
                       </div>
                       {!isLast && (
-                        <div className={`h-10 w-0.5 ${getLineColor(completed && idx < currentPhaseIndex)}`} />
+                        <div className={`h-10 w-0.5 ${getLineColor(entry.completed && idx < (currentPhaseIndex >= 0 ? currentPhaseIndex : timeline.length))}`} />
                       )}
                     </div>
 
                     {/* Label and date */}
                     <div className="pb-10">
                       <p
-                        className={`text-[14px] font-medium ${isActive || completed ? 'text-[#18181b]' : 'text-[#a8a8b4]'}`}
+                        className={`text-[14px] font-medium ${isActive || entry.completed ? 'text-[#18181b]' : 'text-[#a8a8b4]'}`}
                       >
-                        {phase.label}
+                        {entry.label}
                       </p>
-                      {timelineEntry?.date && (
+                      {entry.completed_at && (
                         <p className="mt-0.5 text-[12px] text-[#a8a8b4]">
-                          {timelineEntry.date}
+                          {formatDate(entry.completed_at)}
                         </p>
                       )}
                     </div>
@@ -233,15 +207,14 @@ export default async function ProjectDetailPage({
           </div>
         </div>
 
-        {/* Right column — info cards */}
+        {/* Right column -- info cards */}
         <div className="space-y-4">
           {/* Vehicle info */}
           <div className="rounded-xl border border-[#e6e6eb] bg-white p-5 shadow-sm">
             <h3 className="mb-3 text-[13px] font-semibold uppercase tracking-wide text-[#a8a8b4]">
               Vehicle
             </h3>
-            <p className="text-[15px] font-medium text-[#18181b]">{project.vehicle}</p>
-            <p className="mt-1 font-mono text-[12px] text-[#60606a]">{project.vin}</p>
+            <p className="text-[15px] font-medium text-[#18181b]">{project!.vehicle_summary}</p>
           </div>
 
           {/* Key dates */}
@@ -252,22 +225,22 @@ export default async function ProjectDetailPage({
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-[13px] text-[#60606a]">Date In</span>
-                <span className="text-[13px] font-medium text-[#18181b]">{project.date_in}</span>
+                <span className="text-[13px] font-medium text-[#18181b]">{formatDate(project!.date_in)}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-[13px] text-[#60606a]">Est. Completion</span>
-                <span className="text-[13px] font-medium text-[#18181b]">{project.estimated_completion}</span>
+                <span className="text-[13px] font-medium text-[#18181b]">{formatDate(project!.estimated_completion)}</span>
               </div>
             </div>
           </div>
 
           {/* Notes */}
-          {project.notes && (
+          {project!.notes && (
             <div className="rounded-xl border border-[#e6e6eb] bg-white p-5 shadow-sm">
               <h3 className="mb-3 text-[13px] font-semibold uppercase tracking-wide text-[#a8a8b4]">
                 Notes
               </h3>
-              <p className="text-[13px] leading-relaxed text-[#60606a]">{project.notes}</p>
+              <p className="text-[13px] leading-relaxed text-[#60606a]">{project!.notes}</p>
             </div>
           )}
 
