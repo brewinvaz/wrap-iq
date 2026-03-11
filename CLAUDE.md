@@ -31,3 +31,14 @@ Monorepo: `frontend/` (Next.js 15, React 19) + `backend/` (FastAPI, Python 3.13)
 - Backend test runner: pytest with asyncio_mode="auto"
 - Frontend styling: Tailwind CSS 4 via @tailwindcss/postcss
 - Next.js output: standalone (for Docker production builds)
+
+## Code Change Workflow
+All code changes MUST follow this workflow:
+1. **GitHub Issue** — Create a GH issue first and add it to the WrapIQ GitHub project board (#7, owner: brewinvaz)
+2. **Git Worktree** — Create a git worktree for the fix/feature branch (e.g. `.worktrees/<branch-name>`)
+3. **Tests** — Add new tests or update existing tests for any code changes
+4. **Pull Request** — Create a PR linking to the issue
+5. **CI** — Watch CI until all checks pass; fix any failures
+6. **Merge** — Rebase and merge the PR once CI is green
+7. **Close Issue** — Move the issue to Done on the project board
+8. **Sync Main** — Pull latest changes to local main branch and clean up worktree
