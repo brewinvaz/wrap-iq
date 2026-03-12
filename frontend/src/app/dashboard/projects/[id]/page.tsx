@@ -6,6 +6,7 @@ import { api, ApiError } from '@/lib/api-client';
 import { formatCurrency } from '@/lib/format';
 import { ProjectDetail, Note, WorkOrderPhoto } from '@/lib/types';
 import PhotoUploadZone from '@/components/PhotoUploadZone';
+import Select from '@/components/ui/Select';
 
 // --- API response types ---
 
@@ -883,15 +884,16 @@ function PhotoSection({
             </div>
             <div className="p-2">
               <p className="truncate text-xs text-[var(--text-secondary)]">{photo.filename}</p>
-              <select
+              <Select
                 value={photo.photo_type ?? ''}
-                onChange={(e) => onCategoryChange(photo.id, (e.target.value || null) as 'before' | 'after' | null)}
-                className="mt-1 w-full rounded border border-[var(--border)] bg-[var(--surface-card)] px-2 py-1 text-xs text-[var(--text-secondary)]"
-              >
-                <option value="">Uncategorized</option>
-                <option value="before">Before</option>
-                <option value="after">After</option>
-              </select>
+                onChange={(v) => onCategoryChange(photo.id, (v || null) as 'before' | 'after' | null)}
+                options={[
+                  { value: '', label: 'Uncategorized' },
+                  { value: 'before', label: 'Before' },
+                  { value: 'after', label: 'After' },
+                ]}
+                size="sm"
+              />
               <input
                 type="text"
                 defaultValue={photo.caption ?? ''}
