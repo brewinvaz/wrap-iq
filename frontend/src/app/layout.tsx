@@ -1,16 +1,15 @@
 import type { Metadata } from "next";
-import { DM_Sans, DM_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const dmSans = DM_Sans({
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-dm-sans",
+  variable: "--font-jakarta",
 });
 
-const dmMono = DM_Mono({
-  weight: ["400", "500"],
+const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
-  variable: "--font-dm-mono",
+  variable: "--font-jetbrains",
 });
 
 export const metadata: Metadata = {
@@ -25,14 +24,19 @@ export const metadata: Metadata = {
   },
 };
 
+const themeScript = `(function(){var t=localStorage.getItem('wrapiq-theme')||'dark';if(t==='system'){var d=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',d?'dark':'light')}else{document.documentElement.setAttribute('data-theme',t)}})();`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${dmSans.variable} ${dmMono.variable} font-sans antialiased`}>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
+      <body className={`${jakarta.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
         {children}
       </body>
     </html>
