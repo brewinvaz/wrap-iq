@@ -361,7 +361,7 @@ function StepsIndicator({ history }: { history: ProjectDetail['statusHistory'] }
             {i > 0 && (
               <div
                 className={`h-0.5 w-6 ${
-                  isCompleted ? 'bg-[#18181b]' : 'bg-[var(--surface-raised)]'
+                  isCompleted ? 'bg-[var(--accent-primary)]' : 'bg-[var(--surface-raised)]'
                 }`}
               />
             )}
