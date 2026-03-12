@@ -1,4 +1,4 @@
-.PHONY: help up down restart build rebuild logs ps migrate test lint clean docker-prune-all prune-branches
+.PHONY: help up down restart build rebuild logs logs-api logs-web ps migrate test lint clean docker-prune-all prune-branches
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -24,10 +24,10 @@ ps: ## Show status of all containers
 logs: ## Tail logs for all services
 	docker compose logs -f
 
-logs-backend: ## Tail backend logs
+logs-api: ## Tail backend logs
 	docker compose logs -f backend
 
-logs-frontend: ## Tail frontend logs
+logs-web: ## Tail frontend logs
 	docker compose logs -f frontend
 
 migrate: ## Run database migrations
