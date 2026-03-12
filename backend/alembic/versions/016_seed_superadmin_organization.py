@@ -17,8 +17,8 @@ down_revision: str = "015"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
-ORG_NAME = "BlueMint IQ"
-ORG_SLUG = "bluemint-iq"
+ORG_NAME = "BlueMintIQ"
+ORG_SLUG = "bluemintiq"
 
 SUPERADMINS = {
     "brewin@bluemintiq.com": "Brewin Vaz",
