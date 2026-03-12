@@ -9,8 +9,8 @@ env:
   RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
 jobs:
-  deploy-backend:
-    name: Deploy Backend
+  deploy-api:
+    name: Deploy API
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,33 +18,20 @@ jobs:
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
-      - name: Deploy Backend
-        run: railway up --service backend --detach
+      - name: Deploy API
+        run: railway up --service api --detach
         working-directory: backend
 
-  deploy-worker:
-    name: Deploy Worker
+  deploy-wrapflow:
+    name: Deploy WrapFlow
     runs-on: ubuntu-latest
+    needs: deploy-api  # frontend build needs backend URL; deploy after API is up
     steps:
       - uses: actions/checkout@v4
 
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
-      - name: Deploy Worker
-        run: railway up --service worker --detach
-        working-directory: backend
-
-  deploy-frontend:
-    name: Deploy Frontend
-    runs-on: ubuntu-latest
-    needs: deploy-backend  # frontend build needs backend URL; deploy after backend is up
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Railway CLI
-        run: npm install -g @railway/cli
-
-      - name: Deploy Frontend
-        run: railway up --service frontend --detach
+      - name: Deploy WrapFlow
+        run: railway up --service wrapflow --detach
         working-directory: frontend
