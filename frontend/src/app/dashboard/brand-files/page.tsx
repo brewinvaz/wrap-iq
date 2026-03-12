@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Select from '@/components/ui/Select';
 
 const FILE_TYPE_COLORS: Record<string, string> = {
   AI: 'bg-orange-500/10 text-orange-400',
@@ -65,24 +66,18 @@ export default function BrandFilesPage() {
           <span className="font-mono text-[9.5px] uppercase tracking-wider text-[var(--text-secondary)]">
             Filter
           </span>
-          <select
+          <Select
             value={clientFilter}
-            onChange={(e) => setClientFilter(e.target.value)}
-            className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)] px-3 py-1.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent-primary)]"
-          >
-            {clients.map((c) => (
-              <option key={c}>{c}</option>
-            ))}
-          </select>
-          <select
+            onChange={setClientFilter}
+            options={clients.map((c) => ({ value: c, label: c }))}
+            size="sm"
+          />
+          <Select
             value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
-            className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)] px-3 py-1.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent-primary)]"
-          >
-            {fileTypes.map((t) => (
-              <option key={t}>{t}</option>
-            ))}
-          </select>
+            onChange={setTypeFilter}
+            options={fileTypes.map((t) => ({ value: t, label: t }))}
+            size="sm"
+          />
         </div>
       </div>
 
