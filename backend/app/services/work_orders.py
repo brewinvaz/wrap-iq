@@ -101,9 +101,7 @@ async def create_work_order(
     await session.commit()
 
     result = await session.execute(
-        select(WorkOrder)
-        .options(selectinload(WorkOrder.work_order_vehicles))
-        .where(WorkOrder.id == wo.id)
+        select(WorkOrder).where(WorkOrder.id == wo.id)
     )
     return result.scalar_one()
 
