@@ -20,11 +20,11 @@ export default function KeyRevealBanner({
   }
 
   return (
-    <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+    <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 p-4">
       <div className="flex items-start gap-3">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-100">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-500/20">
           <svg
-            className="h-4 w-4 text-amber-600"
+            className="h-4 w-4 text-amber-400"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -38,10 +38,10 @@ export default function KeyRevealBanner({
           </svg>
         </div>
         <div className="flex-1">
-          <p className="text-sm font-semibold text-amber-800">
+          <p className="text-sm font-semibold text-amber-400">
             Save your API key now
           </p>
-          <p className="mt-1 text-xs text-amber-700">
+          <p className="mt-1 text-xs text-amber-400/80">
             This is the only time you will see the full key. Copy it and store it
             securely.
           </p>
@@ -51,7 +51,7 @@ export default function KeyRevealBanner({
             </code>
             <button
               onClick={handleCopy}
-              className="shrink-0 rounded-lg border border-amber-300 bg-white px-3 py-2 text-sm font-medium text-amber-700 transition-colors hover:bg-amber-100"
+              className="shrink-0 rounded-lg border border-amber-500/30 bg-[var(--surface-card)] px-3 py-2 text-sm font-medium text-amber-400 transition-colors hover:bg-amber-500/10"
             >
               {copied ? 'Copied!' : 'Copy'}
             </button>
@@ -59,7 +59,7 @@ export default function KeyRevealBanner({
         </div>
         <button
           onClick={onDismiss}
-          className="shrink-0 rounded-lg p-1 text-amber-400 transition-colors hover:bg-amber-100 hover:text-amber-600"
+          className="shrink-0 rounded-lg p-1 text-amber-400 transition-colors hover:bg-amber-500/10 hover:text-amber-300"
         >
           <svg
             className="h-5 w-5"

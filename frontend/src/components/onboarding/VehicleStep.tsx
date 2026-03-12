@@ -112,7 +112,7 @@ export function VehicleStep({ data, onChange, token, onBack, onNext }: Props) {
           </button>
         </div>
         {vinError && (
-          <p className="mt-1.5 text-[12px] text-red-600">{vinError}</p>
+          <p className="mt-1.5 text-[12px] text-red-400">{vinError}</p>
         )}
         <p className="mt-1.5 text-[12px] text-[var(--text-muted)]">Optional — or fill in the fields below manually</p>
       </div>

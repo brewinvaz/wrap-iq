@@ -198,7 +198,7 @@ function KanbanBoardSkeleton() {
 function ErrorBanner({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
     <div className="mx-6 mt-4 flex items-center justify-between rounded-lg border border-rose-500/20 bg-rose-500/10 px-4 py-3">
-      <div className="flex items-center gap-2 text-sm text-rose-700">
+      <div className="flex items-center gap-2 text-sm text-rose-400">
         <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
           <path
             strokeLinecap="round"
@@ -746,10 +746,10 @@ export default function DashboardPage() {
               d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
             />
           </svg>
-          <span className="text-sm text-rose-700">{statusError}</span>
+          <span className="text-sm text-rose-400">{statusError}</span>
           <button
             onClick={() => setStatusError(null)}
-            className="ml-2 rounded-md p-1 text-rose-400 transition-colors hover:bg-rose-100 hover:text-rose-600"
+            className="ml-2 rounded-md p-1 text-rose-400 transition-colors hover:bg-rose-500/10 hover:text-rose-300"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

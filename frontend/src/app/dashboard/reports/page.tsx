@@ -284,8 +284,8 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
         <h1 className="text-[22px] font-[800] text-[var(--text-primary)]">Reports & Insights</h1>
       </header>
       <div className="flex flex-1 flex-col items-center justify-center gap-4">
-        <div className="rounded-full bg-red-100 p-3">
-          <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <div className="rounded-full bg-red-500/10 p-3">
+          <svg className="h-6 w-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.072 16.5c-.77.833.192 2.5 1.732 2.5z" />
           </svg>
         </div>

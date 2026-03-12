@@ -145,16 +145,16 @@ export default function RegisterPage() {
               />
               {password.length > 0 && (
                 <ul className="mt-1.5 space-y-0.5 text-[12px]">
-                  <li className={hasMinLength ? 'text-green-600' : 'text-[var(--text-muted)]'}>
+                  <li className={hasMinLength ? 'text-green-400' : 'text-[var(--text-muted)]'}>
                     {hasMinLength ? '\u2713' : '\u2022'} At least 8 characters
                   </li>
-                  <li className={hasUppercase ? 'text-green-600' : 'text-[var(--text-muted)]'}>
+                  <li className={hasUppercase ? 'text-green-400' : 'text-[var(--text-muted)]'}>
                     {hasUppercase ? '\u2713' : '\u2022'} At least one uppercase letter
                   </li>
-                  <li className={hasLowercase ? 'text-green-600' : 'text-[var(--text-muted)]'}>
+                  <li className={hasLowercase ? 'text-green-400' : 'text-[var(--text-muted)]'}>
                     {hasLowercase ? '\u2713' : '\u2022'} At least one lowercase letter
                   </li>
-                  <li className={hasDigit ? 'text-green-600' : 'text-[var(--text-muted)]'}>
+                  <li className={hasDigit ? 'text-green-400' : 'text-[var(--text-muted)]'}>
                     {hasDigit ? '\u2713' : '\u2022'} At least one digit
                   </li>
                 </ul>
@@ -162,7 +162,7 @@ export default function RegisterPage() {
             </div>
 
             {error && (
-              <p className="text-[13px] text-red-600">{error}</p>
+              <p className="text-[13px] text-red-400">{error}</p>
             )}
 
             <button

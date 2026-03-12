@@ -205,7 +205,7 @@ export default function ChecklistsPage() {
                           type="checkbox"
                           checked={item.done}
                           onChange={() => toggleItem(wo.id, idx)}
-                          className="h-4 w-4 shrink-0 rounded border-[var(--border)] text-blue-600 focus:ring-blue-500"
+                          className="h-4 w-4 shrink-0 rounded border-[var(--border)] text-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
                         />
                         <span
                           className={`text-sm ${

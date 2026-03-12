@@ -123,7 +123,7 @@ export default function InvoicesPage() {
             </div>
             <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-[18px]">
               <p className="text-xs text-[var(--text-muted)]">Paid</p>
-              <p className="mt-1 text-2xl font-bold text-emerald-600 font-mono">{formatCurrency(paidTotal)}</p>
+              <p className="mt-1 text-2xl font-bold text-emerald-400 font-mono">{formatCurrency(paidTotal)}</p>
             </div>
           </div>
         )}
@@ -154,7 +154,7 @@ export default function InvoicesPage() {
 
         {error && (
           <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-4">
-            <p className="text-sm text-rose-700">{error}</p>
+            <p className="text-sm text-rose-400">{error}</p>
             <button
               onClick={fetchInvoices}
               className="mt-2 rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-90"

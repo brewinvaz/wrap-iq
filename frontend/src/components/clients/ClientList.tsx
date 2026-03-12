@@ -4,10 +4,10 @@ import { Client } from '@/lib/types';
 import { formatCurrency } from '@/lib/format';
 
 const tagColors: Record<string, string> = {
-  VIP: 'bg-amber-100 text-amber-700',
-  Repeat: 'bg-emerald-100 text-emerald-700',
-  Fleet: 'bg-blue-100 text-blue-700',
-  New: 'bg-violet-100 text-violet-700',
+  VIP: 'bg-amber-500/10 text-amber-400',
+  Repeat: 'bg-emerald-500/10 text-emerald-400',
+  Fleet: 'bg-blue-500/10 text-blue-400',
+  New: 'bg-violet-500/10 text-violet-400',
 };
 
 interface ClientListProps {

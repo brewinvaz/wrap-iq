@@ -309,7 +309,7 @@ function AskAIModal({
 
         {/* Error */}
         {error && (
-          <div className="mx-6 mb-2 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-2 text-sm text-red-700">
+          <div className="mx-6 mb-2 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-2 text-sm text-red-400">
             {error}
           </div>
         )}

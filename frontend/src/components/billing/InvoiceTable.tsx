@@ -8,9 +8,9 @@ interface InvoiceTableProps {
 
 function statusBadge(status: BillingInvoice['status']) {
   const styles: Record<string, string> = {
-    paid: 'bg-emerald-50 text-emerald-700',
-    pending: 'bg-amber-50 text-amber-700',
-    failed: 'bg-red-50 text-red-700',
+    paid: 'bg-emerald-500/10 text-emerald-400',
+    pending: 'bg-amber-500/10 text-amber-400',
+    failed: 'bg-red-500/10 text-red-400',
     refunded: 'bg-[var(--surface-raised)] text-[var(--text-secondary)]',
   };
   return (

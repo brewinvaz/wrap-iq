@@ -110,7 +110,7 @@ export default function APIKeyList({
                   <span
                     className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${
                       key.isActive
-                        ? 'bg-emerald-50 text-emerald-700'
+                        ? 'bg-emerald-500/10 text-emerald-400'
                         : 'bg-[var(--surface-raised)] text-[var(--text-secondary)]'
                     }`}
                   >
@@ -154,7 +154,7 @@ export default function APIKeyList({
                           confirmAction?.id === key.id &&
                           confirmAction?.type === 'revoke'
                             ? 'bg-red-600 text-white'
-                            : 'border border-red-200 text-red-600 hover:bg-red-50'
+                            : 'border border-red-500/20 text-red-400 hover:bg-red-500/10'
                         }`}
                       >
                         {confirmAction?.id === key.id &&

@@ -11,14 +11,14 @@ const priorityColors: Record<string, string> = {
 };
 
 const tagStyles: Record<string, { bg: string; text: string }> = {
-  'full-wrap': { bg: 'bg-blue-50 text-blue-700', text: 'Full Wrap' },
-  partial: { bg: 'bg-violet-50 text-violet-700', text: 'Partial' },
-  commercial: { bg: 'bg-amber-50 text-amber-700', text: 'Commercial' },
-  fleet: { bg: 'bg-emerald-50 text-emerald-700', text: 'Fleet' },
-  rush: { bg: 'bg-rose-50 text-rose-700', text: 'Rush' },
-  design: { bg: 'bg-orange-50 text-orange-700', text: 'Design' },
-  print: { bg: 'bg-cyan-50 text-cyan-700', text: 'Print' },
-  install: { bg: 'bg-indigo-50 text-indigo-700', text: 'Install' },
+  'full-wrap': { bg: 'bg-blue-500/10 text-blue-400', text: 'Full Wrap' },
+  partial: { bg: 'bg-violet-500/10 text-violet-400', text: 'Partial' },
+  commercial: { bg: 'bg-amber-500/10 text-amber-400', text: 'Commercial' },
+  fleet: { bg: 'bg-emerald-500/10 text-emerald-400', text: 'Fleet' },
+  rush: { bg: 'bg-rose-500/10 text-rose-400', text: 'Rush' },
+  design: { bg: 'bg-orange-500/10 text-orange-400', text: 'Design' },
+  print: { bg: 'bg-cyan-500/10 text-cyan-400', text: 'Print' },
+  install: { bg: 'bg-indigo-500/10 text-indigo-400', text: 'Install' },
 };
 
 

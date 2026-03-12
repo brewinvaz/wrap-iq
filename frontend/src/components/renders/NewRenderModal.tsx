@@ -166,10 +166,10 @@ export default function NewRenderModal({ isOpen, onClose, onCreate }: NewRenderM
         </div>
 
         {error && (
-          <div className="mb-4 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-700">{error}</div>
+          <div className="mb-4 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">{error}</div>
         )}
         {fileError && (
-          <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">{fileError}</div>
+          <div className="mb-4 rounded-lg border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-400">{fileError}</div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">

@@ -28,7 +28,7 @@ export default function PaymentMethodCard({
           </p>
         </div>
         {method.isDefault && (
-          <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
+          <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-400">
             Default
           </span>
         )}
@@ -45,7 +45,7 @@ export default function PaymentMethodCard({
         )}
         <button
           onClick={() => onRemove(method.id)}
-          className="rounded-md px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
+          className="rounded-md px-3 py-1.5 text-xs font-medium text-red-400 transition-colors hover:bg-red-500/10"
         >
           Remove
         </button>

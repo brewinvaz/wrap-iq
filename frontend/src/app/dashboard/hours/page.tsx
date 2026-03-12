@@ -84,7 +84,7 @@ export default function HoursPage() {
 
       {/* Log Hours Form (toggle) */}
       {showLogModal && (
-        <div className="shrink-0 border-b border-[var(--border)] bg-blue-50 px-6 py-4">
+        <div className="shrink-0 border-b border-[var(--border)] bg-[var(--accent-primary)]/5 px-6 py-4">
           <h3 className="mb-3 text-sm font-semibold text-[var(--text-primary)]">Log New Hours</h3>
           <div className="flex flex-wrap items-end gap-3">
             <div>

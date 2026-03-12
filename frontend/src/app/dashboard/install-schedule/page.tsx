@@ -362,7 +362,7 @@ export default function InstallSchedulePage() {
                     </td>
                     <td className="px-4 py-3 font-mono text-sm text-[var(--text-secondary)]">{formatDate(item.dateIn)}</td>
                     <td className="px-4 py-3">
-                      <span className={`font-mono text-sm ${overdue ? 'font-medium text-rose-600' : 'text-[var(--text-secondary)]'}`}>
+                      <span className={`font-mono text-sm ${overdue ? 'font-medium text-rose-400' : 'text-[var(--text-secondary)]'}`}>
                         {formatDate(item.dueDate)}
                         {overdue && <span className="ml-1 text-[10px] font-bold uppercase">OVERDUE</span>}
                       </span>

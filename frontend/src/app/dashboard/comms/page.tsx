@@ -242,7 +242,7 @@ export default function CommsPage() {
             <button
               onClick={handleMarkAllRead}
               disabled={markingRead}
-              className="text-xs font-medium text-blue-600 hover:text-blue-700 disabled:opacity-50"
+              className="text-xs font-medium text-[var(--accent-primary)] hover:text-[var(--accent-primary)]/80 disabled:opacity-50"
             >
               {markingRead ? 'Marking...' : 'Mark all as read'}
             </button>

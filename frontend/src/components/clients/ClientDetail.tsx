@@ -6,16 +6,16 @@ import { api, ApiError } from '@/lib/api-client';
 import { formatCurrency } from '@/lib/format';
 
 const tagColors: Record<string, string> = {
-  VIP: 'bg-amber-100 text-amber-700',
-  Repeat: 'bg-emerald-100 text-emerald-700',
-  Fleet: 'bg-blue-100 text-blue-700',
-  New: 'bg-violet-100 text-violet-700',
+  VIP: 'bg-amber-500/10 text-amber-400',
+  Repeat: 'bg-emerald-500/10 text-emerald-400',
+  Fleet: 'bg-blue-500/10 text-blue-400',
+  New: 'bg-violet-500/10 text-violet-400',
 };
 
 const statusStyles: Record<string, { dot: string; text: string }> = {
-  completed: { dot: 'bg-emerald-500', text: 'text-emerald-700' },
-  'in-progress': { dot: 'bg-blue-500', text: 'text-blue-700' },
-  scheduled: { dot: 'bg-amber-500', text: 'text-amber-700' },
+  completed: { dot: 'bg-emerald-500', text: 'text-emerald-400' },
+  'in-progress': { dot: 'bg-blue-500', text: 'text-blue-400' },
+  scheduled: { dot: 'bg-amber-500', text: 'text-amber-400' },
 };
 
 function CardHeader({ title }: { title: string }) {
@@ -397,7 +397,7 @@ export default function ClientDetail({ client, onClientUpdated }: ClientDetailPr
             {feedback && (
               <span
                 className={`text-sm font-medium ${
-                  feedback.type === 'success' ? 'text-emerald-600' : 'text-red-600'
+                  feedback.type === 'success' ? 'text-emerald-400' : 'text-red-400'
                 }`}
               >
                 {feedback.message}

@@ -139,8 +139,8 @@ export default function TeamList({
                     onClick={() => onToggleActive(member.id)}
                     className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
                       member.isActive
-                        ? 'border border-red-500/20 text-red-600 hover:bg-red-500/10'
-                        : 'border border-emerald-500/20 text-emerald-600 hover:bg-emerald-500/10'
+                        ? 'border border-red-500/20 text-red-400 hover:bg-red-500/10'
+                        : 'border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/10'
                     }`}
                   >
                     {member.isActive ? 'Deactivate' : 'Activate'}
