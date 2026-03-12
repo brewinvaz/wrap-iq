@@ -77,32 +77,32 @@ export function VehicleStep({ data, onChange, token, onBack, onNext }: Props) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <h2 className="mb-1 text-[16px] font-semibold text-[#18181b]">Vehicle Information</h2>
-      <p className="mb-5 text-[13px] text-[#60606a]">
+      <h2 className="mb-1 text-[16px] font-semibold text-[var(--text-primary)]">Vehicle Information</h2>
+      <p className="mb-5 text-[13px] text-[var(--text-secondary)]">
         Enter a VIN to auto-fill, or fill in manually.
       </p>
 
       {/* VIN lookup */}
       <div>
-        <label className="mb-1 block text-[13px] font-medium text-[#18181b]">VIN</label>
+        <label className="mb-1 block text-[13px] font-medium text-[var(--text-primary)]">VIN</label>
         <div className="flex gap-2">
           <input
             type="text"
             value={data.vin}
             onChange={(e) => update('vin', e.target.value.toUpperCase())}
             maxLength={17}
-            className="flex-1 rounded-lg border border-[#e6e6eb] px-3 py-2 font-mono text-[14px] text-[#18181b] placeholder-[#a8a8b4] outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            className="flex-1 rounded-[10px] border border-[var(--border)] bg-[var(--surface-raised)] px-[10px] py-[10px] font-mono text-[14px] text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)]"
             placeholder="1HGCM82633A123456"
           />
           <button
             type="button"
             onClick={handleVinDecode}
             disabled={vinLoading || data.vin.length < 17}
-            className="rounded-lg border border-[#e6e6eb] bg-white px-4 py-2 text-[13px] font-medium text-[#18181b] transition-colors hover:bg-[#f8f8fa] disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-[10px] border border-[var(--border)] bg-[var(--surface-card)] px-4 py-2 text-[13px] font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-raised)] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {vinLoading ? (
               <span className="flex items-center gap-1.5">
-                <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#e6e6eb] border-t-blue-600" />
+                <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[var(--border)] border-t-[var(--accent-primary)]" />
                 Looking up...
               </span>
             ) : (
@@ -113,48 +113,48 @@ export function VehicleStep({ data, onChange, token, onBack, onNext }: Props) {
         {vinError && (
           <p className="mt-1.5 text-[12px] text-red-600">{vinError}</p>
         )}
-        <p className="mt-1.5 text-[12px] text-[#a8a8b4]">Optional — or fill in the fields below manually</p>
+        <p className="mt-1.5 text-[12px] text-[var(--text-muted)]">Optional — or fill in the fields below manually</p>
       </div>
 
       <div className="mt-5 grid gap-4 sm:grid-cols-3">
         <div>
-          <label className="mb-1 block text-[13px] font-medium text-[#18181b]">Year</label>
+          <label className="mb-1 block text-[13px] font-medium text-[var(--text-primary)]">Year</label>
           <input
             type="text"
             value={data.year}
             onChange={(e) => update('year', e.target.value.replace(/\D/g, '').slice(0, 4))}
-            className="w-full rounded-lg border border-[#e6e6eb] px-3 py-2 text-[14px] text-[#18181b] placeholder-[#a8a8b4] outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            className="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface-raised)] px-[10px] py-[10px] text-[14px] text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)]"
             placeholder="2024"
           />
         </div>
         <div>
-          <label className="mb-1 block text-[13px] font-medium text-[#18181b]">Make</label>
+          <label className="mb-1 block text-[13px] font-medium text-[var(--text-primary)]">Make</label>
           <input
             type="text"
             value={data.make}
             onChange={(e) => update('make', e.target.value)}
-            className="w-full rounded-lg border border-[#e6e6eb] px-3 py-2 text-[14px] text-[#18181b] placeholder-[#a8a8b4] outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            className="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface-raised)] px-[10px] py-[10px] text-[14px] text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)]"
             placeholder="Ford"
           />
         </div>
         <div>
-          <label className="mb-1 block text-[13px] font-medium text-[#18181b]">Model</label>
+          <label className="mb-1 block text-[13px] font-medium text-[var(--text-primary)]">Model</label>
           <input
             type="text"
             value={data.model}
             onChange={(e) => update('model', e.target.value)}
-            className="w-full rounded-lg border border-[#e6e6eb] px-3 py-2 text-[14px] text-[#18181b] placeholder-[#a8a8b4] outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            className="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface-raised)] px-[10px] py-[10px] text-[14px] text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)]"
             placeholder="Transit"
           />
         </div>
       </div>
 
       <div className="mt-4">
-        <label className="mb-1 block text-[13px] font-medium text-[#18181b]">Vehicle type</label>
+        <label className="mb-1 block text-[13px] font-medium text-[var(--text-primary)]">Vehicle type</label>
         <select
           value={data.vehicle_type}
           onChange={(e) => update('vehicle_type', e.target.value)}
-          className="w-full rounded-lg border border-[#e6e6eb] px-3 py-2 text-[14px] text-[#18181b] outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          className="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface-raised)] px-[10px] py-[10px] text-[14px] text-[var(--text-primary)] outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)]"
         >
           {VEHICLE_TYPES.map((t) => (
             <option key={t.value} value={t.value}>{t.label}</option>
@@ -166,13 +166,13 @@ export function VehicleStep({ data, onChange, token, onBack, onNext }: Props) {
         <button
           type="button"
           onClick={onBack}
-          className="rounded-lg border border-[#e6e6eb] px-5 py-2.5 text-[13px] font-medium text-[#18181b] transition-colors hover:bg-[#f8f8fa]"
+          className="rounded-[10px] border border-[var(--border)] px-5 py-2.5 text-[13px] font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-raised)]"
         >
           Back
         </button>
         <button
           type="submit"
-          className="rounded-lg bg-blue-600 px-5 py-2.5 text-[13px] font-medium text-white transition-colors hover:bg-blue-700"
+          className="rounded-[10px] bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-5 py-2.5 text-[13px] font-medium text-white transition-opacity hover:opacity-90"
         >
           Next
         </button>

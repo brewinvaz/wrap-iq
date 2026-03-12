@@ -45,24 +45,24 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#f4f4f6] px-4">
+    <div className="flex min-h-screen items-center justify-center bg-[var(--surface-app)] px-4">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center">
-          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-[#18181b]">
-            <span className="font-mono text-sm font-bold text-white">WF</span>
+          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)]">
+            <span className="font-mono text-sm font-bold text-white">W</span>
           </div>
-          <h1 className="text-xl font-bold text-[#18181b]">
-            Sign in to Wrap<span className="text-blue-600">Flow</span>
+          <h1 className="text-xl font-bold text-[var(--text-primary)]">
+            Sign in to Wrap<span className="text-[var(--accent-primary)]">Flow</span>
           </h1>
-          <p className="mt-1 text-sm text-[#60606a]">Enter your credentials to continue</p>
+          <p className="mt-1 text-sm text-[var(--text-secondary)]">Enter your credentials to continue</p>
         </div>
 
         {/* Card */}
-        <div className="rounded-xl border border-[#e6e6eb] bg-white p-6 shadow-sm">
+        <div className="rounded-[12px] border border-[var(--border)] bg-[var(--surface-card)] p-6 shadow-sm">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="email" className="mb-1 block text-[13px] font-medium text-[#18181b]">
+              <label htmlFor="email" className="mb-1 block text-[13px] font-medium text-[var(--text-primary)]">
                 Email
               </label>
               <input
@@ -72,12 +72,12 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@company.com"
-                className="h-10 w-full rounded-lg border border-[#e6e6eb] bg-[#f4f4f6] px-3 text-[14px] text-[#18181b] placeholder-[#a8a8b4] outline-none transition-colors focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                className="h-10 w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface-raised)] px-[10px] text-[14px] text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none transition-colors focus:border-[var(--accent-primary)] focus:bg-[var(--surface-card)] focus:ring-2 focus:ring-[var(--accent-primary)]/20"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="mb-1 block text-[13px] font-medium text-[#18181b]">
+              <label htmlFor="password" className="mb-1 block text-[13px] font-medium text-[var(--text-primary)]">
                 Password
               </label>
               <input
@@ -87,7 +87,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
-                className="h-10 w-full rounded-lg border border-[#e6e6eb] bg-[#f4f4f6] px-3 text-[14px] text-[#18181b] placeholder-[#a8a8b4] outline-none transition-colors focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                className="h-10 w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface-raised)] px-[10px] text-[14px] text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none transition-colors focus:border-[var(--accent-primary)] focus:bg-[var(--surface-card)] focus:ring-2 focus:ring-[var(--accent-primary)]/20"
               />
             </div>
 
@@ -98,16 +98,16 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="flex h-10 w-full items-center justify-center rounded-lg bg-[#2563eb] text-[14px] font-medium text-white transition-colors hover:bg-[#1d4ed8] disabled:opacity-60"
+              className="flex h-10 w-full items-center justify-center rounded-[10px] bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-[14px] font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
             >
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
           </form>
         </div>
 
-        <p className="mt-4 text-center text-[13px] text-[#60606a]">
+        <p className="mt-4 text-center text-[13px] text-[var(--text-secondary)]">
           Don&apos;t have an account?{' '}
-          <Link href="/register" className="font-medium text-blue-600 hover:text-blue-700">
+          <Link href="/register" className="font-medium text-[var(--accent-primary)] hover:opacity-80">
             Create one
           </Link>
         </p>

@@ -153,8 +153,8 @@ export default function OnboardingPage() {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
         <div className="text-center">
-          <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-[#e6e6eb] border-t-blue-600" />
-          <p className="text-[14px] text-[#60606a]">Loading...</p>
+          <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-[var(--border)] border-t-[var(--accent-primary)]" />
+          <p className="text-[14px] text-[var(--text-secondary)]">Loading...</p>
         </div>
       </div>
     );
@@ -164,14 +164,14 @@ export default function OnboardingPage() {
   if (pageState === 'invalid') {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
-        <div className="w-full max-w-md rounded-xl border border-[#e6e6eb] bg-white p-8 text-center shadow-sm">
+        <div className="w-full max-w-md rounded-[12px] border border-[var(--border)] bg-[var(--surface-card)] p-8 text-center shadow-sm">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
             <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </div>
-          <h2 className="text-lg font-semibold text-[#18181b]">Link expired or invalid</h2>
-          <p className="mt-2 text-[14px] text-[#60606a]">
+          <h2 className="text-lg font-semibold text-[var(--text-primary)]">Link expired or invalid</h2>
+          <p className="mt-2 text-[14px] text-[var(--text-secondary)]">
             This onboarding link has expired or has already been used. Please contact the shop for a new invite.
           </p>
         </div>
@@ -188,10 +188,10 @@ export default function OnboardingPage() {
     <div>
       {/* Org welcome */}
       <div className="mb-6 text-center">
-        <h1 className="text-xl font-semibold text-[#18181b]">
+        <h1 className="text-xl font-semibold text-[var(--text-primary)]">
           Welcome to {orgName}
         </h1>
-        <p className="mt-1 text-[14px] text-[#60606a]">
+        <p className="mt-1 text-[14px] text-[var(--text-secondary)]">
           Complete the form below to get your project started.
         </p>
       </div>
@@ -205,10 +205,10 @@ export default function OnboardingPage() {
                 <div
                   className={`flex h-8 w-8 items-center justify-center rounded-full text-[13px] font-medium transition-colors ${
                     i < step
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-[var(--accent-primary)] text-white'
                       : i === step
-                        ? 'border-2 border-blue-600 text-blue-600'
-                        : 'border-2 border-[#e6e6eb] text-[#a8a8b4]'
+                        ? 'border-2 border-[var(--accent-primary)] text-[var(--accent-primary)]'
+                        : 'border-2 border-[var(--border)] text-[var(--text-muted)]'
                   }`}
                 >
                   {i < step ? (
@@ -220,14 +220,14 @@ export default function OnboardingPage() {
                   )}
                 </div>
                 <span className={`mt-1.5 text-[11px] font-medium ${
-                  i <= step ? 'text-[#18181b]' : 'text-[#a8a8b4]'
+                  i <= step ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)]'
                 }`}>
                   {label}
                 </span>
               </div>
               {i < STEPS.length - 1 && (
                 <div className={`mx-2 mb-5 h-px flex-1 ${
-                  i < step ? 'bg-blue-600' : 'bg-[#e6e6eb]'
+                  i < step ? 'bg-[var(--accent-primary)]' : 'bg-[var(--border)]'
                 }`} />
               )}
             </div>
@@ -237,13 +237,13 @@ export default function OnboardingPage() {
 
       {/* Error banner */}
       {error && (
-        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
+        <div className="mb-4 rounded-[10px] border border-red-200 bg-red-50 px-4 py-3">
           <p className="text-[13px] text-red-700">{error}</p>
         </div>
       )}
 
       {/* Form card */}
-      <div className="rounded-xl border border-[#e6e6eb] bg-white p-6 shadow-sm">
+      <div className="rounded-[12px] border border-[var(--border)] bg-[var(--surface-card)] p-6 shadow-sm">
         {step === 0 && (
           <ContactStep
             data={contact}

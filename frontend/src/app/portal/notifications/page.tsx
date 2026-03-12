@@ -52,7 +52,7 @@ export default function PortalNotificationsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#e6e6eb] border-t-blue-500" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--border)] border-t-[var(--accent-primary)]" />
       </div>
     );
   }
@@ -60,8 +60,8 @@ export default function PortalNotificationsPage() {
   if (error) {
     return (
       <div className="py-20 text-center">
-        <h2 className="text-lg font-semibold text-[#18181b]">Something went wrong</h2>
-        <p className="mt-2 text-[14px] text-[#60606a]">{error}</p>
+        <h2 className="text-lg font-semibold text-[var(--text-primary)]">Something went wrong</h2>
+        <p className="mt-2 text-[14px] text-[var(--text-secondary)]">{error}</p>
       </div>
     );
   }
@@ -70,9 +70,9 @@ export default function PortalNotificationsPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#18181b]">Notifications</h1>
+          <h1 className="text-2xl font-bold text-[var(--text-primary)]">Notifications</h1>
           {unreadCount > 0 && (
-            <p className="mt-1 text-[14px] text-[#60606a]">
+            <p className="mt-1 text-[14px] text-[var(--text-secondary)]">
               {unreadCount} unread notification{unreadCount !== 1 ? 's' : ''}
             </p>
           )}
@@ -80,7 +80,7 @@ export default function PortalNotificationsPage() {
         {unreadCount > 0 && (
           <button
             onClick={handleMarkAllRead}
-            className="rounded-lg border border-[#e6e6eb] bg-white px-3 py-1.5 text-[13px] font-medium text-[#60606a] shadow-sm transition-colors hover:bg-[#f4f4f6]"
+            className="rounded-[10px] border border-[var(--border)] bg-[var(--surface-card)] px-3 py-1.5 text-[13px] font-medium text-[var(--text-secondary)] shadow-sm transition-colors hover:bg-[var(--surface-raised)]"
           >
             Mark all read
           </button>
@@ -91,15 +91,15 @@ export default function PortalNotificationsPage() {
         {notifications.map((notification) => (
           <div
             key={notification.id}
-            className={`rounded-xl border bg-white p-5 shadow-sm ${
-              notification.is_read ? 'border-[#e6e6eb]' : 'border-blue-200'
+            className={`rounded-[12px] border bg-[var(--surface-card)] p-[18px] shadow-sm ${
+              notification.is_read ? 'border-[var(--border)]' : 'border-[var(--accent-primary)]/30'
             }`}
           >
             <div className="flex items-start gap-3">
               {/* Unread indicator */}
               <div className="mt-1.5 shrink-0">
                 {!notification.is_read ? (
-                  <div className="h-2 w-2 rounded-full bg-blue-500" />
+                  <div className="h-2 w-2 rounded-full bg-[var(--accent-primary)]" />
                 ) : (
                   <div className="h-2 w-2" />
                 )}
@@ -110,17 +110,17 @@ export default function PortalNotificationsPage() {
                   <h3
                     className={`text-[14px] ${
                       notification.is_read
-                        ? 'font-medium text-[#60606a]'
-                        : 'font-semibold text-[#18181b]'
+                        ? 'font-medium text-[var(--text-secondary)]'
+                        : 'font-semibold text-[var(--text-primary)]'
                     }`}
                   >
                     {notification.title}
                   </h3>
-                  <span className="shrink-0 text-[11px] text-[#a8a8b4]">
+                  <span className="shrink-0 text-[11px] text-[var(--text-muted)]">
                     {formatTimestamp(notification.created_at)}
                   </span>
                 </div>
-                <p className="mt-1 text-[13px] leading-relaxed text-[#60606a]">
+                <p className="mt-1 text-[13px] leading-relaxed text-[var(--text-secondary)]">
                   {notification.message}
                 </p>
               </div>
@@ -130,7 +130,7 @@ export default function PortalNotificationsPage() {
 
         {notifications.length === 0 && (
           <div className="py-12 text-center">
-            <p className="text-[14px] text-[#a8a8b4]">No notifications yet.</p>
+            <p className="text-[14px] text-[var(--text-muted)]">No notifications yet.</p>
           </div>
         )}
       </div>

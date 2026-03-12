@@ -146,24 +146,24 @@ export function FilesStep({ data, onChange, files, onFilesChange, token, onBack,
 
   return (
     <form onSubmit={handleSubmit}>
-      <h2 className="mb-1 text-[16px] font-semibold text-[#18181b]">Project Details & Files</h2>
-      <p className="mb-5 text-[13px] text-[#60606a]">
+      <h2 className="mb-1 text-[16px] font-semibold text-[var(--text-primary)]">Project Details & Files</h2>
+      <p className="mb-5 text-[13px] text-[var(--text-secondary)]">
         Tell us about your project and upload any reference files.
       </p>
 
       {/* Job type */}
       <div>
-        <label className="mb-1 block text-[13px] font-medium text-[#18181b]">Job type</label>
+        <label className="mb-1 block text-[13px] font-medium text-[var(--text-primary)]">Job type</label>
         <div className="flex gap-3">
           {JOB_TYPES.map((jt) => (
             <button
               key={jt.value}
               type="button"
               onClick={() => updateProject('job_type', jt.value)}
-              className={`rounded-lg border px-4 py-2 text-[13px] font-medium transition-colors ${
+              className={`rounded-[10px] border px-4 py-2 text-[13px] font-medium transition-colors ${
                 data.job_type === jt.value
-                  ? 'border-blue-600 bg-blue-50 text-blue-700'
-                  : 'border-[#e6e6eb] text-[#60606a] hover:bg-[#f8f8fa]'
+                  ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]'
+                  : 'border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--surface-raised)]'
               }`}
             >
               {jt.label}
@@ -174,38 +174,38 @@ export function FilesStep({ data, onChange, files, onFilesChange, token, onBack,
 
       {/* Description */}
       <div className="mt-4">
-        <label className="mb-1 block text-[13px] font-medium text-[#18181b]">
+        <label className="mb-1 block text-[13px] font-medium text-[var(--text-primary)]">
           Project description
         </label>
         <textarea
           value={data.project_description}
           onChange={(e) => updateProject('project_description', e.target.value)}
           rows={3}
-          className="w-full rounded-lg border border-[#e6e6eb] px-3 py-2 text-[14px] text-[#18181b] placeholder-[#a8a8b4] outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          className="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface-raised)] px-[10px] py-[10px] text-[14px] text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)]"
           placeholder="Describe your wrap project — full wrap, partial, color change, etc."
         />
       </div>
 
       {/* Referral */}
       <div className="mt-4">
-        <label className="mb-1 block text-[13px] font-medium text-[#18181b]">
+        <label className="mb-1 block text-[13px] font-medium text-[var(--text-primary)]">
           How did you hear about us?
         </label>
         <input
           type="text"
           value={data.referral_source}
           onChange={(e) => updateProject('referral_source', e.target.value)}
-          className="w-full rounded-lg border border-[#e6e6eb] px-3 py-2 text-[14px] text-[#18181b] placeholder-[#a8a8b4] outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          className="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface-raised)] px-[10px] py-[10px] text-[14px] text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)]"
           placeholder="Google, referral, Instagram, etc."
         />
       </div>
 
       {/* File upload */}
       <div className="mt-6">
-        <label className="mb-1 block text-[13px] font-medium text-[#18181b]">
+        <label className="mb-1 block text-[13px] font-medium text-[var(--text-primary)]">
           Reference files
         </label>
-        <p className="mb-3 text-[12px] text-[#a8a8b4]">
+        <p className="mb-3 text-[12px] text-[var(--text-muted)]">
           Upload design files, inspiration photos, or logos. Max 5 files, 10MB each.
           JPEG, PNG, WebP, or PDF.
         </p>
@@ -213,12 +213,12 @@ export function FilesStep({ data, onChange, files, onFilesChange, token, onBack,
         {/* Drop zone */}
         <div
           onClick={() => fileInputRef.current?.click()}
-          className="cursor-pointer rounded-lg border-2 border-dashed border-[#e6e6eb] p-6 text-center transition-colors hover:border-blue-400 hover:bg-blue-50/30"
+          className="cursor-pointer rounded-[10px] border-2 border-dashed border-[var(--border)] p-6 text-center transition-colors hover:border-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/5"
         >
-          <svg className="mx-auto mb-2 h-8 w-8 text-[#a8a8b4]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <svg className="mx-auto mb-2 h-8 w-8 text-[var(--text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
           </svg>
-          <p className="text-[13px] text-[#60606a]">
+          <p className="text-[13px] text-[var(--text-secondary)]">
             Click to upload or drag files here
           </p>
           <input
@@ -239,9 +239,9 @@ export function FilesStep({ data, onChange, files, onFilesChange, token, onBack,
         {activeUploads.length > 0 && (
           <div className="mt-3 space-y-2">
             {activeUploads.map((u, i) => (
-              <div key={i} className="flex items-center gap-3 rounded-lg border border-[#e6e6eb] px-3 py-2">
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#e6e6eb] border-t-blue-600" />
-                <span className="flex-1 truncate text-[13px] text-[#60606a]">{u.file.name}</span>
+              <div key={i} className="flex items-center gap-3 rounded-[10px] border border-[var(--border)] px-3 py-2">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--border)] border-t-[var(--accent-primary)]" />
+                <span className="flex-1 truncate text-[13px] text-[var(--text-secondary)]">{u.file.name}</span>
               </div>
             ))}
           </div>
@@ -251,18 +251,18 @@ export function FilesStep({ data, onChange, files, onFilesChange, token, onBack,
         {files.length > 0 && (
           <div className="mt-3 space-y-2">
             {files.map((f, i) => (
-              <div key={f.r2_key} className="flex items-center gap-3 rounded-lg border border-[#e6e6eb] px-3 py-2">
+              <div key={f.r2_key} className="flex items-center gap-3 rounded-[10px] border border-[var(--border)] px-3 py-2">
                 <svg className="h-4 w-4 shrink-0 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                 </svg>
-                <span className="flex-1 truncate text-[13px] text-[#18181b]">{f.filename}</span>
-                <span className="text-[11px] text-[#a8a8b4]">
+                <span className="flex-1 truncate text-[13px] text-[var(--text-primary)]">{f.filename}</span>
+                <span className="text-[11px] text-[var(--text-muted)]">
                   {(f.size_bytes / 1024 / 1024).toFixed(1)} MB
                 </span>
                 <button
                   type="button"
                   onClick={() => removeFile(i)}
-                  className="text-[#a8a8b4] transition-colors hover:text-red-500"
+                  className="text-[var(--text-muted)] transition-colors hover:text-red-500"
                 >
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -278,14 +278,14 @@ export function FilesStep({ data, onChange, files, onFilesChange, token, onBack,
         <button
           type="button"
           onClick={onBack}
-          className="rounded-lg border border-[#e6e6eb] px-5 py-2.5 text-[13px] font-medium text-[#18181b] transition-colors hover:bg-[#f8f8fa]"
+          className="rounded-[10px] border border-[var(--border)] px-5 py-2.5 text-[13px] font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-raised)]"
         >
           Back
         </button>
         <button
           type="submit"
           disabled={activeUploads.length > 0}
-          className="rounded-lg bg-blue-600 px-5 py-2.5 text-[13px] font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-[10px] bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-5 py-2.5 text-[13px] font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Next
         </button>

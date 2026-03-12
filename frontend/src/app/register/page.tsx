@@ -68,24 +68,24 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#f4f4f6] px-4">
+    <div className="flex min-h-screen items-center justify-center bg-[var(--surface-app)] px-4">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center">
-          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-[#18181b]">
-            <span className="font-mono text-sm font-bold text-white">WF</span>
+          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)]">
+            <span className="font-mono text-sm font-bold text-white">W</span>
           </div>
-          <h1 className="text-xl font-bold text-[#18181b]">
-            Create your Wrap<span className="text-blue-600">Flow</span> account
+          <h1 className="text-xl font-bold text-[var(--text-primary)]">
+            Create your Wrap<span className="text-[var(--accent-primary)]">Flow</span> account
           </h1>
-          <p className="mt-1 text-sm text-[#60606a]">Get started with your organization</p>
+          <p className="mt-1 text-sm text-[var(--text-secondary)]">Get started with your organization</p>
         </div>
 
         {/* Card */}
-        <div className="rounded-xl border border-[#e6e6eb] bg-white p-6 shadow-sm">
+        <div className="rounded-[12px] border border-[var(--border)] bg-[var(--surface-card)] p-6 shadow-sm">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="org" className="mb-1 block text-[13px] font-medium text-[#18181b]">
+              <label htmlFor="org" className="mb-1 block text-[13px] font-medium text-[var(--text-primary)]">
                 Organization name
               </label>
               <input
@@ -95,12 +95,12 @@ export default function RegisterPage() {
                 value={orgName}
                 onChange={(e) => setOrgName(e.target.value)}
                 placeholder="Acme Wraps Inc."
-                className="h-10 w-full rounded-lg border border-[#e6e6eb] bg-[#f4f4f6] px-3 text-[14px] text-[#18181b] placeholder-[#a8a8b4] outline-none transition-colors focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                className="h-10 w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface-raised)] px-[10px] text-[14px] text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none transition-colors focus:border-[var(--accent-primary)] focus:bg-[var(--surface-card)] focus:ring-2 focus:ring-[var(--accent-primary)]/20"
               />
             </div>
 
             <div>
-              <label htmlFor="fullName" className="mb-1 block text-[13px] font-medium text-[#18181b]">
+              <label htmlFor="fullName" className="mb-1 block text-[13px] font-medium text-[var(--text-primary)]">
                 Full name
               </label>
               <input
@@ -110,12 +110,12 @@ export default function RegisterPage() {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Jane Smith"
-                className="h-10 w-full rounded-lg border border-[#e6e6eb] bg-[#f4f4f6] px-3 text-[14px] text-[#18181b] placeholder-[#a8a8b4] outline-none transition-colors focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                className="h-10 w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface-raised)] px-[10px] text-[14px] text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none transition-colors focus:border-[var(--accent-primary)] focus:bg-[var(--surface-card)] focus:ring-2 focus:ring-[var(--accent-primary)]/20"
               />
             </div>
 
             <div>
-              <label htmlFor="email" className="mb-1 block text-[13px] font-medium text-[#18181b]">
+              <label htmlFor="email" className="mb-1 block text-[13px] font-medium text-[var(--text-primary)]">
                 Email
               </label>
               <input
@@ -125,12 +125,12 @@ export default function RegisterPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@company.com"
-                className="h-10 w-full rounded-lg border border-[#e6e6eb] bg-[#f4f4f6] px-3 text-[14px] text-[#18181b] placeholder-[#a8a8b4] outline-none transition-colors focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                className="h-10 w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface-raised)] px-[10px] text-[14px] text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none transition-colors focus:border-[var(--accent-primary)] focus:bg-[var(--surface-card)] focus:ring-2 focus:ring-[var(--accent-primary)]/20"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="mb-1 block text-[13px] font-medium text-[#18181b]">
+              <label htmlFor="password" className="mb-1 block text-[13px] font-medium text-[var(--text-primary)]">
                 Password
               </label>
               <input
@@ -141,20 +141,20 @@ export default function RegisterPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Create a password (min. 8 characters)"
-                className="h-10 w-full rounded-lg border border-[#e6e6eb] bg-[#f4f4f6] px-3 text-[14px] text-[#18181b] placeholder-[#a8a8b4] outline-none transition-colors focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                className="h-10 w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface-raised)] px-[10px] text-[14px] text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none transition-colors focus:border-[var(--accent-primary)] focus:bg-[var(--surface-card)] focus:ring-2 focus:ring-[var(--accent-primary)]/20"
               />
               {password.length > 0 && (
                 <ul className="mt-1.5 space-y-0.5 text-[12px]">
-                  <li className={hasMinLength ? 'text-green-600' : 'text-[#a8a8b4]'}>
+                  <li className={hasMinLength ? 'text-green-600' : 'text-[var(--text-muted)]'}>
                     {hasMinLength ? '\u2713' : '\u2022'} At least 8 characters
                   </li>
-                  <li className={hasUppercase ? 'text-green-600' : 'text-[#a8a8b4]'}>
+                  <li className={hasUppercase ? 'text-green-600' : 'text-[var(--text-muted)]'}>
                     {hasUppercase ? '\u2713' : '\u2022'} At least one uppercase letter
                   </li>
-                  <li className={hasLowercase ? 'text-green-600' : 'text-[#a8a8b4]'}>
+                  <li className={hasLowercase ? 'text-green-600' : 'text-[var(--text-muted)]'}>
                     {hasLowercase ? '\u2713' : '\u2022'} At least one lowercase letter
                   </li>
-                  <li className={hasDigit ? 'text-green-600' : 'text-[#a8a8b4]'}>
+                  <li className={hasDigit ? 'text-green-600' : 'text-[var(--text-muted)]'}>
                     {hasDigit ? '\u2713' : '\u2022'} At least one digit
                   </li>
                 </ul>
@@ -168,16 +168,16 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="flex h-10 w-full items-center justify-center rounded-lg bg-[#2563eb] text-[14px] font-medium text-white transition-colors hover:bg-[#1d4ed8] disabled:opacity-60"
+              className="flex h-10 w-full items-center justify-center rounded-[10px] bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-[14px] font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
             >
               {loading ? 'Creating account...' : 'Create account'}
             </button>
           </form>
         </div>
 
-        <p className="mt-4 text-center text-[13px] text-[#60606a]">
+        <p className="mt-4 text-center text-[13px] text-[var(--text-secondary)]">
           Already have an account?{' '}
-          <Link href="/login" className="font-medium text-blue-600 hover:text-blue-700">
+          <Link href="/login" className="font-medium text-[var(--accent-primary)] hover:opacity-80">
             Sign in
           </Link>
         </p>
