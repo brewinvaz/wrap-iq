@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { api, ApiError } from '@/lib/api-client';
+import { Button } from '@/components/ui/Button';
 import { formatCurrency } from '@/lib/format';
 import { ProjectDetail, Note, WorkOrderPhoto } from '@/lib/types';
 import PhotoUploadZone from '@/components/PhotoUploadZone';
@@ -296,18 +297,12 @@ function ErrorState({ message, onRetry, onBack }: { message: string; onRetry: ()
       <p className="text-lg font-semibold text-[var(--text-primary)]">Failed to load project</p>
       <p className="text-sm text-[var(--text-secondary)]">{message}</p>
       <div className="flex gap-3">
-        <button
-          onClick={onBack}
-          className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)] px-4 py-2 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-raised)]"
-        >
+        <Button variant="secondary" onClick={onBack}>
           Back to Dashboard
-        </button>
-        <button
-          onClick={onRetry}
-          className="rounded-lg bg-[var(--accent-primary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--accent-primary)]/90"
-        >
+        </Button>
+        <Button onClick={onRetry}>
           Retry
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -787,13 +782,12 @@ function NotesTab({ project, workOrderId }: { project: ProjectDetail; workOrderI
         />
         <div className="mt-2 flex items-center justify-between">
           <SaveIndicator status={displayStatus} />
-          <button
+          <Button
             onClick={addNote}
             disabled={!newNote.trim() || addSaveStatus === 'saving'}
-            className="rounded-lg bg-[var(--accent-primary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--accent-primary)]/90 disabled:cursor-not-allowed disabled:opacity-40"
           >
             Add Note
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -1141,9 +1135,11 @@ export default function ProjectDetailPage({
       {/* Top header */}
       <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="mb-3 flex items-center gap-2">
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => router.push('/dashboard')}
-            className="flex items-center gap-1 rounded-lg px-2 py-1 text-sm text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-raised)] hover:text-[var(--text-primary)]"
+            className="flex items-center gap-1"
           >
             <svg
               className="h-4 w-4"
@@ -1159,7 +1155,7 @@ export default function ProjectDetailPage({
               />
             </svg>
             Back to Projects
-          </button>
+          </Button>
         </div>
 
         <div className="flex items-center justify-between">
