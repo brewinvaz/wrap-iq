@@ -11,7 +11,7 @@ function statusBadge(status: BillingInvoice['status']) {
     paid: 'bg-emerald-50 text-emerald-700',
     pending: 'bg-amber-50 text-amber-700',
     failed: 'bg-red-50 text-red-700',
-    refunded: 'bg-gray-100 text-[#60606a]',
+    refunded: 'bg-[var(--surface-raised)] text-[var(--text-secondary)]',
   };
   return (
     <span
@@ -25,54 +25,54 @@ function statusBadge(status: BillingInvoice['status']) {
 export default function InvoiceTable({ invoices }: InvoiceTableProps) {
   if (invoices.length === 0) {
     return (
-      <div className="rounded-xl border border-[#e6e6eb] bg-white p-6">
-        <h2 className="text-base font-semibold text-[#18181b]">
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-6">
+        <h2 className="text-base font-semibold text-[var(--text-primary)]">
           Billing History
         </h2>
-        <p className="mt-4 text-sm text-[#60606a]">No invoices yet.</p>
+        <p className="mt-4 text-sm text-[var(--text-secondary)]">No invoices yet.</p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-xl border border-[#e6e6eb] bg-white p-6">
-      <h2 className="text-base font-semibold text-[#18181b]">
+    <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-6">
+      <h2 className="text-base font-semibold text-[var(--text-primary)]">
         Billing History
       </h2>
 
       <div className="mt-4 overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead>
-            <tr className="border-b border-[#e6e6eb]">
-              <th className="pb-3 pr-4 font-medium text-[#60606a]">Invoice</th>
-              <th className="pb-3 pr-4 font-medium text-[#60606a]">Date</th>
-              <th className="pb-3 pr-4 font-medium text-[#60606a]">
+            <tr className="border-b border-[var(--border)]">
+              <th className="pb-3 pr-4 font-medium text-[var(--text-secondary)]">Invoice</th>
+              <th className="pb-3 pr-4 font-medium text-[var(--text-secondary)]">Date</th>
+              <th className="pb-3 pr-4 font-medium text-[var(--text-secondary)]">
                 Description
               </th>
-              <th className="pb-3 pr-4 font-medium text-[#60606a]">Amount</th>
-              <th className="pb-3 font-medium text-[#60606a]">Status</th>
+              <th className="pb-3 pr-4 font-medium text-[var(--text-secondary)]">Amount</th>
+              <th className="pb-3 font-medium text-[var(--text-secondary)]">Status</th>
             </tr>
           </thead>
           <tbody>
             {invoices.map((invoice) => (
               <tr
                 key={invoice.id}
-                className="border-b border-[#e6e6eb] last:border-0"
+                className="border-b border-[var(--border)] last:border-0"
               >
-                <td className="py-3 pr-4 font-medium text-[#18181b]">
+                <td className="py-3 pr-4 font-mono font-medium text-[var(--text-primary)]">
                   {invoice.invoiceNumber}
                 </td>
-                <td className="py-3 pr-4 text-[#60606a]">
+                <td className="py-3 pr-4 text-[var(--text-secondary)]">
                   {new Date(invoice.invoiceDate).toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric',
                     year: 'numeric',
                   })}
                 </td>
-                <td className="py-3 pr-4 text-[#60606a]">
+                <td className="py-3 pr-4 text-[var(--text-secondary)]">
                   {invoice.description}
                 </td>
-                <td className="py-3 pr-4 font-medium text-[#18181b]">
+                <td className="py-3 pr-4 font-mono font-medium text-[var(--text-primary)]">
                   ${(invoice.amountCents / 100).toFixed(2)}
                 </td>
                 <td className="py-3">{statusBadge(invoice.status)}</td>

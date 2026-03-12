@@ -88,15 +88,15 @@ export default function CreateInvoiceModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="create-invoice-title"
-        className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
+        className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-[var(--surface-card)] p-6 shadow-xl"
       >
         <div className="mb-6 flex items-center justify-between">
-          <h3 id="create-invoice-title" className="text-lg font-semibold text-[#18181b]">
+          <h3 id="create-invoice-title" className="text-lg font-semibold text-[var(--text-primary)]">
             Create Invoice
           </h3>
           <button
             onClick={onClose}
-            className="rounded-lg p-1 text-[#a8a8b4] transition-colors hover:bg-gray-100 hover:text-[#18181b]"
+            className="rounded-lg p-1 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-overlay)] hover:text-[var(--text-primary)]"
           >
             <svg
               className="h-5 w-5"
@@ -125,7 +125,7 @@ export default function CreateInvoiceModal({
             <div>
               <label
                 htmlFor="client-name"
-                className="mb-1.5 block text-sm font-medium text-[#18181b]"
+                className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]"
               >
                 Client Name *
               </label>
@@ -136,13 +136,13 @@ export default function CreateInvoiceModal({
                 onChange={(e) => setClientName(e.target.value)}
                 required
                 placeholder="e.g. Acme Corp"
-                className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] placeholder-[#a8a8b4] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
               />
             </div>
             <div>
               <label
                 htmlFor="client-email"
-                className="mb-1.5 block text-sm font-medium text-[#18181b]"
+                className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]"
               >
                 Client Email *
               </label>
@@ -153,7 +153,7 @@ export default function CreateInvoiceModal({
                 onChange={(e) => setClientEmail(e.target.value)}
                 required
                 placeholder="client@example.com"
-                className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] placeholder-[#a8a8b4] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
               />
             </div>
           </div>
@@ -162,7 +162,7 @@ export default function CreateInvoiceModal({
             <div>
               <label
                 htmlFor="subtotal"
-                className="mb-1.5 block text-sm font-medium text-[#18181b]"
+                className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]"
               >
                 Subtotal ($) *
               </label>
@@ -177,13 +177,13 @@ export default function CreateInvoiceModal({
                 }
                 required
                 placeholder="0.00"
-                className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] placeholder-[#a8a8b4] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 font-mono text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
               />
             </div>
             <div>
               <label
                 htmlFor="tax-rate"
-                className="mb-1.5 block text-sm font-medium text-[#18181b]"
+                className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]"
               >
                 Tax Rate (%)
               </label>
@@ -198,7 +198,7 @@ export default function CreateInvoiceModal({
                   setTaxRate(e.target.value === '' ? '' : Number(e.target.value))
                 }
                 placeholder="0"
-                className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] placeholder-[#a8a8b4] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 font-mono text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
               />
             </div>
           </div>
@@ -206,7 +206,7 @@ export default function CreateInvoiceModal({
           <div>
             <label
               htmlFor="due-date"
-              className="mb-1.5 block text-sm font-medium text-[#18181b]"
+              className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]"
             >
               Due Date
             </label>
@@ -215,14 +215,14 @@ export default function CreateInvoiceModal({
               type="date"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
-              className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
             />
           </div>
 
           <div>
             <label
               htmlFor="notes"
-              className="mb-1.5 block text-sm font-medium text-[#18181b]"
+              className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]"
             >
               Notes
             </label>
@@ -232,7 +232,7 @@ export default function CreateInvoiceModal({
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Optional notes..."
               rows={3}
-              className="w-full resize-none rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] placeholder-[#a8a8b4] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full resize-none rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
             />
           </div>
 
@@ -240,14 +240,14 @@ export default function CreateInvoiceModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded-lg border border-[#e6e6eb] px-4 py-2.5 text-sm font-medium text-[#60606a] transition-colors hover:bg-gray-50"
+              className="flex-1 rounded-lg border border-[var(--border)] px-4 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-overlay)]"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex-1 rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2.5 text-sm font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSubmitting ? 'Creating...' : 'Create Invoice'}
             </button>

@@ -29,17 +29,17 @@ export default function TeamList({
   const [editingRole, setEditingRole] = useState<string | null>(null);
 
   return (
-    <div className="rounded-xl border border-[#e6e6eb] bg-white">
-      <div className="flex items-center justify-between border-b border-[#e6e6eb] px-6 py-4">
+    <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)]">
+      <div className="flex items-center justify-between border-b border-[var(--border)] px-6 py-4">
         <div className="flex items-center gap-3">
-          <h2 className="text-lg font-semibold text-[#18181b]">Team Members</h2>
-          <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-[#60606a]">
+          <h2 className="text-lg font-semibold text-[var(--text-primary)]">Team Members</h2>
+          <span className="rounded-full bg-[var(--surface-raised)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-secondary)]">
             {members.filter((m) => m.isActive).length} active
           </span>
         </div>
         <button
           onClick={onInvite}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+          className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors"
         >
           + Invite Member
         </button>
@@ -48,29 +48,29 @@ export default function TeamList({
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-[#e6e6eb]">
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-[#a8a8b4]">
+            <tr className="border-b border-[var(--border)]">
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">
                 Member
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-[#a8a8b4]">
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">
                 Role
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-[#a8a8b4]">
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">
                 Status
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-[#a8a8b4]">
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">
                 Joined
               </th>
-              <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-[#a8a8b4]">
+              <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#e6e6eb]">
+          <tbody className="divide-y divide-[var(--border)]">
             {members.map((member) => (
               <tr
                 key={member.id}
-                className="transition-colors hover:bg-gray-50"
+                className="transition-colors hover:bg-[var(--surface-overlay)]"
               >
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
@@ -80,11 +80,11 @@ export default function TeamList({
                       {member.initials}
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-[#18181b]">
+                      <p className="text-sm font-medium text-[var(--text-primary)]">
                         {member.email}
                       </p>
                       {member.lastActive && (
-                        <p className="text-xs text-[#a8a8b4]">
+                        <p className="text-xs text-[var(--text-muted)]">
                           Last active: {member.lastActive}
                         </p>
                       )}
@@ -101,7 +101,7 @@ export default function TeamList({
                       }}
                       onBlur={() => setEditingRole(null)}
                       autoFocus
-                      className="rounded-lg border border-[#e6e6eb] px-2 py-1 text-sm text-[#18181b] focus:border-blue-500 focus:outline-none"
+                      className="rounded-lg border border-[var(--border)] px-2 py-1 text-sm text-[var(--text-primary)] focus:border-[var(--accent-primary)] focus:outline-none"
                     >
                       {allRoles.map((role) => (
                         <option key={role} value={role}>
@@ -134,7 +134,7 @@ export default function TeamList({
                     {member.isActive ? 'Active' : 'Inactive'}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-sm text-[#60606a]">
+                <td className="px-6 py-4 text-sm text-[var(--text-secondary)]">
                   {member.joinedDate}
                 </td>
                 <td className="px-6 py-4 text-right">

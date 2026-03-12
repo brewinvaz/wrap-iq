@@ -46,12 +46,12 @@ export default function KeyRevealBanner({
             securely.
           </p>
           <div className="mt-3 flex items-center gap-2">
-            <code className="flex-1 rounded-lg border border-amber-200 bg-white px-3 py-2 font-mono text-sm text-[#18181b]">
+            <code className="flex-1 rounded-lg border border-amber-200 bg-[var(--surface-card)] px-3 py-2 font-mono text-sm text-[var(--text-primary)]">
               {fullKey}
             </code>
             <button
               onClick={handleCopy}
-              className="shrink-0 rounded-lg border border-amber-300 bg-white px-3 py-2 text-sm font-medium text-amber-700 transition-colors hover:bg-amber-100"
+              className="shrink-0 rounded-lg border border-amber-300 bg-[var(--surface-card)] px-3 py-2 text-sm font-medium text-amber-700 transition-colors hover:bg-amber-100"
             >
               {copied ? 'Copied!' : 'Copy'}
             </button>

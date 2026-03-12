@@ -59,15 +59,15 @@ export default function CreateKeyModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="create-key-title"
-        className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
+        className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-[var(--surface-card)] p-6 shadow-xl"
       >
         <div className="mb-6 flex items-center justify-between">
-          <h3 id="create-key-title" className="text-lg font-semibold text-[#18181b]">
+          <h3 id="create-key-title" className="text-lg font-semibold text-[var(--text-primary)]">
             Generate New API Key
           </h3>
           <button
             onClick={onClose}
-            className="rounded-lg p-1 text-[#a8a8b4] transition-colors hover:bg-gray-100 hover:text-[#18181b]"
+            className="rounded-lg p-1 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-overlay)] hover:text-[var(--text-primary)]"
           >
             <svg
               className="h-5 w-5"
@@ -89,7 +89,7 @@ export default function CreateKeyModal({
           <div>
             <label
               htmlFor="key-name"
-              className="mb-1.5 block text-sm font-medium text-[#18181b]"
+              className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]"
             >
               Key Name
             </label>
@@ -100,7 +100,7 @@ export default function CreateKeyModal({
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g., Production Integration"
               required
-              className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] placeholder-[#a8a8b4] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
             />
           </div>
 
@@ -114,7 +114,7 @@ export default function CreateKeyModal({
             <div>
               <label
                 htmlFor="rate-minute"
-                className="mb-1.5 block text-sm font-medium text-[#18181b]"
+                className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]"
               >
                 Rate limit / minute
               </label>
@@ -125,13 +125,13 @@ export default function CreateKeyModal({
                 max={10000}
                 value={rateLimitPerMinute}
                 onChange={(e) => setRateLimitPerMinute(Number(e.target.value))}
-                className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 font-mono text-sm text-[var(--text-primary)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
               />
             </div>
             <div>
               <label
                 htmlFor="rate-day"
-                className="mb-1.5 block text-sm font-medium text-[#18181b]"
+                className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]"
               >
                 Rate limit / day
               </label>
@@ -142,7 +142,7 @@ export default function CreateKeyModal({
                 max={1000000}
                 value={rateLimitPerDay}
                 onChange={(e) => setRateLimitPerDay(Number(e.target.value))}
-                className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 font-mono text-sm text-[var(--text-primary)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
               />
             </div>
           </div>
@@ -151,13 +151,13 @@ export default function CreateKeyModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded-lg border border-[#e6e6eb] px-4 py-2.5 text-sm font-medium text-[#60606a] transition-colors hover:bg-gray-50"
+              className="flex-1 rounded-lg border border-[var(--border)] px-4 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-overlay)]"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+              className="flex-1 rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2.5 text-sm font-medium text-white transition-colors"
             >
               Generate Key
             </button>

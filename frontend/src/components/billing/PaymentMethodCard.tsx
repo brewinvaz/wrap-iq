@@ -14,16 +14,16 @@ export default function PaymentMethodCard({
   onRemove,
 }: PaymentMethodCardProps) {
   return (
-    <div className="flex items-center justify-between rounded-lg border border-[#e6e6eb] bg-white px-4 py-3">
+    <div className="flex items-center justify-between rounded-lg border border-[var(--border)] bg-[var(--surface-card)] px-4 py-3">
       <div className="flex items-center gap-3">
-        <div className="flex h-10 w-14 items-center justify-center rounded-md bg-gray-100 text-xs font-semibold text-[#60606a]">
+        <div className="flex h-10 w-14 items-center justify-center rounded-md bg-[var(--surface-raised)] text-xs font-semibold text-[var(--text-secondary)]">
           {method.brand}
         </div>
         <div>
-          <p className="text-sm font-medium text-[#18181b]">
-            {method.brand} ending in {method.lastFour}
+          <p className="text-sm font-medium text-[var(--text-primary)]">
+            {method.brand} ending in <span className="font-mono">{method.lastFour}</span>
           </p>
-          <p className="text-xs text-[#60606a]">
+          <p className="text-xs text-[var(--text-secondary)]">
             Expires {String(method.expMonth).padStart(2, '0')}/{method.expYear}
           </p>
         </div>
@@ -38,7 +38,7 @@ export default function PaymentMethodCard({
         {!method.isDefault && (
           <button
             onClick={() => onSetDefault(method.id)}
-            className="rounded-md px-3 py-1.5 text-xs font-medium text-[#60606a] transition-colors hover:bg-gray-100"
+            className="rounded-md px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-overlay)]"
           >
             Set Default
           </button>

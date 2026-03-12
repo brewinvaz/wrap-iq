@@ -29,12 +29,12 @@ function UsageBar({
   return (
     <div>
       <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-[#18181b]">{label}</span>
-        <span className="text-sm text-[#60606a]">
+        <span className="text-sm font-medium text-[var(--text-primary)]">{label}</span>
+        <span className="font-mono text-sm text-[var(--text-secondary)]">
           {fmt(used)} / {fmt(limit)} {unit}
         </span>
       </div>
-      <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-100">
+      <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-[var(--surface-raised)]">
         <div
           className={`h-full rounded-full transition-all ${barColor}`}
           style={{ width: `${pct}%` }}
@@ -46,9 +46,9 @@ function UsageBar({
 
 export default function UsageMetrics({ metrics }: UsageMetricsProps) {
   return (
-    <div className="rounded-xl border border-[#e6e6eb] bg-white p-6">
-      <h2 className="text-base font-semibold text-[#18181b]">Usage</h2>
-      <p className="mt-1 text-sm text-[#60606a]">
+    <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-6">
+      <h2 className="text-base font-semibold text-[var(--text-primary)]">Usage</h2>
+      <p className="mt-1 text-sm text-[var(--text-secondary)]">
         Current usage for your billing period.
       </p>
 
@@ -66,11 +66,11 @@ export default function UsageMetrics({ metrics }: UsageMetricsProps) {
           unit="GB"
           formatValue={(v) => v.toFixed(1)}
         />
-        <div className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-3">
-          <span className="text-sm font-medium text-[#18181b]">
+        <div className="flex items-center justify-between rounded-lg bg-[var(--surface-raised)] px-4 py-3">
+          <span className="text-sm font-medium text-[var(--text-primary)]">
             Total Projects
           </span>
-          <span className="text-lg font-semibold text-[#18181b]">
+          <span className="text-lg font-semibold text-[var(--text-primary)]">
             {metrics.projectsCount}
           </span>
         </div>

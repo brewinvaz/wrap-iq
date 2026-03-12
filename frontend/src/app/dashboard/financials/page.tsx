@@ -208,35 +208,35 @@ export default function FinancialsPage() {
   if (loading) {
     return (
       <div className="flex h-full flex-col">
-        <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+        <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-xl font-bold text-[#18181b]">Financials</h1>
-            <div className="h-9 w-28 animate-pulse rounded-lg bg-gray-200" />
+            <h1 className="text-xl font-bold text-[var(--text-primary)]">Financials</h1>
+            <div className="h-9 w-28 animate-pulse rounded-lg bg-[var(--surface-raised)]" />
           </div>
         </header>
         <div className="flex-1 space-y-6 overflow-auto p-6">
           <div className="grid grid-cols-4 gap-4">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="rounded-xl border border-[#e6e6eb] bg-white p-4">
-                <div className="h-3 w-20 animate-pulse rounded bg-gray-200" />
-                <div className="mt-3 h-7 w-24 animate-pulse rounded bg-gray-200" />
-                <div className="mt-2 h-3 w-16 animate-pulse rounded bg-gray-200" />
+              <div key={i} className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-4">
+                <div className="h-3 w-20 animate-pulse rounded bg-[var(--surface-raised)]" />
+                <div className="mt-3 h-7 w-24 animate-pulse rounded bg-[var(--surface-raised)]" />
+                <div className="mt-2 h-3 w-16 animate-pulse rounded bg-[var(--surface-raised)]" />
               </div>
             ))}
           </div>
-          <div className="rounded-xl border border-[#e6e6eb] bg-white p-5">
-            <div className="h-4 w-32 animate-pulse rounded bg-gray-200" />
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-5">
+            <div className="h-4 w-32 animate-pulse rounded bg-[var(--surface-raised)]" />
             <div className="mt-4 space-y-3">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-6 animate-pulse rounded-full bg-gray-200" />
+                <div key={i} className="h-6 animate-pulse rounded-full bg-[var(--surface-raised)]" />
               ))}
             </div>
           </div>
-          <div className="rounded-xl border border-[#e6e6eb] bg-white p-5">
-            <div className="h-4 w-28 animate-pulse rounded bg-gray-200" />
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-5">
+            <div className="h-4 w-28 animate-pulse rounded bg-[var(--surface-raised)]" />
             <div className="mt-4 space-y-3">
               {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="h-10 animate-pulse rounded bg-gray-100" />
+                <div key={i} className="h-10 animate-pulse rounded bg-[var(--surface-raised)]" />
               ))}
             </div>
           </div>
@@ -249,9 +249,9 @@ export default function FinancialsPage() {
   if (error) {
     return (
       <div className="flex h-full flex-col">
-        <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+        <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-xl font-bold text-[#18181b]">Financials</h1>
+            <h1 className="text-xl font-bold text-[var(--text-primary)]">Financials</h1>
           </div>
         </header>
         <div className="flex flex-1 items-center justify-center p-6">
@@ -259,7 +259,7 @@ export default function FinancialsPage() {
             <p className="text-sm text-red-600">{error}</p>
             <button
               onClick={fetchData}
-              className="mt-3 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+              className="mt-3 rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors"
             >
               Retry
             </button>
@@ -271,27 +271,27 @@ export default function FinancialsPage() {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-[#18181b]">Financials</h1>
+            <h1 className="text-xl font-bold text-[var(--text-primary)]">Financials</h1>
           </div>
           <div className="flex items-center gap-2">
             <Link
               href="/dashboard/estimates"
-              className="rounded-lg border border-[#e6e6eb] px-4 py-2 text-sm font-medium text-[#60606a] transition-colors hover:bg-[#f4f4f6]"
+              className="rounded-lg border border-[var(--border)] px-4 py-2 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-overlay)]"
             >
               Estimates
             </Link>
             <Link
               href="/dashboard/invoices"
-              className="rounded-lg border border-[#e6e6eb] px-4 py-2 text-sm font-medium text-[#60606a] transition-colors hover:bg-[#f4f4f6]"
+              className="rounded-lg border border-[var(--border)] px-4 py-2 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-overlay)]"
             >
               Invoices
             </Link>
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+              className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors"
             >
               + New Invoice
             </button>
@@ -303,10 +303,10 @@ export default function FinancialsPage() {
         {/* Stats */}
         <div className="grid grid-cols-4 gap-4">
           {stats.map((s) => (
-            <div key={s.label} className="rounded-xl border border-[#e6e6eb] bg-white p-4">
-              <p className="text-xs text-[#a8a8b4]">{s.label}</p>
-              <p className="mt-1 text-2xl font-bold text-[#18181b]">{s.value}</p>
-              <p className={`mt-1 text-xs font-medium ${s.up ? 'text-emerald-600' : 'text-[#60606a]'}`}>
+            <div key={s.label} className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-4">
+              <p className="text-xs text-[var(--text-muted)]">{s.label}</p>
+              <p className="mt-1 font-mono text-2xl font-bold text-[var(--text-primary)]">{s.value}</p>
+              <p className={`mt-1 text-xs font-medium ${s.up ? 'text-emerald-600' : 'text-[var(--text-secondary)]'}`}>
                 {s.change}
               </p>
             </div>
@@ -314,24 +314,24 @@ export default function FinancialsPage() {
         </div>
 
         {/* Monthly Summary */}
-        <div className="rounded-xl border border-[#e6e6eb] bg-white p-5">
-          <h2 className="mb-4 text-sm font-semibold text-[#18181b]">Monthly Summary</h2>
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-5">
+          <h2 className="mb-4 text-sm font-semibold text-[var(--text-primary)]">Monthly Summary</h2>
           {monthlySummary.length === 0 ? (
-            <p className="py-4 text-center text-sm text-[#a8a8b4]">No invoice data yet</p>
+            <p className="py-4 text-center text-sm text-[var(--text-muted)]">No invoice data yet</p>
           ) : (
             <div className="space-y-3">
               {monthlySummary.map((m) => {
                 const pct = Math.round((m.revenue / maxRevenue) * 100);
                 return (
                   <div key={m.month} className="flex items-center gap-4">
-                    <span className="w-8 text-sm font-medium text-[#60606a]">{m.month}</span>
+                    <span className="w-8 text-sm font-medium text-[var(--text-secondary)]">{m.month}</span>
                     <div className="flex-1">
-                      <div className="h-6 w-full rounded-full bg-[#f4f4f6]">
+                      <div className="h-6 w-full rounded-full bg-[var(--surface-raised)]">
                         <div
-                          className="flex h-6 items-center rounded-full bg-blue-600 px-3 text-xs font-medium text-white"
+                          className="flex h-6 items-center rounded-full bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-3 text-xs font-medium text-white"
                           style={{ width: `${Math.max(pct, 5)}%` }}
                         >
-                          {formatCurrency(m.revenue)}
+                          <span className="font-mono">{formatCurrency(m.revenue)}</span>
                         </div>
                       </div>
                     </div>
@@ -343,42 +343,42 @@ export default function FinancialsPage() {
         </div>
 
         {/* Recent Invoices */}
-        <div className="overflow-hidden rounded-xl border border-[#e6e6eb] bg-white">
-          <div className="flex items-center justify-between border-b border-[#e6e6eb] px-5 py-3">
-            <h2 className="text-sm font-semibold text-[#18181b]">Recent Invoices</h2>
-            <Link href="/dashboard/invoices" className="text-xs font-medium text-blue-600 hover:text-blue-700">
+        <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-card)]">
+          <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-3">
+            <h2 className="text-sm font-semibold text-[var(--text-primary)]">Recent Invoices</h2>
+            <Link href="/dashboard/invoices" className="text-xs font-medium text-[var(--accent-primary)] hover:text-[var(--accent-secondary)]">
               View all
             </Link>
           </div>
           {invoices.length === 0 ? (
             <div className="px-5 py-8 text-center">
-              <p className="text-sm text-[#a8a8b4]">No invoices yet</p>
+              <p className="text-sm text-[var(--text-muted)]">No invoices yet</p>
             </div>
           ) : (
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#e6e6eb] bg-[#f4f4f6]">
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Invoice</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Client</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Amount</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Status</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Date</th>
+                <tr className="border-b border-[var(--border)] bg-[var(--surface-raised)]">
+                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Invoice</th>
+                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Client</th>
+                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Amount</th>
+                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Status</th>
+                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Date</th>
                 </tr>
               </thead>
               <tbody>
                 {invoices.map((inv) => {
                   const s = statusStyle[inv.status] ?? defaultStatus;
                   return (
-                    <tr key={inv.id} className="border-b border-[#e6e6eb] last:border-0 hover:bg-[#f4f4f6]/50">
-                      <td className="px-4 py-3 font-medium text-[#18181b]">{inv.invoice_number}</td>
-                      <td className="px-4 py-3 text-[#60606a]">{inv.client_name}</td>
-                      <td className="px-4 py-3 font-medium text-[#18181b]">{formatCurrency(inv.total)}</td>
+                    <tr key={inv.id} className="border-b border-[var(--border)] last:border-0 hover:bg-[var(--surface-overlay)]">
+                      <td className="px-4 py-3 font-mono font-medium text-[var(--text-primary)]">{inv.invoice_number}</td>
+                      <td className="px-4 py-3 text-[var(--text-secondary)]">{inv.client_name}</td>
+                      <td className="px-4 py-3 font-mono font-medium text-[var(--text-primary)]">{formatCurrency(inv.total)}</td>
                       <td className="px-4 py-3">
                         <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium capitalize ${s.bg} ${s.text}`}>
                           {inv.status}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-[#60606a]">{formatDate(inv.created_at)}</td>
+                      <td className="px-4 py-3 text-[var(--text-secondary)]">{formatDate(inv.created_at)}</td>
                     </tr>
                   );
                 })}
@@ -389,37 +389,37 @@ export default function FinancialsPage() {
 
         {/* Estimates */}
         {estimates.length > 0 && (
-          <div className="overflow-hidden rounded-xl border border-[#e6e6eb] bg-white">
-            <div className="flex items-center justify-between border-b border-[#e6e6eb] px-5 py-3">
-              <h2 className="text-sm font-semibold text-[#18181b]">Estimates</h2>
-              <Link href="/dashboard/estimates" className="text-xs font-medium text-blue-600 hover:text-blue-700">
+          <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-card)]">
+            <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-3">
+              <h2 className="text-sm font-semibold text-[var(--text-primary)]">Estimates</h2>
+              <Link href="/dashboard/estimates" className="text-xs font-medium text-[var(--accent-primary)] hover:text-[var(--accent-secondary)]">
                 View all
               </Link>
             </div>
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#e6e6eb] bg-[#f4f4f6]">
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Estimate</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Client</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Amount</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Status</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Date</th>
+                <tr className="border-b border-[var(--border)] bg-[var(--surface-raised)]">
+                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Estimate</th>
+                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Client</th>
+                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Amount</th>
+                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Status</th>
+                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Date</th>
                 </tr>
               </thead>
               <tbody>
                 {estimates.map((est) => {
                   const s = statusStyle[est.status] ?? defaultStatus;
                   return (
-                    <tr key={est.id} className="border-b border-[#e6e6eb] last:border-0 hover:bg-[#f4f4f6]/50">
-                      <td className="px-4 py-3 font-medium text-[#18181b]">{est.estimate_number}</td>
-                      <td className="px-4 py-3 text-[#60606a]">{est.client_name}</td>
-                      <td className="px-4 py-3 font-medium text-[#18181b]">{formatCurrency(est.total)}</td>
+                    <tr key={est.id} className="border-b border-[var(--border)] last:border-0 hover:bg-[var(--surface-overlay)]">
+                      <td className="px-4 py-3 font-mono font-medium text-[var(--text-primary)]">{est.estimate_number}</td>
+                      <td className="px-4 py-3 text-[var(--text-secondary)]">{est.client_name}</td>
+                      <td className="px-4 py-3 font-mono font-medium text-[var(--text-primary)]">{formatCurrency(est.total)}</td>
                       <td className="px-4 py-3">
                         <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium capitalize ${s.bg} ${s.text}`}>
                           {est.status}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-[#60606a]">{formatDate(est.created_at)}</td>
+                      <td className="px-4 py-3 text-[var(--text-secondary)]">{formatDate(est.created_at)}</td>
                     </tr>
                   );
                 })}

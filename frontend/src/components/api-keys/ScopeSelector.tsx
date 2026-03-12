@@ -31,16 +31,16 @@ export default function ScopeSelector({
 
   return (
     <div className="space-y-3">
-      <label className="block text-sm font-medium text-[#18181b]">
+      <label className="block text-sm font-medium text-[var(--text-primary)]">
         Permissions
       </label>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {Object.entries(groups).map(([resource, scopes]) => (
           <div
             key={resource}
-            className="rounded-lg border border-[#e6e6eb] p-3"
+            className="rounded-lg border border-[var(--border)] p-3"
           >
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[#60606a]">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
               {resource}
             </p>
             {scopes.map((scope) => (
@@ -52,13 +52,13 @@ export default function ScopeSelector({
                   type="checkbox"
                   checked={selectedScopes.includes(scope.scope)}
                   onChange={() => toggleScope(scope.scope)}
-                  className="mt-0.5 h-4 w-4 rounded border-[#e6e6eb] text-blue-600 focus:ring-blue-500"
+                  className="mt-0.5 h-4 w-4 rounded border-[var(--border)] text-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
                 />
                 <div>
-                  <p className="text-sm font-medium text-[#18181b]">
+                  <p className="text-sm font-medium text-[var(--text-primary)]">
                     {scope.scope}
                   </p>
-                  <p className="text-xs text-[#60606a]">{scope.description}</p>
+                  <p className="text-xs text-[var(--text-secondary)]">{scope.description}</p>
                 </div>
               </label>
             ))}
