@@ -72,7 +72,7 @@ const INITIAL_CHECKLISTS: JobChecklist[] = [
 const STATUS_STYLES = {
   'in-progress': { bg: 'bg-amber-50', text: 'text-amber-700', label: 'In Progress' },
   completed: { bg: 'bg-emerald-50', text: 'text-emerald-700', label: 'Completed' },
-  'not-started': { bg: 'bg-gray-100', text: 'text-[#60606a]', label: 'Not Started' },
+  'not-started': { bg: 'bg-[var(--surface-app)]', text: 'text-[var(--text-secondary)]', label: 'Not Started' },
 };
 
 export default function ChecklistsPage() {
@@ -105,13 +105,13 @@ export default function ChecklistsPage() {
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-[#18181b]">
+            <h1 className="text-xl font-bold text-[var(--text-primary)]">
               Installation Checklists
             </h1>
-            <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-[#60606a]">
+            <span className="rounded-full bg-[var(--surface-app)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-secondary)]">
               {totalJobs} jobs
             </span>
           </div>
@@ -130,14 +130,14 @@ export default function ChecklistsPage() {
             return (
               <div
                 key={checklist.id}
-                className="rounded-lg border border-[#e6e6eb] bg-white"
+                className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)]"
               >
                 {/* Checklist header */}
                 <div className="px-5 py-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="flex items-center gap-2">
-                        <p className="text-sm font-semibold text-[#18181b]">
+                        <p className="text-sm font-semibold text-[var(--text-primary)]">
                           {checklist.jobName}
                         </p>
                         <span
@@ -146,21 +146,21 @@ export default function ChecklistsPage() {
                           {style.label}
                         </span>
                       </div>
-                      <p className="mt-0.5 text-xs text-[#60606a]">
+                      <p className="mt-0.5 text-xs text-[var(--text-secondary)]">
                         {checklist.vehicle} &middot; {checklist.date}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-mono text-lg font-bold text-[#18181b]">
+                      <p className="font-mono text-lg font-bold text-[var(--text-primary)]">
                         {pct}%
                       </p>
-                      <p className="font-mono text-[10px] text-[#a8a8b4]">
+                      <p className="font-mono text-[10px] text-[var(--text-muted)]">
                         {completed}/{total} done
                       </p>
                     </div>
                   </div>
                   {/* Progress bar */}
-                  <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
+                  <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-app)]">
                     <div
                       className={`h-full rounded-full transition-all duration-300 ${
                         pct === 100 ? 'bg-emerald-500' : 'bg-blue-500'
@@ -171,13 +171,13 @@ export default function ChecklistsPage() {
                 </div>
 
                 {/* Checklist items */}
-                <div className="border-t border-[#e6e6eb]">
+                <div className="border-t border-[var(--border)]">
                   {checklist.items.map((item, idx) => (
                     <label
                       key={item.id}
-                      className={`flex cursor-pointer items-center gap-3 px-5 py-3 transition-colors hover:bg-gray-50 ${
+                      className={`flex cursor-pointer items-center gap-3 px-5 py-3 transition-colors hover:bg-[var(--surface-overlay)] ${
                         idx < checklist.items.length - 1
-                          ? 'border-b border-[#e6e6eb]'
+                          ? 'border-b border-[var(--border)]'
                           : ''
                       }`}
                     >
@@ -185,13 +185,13 @@ export default function ChecklistsPage() {
                         type="checkbox"
                         checked={item.checked}
                         onChange={() => toggleItem(checklist.id, item.id)}
-                        className="h-4 w-4 shrink-0 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        className="h-4 w-4 shrink-0 rounded border-[var(--border)] text-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
                       />
                       <span
                         className={`text-sm ${
                           item.checked
-                            ? 'text-[#a8a8b4] line-through'
-                            : 'text-[#18181b]'
+                            ? 'text-[var(--text-muted)] line-through'
+                            : 'text-[var(--text-primary)]'
                         }`}
                       >
                         {item.label}

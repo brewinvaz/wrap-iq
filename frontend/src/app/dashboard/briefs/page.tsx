@@ -76,11 +76,11 @@ export default function BriefsPage() {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-[#18181b]">Job Briefs</h1>
-            <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-[#60606a]">
+            <h1 className="text-xl font-bold text-[var(--text-primary)]">Job Briefs</h1>
+            <span className="rounded-full bg-[var(--surface-app)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-secondary)]">
               {briefs.length} briefs
             </span>
           </div>
@@ -94,7 +94,7 @@ export default function BriefsPage() {
             return (
               <div
                 key={brief.id}
-                className="rounded-lg border border-[#e6e6eb] bg-white transition-shadow hover:shadow-sm"
+                className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)] transition-shadow hover:shadow-sm"
               >
                 {/* Brief header row */}
                 <button
@@ -104,7 +104,7 @@ export default function BriefsPage() {
                   <div className="flex items-center gap-4 min-w-0">
                     <div className="shrink-0">
                       <svg
-                        className={`h-4 w-4 text-[#a8a8b4] transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                        className={`h-4 w-4 text-[var(--text-muted)] transition-transform ${isExpanded ? 'rotate-90' : ''}`}
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -114,48 +114,48 @@ export default function BriefsPage() {
                       </svg>
                     </div>
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-[#18181b]">{brief.jobName}</p>
-                      <p className="mt-0.5 text-xs text-[#a8a8b4]">{brief.client}</p>
+                      <p className="truncate text-sm font-medium text-[var(--text-primary)]">{brief.jobName}</p>
+                      <p className="mt-0.5 text-xs text-[var(--text-muted)]">{brief.client}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4 shrink-0">
                     <span
-                      className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[brief.status] ?? 'bg-gray-100 text-gray-600'}`}
+                      className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[brief.status] ?? 'bg-[var(--surface-app)] text-[var(--text-secondary)]'}`}
                     >
                       {brief.status}
                     </span>
-                    <span className="font-mono text-xs text-[#a8a8b4]">Due {brief.dueDate}</span>
+                    <span className="font-mono text-xs text-[var(--text-muted)]">Due {brief.dueDate}</span>
                   </div>
                 </button>
 
                 {/* Expanded details */}
                 {isExpanded && (
-                  <div className="border-t border-[#e6e6eb] bg-gray-50 px-5 py-4">
+                  <div className="border-t border-[var(--border)] bg-[var(--surface-app)] px-5 py-4">
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                       <div>
-                        <p className="font-mono text-[9.5px] uppercase tracking-wider text-[#a8a8b4]">
+                        <p className="font-mono text-[9.5px] uppercase tracking-wider text-[var(--text-muted)]">
                           Vehicle / Surface
                         </p>
-                        <p className="mt-1 text-sm text-[#18181b]">{brief.vehicleInfo}</p>
+                        <p className="mt-1 text-sm text-[var(--text-primary)]">{brief.vehicleInfo}</p>
                       </div>
                       <div>
-                        <p className="font-mono text-[9.5px] uppercase tracking-wider text-[#a8a8b4]">
+                        <p className="font-mono text-[9.5px] uppercase tracking-wider text-[var(--text-muted)]">
                           Wrap Type
                         </p>
-                        <p className="mt-1 text-sm text-[#18181b]">{brief.wrapType}</p>
+                        <p className="mt-1 text-sm text-[var(--text-primary)]">{brief.wrapType}</p>
                       </div>
                       <div>
-                        <p className="font-mono text-[9.5px] uppercase tracking-wider text-[#a8a8b4]">
+                        <p className="font-mono text-[9.5px] uppercase tracking-wider text-[var(--text-muted)]">
                           Due Date
                         </p>
-                        <p className="mt-1 text-sm text-[#18181b]">{brief.dueDate}</p>
+                        <p className="mt-1 text-sm text-[var(--text-primary)]">{brief.dueDate}</p>
                       </div>
                     </div>
                     <div className="mt-4">
-                      <p className="font-mono text-[9.5px] uppercase tracking-wider text-[#a8a8b4]">
+                      <p className="font-mono text-[9.5px] uppercase tracking-wider text-[var(--text-muted)]">
                         Special Instructions
                       </p>
-                      <p className="mt-1 text-sm leading-relaxed text-[#60606a]">
+                      <p className="mt-1 text-sm leading-relaxed text-[var(--text-secondary)]">
                         {brief.specialInstructions}
                       </p>
                     </div>
