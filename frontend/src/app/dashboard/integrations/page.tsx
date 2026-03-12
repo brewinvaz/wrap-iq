@@ -151,7 +151,7 @@ export default function IntegrationsPage() {
             </span>
           </div>
           {webhooks.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-[var(--border)] bg-[#fafafa] px-6 py-8 text-center">
+            <div className="rounded-xl border border-dashed border-[var(--border)] bg-[var(--surface-raised)] px-6 py-8 text-center">
               <p className="text-sm text-[var(--text-secondary)]">No webhooks configured</p>
               <p className="mt-1 text-xs text-[var(--text-muted)]">
                 Webhooks let external services receive real-time updates from WrapFlow.
@@ -213,7 +213,7 @@ export default function IntegrationsPage() {
             </span>
           </div>
           {apiKeys.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-[var(--border)] bg-[#fafafa] px-6 py-8 text-center">
+            <div className="rounded-xl border border-dashed border-[var(--border)] bg-[var(--surface-raised)] px-6 py-8 text-center">
               <p className="text-sm text-[var(--text-secondary)]">No API keys created</p>
               <p className="mt-1 text-xs text-[var(--text-muted)]">
                 API keys allow external applications to authenticate with WrapFlow.

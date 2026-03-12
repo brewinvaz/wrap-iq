@@ -27,7 +27,7 @@ const typeStyles: Record<Document['type'], { bg: string; text: string }> = {
 };
 
 const statusStyles: Record<Document['status'], { bg: string; text: string }> = {
-  draft: { bg: 'bg-gray-100', text: 'text-gray-600' },
+  draft: { bg: 'bg-[var(--surface-raised)]', text: 'text-[var(--text-secondary)]' },
   sent: { bg: 'bg-amber-50', text: 'text-amber-700' },
   signed: { bg: 'bg-emerald-50', text: 'text-emerald-700' },
   expired: { bg: 'bg-rose-50', text: 'text-rose-700' },
@@ -36,11 +36,11 @@ const statusStyles: Record<Document['status'], { bg: string; text: string }> = {
 export default function ContractsPage() {
   return (
     <div className="flex h-full flex-col">
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-[#18181b]">Contracts & Documents</h1>
-            <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-[#60606a]">
+            <h1 className="text-xl font-bold text-[var(--text-primary)]">Contracts & Documents</h1>
+            <span className="rounded-full bg-[var(--surface-raised)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-muted)]">
               {documents.length} documents
             </span>
           </div>
@@ -51,16 +51,16 @@ export default function ContractsPage() {
       </header>
 
       <div className="flex-1 overflow-auto p-6">
-        <div className="overflow-hidden rounded-xl border border-[#e6e6eb] bg-white">
+        <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-card)]">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[#e6e6eb] bg-[#f4f4f6]">
-                <th className="px-4 py-3 text-left font-medium text-[#60606a]">Document</th>
-                <th className="px-4 py-3 text-left font-medium text-[#60606a]">Client</th>
-                <th className="px-4 py-3 text-left font-medium text-[#60606a]">Type</th>
-                <th className="px-4 py-3 text-left font-medium text-[#60606a]">Status</th>
-                <th className="px-4 py-3 text-left font-medium text-[#60606a]">Date</th>
-                <th className="px-4 py-3 text-left font-medium text-[#60606a]">Actions</th>
+              <tr className="border-b border-[var(--border)] bg-[var(--surface-raised)]">
+                <th className="px-4 py-3 text-left font-medium text-[var(--text-muted)]">Document</th>
+                <th className="px-4 py-3 text-left font-medium text-[var(--text-muted)]">Client</th>
+                <th className="px-4 py-3 text-left font-medium text-[var(--text-muted)]">Type</th>
+                <th className="px-4 py-3 text-left font-medium text-[var(--text-muted)]">Status</th>
+                <th className="px-4 py-3 text-left font-medium text-[var(--text-muted)]">Date</th>
+                <th className="px-4 py-3 text-left font-medium text-[var(--text-muted)]">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -68,9 +68,9 @@ export default function ContractsPage() {
                 const ts = typeStyles[doc.type];
                 const ss = statusStyles[doc.status];
                 return (
-                  <tr key={doc.id} className="border-b border-[#e6e6eb] last:border-0 hover:bg-[#f4f4f6]/50">
-                    <td className="px-4 py-3 font-medium text-[#18181b]">{doc.name}</td>
-                    <td className="px-4 py-3 text-[#60606a]">{doc.client}</td>
+                  <tr key={doc.id} className="border-b border-[var(--border)] last:border-0 hover:bg-[var(--surface-raised)]/50">
+                    <td className="px-4 py-3 font-medium text-[var(--text-primary)]">{doc.name}</td>
+                    <td className="px-4 py-3 text-[var(--text-muted)]">{doc.client}</td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium capitalize ${ts.bg} ${ts.text}`}>
                         {doc.type}
@@ -81,7 +81,7 @@ export default function ContractsPage() {
                         {doc.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-[#60606a]">{doc.date}</td>
+                    <td className="px-4 py-3 text-[var(--text-muted)]">{doc.date}</td>
                     <td className="px-4 py-3">
                       <button className="text-xs font-medium text-blue-600 hover:text-blue-800">View</button>
                     </td>

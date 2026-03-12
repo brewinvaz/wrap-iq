@@ -31,11 +31,11 @@ const statusCounts = equipment.reduce<Record<string, number>>((acc, e) => {
 export default function EquipmentPage() {
   return (
     <div className="flex h-full flex-col">
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-[#18181b]">My Equipment</h1>
-            <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-[#60606a]">
+            <h1 className="text-xl font-bold text-[var(--text-primary)]">My Equipment</h1>
+            <span className="rounded-full bg-[var(--surface-raised)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-muted)]">
               {equipment.length} items
             </span>
           </div>
@@ -43,11 +43,11 @@ export default function EquipmentPage() {
       </header>
 
       {/* Status summary */}
-      <div className="shrink-0 flex gap-4 border-b border-[#e6e6eb] bg-white px-6 py-3">
+      <div className="shrink-0 flex gap-4 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-3">
         {Object.entries(statusCounts).map(([status, count]) => (
           <div key={status} className="flex items-center gap-2">
-            <span className={`h-2 w-2 rounded-full ${STATUS_DOT[status] ?? 'bg-gray-400'}`} />
-            <span className="text-sm text-[#60606a]">
+            <span className={`h-2 w-2 rounded-full ${STATUS_DOT[status] ?? 'bg-[var(--text-muted)]'}`} />
+            <span className="text-sm text-[var(--text-muted)]">
               {count} {status}
             </span>
           </div>
@@ -60,15 +60,15 @@ export default function EquipmentPage() {
           {equipment.map((item) => (
             <div
               key={item.id}
-              className="rounded-lg border border-[#e6e6eb] bg-white p-5 transition-shadow hover:shadow-sm"
+              className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)] p-5 transition-shadow hover:shadow-sm"
             >
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm font-medium text-[#18181b]">{item.name}</p>
-                  <p className="mt-0.5 text-xs text-[#a8a8b4]">{item.category}</p>
+                  <p className="text-sm font-medium text-[var(--text-primary)]">{item.name}</p>
+                  <p className="mt-0.5 text-xs text-[var(--text-secondary)]">{item.category}</p>
                 </div>
                 <span
-                  className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[item.status] ?? 'bg-gray-100 text-gray-600'}`}
+                  className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[item.status] ?? 'bg-[var(--surface-raised)] text-[var(--text-secondary)]'}`}
                 >
                   {item.status}
                 </span>
@@ -76,21 +76,21 @@ export default function EquipmentPage() {
 
               <div className="mt-4 space-y-2">
                 <div className="flex justify-between">
-                  <span className="font-mono text-[9.5px] uppercase tracking-wider text-[#a8a8b4]">
+                  <span className="font-mono text-[9.5px] uppercase tracking-wider text-[var(--text-secondary)]">
                     Location
                   </span>
-                  <span className="text-xs text-[#60606a]">{item.assignedTo}</span>
+                  <span className="text-xs text-[var(--text-muted)]">{item.assignedTo}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="font-mono text-[9.5px] uppercase tracking-wider text-[#a8a8b4]">
+                  <span className="font-mono text-[9.5px] uppercase tracking-wider text-[var(--text-secondary)]">
                     Last Service
                   </span>
-                  <span className="font-mono text-xs text-[#60606a]">{item.lastService}</span>
+                  <span className="font-mono text-xs text-[var(--text-muted)]">{item.lastService}</span>
                 </div>
               </div>
 
-              <div className="mt-3 border-t border-[#e6e6eb] pt-3">
-                <p className="text-xs leading-relaxed text-[#60606a]">{item.notes}</p>
+              <div className="mt-3 border-t border-[var(--border)] pt-3">
+                <p className="text-xs leading-relaxed text-[var(--text-muted)]">{item.notes}</p>
               </div>
             </div>
           ))}
