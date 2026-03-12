@@ -51,13 +51,13 @@ export default function DayView({
   const dayLabel = `${dayNames[date.getDay()]}, ${date.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}`;
 
   return (
-    <div className="flex-1 overflow-auto bg-white">
+    <div className="flex-1 overflow-auto bg-[var(--surface-card)]">
       {/* Day header */}
       <div
-        className={`border-b border-[#e6e6eb] px-6 py-3 ${isToday ? 'bg-blue-50/50' : 'bg-gray-50'}`}
+        className={`border-b border-[var(--border)] px-6 py-3 ${isToday ? 'bg-[var(--surface-overlay)]' : 'bg-[var(--surface-raised)]'}`}
       >
         <span
-          className={`text-sm font-semibold ${isToday ? 'text-blue-600' : 'text-[#18181b]'}`}
+          className={`text-sm font-semibold ${isToday ? 'text-[var(--accent-primary)]' : 'text-[var(--text-primary)]'}`}
         >
           {dayLabel}
         </span>
@@ -65,13 +65,13 @@ export default function DayView({
 
       <div className="grid min-w-[600px] grid-cols-[80px_repeat(var(--cols),1fr)]" style={{ '--cols': filteredInstallers.length } as React.CSSProperties}>
         {/* Column headers: time + installer names */}
-        <div className="sticky top-0 z-10 border-b border-r border-[#e6e6eb] bg-gray-50 px-2 py-3">
-          <span className="text-xs font-medium text-[#a8a8b4]">Time</span>
+        <div className="sticky top-0 z-10 border-b border-r border-[var(--border)] bg-[var(--surface-raised)] px-2 py-3">
+          <span className="text-xs font-medium text-[var(--text-muted)]">Time</span>
         </div>
         {filteredInstallers.map((installer) => (
           <div
             key={installer.id}
-            className="sticky top-0 z-10 border-b border-r border-[#e6e6eb] bg-gray-50 px-3 py-3 text-center last:border-r-0"
+            className="sticky top-0 z-10 border-b border-r border-[var(--border)] bg-[var(--surface-raised)] px-3 py-3 text-center last:border-r-0"
           >
             <div className="flex items-center justify-center gap-2">
               <div
@@ -80,7 +80,7 @@ export default function DayView({
               >
                 {installer.initials}
               </div>
-              <span className="text-xs font-medium text-[#18181b]">
+              <span className="text-xs font-medium text-[var(--text-primary)]">
                 {installer.name}
               </span>
             </div>
@@ -100,7 +100,7 @@ export default function DayView({
       </div>
 
       {filteredInstallers.length === 0 && (
-        <div className="flex h-48 items-center justify-center text-sm text-[#a8a8b4]">
+        <div className="flex h-48 items-center justify-center text-sm text-[var(--text-muted)]">
           No installers selected. Use the filter chips above to show installers.
         </div>
       )}
@@ -121,8 +121,8 @@ function TimeRow({
 }) {
   return (
     <>
-      <div className="border-b border-r border-[#e6e6eb] px-2 py-3">
-        <span className="text-[11px] font-medium text-[#a8a8b4]">
+      <div className="border-b border-r border-[var(--border)] px-2 py-3">
+        <span className="font-mono text-[11px] font-medium text-[var(--text-muted)]">
           {formatHour(hour)}
         </span>
       </div>
@@ -137,7 +137,7 @@ function TimeRow({
         return (
           <div
             key={installer.id}
-            className="group relative min-h-[50px] border-b border-r border-[#e6e6eb] p-1 last:border-r-0"
+            className="group relative min-h-[50px] border-b border-r border-[var(--border)] p-1 last:border-r-0"
           >
             {cellEvents.map((evt) => {
               const startHour = parseInt(evt.startTime.split(':')[0], 10);
@@ -166,10 +166,10 @@ function TimeRow({
                   >
                     {evt.title}
                   </div>
-                  <div className="mt-0.5 truncate font-mono text-[10px] text-[#60606a]">
+                  <div className="mt-0.5 truncate font-mono text-[10px] text-[var(--text-secondary)]">
                     {evt.vehicle}
                   </div>
-                  <div className="mt-0.5 text-[10px] text-[#a8a8b4]">
+                  <div className="mt-0.5 font-mono text-[10px] text-[var(--text-muted)]">
                     {evt.startTime} – {evt.endTime}
                   </div>
                 </button>

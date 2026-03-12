@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { Clock } from 'lucide-react';
 import { api, ApiError } from '@/lib/api-client';
 
 interface TimeLogUser {
@@ -109,22 +110,22 @@ function exportTimeLogsCsv(logs: TimeLog[]) {
 function LoadingSkeleton() {
   return (
     <div className="flex h-full flex-col">
-      <div className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
-        <div className="h-7 w-48 animate-pulse rounded bg-gray-200" />
+      <div className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
+        <div className="h-7 w-48 animate-pulse rounded bg-[var(--surface-overlay)]" />
       </div>
       <div className="flex-1 space-y-6 overflow-auto p-6">
         <div className="grid grid-cols-4 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-20 animate-pulse rounded-xl border border-[#e6e6eb] bg-gray-100" />
+            <div key={i} className="h-20 animate-pulse rounded-xl border border-[var(--border)] bg-[var(--surface-raised)]" />
           ))}
         </div>
-        <div className="overflow-hidden rounded-xl border border-[#e6e6eb] bg-white">
-          <div className="border-b border-[#e6e6eb] bg-[#f4f4f6] px-4 py-3">
-            <div className="h-4 w-full animate-pulse rounded bg-gray-200" />
+        <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-card)]">
+          <div className="border-b border-[var(--border)] bg-[var(--surface-raised)] px-4 py-3">
+            <div className="h-4 w-full animate-pulse rounded bg-[var(--surface-overlay)]" />
           </div>
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="border-b border-[#e6e6eb] px-4 py-3">
-              <div className="h-4 w-full animate-pulse rounded bg-gray-100" />
+            <div key={i} className="border-b border-[var(--border)] px-4 py-3">
+              <div className="h-4 w-full animate-pulse rounded bg-[var(--surface-raised)]" />
             </div>
           ))}
         </div>
@@ -217,23 +218,23 @@ export default function TimeLogsPage() {
   return (
     <div className="flex h-full flex-col">
       {toast && (
-        <div className="fixed right-6 top-6 z-50 animate-fade-in rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 shadow-lg">
+        <div className="fixed right-6 top-6 z-50 animate-fade-in rounded-lg border border-[var(--phase-install)] bg-[var(--phase-install)]/10 px-4 py-3 text-sm font-medium text-[var(--phase-install)] shadow-lg">
           {toast}
         </div>
       )}
 
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-[#18181b]">Time Logs</h1>
-            <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-[#60606a]">
+            <h1 className="text-[22px] font-[800] text-[var(--text-primary)]">Time Logs</h1>
+            <span className="rounded-full bg-[var(--text-muted)]/10 px-2.5 py-0.5 text-[10px] font-bold uppercase text-[var(--text-secondary)]">
               {total} total
             </span>
           </div>
           <button
             onClick={handleExportCsv}
             disabled={logs.length === 0}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
+            className="rounded-lg bg-[var(--accent-primary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-80 disabled:opacity-50"
           >
             Export CSV
           </button>
@@ -252,65 +253,63 @@ export default function TimeLogsPage() {
       <div className="flex-1 space-y-6 overflow-auto p-6">
         <div className="grid grid-cols-4 gap-4">
           {summaryStats.map((s) => (
-            <div key={s.label} className="rounded-xl border border-[#e6e6eb] bg-white p-4">
-              <p className="text-xs text-[#a8a8b4]">{s.label}</p>
-              <p className={`mt-1 text-2xl font-bold ${s.accent ? 'text-amber-600' : 'text-[#18181b]'}`}>
+            <div key={s.label} className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-[18px]">
+              <p className="text-xs text-[var(--text-muted)]">{s.label}</p>
+              <p className={`mt-1 font-mono text-2xl font-bold ${s.accent ? 'text-amber-500' : 'text-[var(--text-primary)]'}`}>
                 {s.value}
               </p>
             </div>
           ))}
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-[#e6e6eb] bg-white">
-          <div className="border-b border-[#e6e6eb] px-5 py-3">
-            <h2 className="text-sm font-semibold text-[#18181b]">All Time Entries</h2>
+        <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-card)]">
+          <div className="border-b border-[var(--border-subtle)] px-5 py-3">
+            <h2 className="text-sm font-semibold text-[var(--text-primary)]">All Time Entries</h2>
           </div>
 
           {logs.length === 0 && !loading ? (
             <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-              <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-                <svg className="h-6 w-6 text-[#a8a8b4]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                </svg>
+              <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--surface-raised)]">
+                <Clock className="h-6 w-6 text-[var(--text-muted)]" strokeWidth={1.5} />
               </div>
-              <p className="text-sm font-medium text-[#18181b]">No time logs yet</p>
-              <p className="mt-1 max-w-sm text-sm text-[#a8a8b4]">
+              <p className="text-sm font-medium text-[var(--text-primary)]">No time logs yet</p>
+              <p className="mt-1 max-w-sm text-sm text-[var(--text-muted)]">
                 Time entries will appear here as team members log their hours.
               </p>
             </div>
           ) : (
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#e6e6eb] bg-[#f4f4f6]">
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Team Member</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Project</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Task</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Hours</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Date</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Status</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Action</th>
+                <tr className="border-b border-[var(--border-subtle)] bg-[var(--surface-raised)]">
+                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Team Member</th>
+                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Project</th>
+                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Task</th>
+                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Hours</th>
+                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Date</th>
+                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Status</th>
+                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {logs.map((log) => (
-                  <tr key={log.id} className="border-b border-[#e6e6eb] last:border-0 hover:bg-[#f4f4f6]/50">
+                  <tr key={log.id} className="border-b border-[var(--border-subtle)] last:border-0 hover:bg-[var(--surface-raised)]">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <div className={`flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-semibold text-white ${getAvatarColor(log.user.id)}`}>
                           {getInitials(log.user.full_name, log.user.email)}
                         </div>
-                        <span className="font-medium text-[#18181b]">{log.user.full_name || log.user.email}</span>
+                        <span className="font-medium text-[var(--text-primary)]">{log.user.full_name || log.user.email}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-[#60606a]">{log.work_order?.job_number || '—'}</td>
-                    <td className="px-4 py-3 text-[#60606a]">{log.task}</td>
-                    <td className="px-4 py-3 font-medium text-[#18181b]">{log.hours}h</td>
-                    <td className="px-4 py-3 text-[#60606a]">{formatDate(log.log_date)}</td>
+                    <td className="px-4 py-3 font-mono text-[var(--text-secondary)]">{log.work_order?.job_number || '—'}</td>
+                    <td className="px-4 py-3 text-[var(--text-secondary)]">{log.task}</td>
+                    <td className="px-4 py-3 font-mono font-medium text-[var(--text-primary)]">{log.hours}h</td>
+                    <td className="px-4 py-3 font-mono text-[var(--text-secondary)]">{formatDate(log.log_date)}</td>
                     <td className="px-4 py-3">
-                      <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
+                      <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${
                         log.status === 'approved'
-                          ? 'bg-emerald-50 text-emerald-700'
-                          : 'bg-amber-50 text-amber-700'
+                          ? 'bg-[var(--phase-install)]/10 text-[var(--phase-install)]'
+                          : 'bg-amber-500/10 text-amber-500'
                       }`}>
                         {log.status === 'approved' ? 'Approved' : 'Submitted'}
                       </span>
@@ -319,7 +318,7 @@ export default function TimeLogsPage() {
                       {log.status === 'submitted' && (
                         <button
                           onClick={() => handleApprove(log.id)}
-                          className="text-xs font-medium text-emerald-600 hover:text-emerald-800"
+                          className="text-xs font-medium text-[var(--phase-install)] hover:opacity-80"
                         >
                           Approve
                         </button>

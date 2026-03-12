@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { Printer, X, Check } from 'lucide-react';
 import { api, ApiError } from '@/lib/api-client';
 import { useModalAccessibility } from '@/hooks/useModalAccessibility';
 
@@ -112,16 +113,16 @@ const MATERIAL_OPTIONS = [
 ];
 
 const statusStyles: Record<PrintJob['status'], { bg: string; text: string; label: string }> = {
-  queued: { bg: 'bg-gray-100', text: 'text-gray-700', label: 'Queued' },
-  printing: { bg: 'bg-blue-50', text: 'text-blue-700', label: 'Printing' },
-  laminating: { bg: 'bg-amber-50', text: 'text-amber-700', label: 'Laminating' },
-  done: { bg: 'bg-emerald-50', text: 'text-emerald-700', label: 'Done' },
+  queued: { bg: 'bg-[var(--text-muted)]/10', text: 'text-[var(--text-secondary)]', label: 'Queued' },
+  printing: { bg: 'bg-[var(--phase-production)]/10', text: 'text-[var(--phase-production)]', label: 'Printing' },
+  laminating: { bg: 'bg-amber-500/10', text: 'text-amber-500', label: 'Laminating' },
+  done: { bg: 'bg-[var(--phase-install)]/10', text: 'text-[var(--phase-install)]', label: 'Done' },
 };
 
 const priorityStyles: Record<PrintJob['priority'], string> = {
   high: 'text-rose-600',
-  normal: 'text-[#60606a]',
-  low: 'text-[#a8a8b4]',
+  normal: 'text-[var(--text-secondary)]',
+  low: 'text-[var(--text-muted)]',
 };
 
 /* ------------------------------------------------------------------ */
@@ -136,14 +137,10 @@ function SuccessToast({ message, onDismiss }: { message: string; onDismiss: () =
 
   return (
     <div className="fixed bottom-6 right-6 z-[60] flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-sm font-medium text-white shadow-lg">
-      <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-      </svg>
+      <Check className="h-4 w-4 shrink-0" strokeWidth={2} />
       {message}
       <button onClick={onDismiss} className="ml-2 rounded p-0.5 hover:bg-emerald-500">
-        <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
+        <X className="h-3.5 w-3.5" strokeWidth={2} />
       </button>
     </div>
   );
@@ -156,28 +153,28 @@ function SuccessToast({ message, onDismiss }: { message: string; onDismiss: () =
 function LoadingSkeleton() {
   return (
     <div className="flex h-full flex-col">
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-7 w-56 animate-pulse rounded bg-gray-200" />
-            <div className="h-5 w-16 animate-pulse rounded-full bg-gray-100" />
+            <div className="h-7 w-56 animate-pulse rounded bg-[var(--surface-overlay)]" />
+            <div className="h-5 w-16 animate-pulse rounded-full bg-[var(--surface-raised)]" />
           </div>
-          <div className="h-9 w-32 animate-pulse rounded-lg bg-gray-200" />
+          <div className="h-9 w-32 animate-pulse rounded-lg bg-[var(--surface-overlay)]" />
         </div>
         <div className="mt-3 flex gap-1">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="h-8 w-24 animate-pulse rounded-lg bg-gray-200" />
+            <div key={i} className="h-8 w-24 animate-pulse rounded-lg bg-[var(--surface-overlay)]" />
           ))}
         </div>
       </header>
       <div className="flex-1 overflow-auto p-6">
-        <div className="overflow-hidden rounded-xl border border-[#e6e6eb] bg-white">
-          <div className="border-b border-[#e6e6eb] bg-[#f4f4f6] px-4 py-3">
-            <div className="h-4 w-full animate-pulse rounded bg-gray-200" />
+        <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-card)]">
+          <div className="border-b border-[var(--border)] bg-[var(--surface-raised)] px-4 py-3">
+            <div className="h-4 w-full animate-pulse rounded bg-[var(--surface-overlay)]" />
           </div>
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="border-b border-[#e6e6eb] px-4 py-3">
-              <div className="h-5 w-full animate-pulse rounded bg-gray-100" />
+            <div key={i} className="border-b border-[var(--border)] px-4 py-3">
+              <div className="h-5 w-full animate-pulse rounded bg-[var(--surface-raised)]" />
             </div>
           ))}
         </div>
@@ -265,9 +262,9 @@ function AddToQueueModal({ isOpen, onClose, onAdd }: AddToQueueModalProps) {
   }
 
   const inputClass =
-    'w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] placeholder-[#a8a8b4] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500';
+    'w-full rounded-xl border border-[var(--border)] bg-[var(--surface-raised)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]';
   const errorInputClass =
-    'w-full rounded-lg border border-red-300 px-3.5 py-2.5 text-sm text-[#18181b] placeholder-[#a8a8b4] transition-colors focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500';
+    'w-full rounded-xl border border-red-300 bg-[var(--surface-raised)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -278,26 +275,24 @@ function AddToQueueModal({ isOpen, onClose, onAdd }: AddToQueueModalProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="add-queue-title"
-        className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
+        className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-[var(--border)] bg-[var(--surface-card)] p-6 shadow-xl"
       >
         <div className="mb-6 flex items-center justify-between">
-          <h3 id="add-queue-title" className="text-lg font-semibold text-[#18181b]">
+          <h3 id="add-queue-title" className="text-lg font-semibold text-[var(--text-primary)]">
             Add to Print Queue
           </h3>
           <button
             onClick={onClose}
-            className="rounded-lg p-1 text-[#a8a8b4] transition-colors hover:bg-gray-100 hover:text-[#18181b]"
+            className="rounded-lg p-1 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-raised)] hover:text-[var(--text-primary)]"
           >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <X className="h-5 w-5" strokeWidth={1.5} />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Job Name */}
           <div>
-            <label htmlFor="queue-job-name" className="mb-1.5 block text-sm font-medium text-[#18181b]">
+            <label htmlFor="queue-job-name" className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]">
               Job Name <span className="text-red-500">*</span>
             </label>
             <input
@@ -315,7 +310,7 @@ function AddToQueueModal({ isOpen, onClose, onAdd }: AddToQueueModalProps) {
 
           {/* Material Type */}
           <div>
-            <label htmlFor="queue-material" className="mb-1.5 block text-sm font-medium text-[#18181b]">
+            <label htmlFor="queue-material" className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]">
               Material Type <span className="text-red-500">*</span>
             </label>
             <select
@@ -336,7 +331,7 @@ function AddToQueueModal({ isOpen, onClose, onAdd }: AddToQueueModalProps) {
           {/* Width & Height */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="queue-width" className="mb-1.5 block text-sm font-medium text-[#18181b]">
+              <label htmlFor="queue-width" className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]">
                 Width (ft) <span className="text-red-500">*</span>
               </label>
               <input
@@ -353,7 +348,7 @@ function AddToQueueModal({ isOpen, onClose, onAdd }: AddToQueueModalProps) {
               )}
             </div>
             <div>
-              <label htmlFor="queue-height" className="mb-1.5 block text-sm font-medium text-[#18181b]">
+              <label htmlFor="queue-height" className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]">
                 Height (ft) <span className="text-red-500">*</span>
               </label>
               <input
@@ -373,7 +368,7 @@ function AddToQueueModal({ isOpen, onClose, onAdd }: AddToQueueModalProps) {
 
           {/* Priority */}
           <div>
-            <label htmlFor="queue-priority" className="mb-1.5 block text-sm font-medium text-[#18181b]">
+            <label htmlFor="queue-priority" className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]">
               Priority
             </label>
             <select
@@ -389,7 +384,7 @@ function AddToQueueModal({ isOpen, onClose, onAdd }: AddToQueueModalProps) {
 
           {/* Notes */}
           <div>
-            <label htmlFor="queue-notes" className="mb-1.5 block text-sm font-medium text-[#18181b]">
+            <label htmlFor="queue-notes" className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]">
               Notes
             </label>
             <textarea
@@ -407,14 +402,14 @@ function AddToQueueModal({ isOpen, onClose, onAdd }: AddToQueueModalProps) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded-lg border border-[#e6e6eb] px-4 py-2.5 text-sm font-medium text-[#60606a] transition-colors hover:bg-gray-50"
+              className="flex-1 rounded-lg border border-[var(--border)] px-4 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-raised)]"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex-1 rounded-lg bg-[var(--accent-primary)] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSubmitting ? 'Adding...' : 'Add to Queue'}
             </button>
@@ -492,11 +487,11 @@ export default function PrintPage() {
   if (error) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-4">
-        <p className="text-sm font-medium text-[#18181b]">Failed to load print queue</p>
-        <p className="text-xs text-[#60606a]">{error}</p>
+        <p className="text-sm font-medium text-[var(--text-primary)]">Failed to load print queue</p>
+        <p className="text-xs text-[var(--text-secondary)]">{error}</p>
         <button
           onClick={() => setFetchKey((k) => k + 1)}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          className="rounded-lg bg-[var(--accent-primary)] px-4 py-2 text-sm font-medium text-white hover:opacity-80"
         >
           Retry
         </button>
@@ -506,17 +501,17 @@ export default function PrintPage() {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-[#18181b]">Print / Lamination Queue</h1>
-            <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-[#60606a]">
+            <h1 className="text-[22px] font-[800] text-[var(--text-primary)]">Print / Lamination Queue</h1>
+            <span className="rounded-full bg-[var(--phase-production)]/10 px-2.5 py-0.5 text-[10px] font-bold uppercase text-[var(--phase-production)]">
               {jobs.length} jobs
             </span>
           </div>
           <button
             onClick={() => setModalOpen(true)}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+            className="rounded-lg bg-[var(--accent-primary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-80"
           >
             + Add to Queue
           </button>
@@ -528,8 +523,8 @@ export default function PrintPage() {
               onClick={() => setFilter(tab.key)}
               className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
                 filter === tab.key
-                  ? 'bg-blue-50 text-blue-700'
-                  : 'text-[#60606a] hover:bg-gray-50'
+                  ? 'bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]'
+                  : 'text-[var(--text-secondary)] hover:bg-[var(--surface-raised)]'
               }`}
             >
               {tab.label} ({counts[tab.key]})
@@ -541,44 +536,42 @@ export default function PrintPage() {
       <div className="flex-1 overflow-auto p-6">
         {filtered.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center">
-            <svg className="mb-3 h-10 w-10 text-[#a8a8b4]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18.75 7.159l-.351.089" />
-            </svg>
-            <p className="text-sm font-medium text-[#60606a]">No items in this view</p>
-            <p className="mt-1 text-xs text-[#a8a8b4]">Print queue items will appear here as jobs come in.</p>
+            <Printer className="mb-3 h-10 w-10 text-[var(--text-muted)]" strokeWidth={1.5} />
+            <p className="text-sm font-medium text-[var(--text-secondary)]">No items in this view</p>
+            <p className="mt-1 text-xs text-[var(--text-muted)]">Print queue items will appear here as jobs come in.</p>
           </div>
         ) : (
-          <div className="overflow-hidden rounded-xl border border-[#e6e6eb] bg-white">
+          <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-card)]">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#e6e6eb] bg-[#f4f4f6]">
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Job</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Client</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Material</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Size</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Status</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Priority</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Due</th>
+                <tr className="border-b border-[var(--border-subtle)] bg-[var(--surface-raised)]">
+                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Job</th>
+                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Client</th>
+                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Material</th>
+                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Size</th>
+                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Status</th>
+                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Priority</th>
+                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Due</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.map((job) => {
                   const style = statusStyles[job.status];
                   return (
-                    <tr key={job.id} className="border-b border-[#e6e6eb] last:border-0 hover:bg-[#f4f4f6]/50">
-                      <td className="px-4 py-3 font-medium text-[#18181b]">{job.jobName}</td>
-                      <td className="px-4 py-3 text-[#60606a]">{job.client}</td>
-                      <td className="px-4 py-3 text-[#60606a]">{job.material}</td>
-                      <td className="px-4 py-3 text-[#60606a]">{job.size}</td>
+                    <tr key={job.id} className="border-b border-[var(--border-subtle)] last:border-0 hover:bg-[var(--surface-raised)]">
+                      <td className="px-4 py-3 font-medium text-[var(--text-primary)]">{job.jobName}</td>
+                      <td className="px-4 py-3 text-[var(--text-secondary)]">{job.client}</td>
+                      <td className="px-4 py-3 font-mono text-[var(--text-secondary)]">{job.material}</td>
+                      <td className="px-4 py-3 font-mono text-[var(--text-secondary)]">{job.size}</td>
                       <td className="px-4 py-3">
-                        <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${style.bg} ${style.text}`}>
+                        <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${style.bg} ${style.text}`}>
                           {style.label}
                         </span>
                       </td>
-                      <td className={`px-4 py-3 text-xs font-medium capitalize ${priorityStyles[job.priority]}`}>
+                      <td className={`px-4 py-3 text-[10px] font-bold uppercase ${priorityStyles[job.priority]}`}>
                         {job.priority}
                       </td>
-                      <td className="px-4 py-3 text-[#60606a]">{formatDate(job.dueDate)}</td>
+                      <td className="px-4 py-3 font-mono text-[var(--text-secondary)]">{formatDate(job.dueDate)}</td>
                     </tr>
                   );
                 })}
