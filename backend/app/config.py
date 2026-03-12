@@ -34,6 +34,7 @@ class Settings(BaseSettings):
     @property
     def async_test_database_url(self) -> str:
         return self._normalize_pg_url(self.test_database_url)
+
     redis_url: str = "redis://localhost:6379/0"
     secret_key: str = _DEV_SECRET_KEY
     cors_origins: str = "http://localhost:3000"
