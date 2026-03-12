@@ -165,7 +165,7 @@ export default function IconRail({
           </button>
 
           {dropdownOpen && (
-            <div className="absolute bottom-full left-1/2 z-50 mb-2 w-48 -translate-x-1/2 rounded-xl border border-[var(--border)] bg-[var(--surface-card)] py-1 shadow-lg">
+            <div className="absolute bottom-full left-0 z-50 mb-2 w-48 rounded-xl border border-[var(--border)] bg-[var(--surface-card)] py-1 shadow-lg">
               <div className="px-3 py-1.5">
                 <p className="truncate text-[12px] font-medium text-[var(--text-primary)]">{user?.fullName || roleConfig.name}</p>
                 <p className="truncate text-[10px] text-[var(--text-muted)]">{user?.email || roleConfig.title}</p>
