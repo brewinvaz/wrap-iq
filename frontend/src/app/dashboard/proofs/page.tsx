@@ -1,105 +1,25 @@
 'use client';
 
-import { useState } from 'react';
-
-type ProofStatus = 'all' | 'pending' | 'approved' | 'revision';
-
-interface Proof {
-  id: string;
-  designName: string;
-  client: string;
-  vehicle: string;
-  status: 'pending' | 'approved' | 'revision';
-  submittedDate: string;
-  designer: string;
-}
-
-const proofs: Proof[] = [
-  { id: '1', designName: 'Fleet Branding v2', client: 'Metro Plumbing', vehicle: '2024 Ford Transit', status: 'approved', submittedDate: '2026-03-08', designer: 'Sarah Chen' },
-  { id: '2', designName: 'Box Truck — Side Panels', client: 'FastFreight Inc.', vehicle: '2025 RAM ProMaster', status: 'pending', submittedDate: '2026-03-09', designer: 'Jordan Lee' },
-  { id: '3', designName: 'Matte Blue Color Change', client: 'CleanCo Services', vehicle: '2024 Mercedes Sprinter', status: 'revision', submittedDate: '2026-03-07', designer: 'Sarah Chen' },
-  { id: '4', designName: 'Accent Kit — Gold Stripe', client: 'Elite Auto Group', vehicle: '2024 BMW 3 Series', status: 'pending', submittedDate: '2026-03-10', designer: 'Jordan Lee' },
-  { id: '5', designName: 'Full Trailer Wrap', client: 'Skyline Moving', vehicle: '2024 Utility Trailer', status: 'approved', submittedDate: '2026-03-05', designer: 'Sarah Chen' },
-  { id: '6', designName: 'Hood & Roof Accent', client: 'Greenfield Lawn Care', vehicle: '2025 Toyota Tacoma', status: 'pending', submittedDate: '2026-03-10', designer: 'Jordan Lee' },
-];
-
-const statusStyles: Record<Proof['status'], { bg: string; text: string; label: string }> = {
-  pending: { bg: 'bg-amber-500/10', text: 'text-amber-400', label: 'Pending Review' },
-  approved: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', label: 'Approved' },
-  revision: { bg: 'bg-rose-500/10', text: 'text-rose-400', label: 'Revision Requested' },
-};
-
 export default function ProofsPage() {
-  const [filter, setFilter] = useState<ProofStatus>('all');
-  const filtered = filter === 'all' ? proofs : proofs.filter((p) => p.status === filter);
-
   return (
     <div className="flex h-full flex-col">
       <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-[var(--text-primary)]">Proof Approvals</h1>
-            <span className="rounded-full bg-amber-500/10 px-2.5 py-0.5 text-xs font-medium text-amber-400">
-              {proofs.filter((p) => p.status === 'pending').length} pending
-            </span>
-          </div>
-        </div>
-        <div className="mt-3 flex gap-1">
-          {([
-            { key: 'all' as ProofStatus, label: 'All' },
-            { key: 'pending' as ProofStatus, label: 'Pending' },
-            { key: 'approved' as ProofStatus, label: 'Approved' },
-            { key: 'revision' as ProofStatus, label: 'Revision' },
-          ]).map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setFilter(tab.key)}
-              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                filter === tab.key ? 'bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]' : 'text-[var(--text-secondary)] hover:bg-[var(--surface-overlay)]'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+        <div className="flex items-center gap-3">
+          <h1 className="text-xl font-bold text-[var(--text-primary)]">Proof Approvals</h1>
         </div>
       </header>
 
       <div className="flex-1 overflow-auto p-6">
-        <div className="grid grid-cols-3 gap-4">
-          {filtered.map((proof) => {
-            const style = statusStyles[proof.status];
-            return (
-              <div key={proof.id} className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-card)]">
-                <div className="flex h-36 items-center justify-center bg-gradient-to-br from-[var(--surface-app)] to-[var(--border)]">
-                  <div className="text-center">
-                    <span className="text-2xl">🎨</span>
-                    <p className="mt-1 text-[10px] text-[var(--text-muted)]">Design Proof</p>
-                  </div>
-                </div>
-                <div className="p-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-semibold text-[var(--text-primary)]">{proof.designName}</h3>
-                    <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium ${style.bg} ${style.text}`}>
-                      {style.label}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-xs text-[var(--text-secondary)]">{proof.client} — {proof.vehicle}</p>
-                  <p className="text-xs text-[var(--text-muted)]">By {proof.designer} · {proof.submittedDate}</p>
-
-                  {proof.status === 'pending' && (
-                    <div className="mt-3 flex gap-2">
-                      <button className="flex-1 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700">
-                        Approve
-                      </button>
-                      <button className="flex-1 rounded-lg border border-[var(--border)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-overlay)]">
-                        Request Revision
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+        <div className="flex h-64 flex-col items-center justify-center rounded-lg border border-dashed border-[var(--border)]">
+          <svg width="48" height="48" fill="none" viewBox="0 0 24 24" className="text-[var(--text-muted)]">
+            <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.5" />
+            <circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" strokeWidth="1.5" />
+            <path d="M21 15l-5-5L5 21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <p className="mt-3 text-sm font-medium text-[var(--text-secondary)]">Design proofs coming soon</p>
+          <p className="mt-1 text-xs text-[var(--text-muted)]">
+            Proof review and approval workflows will be available in a future update.
+          </p>
         </div>
       </div>
     </div>
