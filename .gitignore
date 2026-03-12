@@ -68,6 +68,9 @@ docker-compose.override.yml
 # Playwright
 .playwright-mcp/
 
+# Render
+render/
+
 # Misc
 *.bak
 *.tmp
