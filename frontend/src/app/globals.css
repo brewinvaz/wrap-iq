@@ -107,3 +107,12 @@
   box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.15);
   border-color: var(--accent-primary);
 }
+
+/* ── Select dropdown animation ── */
+@keyframes select-fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-select-in {
+  animation: select-fade-in 150ms ease-out;
+}
