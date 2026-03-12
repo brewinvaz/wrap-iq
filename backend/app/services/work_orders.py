@@ -6,7 +6,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.models.client import Client
+from app.models.design_details import DesignDetails
+from app.models.install_details import InstallDetails
+from app.models.production_details import ProductionDetails
 from app.models.work_order import WorkOrder, WorkOrderVehicle
+from app.models.wrap_details import WrapDetails
 
 
 async def generate_job_number(session: AsyncSession, org_id: uuid.UUID) -> str:
@@ -23,7 +27,13 @@ async def create_work_order(
     status_id: uuid.UUID,
     data: dict,
     vehicle_ids: list[uuid.UUID] | None = None,
+    sub_details: dict | None = None,
 ) -> WorkOrder:
+    wrap_data = (sub_details or {}).get("wrap_details")
+    design_data = (sub_details or {}).get("design_details")
+    production_data = (sub_details or {}).get("production_details")
+    install_data = (sub_details or {}).get("install_details")
+
     job_number = await generate_job_number(session, org_id)
     wo = WorkOrder(
         id=uuid.uuid4(),
@@ -43,6 +53,50 @@ async def create_work_order(
                 )
             )
         await session.flush()
+
+    # Create sub-details if provided
+    if wrap_data and vehicle_ids:
+        # WrapDetails requires a vehicle_id FK — only create when vehicles exist
+        for vid in vehicle_ids:
+            session.add(
+                WrapDetails(
+                    id=uuid.uuid4(),
+                    work_order_id=wo.id,
+                    vehicle_id=vid,
+                    organization_id=org_id,
+                    **wrap_data,
+                )
+            )
+
+    if design_data:
+        session.add(
+            DesignDetails(
+                id=uuid.uuid4(),
+                work_order_id=wo.id,
+                organization_id=org_id,
+                **design_data,
+            )
+        )
+
+    if production_data:
+        session.add(
+            ProductionDetails(
+                id=uuid.uuid4(),
+                work_order_id=wo.id,
+                organization_id=org_id,
+                **production_data,
+            )
+        )
+
+    if install_data:
+        session.add(
+            InstallDetails(
+                id=uuid.uuid4(),
+                work_order_id=wo.id,
+                organization_id=org_id,
+                **install_data,
+            )
+        )
 
     await session.commit()
 
