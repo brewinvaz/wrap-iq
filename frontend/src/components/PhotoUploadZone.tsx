@@ -186,7 +186,7 @@ export default function PhotoUploadZone({ workOrderId, onUploadComplete }: Photo
         className={`cursor-pointer rounded-xl border-2 border-dashed p-10 text-center transition-colors ${
           isDragOver
             ? 'border-blue-400 bg-blue-50/50'
-            : 'border-[#e6e6eb] bg-white hover:border-blue-300 hover:bg-blue-50/30'
+            : 'border-[var(--border)] bg-[var(--surface-card)] hover:border-[var(--accent-primary)] hover:bg-blue-50/30'
         } ${isUploading ? 'pointer-events-none opacity-50' : ''}`}
       >
         <input
@@ -198,7 +198,7 @@ export default function PhotoUploadZone({ workOrderId, onUploadComplete }: Photo
           className="hidden"
         />
         <svg
-          className="mx-auto mb-3 h-10 w-10 text-[#a8a8b4]"
+          className="mx-auto mb-3 h-10 w-10 text-[var(--text-muted)]"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -210,10 +210,10 @@ export default function PhotoUploadZone({ workOrderId, onUploadComplete }: Photo
             d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"
           />
         </svg>
-        <p className="text-sm font-medium text-[#60606a]">
+        <p className="text-sm font-medium text-[var(--text-secondary)]">
           Drop photos here or click to upload
         </p>
-        <p className="mt-1 text-xs text-[#a8a8b4]">
+        <p className="mt-1 text-xs text-[var(--text-muted)]">
           PNG, JPG, WebP up to 10MB
         </p>
       </div>
@@ -221,8 +221,8 @@ export default function PhotoUploadZone({ workOrderId, onUploadComplete }: Photo
       {uploading.length > 0 && (
         <div className="mt-4 space-y-2">
           {uploading.map((item, i) => (
-            <div key={i} className="flex items-center gap-3 rounded-lg bg-white p-3 text-sm">
-              <span className="flex-1 truncate text-[#60606a]">{item.file.name}</span>
+            <div key={i} className="flex items-center gap-3 rounded-lg bg-[var(--surface-card)] p-3 text-sm">
+              <span className="flex-1 truncate text-[var(--text-secondary)]">{item.file.name}</span>
               {item.status === 'error' ? (
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-red-500">{item.error}</span>
@@ -237,13 +237,13 @@ export default function PhotoUploadZone({ workOrderId, onUploadComplete }: Photo
                 <span className="text-xs text-green-600">Done</span>
               ) : (
                 <div className="flex items-center gap-2">
-                  <div className="h-1.5 w-24 rounded-full bg-[#e6e6eb]">
+                  <div className="h-1.5 w-24 rounded-full bg-[var(--border)]">
                     <div
                       className="h-1.5 rounded-full bg-blue-500 transition-all"
                       style={{ width: `${item.progress}%` }}
                     />
                   </div>
-                  <span className="w-8 text-right text-xs text-[#a8a8b4]">{item.progress}%</span>
+                  <span className="w-8 text-right text-xs text-[var(--text-muted)]">{item.progress}%</span>
                 </div>
               )}
             </div>

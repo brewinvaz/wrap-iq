@@ -127,15 +127,15 @@ export default function CreateWorkOrderModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="create-work-order-title"
-        className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
+        className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-[var(--surface-card)] p-6 shadow-xl"
       >
         <div className="mb-6 flex items-center justify-between">
-          <h3 id="create-work-order-title" className="text-lg font-semibold text-[#18181b]">
+          <h3 id="create-work-order-title" className="text-lg font-semibold text-[var(--text-primary)]">
             Create Work Order
           </h3>
           <button
             onClick={onClose}
-            className="rounded-lg p-1 text-[#a8a8b4] transition-colors hover:bg-gray-100 hover:text-[#18181b]"
+            className="rounded-lg p-1 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-overlay)] hover:text-[var(--text-primary)]"
           >
             <svg
               className="h-5 w-5"
@@ -164,7 +164,7 @@ export default function CreateWorkOrderModal({
             <div>
               <label
                 htmlFor="job-type"
-                className="mb-1.5 block text-sm font-medium text-[#18181b]"
+                className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]"
               >
                 Job Type
               </label>
@@ -174,7 +174,7 @@ export default function CreateWorkOrderModal({
                 onChange={(e) =>
                   setJobType(e.target.value as 'personal' | 'commercial')
                 }
-                className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
               >
                 <option value="personal">Personal</option>
                 <option value="commercial">Commercial</option>
@@ -183,7 +183,7 @@ export default function CreateWorkOrderModal({
             <div>
               <label
                 htmlFor="priority"
-                className="mb-1.5 block text-sm font-medium text-[#18181b]"
+                className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]"
               >
                 Priority
               </label>
@@ -193,7 +193,7 @@ export default function CreateWorkOrderModal({
                 onChange={(e) =>
                   setPriority(e.target.value as 'low' | 'medium' | 'high')
                 }
-                className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
@@ -205,7 +205,7 @@ export default function CreateWorkOrderModal({
           <div>
             <label
               htmlFor="job-value"
-              className="mb-1.5 block text-sm font-medium text-[#18181b]"
+              className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]"
             >
               Job Value ($)
             </label>
@@ -219,7 +219,7 @@ export default function CreateWorkOrderModal({
                 setJobValue(e.target.value === '' ? '' : Number(e.target.value))
               }
               placeholder="0.00"
-              className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] placeholder-[#a8a8b4] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
             />
           </div>
 
@@ -227,7 +227,7 @@ export default function CreateWorkOrderModal({
             <div>
               <label
                 htmlFor="date-in"
-                className="mb-1.5 block text-sm font-medium text-[#18181b]"
+                className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]"
               >
                 Date In
               </label>
@@ -237,13 +237,13 @@ export default function CreateWorkOrderModal({
                 value={dateIn}
                 onChange={(e) => setDateIn(e.target.value)}
                 required
-                className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
               />
             </div>
             <div>
               <label
                 htmlFor="estimated-completion"
-                className="mb-1.5 block text-sm font-medium text-[#18181b]"
+                className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]"
               >
                 Est. Completion
               </label>
@@ -252,7 +252,7 @@ export default function CreateWorkOrderModal({
                 type="date"
                 value={estimatedCompletionDate}
                 onChange={(e) => setEstimatedCompletionDate(e.target.value)}
-                className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
               />
             </div>
           </div>
@@ -260,7 +260,7 @@ export default function CreateWorkOrderModal({
           <div>
             <label
               htmlFor="client-id"
-              className="mb-1.5 block text-sm font-medium text-[#18181b]"
+              className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]"
             >
               Client
             </label>
@@ -269,7 +269,7 @@ export default function CreateWorkOrderModal({
               value={clientId}
               onChange={(e) => setClientId(e.target.value)}
               disabled={isLoadingClients}
-              className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+              className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)] disabled:opacity-50"
             >
               <option value="">
                 {isLoadingClients ? 'Loading clients...' : 'None (optional)'}
@@ -285,7 +285,7 @@ export default function CreateWorkOrderModal({
           <div>
             <label
               htmlFor="internal-notes"
-              className="mb-1.5 block text-sm font-medium text-[#18181b]"
+              className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]"
             >
               Internal Notes
             </label>
@@ -295,7 +295,7 @@ export default function CreateWorkOrderModal({
               onChange={(e) => setInternalNotes(e.target.value)}
               placeholder="Optional notes..."
               rows={3}
-              className="w-full resize-none rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] placeholder-[#a8a8b4] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full resize-none rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
             />
           </div>
 
@@ -303,14 +303,14 @@ export default function CreateWorkOrderModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded-lg border border-[#e6e6eb] px-4 py-2.5 text-sm font-medium text-[#60606a] transition-colors hover:bg-gray-50"
+              className="flex-1 rounded-lg border border-[var(--border)] px-4 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-overlay)]"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex-1 rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSubmitting ? 'Creating...' : 'Create Work Order'}
             </button>

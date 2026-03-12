@@ -153,11 +153,11 @@ export default function NewRenderModal({ isOpen, onClose, onCreate }: NewRenderM
         role="dialog"
         aria-modal="true"
         aria-labelledby="new-render-title"
-        className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
+        className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-[var(--surface-card)] p-6 shadow-xl"
       >
         <div className="mb-6 flex items-center justify-between">
-          <h3 id="new-render-title" className="text-lg font-semibold text-[#18181b]">New Render</h3>
-          <button onClick={onClose} className="rounded-lg p-1 text-[#a8a8b4] transition-colors hover:bg-gray-100 hover:text-[#18181b]">
+          <h3 id="new-render-title" className="text-lg font-semibold text-[var(--text-primary)]">New Render</h3>
+          <button onClick={onClose} className="rounded-lg p-1 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-overlay)] hover:text-[var(--text-primary)]">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -174,42 +174,42 @@ export default function NewRenderModal({ isOpen, onClose, onCreate }: NewRenderM
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Design Name */}
           <div>
-            <label htmlFor="design-name" className="mb-1.5 block text-sm font-medium text-[#18181b]">Design Name</label>
+            <label htmlFor="design-name" className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]">Design Name</label>
             <input
               id="design-name" type="text" value={designName}
               onChange={(e) => setDesignName(e.target.value)}
               placeholder="e.g. Fleet Branding v2" required
-              className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] placeholder-[#a8a8b4] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
             />
           </div>
 
           {/* Vehicle Photo */}
           <div>
-            <label htmlFor="vehicle-photo" className="mb-1.5 block text-sm font-medium text-[#18181b]">Vehicle Photo</label>
+            <label htmlFor="vehicle-photo" className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]">Vehicle Photo</label>
             <input
               id="vehicle-photo" type="file" onChange={handleVehicleFile}
               accept="image/jpeg,image/png,image/webp" required
-              className="w-full text-sm text-[#60606a] file:mr-4 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-blue-700 hover:file:bg-blue-100"
+              className="w-full text-sm text-[var(--text-secondary)] file:mr-4 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-blue-700 hover:file:bg-blue-100"
             />
-            {vehicleFile && <p className="mt-1 text-xs text-[#a8a8b4]">{vehicleFile.name} ({(vehicleFile.size / 1024 / 1024).toFixed(1)} MB)</p>}
+            {vehicleFile && <p className="mt-1 text-xs text-[var(--text-muted)]">{vehicleFile.name} ({(vehicleFile.size / 1024 / 1024).toFixed(1)} MB)</p>}
           </div>
 
           {/* Wrap Design */}
           <div>
-            <label htmlFor="wrap-design" className="mb-1.5 block text-sm font-medium text-[#18181b]">Wrap Design</label>
+            <label htmlFor="wrap-design" className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]">Wrap Design</label>
             <input
               id="wrap-design" type="file" onChange={handleDesignFile}
               accept="image/jpeg,image/png,image/webp,application/pdf" required
-              className="w-full text-sm text-[#60606a] file:mr-4 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-blue-700 hover:file:bg-blue-100"
+              className="w-full text-sm text-[var(--text-secondary)] file:mr-4 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-blue-700 hover:file:bg-blue-100"
             />
-            {designFile && <p className="mt-1 text-xs text-[#a8a8b4]">{designFile.name} ({(designFile.size / 1024 / 1024).toFixed(1)} MB)</p>}
+            {designFile && <p className="mt-1 text-xs text-[var(--text-muted)]">{designFile.name} ({(designFile.size / 1024 / 1024).toFixed(1)} MB)</p>}
           </div>
 
           {/* Client dropdown */}
           <div>
-            <label htmlFor="client" className="mb-1.5 block text-sm font-medium text-[#18181b]">Client <span className="text-[#a8a8b4]">(optional)</span></label>
+            <label htmlFor="client" className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]">Client <span className="text-[var(--text-muted)]">(optional)</span></label>
             <select id="client" value={clientId} onChange={(e) => setClientId(e.target.value)}
-              className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
+              className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]">
               <option value="">— None —</option>
               {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
@@ -217,9 +217,9 @@ export default function NewRenderModal({ isOpen, onClose, onCreate }: NewRenderM
 
           {/* Vehicle dropdown */}
           <div>
-            <label htmlFor="vehicle" className="mb-1.5 block text-sm font-medium text-[#18181b]">Vehicle <span className="text-[#a8a8b4]">(optional)</span></label>
+            <label htmlFor="vehicle" className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]">Vehicle <span className="text-[var(--text-muted)]">(optional)</span></label>
             <select id="vehicle" value={vehicleId} onChange={(e) => setVehicleId(e.target.value)}
-              className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
+              className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]">
               <option value="">— None —</option>
               {vehicles.map(v => <option key={v.id} value={v.id}>{[v.year, v.make, v.model].filter(Boolean).join(' ') || 'Unknown'}</option>)}
             </select>
@@ -227,9 +227,9 @@ export default function NewRenderModal({ isOpen, onClose, onCreate }: NewRenderM
 
           {/* Work Order dropdown */}
           <div>
-            <label htmlFor="work-order" className="mb-1.5 block text-sm font-medium text-[#18181b]">Work Order <span className="text-[#a8a8b4]">(optional)</span></label>
+            <label htmlFor="work-order" className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]">Work Order <span className="text-[var(--text-muted)]">(optional)</span></label>
             <select id="work-order" value={workOrderId} onChange={(e) => setWorkOrderId(e.target.value)}
-              className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
+              className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]">
               <option value="">— None —</option>
               {workOrders.map(wo => <option key={wo.id} value={wo.id}>{wo.job_number}</option>)}
             </select>
@@ -237,12 +237,12 @@ export default function NewRenderModal({ isOpen, onClose, onCreate }: NewRenderM
 
           {/* Notes */}
           <div>
-            <label htmlFor="render-notes" className="mb-1.5 block text-sm font-medium text-[#18181b]">Notes / Instructions <span className="text-[#a8a8b4]">(optional)</span></label>
+            <label htmlFor="render-notes" className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]">Notes / Instructions <span className="text-[var(--text-muted)]">(optional)</span></label>
             <textarea
               id="render-notes" value={notes} onChange={(e) => setNotes(e.target.value)}
               placeholder="e.g. Full wrap, all panels, driver side focus..."
               rows={3}
-              className="w-full resize-none rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] placeholder-[#a8a8b4] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full resize-none rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
             />
           </div>
 
@@ -257,11 +257,11 @@ export default function NewRenderModal({ isOpen, onClose, onCreate }: NewRenderM
           {/* Buttons */}
           <div className="flex items-center gap-3 pt-2">
             <button type="button" onClick={() => { resetForm(); onClose(); }} disabled={isSubmitting}
-              className="flex-1 rounded-lg border border-[#e6e6eb] px-4 py-2.5 text-sm font-medium text-[#60606a] transition-colors hover:bg-gray-50 disabled:opacity-50">
+              className="flex-1 rounded-lg border border-[var(--border)] px-4 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-overlay)] disabled:opacity-50">
               Cancel
             </button>
             <button type="submit" disabled={isSubmitting || !vehicleFile || !designFile || !designName.trim()}
-              className="flex-1 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50">
+              className="flex-1 rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50">
               {isSubmitting ? 'Creating...' : 'Create Render'}
             </button>
           </div>

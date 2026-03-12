@@ -237,45 +237,45 @@ function useDebouncedSave(
 function LoadingSkeleton() {
   return (
     <div className="flex h-full flex-col">
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="mb-3">
-          <div className="h-5 w-32 animate-pulse rounded bg-gray-200" />
+          <div className="h-5 w-32 animate-pulse rounded bg-[var(--surface-raised)]" />
         </div>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-7 w-64 animate-pulse rounded bg-gray-200" />
-            <div className="h-5 w-20 animate-pulse rounded bg-gray-100" />
+            <div className="h-7 w-64 animate-pulse rounded bg-[var(--surface-raised)]" />
+            <div className="h-5 w-20 animate-pulse rounded bg-[var(--surface-app)]" />
           </div>
           <div className="text-right space-y-1">
-            <div className="h-4 w-32 animate-pulse rounded bg-gray-100" />
-            <div className="h-6 w-20 animate-pulse rounded bg-gray-200" />
+            <div className="h-4 w-32 animate-pulse rounded bg-[var(--surface-app)]" />
+            <div className="h-6 w-20 animate-pulse rounded bg-[var(--surface-raised)]" />
           </div>
         </div>
         <div className="mt-4 flex items-center gap-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="flex items-center gap-1">
-              {i > 0 && <div className="h-0.5 w-6 bg-[#e6e6eb]" />}
-              <div className="h-6 w-6 animate-pulse rounded-full bg-gray-200" />
+              {i > 0 && <div className="h-0.5 w-6 bg-[var(--border)]" />}
+              <div className="h-6 w-6 animate-pulse rounded-full bg-[var(--surface-raised)]" />
             </div>
           ))}
         </div>
       </header>
-      <div className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-3">
+      <div className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-3">
         <div className="flex gap-4">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="h-4 w-16 animate-pulse rounded bg-gray-200" />
+            <div key={i} className="h-4 w-16 animate-pulse rounded bg-[var(--surface-raised)]" />
           ))}
         </div>
       </div>
       <div className="flex-1 overflow-auto px-6 py-6">
         <div className="grid grid-cols-3 gap-4">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-24 animate-pulse rounded-xl bg-gray-200" />
+            <div key={i} className="h-24 animate-pulse rounded-xl bg-[var(--surface-raised)]" />
           ))}
         </div>
         <div className="mt-6 grid grid-cols-2 gap-6">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-48 animate-pulse rounded-xl bg-gray-200" />
+            <div key={i} className="h-48 animate-pulse rounded-xl bg-[var(--surface-raised)]" />
           ))}
         </div>
       </div>
@@ -292,18 +292,18 @@ function ErrorState({ message, onRetry, onBack }: { message: string; onRetry: ()
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.072 16.5c-.77.833.192 2.5 1.732 2.5z" />
         </svg>
       </div>
-      <p className="text-lg font-semibold text-[#18181b]">Failed to load project</p>
-      <p className="text-sm text-[#60606a]">{message}</p>
+      <p className="text-lg font-semibold text-[var(--text-primary)]">Failed to load project</p>
+      <p className="text-sm text-[var(--text-secondary)]">{message}</p>
       <div className="flex gap-3">
         <button
           onClick={onBack}
-          className="rounded-lg border border-[#e6e6eb] bg-white px-4 py-2 text-sm font-medium text-[#60606a] transition-colors hover:bg-gray-50"
+          className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)] px-4 py-2 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-overlay)]"
         >
           Back to Dashboard
         </button>
         <button
           onClick={onRetry}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+          className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
         >
           Retry
         </button>
@@ -316,10 +316,10 @@ function ErrorState({ message, onRetry, onBack }: { message: string; onRetry: ()
 function FieldRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-start gap-3 py-2">
-      <span className="w-36 shrink-0 font-mono text-[10px] uppercase tracking-wider text-[#a8a8b4]">
+      <span className="w-36 shrink-0 font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
         {label}
       </span>
-      <span className="text-sm text-[#18181b]">{value}</span>
+      <span className="text-sm text-[var(--text-primary)]">{value}</span>
     </div>
   );
 }
@@ -333,9 +333,9 @@ function InfoCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-[#e6e6eb] bg-white">
-      <div className="border-b border-[#e6e6eb] px-5 py-3">
-        <h3 className="text-sm font-semibold text-[#18181b]">{title}</h3>
+    <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)]">
+      <div className="border-b border-[var(--border)] px-5 py-3">
+        <h3 className="text-sm font-semibold text-[var(--text-primary)]">{title}</h3>
       </div>
       <div className="px-5 py-3">{children}</div>
     </div>
@@ -360,7 +360,7 @@ function StepsIndicator({ history }: { history: ProjectDetail['statusHistory'] }
             {i > 0 && (
               <div
                 className={`h-0.5 w-6 ${
-                  isCompleted ? 'bg-[#18181b]' : 'bg-[#e6e6eb]'
+                  isCompleted ? 'bg-[var(--text-primary)]' : 'bg-[var(--border)]'
                 }`}
               />
             )}
@@ -369,7 +369,7 @@ function StepsIndicator({ history }: { history: ProjectDetail['statusHistory'] }
                 className={`flex h-6 w-6 items-center justify-center rounded-full text-[9px] font-semibold ${
                   isCompleted || isCurrent
                     ? 'text-white'
-                    : 'border border-[#e6e6eb] bg-white text-[#a8a8b4]'
+                    : 'border border-[var(--border)] bg-[var(--surface-card)] text-[var(--text-muted)]'
                 }`}
                 style={
                   isCompleted || isCurrent
@@ -398,8 +398,8 @@ function StepsIndicator({ history }: { history: ProjectDetail['statusHistory'] }
               <span
                 className={`text-[9px] font-medium ${
                   isCompleted || isCurrent
-                    ? 'text-[#18181b]'
-                    : 'text-[#a8a8b4]'
+                    ? 'text-[var(--text-primary)]'
+                    : 'text-[var(--text-muted)]'
                 }`}
               >
                 {step}
@@ -424,19 +424,19 @@ function OverviewTab({ project }: { project: ProjectDetail }) {
     <div className="space-y-6">
       {/* Profit Box */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="rounded-xl border border-[#e6e6eb] bg-white p-5">
-          <p className="font-mono text-[10px] uppercase tracking-wider text-[#a8a8b4]">
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-5">
+          <p className="font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
             Revenue
           </p>
-          <p className="mt-1 text-2xl font-bold text-[#18181b]">
+          <p className="mt-1 text-2xl font-bold text-[var(--text-primary)]">
             {formatCurrency(project.revenue)}
           </p>
         </div>
-        <div className="rounded-xl border border-[#e6e6eb] bg-white p-5">
-          <p className="font-mono text-[10px] uppercase tracking-wider text-[#a8a8b4]">
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-5">
+          <p className="font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
             Cost
           </p>
-          <p className="mt-1 text-2xl font-bold text-[#18181b]">
+          <p className="mt-1 text-2xl font-bold text-[var(--text-primary)]">
             {formatCurrency(project.cost)}
           </p>
         </div>
@@ -534,21 +534,21 @@ function OverviewTab({ project }: { project: ProjectDetail }) {
             value={formatDate(project.installDetails.endDate)}
           />
           {project.installDetails.timeLogs.length > 0 && (
-            <div className="mt-3 border-t border-[#e6e6eb] pt-3">
-              <p className="mb-2 font-mono text-[10px] uppercase tracking-wider text-[#a8a8b4]">
+            <div className="mt-3 border-t border-[var(--border)] pt-3">
+              <p className="mb-2 font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
                 Time Logs
               </p>
               <div className="space-y-1.5">
                 {project.installDetails.timeLogs.map((log, i) => (
                   <div
                     key={i}
-                    className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 text-xs"
+                    className="flex items-center justify-between rounded-lg bg-[var(--surface-app)] px-3 py-2 text-xs"
                   >
-                    <span className="font-medium text-[#18181b]">
+                    <span className="font-medium text-[var(--text-primary)]">
                       {log.installer}
                     </span>
-                    <span className="text-[#60606a]">{log.task}</span>
-                    <span className="font-mono text-[#18181b]">{log.hours}h</span>
+                    <span className="text-[var(--text-secondary)]">{log.task}</span>
+                    <span className="font-mono text-[var(--text-primary)]">{log.hours}h</span>
                   </div>
                 ))}
               </div>
@@ -561,31 +561,31 @@ function OverviewTab({ project }: { project: ProjectDetail }) {
           <InfoCard title="Hours Tracking">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-wider text-[#a8a8b4]">
+                <p className="font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
                   Estimated
                 </p>
-                <p className="mt-1 text-xl font-bold text-[#18181b]">
+                <p className="mt-1 text-xl font-bold text-[var(--text-primary)]">
                   {project.estimatedHours}h
                 </p>
               </div>
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-wider text-[#a8a8b4]">
+                <p className="font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
                   Actual
                 </p>
-                <p className="mt-1 text-xl font-bold text-[#18181b]">
+                <p className="mt-1 text-xl font-bold text-[var(--text-primary)]">
                   {project.actualHours}h
                 </p>
               </div>
             </div>
             {project.estimatedHours > 0 && (
               <div className="mt-3">
-                <div className="mb-1 flex justify-between text-[10px] text-[#60606a]">
+                <div className="mb-1 flex justify-between text-[10px] text-[var(--text-secondary)]">
                   <span>Progress</span>
                   <span>
                     {Math.round((project.actualHours / project.estimatedHours) * 100)}%
                   </span>
                 </div>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
+                <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--surface-app)]">
                   <div
                     className="h-full rounded-full bg-blue-500 transition-all duration-300"
                     style={{
@@ -614,7 +614,7 @@ function OverviewTab({ project }: { project: ProjectDetail }) {
                 >
                   {member.initials}
                 </div>
-                <span className="text-[11px] text-[#60606a]">{member.initials}</span>
+                <span className="text-[11px] text-[var(--text-secondary)]">{member.initials}</span>
               </div>
             ))}
           </div>
@@ -644,19 +644,19 @@ function ChecklistTab({ project, workOrderId }: { project: ProjectDetail; workOr
   return (
     <div className="mx-auto max-w-2xl">
       {/* Progress header */}
-      <div className="mb-6 rounded-xl border border-[#e6e6eb] bg-white p-5">
+      <div className="mb-6 rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-5">
         <div className="mb-2 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-sm font-semibold text-[#18181b]">
+            <span className="text-sm font-semibold text-[var(--text-primary)]">
               {completedCount} of {totalCount} tasks completed
             </span>
             <SaveIndicator status={saveStatus} />
           </div>
-          <span className="font-mono text-sm font-medium text-[#60606a]">
+          <span className="font-mono text-sm font-medium text-[var(--text-secondary)]">
             {progress}%
           </span>
         </div>
-        <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-100">
+        <div className="h-2.5 w-full overflow-hidden rounded-full bg-[var(--surface-app)]">
           <div
             className="h-full rounded-full bg-blue-500 transition-all duration-500"
             style={{ width: `${progress}%` }}
@@ -672,15 +672,15 @@ function ChecklistTab({ project, workOrderId }: { project: ProjectDetail; workOr
             onClick={() => toggleTask(i)}
             className={`flex w-full items-center gap-3 rounded-xl border px-5 py-3.5 text-left transition-all duration-200 ${
               task.done
-                ? 'border-[#e6e6eb] bg-gray-50'
-                : 'border-[#e6e6eb] bg-white hover:border-blue-200 hover:shadow-sm'
+                ? 'border-[var(--border)] bg-[var(--surface-app)]'
+                : 'border-[var(--border)] bg-[var(--surface-card)] hover:border-blue-200 hover:shadow-sm'
             }`}
           >
             <div
               className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-colors ${
                 task.done
                   ? 'border-blue-500 bg-blue-500'
-                  : 'border-[#e6e6eb] bg-white'
+                  : 'border-[var(--border)] bg-[var(--surface-card)]'
               }`}
             >
               {task.done && (
@@ -702,8 +702,8 @@ function ChecklistTab({ project, workOrderId }: { project: ProjectDetail; workOr
             <span
               className={`text-sm ${
                 task.done
-                  ? 'text-[#a8a8b4] line-through'
-                  : 'font-medium text-[#18181b]'
+                  ? 'text-[var(--text-muted)] line-through'
+                  : 'font-medium text-[var(--text-primary)]'
               }`}
             >
               {task.label}
@@ -713,7 +713,7 @@ function ChecklistTab({ project, workOrderId }: { project: ProjectDetail; workOr
       </div>
 
       {totalCount === 0 && (
-        <div className="py-12 text-center text-sm text-[#a8a8b4]">
+        <div className="py-12 text-center text-sm text-[var(--text-muted)]">
           No tasks have been added to this project yet.
         </div>
       )}
@@ -776,20 +776,20 @@ function NotesTab({ project, workOrderId }: { project: ProjectDetail; workOrderI
   return (
     <div className="mx-auto max-w-2xl space-y-4">
       {/* Add note input */}
-      <div className="rounded-xl border border-[#e6e6eb] bg-white p-4">
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-4">
         <textarea
           value={newNote}
           onChange={(e) => setNewNote(e.target.value)}
           placeholder="Add a note..."
           rows={3}
-          className="w-full resize-none rounded-lg border-0 bg-gray-50 p-3 text-sm text-[#18181b] placeholder-[#a8a8b4] outline-none focus:ring-2 focus:ring-blue-200"
+          className="w-full resize-none rounded-lg border-0 bg-[var(--surface-app)] p-3 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none focus:ring-2 focus:ring-blue-200"
         />
         <div className="mt-2 flex items-center justify-between">
           <SaveIndicator status={displayStatus} />
           <button
             onClick={addNote}
             disabled={!newNote.trim() || addSaveStatus === 'saving'}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
+            className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
           >
             Add Note
           </button>
@@ -797,9 +797,9 @@ function NotesTab({ project, workOrderId }: { project: ProjectDetail; workOrderI
       </div>
 
       {/* Editable notes area (auto-saved) */}
-      <div className="rounded-xl border border-[#e6e6eb] bg-white p-4">
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-4">
         <div className="mb-2 flex items-center justify-between">
-          <span className="font-mono text-[10px] uppercase tracking-wider text-[#a8a8b4]">
+          <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
             Internal Notes
           </span>
           <SaveIndicator status={autoSaveStatus} />
@@ -809,15 +809,15 @@ function NotesTab({ project, workOrderId }: { project: ProjectDetail; workOrderI
           onChange={(e) => handleNotesChange(e.target.value)}
           placeholder="Type your notes here... changes are auto-saved."
           rows={8}
-          className="w-full resize-none rounded-lg border-0 bg-gray-50 p-3 text-sm leading-relaxed text-[#18181b] placeholder-[#a8a8b4] outline-none focus:ring-2 focus:ring-blue-200"
+          className="w-full resize-none rounded-lg border-0 bg-[var(--surface-app)] p-3 text-sm leading-relaxed text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none focus:ring-2 focus:ring-blue-200"
         />
       </div>
 
       {/* Legacy notes display (read-only, from initial load) */}
       {notes.length > 0 && notes[0].author !== 'System' && (
         <>
-          <div className="mt-6 border-t border-[#e6e6eb] pt-4">
-            <span className="font-mono text-[10px] uppercase tracking-wider text-[#a8a8b4]">
+          <div className="mt-6 border-t border-[var(--border)] pt-4">
+            <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
               Previous Notes
             </span>
           </div>
@@ -826,27 +826,27 @@ function NotesTab({ project, workOrderId }: { project: ProjectDetail; workOrderI
             .map((note) => (
               <div
                 key={note.id}
-                className="rounded-xl border border-[#e6e6eb] bg-white p-5"
+                className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-5"
               >
                 <div className="mb-2 flex items-center gap-2">
                   <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-100 text-[10px] font-semibold text-blue-700">
                     {note.author.slice(0, 2).toUpperCase()}
                   </div>
-                  <span className="text-sm font-medium text-[#18181b]">
+                  <span className="text-sm font-medium text-[var(--text-primary)]">
                     {note.author}
                   </span>
-                  <span className="text-xs text-[#a8a8b4]">
+                  <span className="text-xs text-[var(--text-muted)]">
                     {formatTimestamp(note.timestamp)}
                   </span>
                 </div>
-                <p className="text-sm leading-relaxed text-[#60606a]">{note.text}</p>
+                <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{note.text}</p>
               </div>
             ))}
         </>
       )}
 
       {notes.length === 0 && !internalNotes && (
-        <div className="py-12 text-center text-sm text-[#a8a8b4]">
+        <div className="py-12 text-center text-sm text-[var(--text-muted)]">
           No notes yet. Add the first one above.
         </div>
       )}
@@ -873,7 +873,7 @@ function PhotoSection({
       <h3 className="mb-3 text-sm font-semibold text-[#1a1a2e]">{label}</h3>
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
         {photos.map((photo) => (
-          <div key={photo.id} className="group relative overflow-hidden rounded-lg border border-[#e6e6eb] bg-white">
+          <div key={photo.id} className="group relative overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--surface-card)]">
             <div className="aspect-square">
               <img
                 src={photo.url}
@@ -882,11 +882,11 @@ function PhotoSection({
               />
             </div>
             <div className="p-2">
-              <p className="truncate text-xs text-[#60606a]">{photo.filename}</p>
+              <p className="truncate text-xs text-[var(--text-secondary)]">{photo.filename}</p>
               <select
                 value={photo.photo_type ?? ''}
                 onChange={(e) => onCategoryChange(photo.id, (e.target.value || null) as 'before' | 'after' | null)}
-                className="mt-1 w-full rounded border border-[#e6e6eb] bg-white px-2 py-1 text-xs text-[#60606a]"
+                className="mt-1 w-full rounded border border-[var(--border)] bg-[var(--surface-card)] px-2 py-1 text-xs text-[var(--text-secondary)]"
               >
                 <option value="">Uncategorized</option>
                 <option value="before">Before</option>
@@ -897,7 +897,7 @@ function PhotoSection({
                 defaultValue={photo.caption ?? ''}
                 placeholder="Add caption..."
                 onBlur={(e) => onCaptionChange(photo.id, e.target.value)}
-                className="mt-1 w-full rounded border border-[#e6e6eb] bg-white px-2 py-1 text-xs text-[#60606a] placeholder:text-[#c4c4cc]"
+                className="mt-1 w-full rounded border border-[var(--border)] bg-[var(--surface-card)] px-2 py-1 text-xs text-[var(--text-secondary)] placeholder:text-[#c4c4cc]"
                 maxLength={500}
               />
             </div>
@@ -971,7 +971,7 @@ function PhotosTab({ workOrderId }: { workOrderId: string }) {
   };
 
   if (loading) {
-    return <div className="py-12 text-center text-sm text-[#a8a8b4]">Loading photos...</div>;
+    return <div className="py-12 text-center text-sm text-[var(--text-muted)]">Loading photos...</div>;
   }
 
   return (
@@ -1007,7 +1007,7 @@ function PhotosTab({ workOrderId }: { workOrderId: string }) {
       )}
 
       {photos.length === 0 && (
-        <div className="py-12 text-center text-sm text-[#a8a8b4]">
+        <div className="py-12 text-center text-sm text-[var(--text-muted)]">
           No photos uploaded yet.
         </div>
       )}
@@ -1021,7 +1021,7 @@ function TimelineTab({ project }: { project: ProjectDetail }) {
     <div className="mx-auto max-w-2xl">
       <div className="relative">
         {/* Connecting line */}
-        <div className="absolute left-[15px] top-3 bottom-3 w-0.5 bg-[#e6e6eb]" />
+        <div className="absolute left-[15px] top-3 bottom-3 w-0.5 bg-[var(--border)]" />
 
         <div className="space-y-6">
           {[...project.statusHistory].reverse().map((entry, i) => {
@@ -1046,18 +1046,18 @@ function TimelineTab({ project }: { project: ProjectDetail }) {
                     />
                   </svg>
                 </div>
-                <div className="rounded-xl border border-[#e6e6eb] bg-white px-5 py-4 flex-1">
+                <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] px-5 py-4 flex-1">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-semibold text-[#18181b]">
+                    <span className="text-sm font-semibold text-[var(--text-primary)]">
                       {entry.status}
                     </span>
-                    <span className="text-xs text-[#a8a8b4]">
+                    <span className="text-xs text-[var(--text-muted)]">
                       {formatTimestamp(entry.timestamp)}
                     </span>
                   </div>
-                  <p className="mt-1 text-xs text-[#60606a]">
+                  <p className="mt-1 text-xs text-[var(--text-secondary)]">
                     Changed by{' '}
-                    <span className="font-medium text-[#18181b]">
+                    <span className="font-medium text-[var(--text-primary)]">
                       {entry.changedBy}
                     </span>
                   </p>
@@ -1069,7 +1069,7 @@ function TimelineTab({ project }: { project: ProjectDetail }) {
       </div>
 
       {project.statusHistory.length === 0 && (
-        <div className="py-12 text-center text-sm text-[#a8a8b4]">
+        <div className="py-12 text-center text-sm text-[var(--text-muted)]">
           No status history available.
         </div>
       )}
@@ -1137,11 +1137,11 @@ export default function ProjectDetailPage({
   return (
     <div className="flex h-full flex-col">
       {/* Top header */}
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="mb-3 flex items-center gap-2">
           <button
             onClick={() => router.push('/dashboard')}
-            className="flex items-center gap-1 rounded-lg px-2 py-1 text-sm text-[#60606a] transition-colors hover:bg-gray-100 hover:text-[#18181b]"
+            className="flex items-center gap-1 rounded-lg px-2 py-1 text-sm text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-overlay)] hover:text-[var(--text-primary)]"
           >
             <svg
               className="h-4 w-4"
@@ -1162,8 +1162,8 @@ export default function ProjectDetailPage({
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-[#18181b]">{project.name}</h1>
-            <span className="rounded-md bg-gray-100 px-2 py-0.5 font-mono text-xs text-[#60606a]">
+            <h1 className="text-xl font-bold text-[var(--text-primary)]">{project.name}</h1>
+            <span className="rounded-md bg-[var(--surface-app)] px-2 py-0.5 font-mono text-xs text-[var(--text-secondary)]">
               {project.id}
             </span>
             <span
@@ -1172,8 +1172,8 @@ export default function ProjectDetailPage({
             />
           </div>
           <div className="text-right">
-            <p className="text-sm text-[#60606a]">{project.client}</p>
-            <p className="text-lg font-bold text-[#18181b]">
+            <p className="text-sm text-[var(--text-secondary)]">{project.client}</p>
+            <p className="text-lg font-bold text-[var(--text-primary)]">
               {formatCurrency(project.value)}
             </p>
           </div>
@@ -1186,7 +1186,7 @@ export default function ProjectDetailPage({
       </header>
 
       {/* Tab navigation */}
-      <div className="shrink-0 border-b border-[#e6e6eb] bg-white px-6">
+      <div className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6">
         <div className="flex gap-0">
           {tabs.map((tab) => (
             <button
@@ -1194,13 +1194,13 @@ export default function ProjectDetailPage({
               onClick={() => setActiveTab(tab.key)}
               className={`relative px-4 py-3 text-sm font-medium transition-colors ${
                 activeTab === tab.key
-                  ? 'text-blue-600'
-                  : 'text-[#60606a] hover:text-[#18181b]'
+                  ? 'text-[var(--accent-primary)]'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               {tab.label}
               {activeTab === tab.key && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600" />
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--accent-primary)]" />
               )}
             </button>
           ))}
