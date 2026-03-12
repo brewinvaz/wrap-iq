@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { api, ApiError } from '@/lib/api-client';
 import { useModalAccessibility } from '@/hooks/useModalAccessibility';
+import Select from '@/components/ui/Select';
 
 interface Client {
   id: string;
@@ -168,17 +169,15 @@ export default function CreateWorkOrderModal({
               >
                 Job Type
               </label>
-              <select
+              <Select
                 id="job-type"
                 value={jobType}
-                onChange={(e) =>
-                  setJobType(e.target.value as 'personal' | 'commercial')
-                }
-                className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
-              >
-                <option value="personal">Personal</option>
-                <option value="commercial">Commercial</option>
-              </select>
+                onChange={(v) => setJobType(v as 'personal' | 'commercial')}
+                options={[
+                  { value: 'personal', label: 'Personal' },
+                  { value: 'commercial', label: 'Commercial' },
+                ]}
+              />
             </div>
             <div>
               <label
@@ -187,18 +186,16 @@ export default function CreateWorkOrderModal({
               >
                 Priority
               </label>
-              <select
+              <Select
                 id="priority"
                 value={priority}
-                onChange={(e) =>
-                  setPriority(e.target.value as 'low' | 'medium' | 'high')
-                }
-                className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
-              >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-              </select>
+                onChange={(v) => setPriority(v as 'low' | 'medium' | 'high')}
+                options={[
+                  { value: 'low', label: 'Low' },
+                  { value: 'medium', label: 'Medium' },
+                  { value: 'high', label: 'High' },
+                ]}
+              />
             </div>
           </div>
 
@@ -264,22 +261,14 @@ export default function CreateWorkOrderModal({
             >
               Client
             </label>
-            <select
+            <Select
               id="client-id"
               value={clientId}
-              onChange={(e) => setClientId(e.target.value)}
+              onChange={setClientId}
               disabled={isLoadingClients}
-              className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)] disabled:opacity-50"
-            >
-              <option value="">
-                {isLoadingClients ? 'Loading clients...' : 'None (optional)'}
-              </option>
-              {clients.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+              placeholder={isLoadingClients ? 'Loading clients...' : 'None (optional)'}
+              options={clients.map((c) => ({ value: c.id, label: c.name }))}
+            />
           </div>
 
           <div>
