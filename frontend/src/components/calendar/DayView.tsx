@@ -128,7 +128,6 @@ function TimeRow({
       </div>
       {installers.map((installer) => {
         const installerEvents = getEventsForInstaller(events, installer.id, dateStr);
-        const hourStr = String(hour).padStart(2, '0');
         const cellEvents = installerEvents.filter((e) => {
           const startHour = parseInt(e.startTime.split(':')[0], 10);
           const endHour = parseInt(e.endTime.split(':')[0], 10);
