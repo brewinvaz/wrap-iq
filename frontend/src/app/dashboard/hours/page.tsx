@@ -1,71 +1,125 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { api, ApiError } from '@/lib/api-client';
 
-const hoursEntries = [
-  { id: '1', date: '2026-03-10', job: 'MTA Bus Fleet Wrap', task: 'Template setup and measurements', hours: 3.5 },
-  { id: '2', date: '2026-03-10', job: 'Coastal Brewing Van', task: 'Color proofing revisions', hours: 1.5 },
-  { id: '3', date: '2026-03-09', job: 'Summit Electric Trucks', task: 'Final artwork adjustments', hours: 4.0 },
-  { id: '4', date: '2026-03-09', job: 'Jade Garden Signage', task: 'Initial concept design', hours: 2.0 },
-  { id: '5', date: '2026-03-08', job: 'MTA Bus Fleet Wrap', task: 'Panel layout and cut lines', hours: 5.0 },
-  { id: '6', date: '2026-03-07', job: 'Coastal Brewing Van', task: 'Design mockup on vehicle template', hours: 6.0 },
-  { id: '7', date: '2026-03-06', job: 'Summit Electric Trucks', task: 'Logo vectorization', hours: 2.5 },
-  { id: '8', date: '2026-03-05', job: 'MTA Bus Fleet Wrap', task: 'Client revision round 2', hours: 3.0 },
-  { id: '9', date: '2026-03-04', job: 'Jade Garden Signage', task: 'Dimensional drawings', hours: 4.5 },
-  { id: '10', date: '2026-03-03', job: 'Coastal Brewing Van', task: 'Print file preparation', hours: 2.0 },
-  { id: '11', date: '2026-02-28', job: 'Summit Electric Trucks', task: 'Design concept sketches', hours: 3.5 },
-  { id: '12', date: '2026-02-27', job: 'MTA Bus Fleet Wrap', task: 'Brand guidelines review', hours: 1.5 },
-];
-
-function getWeekStart(): string {
-  const now = new Date('2026-03-10');
-  const day = now.getDay();
-  const diff = now.getDate() - day + (day === 0 ? -6 : 1);
-  return new Date(now.setDate(diff)).toISOString().split('T')[0];
+interface TimeLogUser {
+  id: string;
+  email: string;
+  full_name: string | null;
 }
 
-function getMonthStart(): string {
-  return '2026-03-01';
+interface TimeLogWorkOrder {
+  id: string;
+  job_number: string;
+}
+
+interface TimeLog {
+  id: string;
+  user: TimeLogUser;
+  work_order: TimeLogWorkOrder | null;
+  task: string;
+  hours: number;
+  log_date: string;
+  status: 'submitted' | 'approved';
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+interface TimeLogListResponse {
+  items: TimeLog[];
+  total: number;
+}
+
+interface TimeLogSummary {
+  total_hours: number;
+  pending_hours: number;
+  approved_hours: number;
+  unique_members: number;
 }
 
 export default function HoursPage() {
-  const [showLogModal, setShowLogModal] = useState(false);
+  const [entries, setEntries] = useState<TimeLog[]>([]);
+  const [summary, setSummary] = useState<TimeLogSummary | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const weekStart = getWeekStart();
-  const monthStart = getMonthStart();
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const [logsRes, summaryRes] = await Promise.all([
+        api.get<TimeLogListResponse>('/api/time-logs?limit=100'),
+        api.get<TimeLogSummary>('/api/time-logs/summary'),
+      ]);
+      setEntries(logsRes.items);
+      setSummary(summaryRes);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.message);
+      } else {
+        setError('Failed to load time logs');
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  const weeklyHours = hoursEntries
-    .filter((e) => e.date >= weekStart)
-    .reduce((sum, e) => sum + e.hours, 0);
-  const monthlyHours = hoursEntries
-    .filter((e) => e.date >= monthStart)
-    .reduce((sum, e) => sum + e.hours, 0);
-  const totalHours = hoursEntries.reduce((sum, e) => sum + e.hours, 0);
-  const avgDaily = totalHours / new Set(hoursEntries.map((e) => e.date)).size;
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const totalHours = entries.reduce((sum, e) => sum + e.hours, 0);
+  const uniqueDays = new Set(entries.map((e) => e.log_date)).size;
+  const avgDaily = uniqueDays > 0 ? totalHours / uniqueDays : 0;
 
   const stats = [
-    { label: 'This Week', value: `${weeklyHours.toFixed(1)}h`, sub: 'Mon-Sun' },
-    { label: 'This Month', value: `${monthlyHours.toFixed(1)}h`, sub: 'March 2026' },
-    { label: 'Total Logged', value: `${totalHours.toFixed(1)}h`, sub: `${hoursEntries.length} entries` },
-    { label: 'Avg / Day', value: `${avgDaily.toFixed(1)}h`, sub: 'working days' },
+    { label: 'Total Hours', value: summary ? `${summary.total_hours.toFixed(1)}h` : '—' },
+    { label: 'Approved', value: summary ? `${summary.approved_hours.toFixed(1)}h` : '—' },
+    { label: 'Pending', value: summary ? `${summary.pending_hours.toFixed(1)}h` : '—' },
+    { label: 'Avg / Day', value: `${avgDaily.toFixed(1)}h` },
   ];
+
+  if (loading) {
+    return (
+      <div className="flex h-full flex-col">
+        <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
+          <h1 className="text-xl font-bold text-[var(--text-primary)]">Design Hours</h1>
+        </header>
+        <div className="flex flex-1 items-center justify-center">
+          <p className="text-sm text-[var(--text-muted)]">Loading time logs...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex h-full flex-col">
+        <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
+          <h1 className="text-xl font-bold text-[var(--text-primary)]">Design Hours</h1>
+        </header>
+        <div className="flex flex-1 items-center justify-center">
+          <div className="text-center">
+            <p className="text-sm text-red-500">{error}</p>
+            <button onClick={fetchData} className="mt-2 text-sm font-medium text-[var(--accent-primary)]">
+              Retry
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-full flex-col">
       <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-[var(--text-primary)]">Design Hours</h1>
-            <span className="rounded-full bg-[var(--surface-app)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-secondary)]">
-              {hoursEntries.length} entries
-            </span>
-          </div>
-          <button
-            onClick={() => setShowLogModal(!showLogModal)}
-            className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
-          >
-            + Log Hours
-          </button>
+        <div className="flex items-center gap-3">
+          <h1 className="text-xl font-bold text-[var(--text-primary)]">Design Hours</h1>
+          <span className="rounded-full bg-[var(--surface-app)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-secondary)]">
+            {entries.length} entries
+          </span>
         </div>
       </header>
 
@@ -77,65 +131,56 @@ export default function HoursPage() {
               {stat.label}
             </p>
             <p className="mt-1 font-mono text-2xl font-bold text-[var(--text-primary)]">{stat.value}</p>
-            <p className="mt-0.5 text-xs text-[var(--text-muted)]">{stat.sub}</p>
           </div>
         ))}
       </div>
 
-      {/* Log Hours Form (toggle) */}
-      {showLogModal && (
-        <div className="shrink-0 border-b border-[var(--border)] bg-[var(--accent-primary)]/5 px-6 py-4">
-          <h3 className="mb-3 text-sm font-semibold text-[var(--text-primary)]">Log New Hours</h3>
-          <div className="flex flex-wrap items-end gap-3">
-            <div>
-              <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-wider text-[var(--text-muted)]">Date</label>
-              <input type="date" defaultValue="2026-03-10" className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)] px-3 py-1.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent-primary)]" />
-            </div>
-            <div>
-              <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-wider text-[var(--text-muted)]">Job</label>
-              <input type="text" placeholder="Job name" className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)] px-3 py-1.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent-primary)]" />
-            </div>
-            <div className="flex-1">
-              <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-wider text-[var(--text-muted)]">Task</label>
-              <input type="text" placeholder="Task description" className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface-card)] px-3 py-1.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent-primary)]" />
-            </div>
-            <div>
-              <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-wider text-[var(--text-muted)]">Hours</label>
-              <input type="number" step="0.5" defaultValue="1" className="w-20 rounded-lg border border-[var(--border)] bg-[var(--surface-card)] px-3 py-1.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent-primary)]" />
-            </div>
-            <button className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-blue-700">
-              Save
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Hours Table */}
       <div className="flex-1 overflow-auto p-6">
-        <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)]">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-[var(--border)]">
-                <th className="px-4 py-3 text-left font-mono text-[9.5px] uppercase tracking-wider text-[var(--text-muted)]">Date</th>
-                <th className="px-4 py-3 text-left font-mono text-[9.5px] uppercase tracking-wider text-[var(--text-muted)]">Job</th>
-                <th className="px-4 py-3 text-left font-mono text-[9.5px] uppercase tracking-wider text-[var(--text-muted)]">Task</th>
-                <th className="px-4 py-3 text-right font-mono text-[9.5px] uppercase tracking-wider text-[var(--text-muted)]">Hours</th>
-              </tr>
-            </thead>
-            <tbody>
-              {hoursEntries.map((entry) => (
-                <tr key={entry.id} className="border-b border-[var(--border)] last:border-b-0 hover:bg-[var(--surface-overlay)]">
-                  <td className="px-4 py-3 font-mono text-sm text-[var(--text-secondary)]">{entry.date}</td>
-                  <td className="px-4 py-3 text-sm font-medium text-[var(--text-primary)]">{entry.job}</td>
-                  <td className="px-4 py-3 text-sm text-[var(--text-secondary)]">{entry.task}</td>
-                  <td className="px-4 py-3 text-right font-mono text-sm font-semibold text-[var(--text-primary)]">
-                    {entry.hours.toFixed(1)}
-                  </td>
+        {entries.length === 0 ? (
+          <div className="flex h-48 items-center justify-center text-sm text-[var(--text-muted)]">
+            No time entries logged yet.
+          </div>
+        ) : (
+          <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)]">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-[var(--border)]">
+                  <th className="px-4 py-3 text-left font-mono text-[9.5px] uppercase tracking-wider text-[var(--text-muted)]">Date</th>
+                  <th className="px-4 py-3 text-left font-mono text-[9.5px] uppercase tracking-wider text-[var(--text-muted)]">Job</th>
+                  <th className="px-4 py-3 text-left font-mono text-[9.5px] uppercase tracking-wider text-[var(--text-muted)]">Task</th>
+                  <th className="px-4 py-3 text-left font-mono text-[9.5px] uppercase tracking-wider text-[var(--text-muted)]">Status</th>
+                  <th className="px-4 py-3 text-right font-mono text-[9.5px] uppercase tracking-wider text-[var(--text-muted)]">Hours</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {entries.map((entry) => (
+                  <tr key={entry.id} className="border-b border-[var(--border)] last:border-b-0 hover:bg-[var(--surface-overlay)]">
+                    <td className="px-4 py-3 font-mono text-sm text-[var(--text-secondary)]">{entry.log_date}</td>
+                    <td className="px-4 py-3 text-sm font-medium text-[var(--text-primary)]">
+                      {entry.work_order ? `Job #${entry.work_order.job_number}` : '—'}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-[var(--text-secondary)]">{entry.task}</td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                          entry.status === 'approved'
+                            ? 'bg-emerald-500/10 text-emerald-400'
+                            : 'bg-amber-500/10 text-amber-400'
+                        }`}
+                      >
+                        {entry.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right font-mono text-sm font-semibold text-[var(--text-primary)]">
+                      {entry.hours.toFixed(1)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
