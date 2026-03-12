@@ -30,11 +30,10 @@ const toggleActive = 'rounded-lg bg-blue-600 px-4 py-2 text-sm text-white';
 
 export default function JobPricingTab({ data, onChange }: Props) {
   const [clients, setClients] = useState<Client[]>([]);
-  const [isLoadingClients, setIsLoadingClients] = useState(false);
+  const [isLoadingClients, setIsLoadingClients] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
-    setIsLoadingClients(true);
     api
       .get<{ items: { id: string; name: string }[] }>('/api/clients?limit=500')
       .then((res) => {
