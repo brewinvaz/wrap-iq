@@ -73,7 +73,7 @@ prune-branches: ## Delete local branches already merged to main on remote
 #        make release type=minor
 #        make release type=major
 
-RELEASE_TYPE ?= patch
+type ?= patch
 
 release: ## Create a semver tag and push it (type=patch|minor|major)
 	@latest=$$(git tag -l 'v*' --sort=-v:refname | head -n1); \
