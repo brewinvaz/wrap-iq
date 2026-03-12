@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api-client';
+import { Button } from '@/components/ui/Button';
 
 interface Notification {
   id: string;
@@ -78,12 +79,13 @@ export default function PortalNotificationsPage() {
           )}
         </div>
         {unreadCount > 0 && (
-          <button
+          <Button
             onClick={handleMarkAllRead}
-            className="rounded-[10px] border border-[var(--border)] bg-[var(--surface-card)] px-3 py-1.5 text-[13px] font-medium text-[var(--text-secondary)] shadow-sm transition-colors hover:bg-[var(--surface-raised)]"
+            variant="secondary"
+            size="sm"
           >
             Mark all read
-          </button>
+          </Button>
         )}
       </div>
 
