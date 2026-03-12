@@ -134,7 +134,7 @@ export default function IntegrationsPage() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <h1 className="text-xl font-bold text-[var(--text-primary)]">Integrations</h1>
-            <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
+            <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-400">
               {totalActive} active
             </span>
           </div>
@@ -185,7 +185,7 @@ export default function IntegrationsPage() {
                       onClick={() => toggleWebhook(webhook.id, webhook.is_active)}
                       className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
                         webhook.is_active
-                          ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                          ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'
                           : 'bg-[var(--surface-app)] text-[var(--text-secondary)] hover:bg-[var(--surface-raised)]'
                       }`}
                     >
@@ -249,7 +249,7 @@ export default function IntegrationsPage() {
                   <span
                     className={`shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium ${
                       key.is_active
-                        ? 'bg-emerald-50 text-emerald-700'
+                        ? 'bg-emerald-500/10 text-emerald-400'
                         : 'bg-[var(--surface-app)] text-[var(--text-secondary)]'
                     }`}
                   >

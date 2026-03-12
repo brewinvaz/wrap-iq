@@ -1,9 +1,9 @@
 'use client';
 
 const STATUS_STYLES: Record<string, string> = {
-  Available: 'bg-emerald-100 text-emerald-700',
-  'In Use': 'bg-blue-100 text-blue-700',
-  Maintenance: 'bg-amber-100 text-amber-700',
+  Available: 'bg-emerald-500/10 text-emerald-400',
+  'In Use': 'bg-blue-500/10 text-blue-400',
+  Maintenance: 'bg-amber-500/10 text-amber-400',
 };
 
 const STATUS_DOT: Record<string, string> = {

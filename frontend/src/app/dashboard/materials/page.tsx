@@ -36,7 +36,7 @@ export default function MaterialsPage() {
               {materials.length} items
             </span>
             {lowStockCount > 0 && (
-              <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-700">
+              <span className="rounded-full bg-red-500/10 px-2.5 py-0.5 text-xs font-medium text-red-400">
                 {lowStockCount} low stock
               </span>
             )}

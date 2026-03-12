@@ -197,7 +197,7 @@ function KanbanBoardSkeleton() {
 
 function ErrorBanner({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
-    <div className="mx-6 mt-4 flex items-center justify-between rounded-lg border border-rose-200 bg-rose-50 px-4 py-3">
+    <div className="mx-6 mt-4 flex items-center justify-between rounded-lg border border-rose-500/20 bg-rose-500/10 px-4 py-3">
       <div className="flex items-center gap-2 text-sm text-rose-700">
         <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
           <path
@@ -210,7 +210,7 @@ function ErrorBanner({ message, onRetry }: { message: string; onRetry: () => voi
       </div>
       <button
         onClick={onRetry}
-        className="rounded-md bg-rose-100 px-3 py-1.5 text-xs font-medium text-rose-700 transition-colors hover:bg-rose-200"
+        className="rounded-md bg-rose-500/20 px-3 py-1.5 text-xs font-medium text-rose-400 transition-colors hover:bg-rose-500/30"
       >
         Retry
       </button>
@@ -223,9 +223,9 @@ function ErrorBanner({ message, onRetry }: { message: string; onRetry: () => voi
 // ---------------------------------------------------------------------------
 
 const PRIORITY_BADGE: Record<string, string> = {
-  high: 'bg-rose-100 text-rose-700',
-  medium: 'bg-amber-100 text-amber-700',
-  low: 'bg-green-100 text-green-700',
+  high: 'bg-rose-500/10 text-rose-400',
+  medium: 'bg-amber-500/10 text-amber-400',
+  low: 'bg-green-500/10 text-green-400',
 };
 
 function ListView({
@@ -738,7 +738,7 @@ export default function DashboardPage() {
 
       {/* Status change error toast */}
       {statusError && (
-        <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 shadow-lg">
+        <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2 rounded-lg border border-rose-500/20 bg-rose-500/10 px-4 py-3 shadow-lg">
           <svg className="h-5 w-5 shrink-0 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path
               strokeLinecap="round"

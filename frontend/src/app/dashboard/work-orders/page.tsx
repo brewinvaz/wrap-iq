@@ -42,9 +42,9 @@ interface WorkOrderListResponse {
 // --- Styling maps ---
 
 const priorityStyles: Record<string, { bg: string; text: string }> = {
-  high: { bg: 'bg-red-50', text: 'text-red-700' },
-  medium: { bg: 'bg-amber-50', text: 'text-amber-700' },
-  low: { bg: 'bg-green-50', text: 'text-green-700' },
+  high: { bg: 'bg-red-500/10', text: 'text-red-400' },
+  medium: { bg: 'bg-amber-500/10', text: 'text-amber-400' },
+  low: { bg: 'bg-green-500/10', text: 'text-green-400' },
 };
 
 const jobTypeLabels: Record<string, string> = {
@@ -225,7 +225,7 @@ export default function WorkOrdersPage() {
 
       {/* Error */}
       {error && (
-        <div className="mx-6 mt-4 flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
+        <div className="mx-6 mt-4 flex items-center gap-3 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3">
           <span className="text-sm text-red-700">{error}</span>
           <button onClick={fetchWorkOrders} className="text-sm font-medium text-red-700 underline">
             Retry

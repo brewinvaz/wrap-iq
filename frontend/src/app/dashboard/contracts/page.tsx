@@ -21,16 +21,16 @@ const documents: Document[] = [
 ];
 
 const typeStyles: Record<Document['type'], { bg: string; text: string }> = {
-  contract: { bg: 'bg-blue-50', text: 'text-blue-700' },
-  invoice: { bg: 'bg-emerald-50', text: 'text-emerald-700' },
-  estimate: { bg: 'bg-violet-50', text: 'text-violet-700' },
+  contract: { bg: 'bg-blue-500/10', text: 'text-blue-400' },
+  invoice: { bg: 'bg-emerald-500/10', text: 'text-emerald-400' },
+  estimate: { bg: 'bg-violet-500/10', text: 'text-violet-400' },
 };
 
 const statusStyles: Record<Document['status'], { bg: string; text: string }> = {
   draft: { bg: 'bg-[var(--surface-raised)]', text: 'text-[var(--text-secondary)]' },
-  sent: { bg: 'bg-amber-50', text: 'text-amber-700' },
-  signed: { bg: 'bg-emerald-50', text: 'text-emerald-700' },
-  expired: { bg: 'bg-rose-50', text: 'text-rose-700' },
+  sent: { bg: 'bg-amber-500/10', text: 'text-amber-400' },
+  signed: { bg: 'bg-emerald-500/10', text: 'text-emerald-400' },
+  expired: { bg: 'bg-rose-500/10', text: 'text-rose-400' },
 };
 
 export default function ContractsPage() {

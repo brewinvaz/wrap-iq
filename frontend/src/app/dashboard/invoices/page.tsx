@@ -28,16 +28,16 @@ interface InvoiceListResponse {
 }
 
 const statusStyle: Record<string, { bg: string; text: string }> = {
-  draft: { bg: 'bg-gray-50', text: 'text-gray-600' },
-  sent: { bg: 'bg-blue-50', text: 'text-blue-700' },
-  viewed: { bg: 'bg-indigo-50', text: 'text-indigo-700' },
-  partial: { bg: 'bg-orange-50', text: 'text-orange-700' },
-  paid: { bg: 'bg-emerald-50', text: 'text-emerald-700' },
-  overdue: { bg: 'bg-rose-50', text: 'text-rose-700' },
-  void: { bg: 'bg-gray-50', text: 'text-gray-500' },
+  draft: { bg: 'bg-[var(--surface-raised)]', text: 'text-[var(--text-secondary)]' },
+  sent: { bg: 'bg-blue-500/10', text: 'text-blue-400' },
+  viewed: { bg: 'bg-indigo-500/10', text: 'text-indigo-400' },
+  partial: { bg: 'bg-orange-500/10', text: 'text-orange-400' },
+  paid: { bg: 'bg-emerald-500/10', text: 'text-emerald-400' },
+  overdue: { bg: 'bg-rose-500/10', text: 'text-rose-400' },
+  void: { bg: 'bg-[var(--surface-raised)]', text: 'text-[var(--text-muted)]' },
 };
 
-const defaultStyle = { bg: 'bg-gray-50', text: 'text-gray-600' };
+const defaultStyle = { bg: 'bg-[var(--surface-raised)]', text: 'text-[var(--text-secondary)]' };
 
 function formatCurrency(cents: number): string {
   return new Intl.NumberFormat('en-US', {
@@ -153,7 +153,7 @@ export default function InvoicesPage() {
         )}
 
         {error && (
-          <div className="rounded-xl border border-rose-200 bg-rose-50 p-4">
+          <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-4">
             <p className="text-sm text-rose-700">{error}</p>
             <button
               onClick={fetchInvoices}
