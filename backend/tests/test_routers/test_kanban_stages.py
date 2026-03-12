@@ -120,7 +120,7 @@ async def test_delete_system_stage_fails(client):
     # Create a stage with system status
     create_resp = await client.post(
         "/api/kanban-stages",
-        json={"name": "Lead", "system_status": "LEAD", "position": 0},
+        json={"name": "Lead", "system_status": "lead", "position": 0},
         headers={"Authorization": f"Bearer {token}"},
     )
     stage_id = create_resp.json()["id"]
