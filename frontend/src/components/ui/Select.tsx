@@ -1,6 +1,13 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback, useId, useSyncExternalStore } from 'react';
+import {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useId,
+  useSyncExternalStore,
+} from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronDown, Check } from 'lucide-react';
 
