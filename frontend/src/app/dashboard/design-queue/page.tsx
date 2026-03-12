@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Paintbrush } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 import { api, ApiError } from '@/lib/api-client';
 
 type FilterTab = 'all' | 'in_design' | 'in_revision' | 'proof_sent' | 'approved';
@@ -188,12 +189,9 @@ export default function DesignQueuePage() {
       <div className="flex h-full flex-col items-center justify-center gap-4">
         <p className="text-sm font-medium text-[var(--text-primary)]">Failed to load design queue</p>
         <p className="text-xs text-[var(--text-secondary)]">{error}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="rounded-lg bg-[var(--accent-primary)] px-4 py-2 text-sm font-medium text-white hover:opacity-80"
-        >
+        <Button onClick={() => window.location.reload()}>
           Retry
-        </button>
+        </Button>
       </div>
     );
   }

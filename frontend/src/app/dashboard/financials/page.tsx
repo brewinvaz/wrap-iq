@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { Button } from '@/components/ui/Button';
 import { api, ApiError } from '@/lib/api-client';
 import CreateInvoiceModal from '@/components/financials/CreateInvoiceModal';
 
@@ -257,12 +258,9 @@ export default function FinancialsPage() {
         <div className="flex flex-1 items-center justify-center p-6">
           <div className="text-center">
             <p className="text-sm text-red-400">{error}</p>
-            <button
-              onClick={fetchData}
-              className="mt-3 rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-90"
-            >
+            <Button onClick={fetchData} className="mt-3">
               Retry
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -289,12 +287,9 @@ export default function FinancialsPage() {
             >
               Invoices
             </Link>
-            <button
-              onClick={() => setIsCreateModalOpen(true)}
-              className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-90"
-            >
+            <Button onClick={() => setIsCreateModalOpen(true)}>
               + New Invoice
-            </button>
+            </Button>
           </div>
         </div>
       </header>

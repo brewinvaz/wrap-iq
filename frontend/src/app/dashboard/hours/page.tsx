@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { api, ApiError } from '@/lib/api-client';
+import { Button } from '@/components/ui/Button';
 
 interface TimeLogUser {
   id: string;
@@ -103,9 +104,9 @@ export default function HoursPage() {
         <div className="flex flex-1 items-center justify-center">
           <div className="text-center">
             <p className="text-sm text-red-500">{error}</p>
-            <button onClick={fetchData} className="mt-2 text-sm font-medium text-[var(--accent-primary)]">
+            <Button variant="ghost" size="sm" onClick={fetchData} className="mt-2 text-[var(--accent-primary)]">
               Retry
-            </button>
+            </Button>
           </div>
         </div>
       </div>

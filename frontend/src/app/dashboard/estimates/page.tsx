@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { Button } from '@/components/ui/Button';
 import { api, ApiError } from '@/lib/api-client';
 
 interface EstimateResponse {
@@ -152,12 +153,9 @@ export default function EstimatesPage() {
         {error && (
           <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-4">
             <p className="text-sm text-rose-400">{error}</p>
-            <button
-              onClick={fetchEstimates}
-              className="mt-2 rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-90"
-            >
+            <Button onClick={fetchEstimates} className="mt-2">
               Retry
-            </button>
+            </Button>
           </div>
         )}
 
