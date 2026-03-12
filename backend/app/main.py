@@ -206,7 +206,8 @@ async def health():
     except Exception:
         status["redis"] = "unavailable"
 
-    healthy = all(v == "ok" for v in status.values())
+    # Only DB is critical for health check (Railway uses this for readiness)
+    healthy = status["db"] == "ok"
     return JSONResponse(
         status_code=200 if healthy else 503,
         content={"status": "ok" if healthy else "degraded", "services": status},
