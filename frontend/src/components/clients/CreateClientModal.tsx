@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { api, ApiError } from '@/lib/api-client';
 import { useModalAccessibility } from '@/hooks/useModalAccessibility';
+import Select from '@/components/ui/Select';
 
 interface CreateClientModalProps {
   isOpen: boolean;
@@ -165,15 +166,15 @@ export default function CreateClientModal({
             >
               Client Type
             </label>
-            <select
+            <Select
               id="client-type"
               value={clientType}
-              onChange={(e) => setClientType(e.target.value)}
-              className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
-            >
-              <option value="personal">Personal</option>
-              <option value="business">Business</option>
-            </select>
+              onChange={setClientType}
+              options={[
+                { value: 'personal', label: 'Personal' },
+                { value: 'business', label: 'Business' },
+              ]}
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -261,21 +262,18 @@ export default function CreateClientModal({
             >
               Referral Source
             </label>
-            <select
+            <Select
               id="client-referral"
               value={referralSource}
-              onChange={(e) => {
-                setReferralSource(e.target.value);
-                if (e.target.value !== 'other') setCustomReferral('');
+              onChange={(v) => {
+                setReferralSource(v);
+                if (v !== 'other') setCustomReferral('');
               }}
-              className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
-            >
-              {REFERRAL_SOURCES.map((src) => (
-                <option key={src.value} value={src.value}>
-                  {src.label}
-                </option>
-              ))}
-            </select>
+              options={REFERRAL_SOURCES.map((src) => ({
+                value: src.value,
+                label: src.label,
+              }))}
+            />
             {referralSource === 'other' && (
               <input
                 type="text"
