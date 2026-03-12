@@ -11,9 +11,9 @@ function AccessIndicator({ access }: { access: 'full' | 'read' | 'none' }) {
   if (access === 'full') {
     return (
       <div className="flex items-center justify-center" title="Full access">
-        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100">
+        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--accent-primary)]/10">
           <svg
-            className="h-3.5 w-3.5 text-emerald-600"
+            className="h-3.5 w-3.5 text-[var(--accent-primary)]"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -59,9 +59,9 @@ function AccessIndicator({ access }: { access: 'full' | 'read' | 'none' }) {
 
   return (
     <div className="flex items-center justify-center" title="No access">
-      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-100">
+      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--surface-raised)]">
         <svg
-          className="h-3.5 w-3.5 text-gray-400"
+          className="h-3.5 w-3.5 text-[var(--text-muted)]"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -84,17 +84,17 @@ export default function PermissionsMatrix({
   const roles = permissions[0]?.roles.map((r) => r.role) ?? [];
 
   return (
-    <div className="rounded-xl border border-[#e6e6eb] bg-white">
-      <div className="border-b border-[#e6e6eb] px-6 py-4">
+    <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)]">
+      <div className="border-b border-[var(--border)] px-6 py-4">
         <div className="flex items-center gap-3">
-          <h2 className="text-lg font-semibold text-[#18181b]">
+          <h2 className="text-lg font-semibold text-[var(--text-primary)]">
             Permissions Matrix
           </h2>
-          <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-[#60606a]">
+          <span className="rounded-full bg-[var(--surface-raised)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-secondary)]">
             Read-only
           </span>
         </div>
-        <p className="mt-1 text-sm text-[#a8a8b4]">
+        <p className="mt-1 text-sm text-[var(--text-muted)]">
           Overview of what each role can access across the platform.
         </p>
       </div>
@@ -102,27 +102,27 @@ export default function PermissionsMatrix({
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-[#e6e6eb]">
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-[#a8a8b4]">
+            <tr className="border-b border-[var(--border-subtle)]">
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">
                 Feature
               </th>
               {roles.map((role) => (
                 <th
                   key={role}
-                  className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-[#a8a8b4]"
+                  className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]"
                 >
                   {roleLabels[role] || role}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#e6e6eb]">
+          <tbody className="divide-y divide-[var(--border-subtle)]">
             {permissions.map((perm) => (
               <tr
                 key={perm.feature}
-                className="transition-colors hover:bg-gray-50"
+                className="transition-colors hover:bg-[var(--surface-raised)]"
               >
-                <td className="px-6 py-3 text-sm font-medium text-[#18181b]">
+                <td className="px-6 py-3 text-sm font-medium text-[var(--text-primary)]">
                   {perm.feature}
                 </td>
                 {perm.roles.map((r) => (
@@ -136,11 +136,11 @@ export default function PermissionsMatrix({
         </table>
       </div>
 
-      <div className="flex items-center gap-6 border-t border-[#e6e6eb] px-6 py-3">
-        <div className="flex items-center gap-2 text-xs text-[#60606a]">
-          <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-100">
+      <div className="flex items-center gap-6 border-t border-[var(--border)] px-6 py-3">
+        <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
+          <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[var(--accent-primary)]/10">
             <svg
-              className="h-2.5 w-2.5 text-emerald-600"
+              className="h-2.5 w-2.5 text-[var(--accent-primary)]"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -155,7 +155,7 @@ export default function PermissionsMatrix({
           </span>
           Full access
         </div>
-        <div className="flex items-center gap-2 text-xs text-[#60606a]">
+        <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
           <span className="flex h-4 w-4 items-center justify-center rounded-full bg-amber-100">
             <svg
               className="h-2.5 w-2.5 text-amber-600"
@@ -178,10 +178,10 @@ export default function PermissionsMatrix({
           </span>
           Read only
         </div>
-        <div className="flex items-center gap-2 text-xs text-[#60606a]">
-          <span className="flex h-4 w-4 items-center justify-center rounded-full bg-gray-100">
+        <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
+          <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[var(--surface-raised)]">
             <svg
-              className="h-2.5 w-2.5 text-gray-400"
+              className="h-2.5 w-2.5 text-[var(--text-muted)]"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
