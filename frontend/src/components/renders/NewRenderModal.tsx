@@ -274,7 +274,7 @@ export default function NewRenderModal({ isOpen, onClose, onCreate }: NewRenderM
             <Button type="submit" disabled={isSubmitting || !vehicleFile || !designFile || !designName.trim()}
               loading={isSubmitting}
               className="flex-1">
-              {isSubmitting ? 'Creating...' : 'Create Render'}
+              Create Render
             </Button>
           </div>
         </form>

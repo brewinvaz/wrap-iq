@@ -97,7 +97,7 @@ export function ReviewStep({ contact, vehicle, project, files, submitting, onBac
           loading={submitting}
           size="lg"
         >
-          {submitting ? 'Submitting...' : 'Submit'}
+          Submit
         </Button>
       </div>
     </div>

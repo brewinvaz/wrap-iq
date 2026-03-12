@@ -319,7 +319,7 @@ export default function CreateClientModal({
               loading={isSubmitting}
               className="flex-1"
             >
-              {isSubmitting ? 'Creating...' : 'Create Client'}
+              Create Client
             </Button>
           </div>
         </form>

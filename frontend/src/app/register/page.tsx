@@ -172,7 +172,7 @@ export default function RegisterPage() {
               loading={loading}
               className="w-full"
             >
-              {loading ? 'Creating account...' : 'Create account'}
+              Create account
             </Button>
           </form>
         </div>

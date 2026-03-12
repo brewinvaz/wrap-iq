@@ -304,7 +304,7 @@ export default function CreateWorkOrderModal({
               loading={isSubmitting}
               className="flex-1"
             >
-              {isSubmitting ? 'Creating...' : 'Create Work Order'}
+              Create Work Order
             </Button>
           </div>
         </form>
