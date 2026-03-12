@@ -146,25 +146,15 @@ async def create(
         }
     )
     sub_details = {
-        "wrap_details": (
-            data.wrap_details.model_dump()
-            if data.wrap_details
-            else None
-        ),
+        "wrap_details": (data.wrap_details.model_dump() if data.wrap_details else None),
         "design_details": (
-            data.design_details.model_dump()
-            if data.design_details
-            else None
+            data.design_details.model_dump() if data.design_details else None
         ),
         "production_details": (
-            data.production_details.model_dump()
-            if data.production_details
-            else None
+            data.production_details.model_dump() if data.production_details else None
         ),
         "install_details": (
-            data.install_details.model_dump()
-            if data.install_details
-            else None
+            data.install_details.model_dump() if data.install_details else None
         ),
     }
 
