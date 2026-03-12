@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { api, ApiError } from '@/lib/api-client';
+import { Button } from '@/components/ui/Button';
 import CreateWorkOrderModal from '@/components/work-orders/CreateWorkOrderModal';
 
 type PhaseFilter = 'all' | 'work-order' | 'design' | 'production' | 'install';
@@ -204,12 +205,9 @@ export default function JobsPage() {
       <div className="flex h-full flex-col items-center justify-center gap-4">
         <p className="text-sm font-medium text-[var(--text-primary)]">Failed to load jobs</p>
         <p className="text-xs text-[var(--text-secondary)]">{error}</p>
-        <button
-          onClick={() => fetchJobs()}
-          className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-        >
+        <Button onClick={() => fetchJobs()}>
           Retry
-        </button>
+        </Button>
       </div>
     );
   }
@@ -224,12 +222,9 @@ export default function JobsPage() {
               {jobs.length} jobs
             </span>
           </div>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
-          >
+          <Button onClick={() => setShowCreateModal(true)}>
             + New Job
-          </button>
+          </Button>
         </div>
         <div className="mt-3 flex gap-1">
           {tabs.map((tab) => (
