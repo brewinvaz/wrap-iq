@@ -35,12 +35,12 @@ export default function ClientList({
   });
 
   return (
-    <div className="flex h-full w-80 shrink-0 flex-col border-r border-[#e6e6eb] bg-white">
+    <div className="flex h-full w-80 shrink-0 flex-col border-r border-[var(--border)] bg-[var(--surface-card)]">
       {/* Search */}
-      <div className="border-b border-[#e6e6eb] p-4">
+      <div className="border-b border-[var(--border)] p-4">
         <div className="relative">
           <svg
-            className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
+            className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -57,10 +57,10 @@ export default function ClientList({
             placeholder="Search clients..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full rounded-lg border border-gray-200 bg-gray-100 py-2 pl-9 pr-3 text-sm text-[#18181b] placeholder-gray-400 outline-none focus:border-blue-300 focus:ring-1 focus:ring-blue-300"
+            className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface-raised)] py-2 pl-9 pr-3 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none focus:border-[var(--accent-primary)]/30 focus:ring-1 focus:ring-[var(--accent-primary)]/30"
           />
         </div>
-        <p className="mt-2 font-[family-name:var(--font-dm-mono)] text-xs text-gray-400">
+        <p className="mt-2 font-[family-name:var(--font-dm-mono)] text-xs text-[var(--text-muted)]">
           {filtered.length} client{filtered.length !== 1 ? 's' : ''}
         </p>
       </div>
@@ -73,16 +73,16 @@ export default function ClientList({
             <button
               key={client.id}
               onClick={() => onSelect(client)}
-              className={`flex w-full flex-col gap-1.5 border-b border-[#e6e6eb] px-4 py-3 text-left transition-colors ${
+              className={`flex w-full flex-col gap-1.5 border-b border-[var(--border)] px-4 py-3 text-left transition-colors ${
                 isActive
-                  ? 'border-r-2 border-r-blue-600 bg-blue-50/60'
-                  : 'hover:bg-gray-50'
+                  ? 'border-r-2 border-r-[var(--accent-primary)] bg-[var(--accent-primary)]/10'
+                  : 'hover:bg-[var(--surface-raised)]'
               }`}
             >
               <div className="flex items-center justify-between gap-2">
                 <span
                   className={`truncate text-sm font-semibold ${
-                    isActive ? 'text-blue-700' : 'text-[#18181b]'
+                    isActive ? 'text-[var(--accent-primary)]' : 'text-[var(--text-primary)]'
                   }`}
                 >
                   {client.name}
@@ -90,14 +90,14 @@ export default function ClientList({
                 <span
                   className={`shrink-0 rounded px-1.5 py-0.5 font-[family-name:var(--font-dm-mono)] text-[10px] font-medium uppercase ${
                     client.type === 'business'
-                      ? 'bg-gray-100 text-gray-600'
-                      : 'bg-gray-50 text-gray-500'
+                      ? 'bg-[var(--surface-raised)] text-[var(--text-secondary)]'
+                      : 'bg-[var(--surface-raised)] text-[var(--text-secondary)]'
                   }`}
                 >
                   {client.type}
                 </span>
               </div>
-              <p className="truncate font-[family-name:var(--font-dm-mono)] text-xs text-gray-400">
+              <p className="truncate font-[family-name:var(--font-dm-mono)] text-xs text-[var(--text-muted)]">
                 {client.projectCount} project{client.projectCount !== 1 ? 's' : ''} &middot;{' '}
                 {formatCurrency(client.totalSpent)}
               </p>
@@ -107,7 +107,7 @@ export default function ClientList({
                     <span
                       key={tag}
                       className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                        tagColors[tag] ?? 'bg-gray-100 text-gray-600'
+                        tagColors[tag] ?? 'bg-[var(--surface-raised)] text-[var(--text-secondary)]'
                       }`}
                     >
                       {tag}
@@ -119,7 +119,7 @@ export default function ClientList({
           );
         })}
         {filtered.length === 0 && (
-          <div className="px-4 py-8 text-center text-sm text-gray-400">
+          <div className="px-4 py-8 text-center text-sm text-[var(--text-muted)]">
             No clients found.
           </div>
         )}

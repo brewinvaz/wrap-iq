@@ -72,22 +72,22 @@ function vehicleSummary(vehicles: WorkOrder['vehicles']): string {
 function LoadingSkeleton() {
   return (
     <div className="flex h-full flex-col">
-      <div className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
-        <div className="h-7 w-48 animate-pulse rounded bg-gray-200" />
+      <div className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
+        <div className="h-7 w-48 animate-pulse rounded bg-[var(--surface-raised)]" />
         <div className="mt-3 flex gap-2">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-8 w-20 animate-pulse rounded-lg bg-gray-100" />
+            <div key={i} className="h-8 w-20 animate-pulse rounded-lg bg-[var(--surface-raised)]" />
           ))}
         </div>
       </div>
       <div className="flex-1 overflow-auto p-6">
-        <div className="overflow-hidden rounded-xl border border-[#e6e6eb] bg-white">
-          <div className="border-b border-[#e6e6eb] bg-[#f4f4f6] px-4 py-3">
-            <div className="h-4 w-full animate-pulse rounded bg-gray-200" />
+        <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-card)]">
+          <div className="border-b border-[var(--border)] bg-[var(--surface-app)] px-4 py-3">
+            <div className="h-4 w-full animate-pulse rounded bg-[var(--surface-raised)]" />
           </div>
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="border-b border-[#e6e6eb] px-4 py-3">
-              <div className="h-4 w-full animate-pulse rounded bg-gray-100" />
+            <div key={i} className="border-b border-[var(--border)] px-4 py-3">
+              <div className="h-4 w-full animate-pulse rounded bg-[var(--surface-raised)]" />
             </div>
           ))}
         </div>
@@ -167,11 +167,11 @@ export default function WorkOrdersPage() {
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-[#18181b]">Work Orders</h1>
-            <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-[#60606a]">
+            <h1 className="text-[22px] font-[800] tracking-[-0.4px] text-[var(--text-primary)]">Work Orders</h1>
+            <span className="rounded-full bg-[var(--surface-raised)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-secondary)]">
               {total} total
             </span>
           </div>
@@ -181,17 +181,17 @@ export default function WorkOrdersPage() {
               placeholder="Search by job # or client..."
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(0); }}
-              className="h-9 w-56 rounded-lg border border-[#e6e6eb] bg-[#f4f4f6] px-3 text-sm text-[#18181b] placeholder-[#a8a8b4] outline-none focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
+              className="h-9 w-56 rounded-lg border border-[var(--border)] bg-[var(--surface-app)] px-3 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none focus:border-[var(--accent-primary)]/40 focus:bg-[var(--surface-card)] focus:ring-2 focus:ring-[var(--accent-primary)]/20"
             />
             <Link
               href="/dashboard/work-orders/import"
-              className="rounded-lg border border-[#e6e6eb] bg-white px-4 py-2 text-sm font-medium text-[#18181b] transition-colors hover:bg-[#f4f4f6]"
+              className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)] px-4 py-2 text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-raised)]"
             >
               Import CSV
             </Link>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+              className="rounded-lg bg-[var(--accent-primary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--accent-primary)]/90"
             >
               + New Work Order
             </button>
@@ -203,7 +203,7 @@ export default function WorkOrdersPage() {
             <button
               onClick={() => { setActiveStage(null); setPage(0); }}
               className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                activeStage === null ? 'bg-blue-50 text-blue-700' : 'text-[#60606a] hover:bg-gray-50'
+                activeStage === null ? 'bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]' : 'text-[var(--text-secondary)] hover:bg-[var(--surface-raised)]'
               }`}
             >
               All
@@ -213,7 +213,7 @@ export default function WorkOrdersPage() {
                 key={stage.id}
                 onClick={() => { setActiveStage(stage.id); setPage(0); }}
                 className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                  activeStage === stage.id ? 'bg-blue-50 text-blue-700' : 'text-[#60606a] hover:bg-gray-50'
+                  activeStage === stage.id ? 'bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]' : 'text-[var(--text-secondary)] hover:bg-[var(--surface-raised)]'
                 }`}
               >
                 {stage.name}
@@ -236,36 +236,36 @@ export default function WorkOrdersPage() {
       {/* Table */}
       <div className="flex-1 overflow-auto p-6">
         {workOrders.length === 0 && !loading ? (
-          <div className="flex h-64 flex-col items-center justify-center rounded-xl border border-[#e6e6eb] bg-white">
-            <p className="text-sm font-medium text-[#18181b]">No work orders found</p>
-            <p className="mt-1 text-xs text-[#60606a]">
+          <div className="flex h-64 flex-col items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface-card)]">
+            <p className="text-sm font-medium text-[var(--text-primary)]">No work orders found</p>
+            <p className="mt-1 text-xs text-[var(--text-secondary)]">
               {search ? 'Try a different search term' : 'Create your first work order to get started'}
             </p>
           </div>
         ) : (
-          <div className="overflow-hidden rounded-xl border border-[#e6e6eb] bg-white">
+          <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-card)]">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#e6e6eb] bg-[#f4f4f6]">
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Job #</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Client</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Vehicle</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Type</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Priority</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Status</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Value</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Due</th>
+                <tr className="sticky top-0 z-10 border-b border-[var(--border)] bg-[var(--surface-app)]">
+                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Job #</th>
+                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Client</th>
+                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Vehicle</th>
+                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Type</th>
+                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Priority</th>
+                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Status</th>
+                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Value</th>
+                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Due</th>
                 </tr>
               </thead>
               <tbody>
                 {workOrders.map((wo) => {
                   const pStyle = priorityStyles[wo.priority] ?? priorityStyles.medium;
                   return (
-                    <tr key={wo.id} className="border-b border-[#e6e6eb] last:border-0 hover:bg-[#f4f4f6]/50">
-                      <td className="px-4 py-3 font-medium text-[#18181b]">{wo.job_number}</td>
-                      <td className="px-4 py-3 text-[#60606a]">{wo.client_name ?? '—'}</td>
-                      <td className="max-w-[200px] truncate px-4 py-3 text-[#60606a]">{vehicleSummary(wo.vehicles)}</td>
-                      <td className="px-4 py-3 text-[#60606a]">{jobTypeLabels[wo.job_type] ?? wo.job_type}</td>
+                    <tr key={wo.id} className="border-b border-[var(--border)] last:border-0 hover:bg-[var(--surface-raised)]">
+                      <td className="px-4 py-3 font-medium font-mono text-[var(--text-primary)]">{wo.job_number}</td>
+                      <td className="px-4 py-3 text-[var(--text-secondary)]">{wo.client_name ?? '—'}</td>
+                      <td className="max-w-[200px] truncate px-4 py-3 text-[var(--text-secondary)]">{vehicleSummary(wo.vehicles)}</td>
+                      <td className="px-4 py-3 text-[var(--text-secondary)]">{jobTypeLabels[wo.job_type] ?? wo.job_type}</td>
                       <td className="px-4 py-3">
                         <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium capitalize ${pStyle.bg} ${pStyle.text}`}>
                           {wo.priority}
@@ -280,11 +280,11 @@ export default function WorkOrdersPage() {
                             {wo.status.name}
                           </span>
                         ) : (
-                          <span className="text-[#a8a8b4]">—</span>
+                          <span className="text-[var(--text-muted)]">—</span>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-[#60606a]">{wo.job_value ? formatCurrency(wo.job_value) : '—'}</td>
-                      <td className="px-4 py-3 text-[#60606a]">{formatDate(wo.estimated_completion_date)}</td>
+                      <td className="px-4 py-3 font-mono text-[var(--text-secondary)]">{wo.job_value ? formatCurrency(wo.job_value) : '—'}</td>
+                      <td className="px-4 py-3 text-[var(--text-secondary)]">{formatDate(wo.estimated_completion_date)}</td>
                     </tr>
                   );
                 })}
@@ -296,21 +296,21 @@ export default function WorkOrdersPage() {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="mt-4 flex items-center justify-between">
-            <p className="text-xs text-[#60606a]">
+            <p className="text-xs text-[var(--text-secondary)]">
               Showing {page * limit + 1}–{Math.min((page + 1) * limit, total)} of {total}
             </p>
             <div className="flex gap-1">
               <button
                 disabled={page === 0}
                 onClick={() => setPage((p) => p - 1)}
-                className="rounded-lg px-3 py-1.5 text-xs font-medium text-[#60606a] transition-colors hover:bg-gray-100 disabled:opacity-40"
+                className="rounded-lg px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-raised)] disabled:opacity-40"
               >
                 Previous
               </button>
               <button
                 disabled={page >= totalPages - 1}
                 onClick={() => setPage((p) => p + 1)}
-                className="rounded-lg px-3 py-1.5 text-xs font-medium text-[#60606a] transition-colors hover:bg-gray-100 disabled:opacity-40"
+                className="rounded-lg px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-raised)] disabled:opacity-40"
               >
                 Next
               </button>

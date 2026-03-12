@@ -18,12 +18,12 @@ export default function RevenueChart({ data }: RevenueChartProps) {
 
   if (data.length === 0) {
     return (
-      <div className="overflow-hidden rounded-lg border border-[#e6e6eb] bg-white">
-        <div className="px-5 py-4 border-b border-[#e6e6eb]">
-          <h3 className="text-sm font-semibold text-[#18181b]">Revenue Trend</h3>
-          <p className="mt-0.5 text-[11px] text-[#a8a8b4]">Last 6 months</p>
+      <div className="overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--surface-card)]">
+        <div className="px-5 py-4 border-b border-[var(--border)]">
+          <h3 className="text-[15px] font-semibold text-[var(--text-primary)]">Revenue Trend</h3>
+          <p className="mt-0.5 text-[11px] text-[var(--text-muted)]">Last 6 months</p>
         </div>
-        <div className="px-5 py-5 text-center text-sm text-[#a8a8b4]" style={{ height: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="px-5 py-5 text-center text-sm text-[var(--text-muted)]" style={{ height: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           No revenue data available
         </div>
       </div>
@@ -31,10 +31,10 @@ export default function RevenueChart({ data }: RevenueChartProps) {
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-[#e6e6eb] bg-white">
-      <div className="px-5 py-4 border-b border-[#e6e6eb]">
-        <h3 className="text-sm font-semibold text-[#18181b]">Revenue Trend</h3>
-        <p className="mt-0.5 text-[11px] text-[#a8a8b4]">Last 6 months</p>
+    <div className="overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--surface-card)]">
+      <div className="px-5 py-4 border-b border-[var(--border)]">
+        <h3 className="text-[15px] font-semibold text-[var(--text-primary)]">Revenue Trend</h3>
+        <p className="mt-0.5 text-[11px] text-[var(--text-muted)]">Last 6 months</p>
       </div>
       <div className="px-5 py-5">
         <div className="flex items-end justify-between gap-3" style={{ height: '160px' }}>
@@ -44,16 +44,16 @@ export default function RevenueChart({ data }: RevenueChartProps) {
               <div key={point.month} className="group flex flex-1 flex-col items-center gap-2">
                 <div className="relative w-full flex justify-center" style={{ height: '130px' }}>
                   <div
-                    className="w-full max-w-[40px] rounded-t-md bg-blue-500 transition-all duration-700 ease-out"
+                    className="w-full max-w-[40px] rounded-t-md bg-[var(--accent-primary)] transition-all duration-700 ease-out"
                     style={{
                       height: mounted ? `${pct}%` : '0%',
                     }}
                   />
-                  <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 rounded bg-[#18181b] px-2 py-0.5 text-[10px] font-medium text-white opacity-0 transition-opacity group-hover:opacity-100 whitespace-nowrap">
+                  <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 rounded bg-[var(--text-primary)] px-2 py-0.5 text-[10px] font-medium text-white opacity-0 transition-opacity group-hover:opacity-100 whitespace-nowrap">
                     ${(point.value / 1000).toFixed(1)}k
                   </div>
                 </div>
-                <span className="font-mono text-[10px] uppercase tracking-wider text-gray-400">
+                <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
                   {point.month}
                 </span>
               </div>
