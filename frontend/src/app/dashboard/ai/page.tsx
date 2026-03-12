@@ -55,17 +55,17 @@ interface AIStat {
 
 interface AIActivity {
   id: string;
-  type: 'detection' | 'discrepancy' | 'insight' | 'chat-update';
+  type: 'new-lead' | 'high-priority' | 'completed' | 'status-update';
   message: string;
   timestamp: string;
   confidence?: number;
 }
 
 const typeStyles: Record<AIActivity['type'], { bg: string; text: string; label: string }> = {
-  detection: { bg: 'bg-blue-50', text: 'text-blue-700', label: 'Detection' },
-  discrepancy: { bg: 'bg-amber-50', text: 'text-amber-700', label: 'Discrepancy' },
-  insight: { bg: 'bg-violet-50', text: 'text-violet-700', label: 'Insight' },
-  'chat-update': { bg: 'bg-emerald-50', text: 'text-emerald-700', label: 'Auto-Update' },
+  'new-lead': { bg: 'bg-blue-50', text: 'text-blue-700', label: 'New Lead' },
+  'high-priority': { bg: 'bg-amber-50', text: 'text-amber-700', label: 'High Priority' },
+  completed: { bg: 'bg-violet-50', text: 'text-violet-700', label: 'Completed' },
+  'status-update': { bg: 'bg-emerald-50', text: 'text-emerald-700', label: 'Status Update' },
 };
 
 function vehicleLabel(vehicles: ApiVehicle[]): string {
@@ -129,16 +129,16 @@ function deriveActivity(workOrders: ApiWorkOrder[]): AIActivity[] {
     let message: string;
 
     if (systemStatus === 'completed') {
-      type = 'insight';
+      type = 'completed';
       message = `Job #${wo.job_number} completed${clientPart}${vehiclePart}`;
     } else if (wo.priority === 'high') {
-      type = 'discrepancy';
+      type = 'high-priority';
       message = `High priority: Job #${wo.job_number} (${statusName})${clientPart}${vehiclePart}`;
     } else if (systemStatus === 'lead') {
-      type = 'detection';
+      type = 'new-lead';
       message = `New job #${wo.job_number} received${clientPart}${vehiclePart}`;
     } else {
-      type = 'chat-update';
+      type = 'status-update';
       message = `Job #${wo.job_number} updated to "${statusName}"${clientPart}${vehiclePart}`;
     }
 

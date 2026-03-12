@@ -14,11 +14,11 @@ const dmMono = DM_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "WrapIQ",
+  title: "WrapFlow",
   description:
-    "WrapIQ is a shop management platform for vehicle wrap and paint protection film (PPF) businesses. Track projects, manage schedules, and streamline operations.",
+    "WrapFlow is a shop management platform for vehicle wrap and paint protection film (PPF) businesses. Track projects, manage schedules, and streamline operations.",
   openGraph: {
-    title: "WrapIQ",
+    title: "WrapFlow",
     description:
       "Shop management platform for vehicle wrap and PPF businesses. Track projects, manage schedules, and streamline operations.",
     type: "website",
