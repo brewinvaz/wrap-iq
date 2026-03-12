@@ -123,6 +123,28 @@ async def test_with_discrepancies(_set_api_key):
     assert result.discrepancies[1].field == "model"
 
 
+async def test_detect_discrepancies_uses_model_from_settings(_set_api_key):
+    _set_api_key.gemini_model = "gemini-custom-model"
+    vehicle = _mock_vehicle()
+    session = _mock_session(vehicle)
+
+    mock_aio_models = AsyncMock()
+    mock_aio_models.generate_content.return_value = _mock_response(_discrepancy_json())
+    mock_client = MagicMock()
+    mock_client.aio.models = mock_aio_models
+
+    with patch(
+        "app.services.discrepancy_detection.genai.Client",
+        return_value=mock_client,
+    ):
+        await detect_discrepancies(
+            VEHICLE_ID, ORG_ID, b"fake-image", "image/jpeg", session
+        )
+
+    call_kwargs = mock_aio_models.generate_content.call_args
+    assert call_kwargs.kwargs["model"] == "gemini-custom-model"
+
+
 async def test_raises_without_api_key():
     with patch("app.services.discrepancy_detection.settings") as mock_settings:
         mock_settings.gemini_api_key = ""

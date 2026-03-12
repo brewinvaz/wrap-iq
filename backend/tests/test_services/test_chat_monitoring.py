@@ -34,6 +34,43 @@ def _make_work_order_row(wo_id=None, job_number="JOB-001", notes="Some notes"):
 
 
 @patch("app.services.chat_monitoring.settings")
+@patch("app.services.chat_monitoring.genai.Client")
+async def test_analyze_message_uses_model_from_settings(mock_genai_cls, mock_settings):
+    mock_settings.gemini_api_key = "test-key"
+    mock_settings.gemini_model = "gemini-custom-model"
+    mock_client = MagicMock()
+    mock_genai_cls.return_value = mock_client
+
+    wo_id = str(uuid.uuid4())
+    gemini_response = json.dumps(
+        {"message_relevant": False, "suggested_updates": []}
+    )
+
+    mock_aio_models = AsyncMock()
+    mock_aio_models.generate_content.return_value = _mock_gemini_response(
+        gemini_response
+    )
+    mock_client.aio.models = mock_aio_models
+
+    service = ChatMonitoringService()
+    user = _mock_user()
+
+    session = AsyncMock()
+    wo_row = _make_work_order_row(wo_id=uuid.UUID(wo_id))
+    mock_result = MagicMock()
+    mock_result.all.return_value = [wo_row]
+    session.execute.return_value = mock_result
+
+    message = ChatMessage(
+        author="installer", text="Test message", channel="general"
+    )
+    await service.analyze_message(message, user, session)
+
+    call_kwargs = mock_aio_models.generate_content.call_args
+    assert call_kwargs.kwargs["model"] == "gemini-custom-model"
+
+
+@patch("app.services.chat_monitoring.settings")
 async def test_service_raises_without_api_key(mock_settings):
     mock_settings.gemini_api_key = ""
     with pytest.raises(ValueError, match="not configured"):

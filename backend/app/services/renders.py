@@ -24,8 +24,6 @@ from app.services.r2 import (
 
 logger = logging.getLogger("wrapiq")
 
-RENDER_MODEL = "gemini-2.5-flash-image"
-
 
 def build_prompt(description: str | None) -> str:
     base = (
@@ -132,7 +130,7 @@ async def generate_image(
     prompt = build_prompt(description)
 
     response = await client.aio.models.generate_content(
-        model=RENDER_MODEL,
+        model=settings.gemini_render_model,
         contents=[
             types.Part.from_bytes(
                 data=vehicle_photo,
