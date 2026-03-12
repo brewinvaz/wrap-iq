@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api-client';
 import Select from '@/components/ui/Select';
+import DatePicker from '@/components/ui/DatePicker';
 import type { JobPricingState } from './types';
 
 interface Client {
@@ -17,9 +18,6 @@ interface Props {
 
 const inputClass =
   'w-full rounded-lg border border-[var(--border)] bg-transparent px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]';
-
-const dateInputClass =
-  'w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]';
 
 const labelClass = 'mb-1.5 block text-sm font-medium text-[var(--text-primary)]';
 
@@ -135,25 +133,20 @@ export default function JobPricingTab({ data, onChange }: Props) {
           <label htmlFor="date-in" className={labelClass}>
             Date In
           </label>
-          <input
+          <DatePicker
             id="date-in"
-            type="date"
             value={data.dateIn}
-            onChange={(e) => update({ dateIn: e.target.value })}
-            required
-            className={dateInputClass}
+            onChange={(v) => update({ dateIn: v })}
           />
         </div>
         <div>
           <label htmlFor="estimated-completion" className={labelClass}>
             Est. Completion
           </label>
-          <input
+          <DatePicker
             id="estimated-completion"
-            type="date"
             value={data.estimatedCompletionDate}
-            onChange={(e) => update({ estimatedCompletionDate: e.target.value })}
-            className={dateInputClass}
+            onChange={(v) => update({ estimatedCompletionDate: v })}
           />
         </div>
       </div>
