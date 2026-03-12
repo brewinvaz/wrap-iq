@@ -4,6 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react';
 import { setTokens } from '@/lib/auth';
 import { API_BASE_URL } from '@/lib/config';
+import { Button } from '@/components/ui/Button';
 
 type VerifyState = 'verifying' | 'success' | 'error';
 
@@ -130,12 +131,11 @@ function VerifyContent() {
                     onChange={(e) => setRequestEmail(e.target.value)}
                     className="flex-1 rounded-[10px] border border-[var(--border)] bg-[var(--surface-raised)] px-[10px] py-2 text-[14px] text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)]"
                   />
-                  <button
+                  <Button
                     onClick={handleRequestNewLink}
-                    className="rounded-[10px] bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-[13px] font-medium text-white transition-opacity hover:opacity-90"
                   >
                     Send
-                  </button>
+                  </Button>
                 </div>
               </div>
             ) : (
