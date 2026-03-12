@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { api, ApiError } from '@/lib/api-client';
 import { useModalAccessibility } from '@/hooks/useModalAccessibility';
+import DatePicker from '@/components/ui/DatePicker';
 import { Button } from '@/components/ui/Button';
 
 interface CreateInvoiceModalProps {
@@ -212,12 +213,10 @@ export default function CreateInvoiceModal({
             >
               Due Date
             </label>
-            <input
+            <DatePicker
               id="due-date"
-              type="date"
               value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-              className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
+              onChange={setDueDate}
             />
           </div>
 

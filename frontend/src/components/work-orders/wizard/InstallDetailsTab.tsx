@@ -1,5 +1,6 @@
 'use client';
 
+import DatePicker from '@/components/ui/DatePicker';
 import type {
   InstallState,
   InstallLocation,
@@ -39,9 +40,6 @@ const DIFFICULTY_COLORS: Record<InstallDifficulty, string> = {
 /* ------------------------------------------------------------------ */
 /*  Shared style constants                                             */
 /* ------------------------------------------------------------------ */
-
-const INPUT_CLASS =
-  'w-full rounded-lg border border-[var(--border)] bg-transparent px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]';
 
 const LABEL_CLASS = 'mb-1.5 block text-sm font-medium text-[var(--text-primary)]';
 
@@ -110,20 +108,16 @@ export function InstallDetailsTab({ data, onChange }: Props) {
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className={LABEL_CLASS}>Install Start Date</label>
-          <input
-            type="date"
+          <DatePicker
             value={data.installStartDate}
-            onChange={(e) => update('installStartDate', e.target.value)}
-            className={INPUT_CLASS}
+            onChange={(v) => update('installStartDate', v)}
           />
         </div>
         <div>
           <label className={LABEL_CLASS}>Install End Date</label>
-          <input
-            type="date"
+          <DatePicker
             value={data.installEndDate}
-            onChange={(e) => update('installEndDate', e.target.value)}
-            className={INPUT_CLASS}
+            onChange={(v) => update('installEndDate', v)}
           />
         </div>
       </div>

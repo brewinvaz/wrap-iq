@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
+import DatePicker from '@/components/ui/DatePicker';
 
 const presets = ['7D', '30D', '90D', 'YTD', 'Custom'] as const;
 
@@ -81,13 +82,12 @@ export default function DateRangeFilter({ onChange, onCustomRange }: DateRangeFi
               <label htmlFor="custom-start" className="mb-1 block text-[10px] text-[var(--text-muted)]">
                 Start
               </label>
-              <input
+              <DatePicker
                 id="custom-start"
-                type="date"
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
+                onChange={setStartDate}
                 max={endDate || undefined}
-                className="rounded-md border border-[var(--border)] px-2 py-1.5 text-xs text-[var(--text-primary)] outline-none focus:border-[var(--accent-primary)]"
+                size="sm"
               />
             </div>
             <span className="mt-4 text-xs text-[var(--text-muted)]">to</span>
@@ -95,13 +95,12 @@ export default function DateRangeFilter({ onChange, onCustomRange }: DateRangeFi
               <label htmlFor="custom-end" className="mb-1 block text-[10px] text-[var(--text-muted)]">
                 End
               </label>
-              <input
+              <DatePicker
                 id="custom-end"
-                type="date"
                 value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
+                onChange={setEndDate}
                 min={startDate || undefined}
-                className="rounded-md border border-[var(--border)] px-2 py-1.5 text-xs text-[var(--text-primary)] outline-none focus:border-[var(--accent-primary)]"
+                size="sm"
               />
             </div>
           </div>
