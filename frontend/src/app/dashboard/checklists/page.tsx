@@ -1,110 +1,122 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { api } from '@/lib/api-client';
 
-interface ChecklistItem {
-  id: string;
+interface ApiChecklistItem {
   label: string;
-  checked: boolean;
+  done: boolean;
 }
 
-interface JobChecklist {
+interface ApiVehicle {
   id: string;
-  jobName: string;
-  vehicle: string;
-  date: string;
-  status: 'in-progress' | 'completed' | 'not-started';
-  items: ChecklistItem[];
+  make: string | null;
+  model: string | null;
+  year: number | null;
 }
 
-const INITIAL_CHECKLISTS: JobChecklist[] = [
-  {
-    id: 'c1',
-    jobName: 'Marcus Rivera — Full Body PPF',
-    vehicle: '2024 BMW M4',
-    date: 'Mar 10, 2026',
-    status: 'in-progress',
-    items: [
-      { id: 'c1i1', label: 'Vehicle inspection & photo documentation (before)', checked: true },
-      { id: 'c1i2', label: 'Surface wash & clay bar decontamination', checked: true },
-      { id: 'c1i3', label: 'IPA wipe-down of all panels', checked: true },
-      { id: 'c1i4', label: 'Film pre-cut and aligned on plotter', checked: false },
-      { id: 'c1i5', label: 'Hood panel installed & squeegeed', checked: false },
-      { id: 'c1i6', label: 'Front bumper installed & edges tucked', checked: false },
-      { id: 'c1i7', label: 'Fenders & mirrors installed', checked: false },
-      { id: 'c1i8', label: 'Final inspection & photo documentation (after)', checked: false },
-    ],
-  },
-  {
-    id: 'c2',
-    jobName: 'David Park — Full Body PPF',
-    vehicle: '2024 Porsche 911 GT3',
-    date: 'Mar 11, 2026',
-    status: 'not-started',
-    items: [
-      { id: 'c2i1', label: 'Vehicle inspection & photo documentation (before)', checked: false },
-      { id: 'c2i2', label: 'Surface prep & decontamination', checked: false },
-      { id: 'c2i3', label: 'Paint correction on impacted areas', checked: false },
-      { id: 'c2i4', label: 'Film pre-cut on plotter', checked: false },
-      { id: 'c2i5', label: 'Front clip installed (hood, bumper, fenders)', checked: false },
-      { id: 'c2i6', label: 'Rocker panels & A-pillars installed', checked: false },
-      { id: 'c2i7', label: 'Rear bumper & trunk lid installed', checked: false },
-      { id: 'c2i8', label: 'Final inspection & photo documentation (after)', checked: false },
-    ],
-  },
-  {
-    id: 'c3',
-    jobName: 'Elena Vasquez — Accent Package',
-    vehicle: '2023 Mercedes G-Wagon',
-    date: 'Mar 8, 2026',
-    status: 'completed',
-    items: [
-      { id: 'c3i1', label: 'Vehicle inspection & photos', checked: true },
-      { id: 'c3i2', label: 'Mirror caps cleaned & prepped', checked: true },
-      { id: 'c3i3', label: 'Mirror cap film installed', checked: true },
-      { id: 'c3i4', label: 'Door handle cups prepped', checked: true },
-      { id: 'c3i5', label: 'Door handle cup film installed', checked: true },
-      { id: 'c3i6', label: 'Final inspection & photos', checked: true },
-    ],
-  },
-];
+interface ApiWorkOrder {
+  id: string;
+  job_number: string;
+  job_value: number;
+  priority: 'high' | 'medium' | 'low';
+  date_in: string;
+  estimated_completion_date: string | null;
+  checklist: ApiChecklistItem[] | null;
+  status: { id: string; name: string; color: string; system_status: string | null } | null;
+  vehicles: ApiVehicle[];
+  client_name: string | null;
+}
 
-const STATUS_STYLES = {
+interface ApiWorkOrderListResponse {
+  items: ApiWorkOrder[];
+  total: number;
+}
+
+type ChecklistStatus = 'in-progress' | 'completed' | 'not-started';
+
+const STATUS_STYLES: Record<ChecklistStatus, { bg: string; text: string; label: string }> = {
   'in-progress': { bg: 'bg-amber-500/10', text: 'text-amber-400', label: 'In Progress' },
   completed: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', label: 'Completed' },
   'not-started': { bg: 'bg-[var(--surface-raised)]', text: 'text-[var(--text-muted)]', label: 'Not Started' },
 };
 
-export default function ChecklistsPage() {
-  const [checklists, setChecklists] = useState<JobChecklist[]>(INITIAL_CHECKLISTS);
+function vehicleLabel(vehicles: ApiVehicle[]): string {
+  if (vehicles.length === 0) return 'No vehicle';
+  return vehicles
+    .map((v) => [v.year, v.make, v.model].filter(Boolean).join(' '))
+    .join(', ');
+}
 
-  function toggleItem(checklistId: string, itemId: string) {
-    setChecklists((prev) =>
-      prev.map((cl) => {
-        if (cl.id !== checklistId) return cl;
-        const updatedItems = cl.items.map((item) =>
-          item.id === itemId ? { ...item, checked: !item.checked } : item,
-        );
-        const allChecked = updatedItems.every((i) => i.checked);
-        const someChecked = updatedItems.some((i) => i.checked);
-        return {
-          ...cl,
-          items: updatedItems,
-          status: allChecked
-            ? 'completed'
-            : someChecked
-              ? 'in-progress'
-              : 'not-started',
-        };
-      }),
+function deriveStatus(items: ApiChecklistItem[]): ChecklistStatus {
+  if (items.length === 0) return 'not-started';
+  const allDone = items.every((i) => i.done);
+  const someDone = items.some((i) => i.done);
+  if (allDone) return 'completed';
+  if (someDone) return 'in-progress';
+  return 'not-started';
+}
+
+export default function ChecklistsPage() {
+  const [workOrders, setWorkOrders] = useState<ApiWorkOrder[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchWorkOrders = useCallback(async () => {
+    try {
+      const data = await api.get<ApiWorkOrderListResponse>('/api/work-orders?limit=100');
+      setWorkOrders(data.items.filter((wo) => wo.checklist && wo.checklist.length > 0));
+    } catch {
+      setError('Failed to load checklists');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchWorkOrders();
+  }, [fetchWorkOrders]);
+
+  async function toggleItem(workOrderId: string, itemIndex: number) {
+    const wo = workOrders.find((w) => w.id === workOrderId);
+    if (!wo || !wo.checklist) return;
+
+    const updatedChecklist = wo.checklist.map((item, idx) =>
+      idx === itemIndex ? { ...item, done: !item.done } : item,
+    );
+
+    // Optimistic update
+    setWorkOrders((prev) =>
+      prev.map((w) => (w.id === workOrderId ? { ...w, checklist: updatedChecklist } : w)),
+    );
+
+    try {
+      await api.patch(`/api/work-orders/${workOrderId}`, { checklist: updatedChecklist });
+    } catch {
+      setWorkOrders((prev) =>
+        prev.map((w) => (w.id === workOrderId ? { ...w, checklist: wo.checklist } : w)),
+      );
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <p className="text-sm text-[var(--text-muted)]">Loading checklists…</p>
+      </div>
     );
   }
 
-  const totalJobs = checklists.length;
+  if (error) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <p className="text-sm text-red-500">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-full flex-col">
-      {/* Header */}
       <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -112,97 +124,106 @@ export default function ChecklistsPage() {
               Installation Checklists
             </h1>
             <span className="rounded-full bg-[var(--surface-raised)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-muted)]">
-              {totalJobs} jobs
+              {workOrders.length} jobs
             </span>
           </div>
         </div>
       </header>
 
-      {/* Content */}
       <div className="flex-1 overflow-auto p-6">
-        <div className="space-y-4">
-          {checklists.map((checklist) => {
-            const completed = checklist.items.filter((i) => i.checked).length;
-            const total = checklist.items.length;
-            const pct = Math.round((completed / total) * 100);
-            const style = STATUS_STYLES[checklist.status];
+        {workOrders.length === 0 ? (
+          <div className="flex h-64 items-center justify-center rounded-lg border border-dashed border-[var(--border)]">
+            <p className="text-sm text-[var(--text-muted)]">No jobs with checklists found</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {workOrders.map((wo) => {
+              const items = wo.checklist ?? [];
+              const completed = items.filter((i) => i.done).length;
+              const total = items.length;
+              const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+              const status = deriveStatus(items);
+              const style = STATUS_STYLES[status];
+              const dateLabel = wo.estimated_completion_date
+                ? new Date(wo.estimated_completion_date).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })
+                : 'No date';
 
-            return (
-              <div
-                key={checklist.id}
-                className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)]"
-              >
-                {/* Checklist header */}
-                <div className="px-5 py-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm font-semibold text-[var(--text-primary)]">
-                          {checklist.jobName}
+              return (
+                <div
+                  key={wo.id}
+                  className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)]"
+                >
+                  <div className="px-5 py-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-semibold text-[var(--text-primary)]">
+                            {wo.client_name ?? 'Unknown Client'} — #{wo.job_number}
+                          </p>
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${style.bg} ${style.text}`}
+                          >
+                            {style.label}
+                          </span>
+                        </div>
+                        <p className="mt-0.5 text-xs text-[var(--text-muted)]">
+                          {vehicleLabel(wo.vehicles)} &middot; {dateLabel}
                         </p>
-                        <span
-                          className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${style.bg} ${style.text}`}
-                        >
-                          {style.label}
-                        </span>
                       </div>
-                      <p className="mt-0.5 text-xs text-[var(--text-muted)]">
-                        {checklist.vehicle} &middot; {checklist.date}
-                      </p>
+                      <div className="text-right">
+                        <p className="font-mono text-lg font-bold text-[var(--text-primary)]">
+                          {pct}%
+                        </p>
+                        <p className="font-mono text-[10px] text-[var(--text-secondary)]">
+                          {completed}/{total} done
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-mono text-lg font-bold text-[var(--text-primary)]">
-                        {pct}%
-                      </p>
-                      <p className="font-mono text-[10px] text-[var(--text-secondary)]">
-                        {completed}/{total} done
-                      </p>
-                    </div>
-                  </div>
-                  {/* Progress bar */}
-                  <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-raised)]">
-                    <div
-                      className={`h-full rounded-full transition-all duration-300 ${
-                        pct === 100 ? 'bg-emerald-500' : 'bg-blue-500'
-                      }`}
-                      style={{ width: `${pct}%` }}
-                    />
-                  </div>
-                </div>
-
-                {/* Checklist items */}
-                <div className="border-t border-[var(--border)]">
-                  {checklist.items.map((item, idx) => (
-                    <label
-                      key={item.id}
-                      className={`flex cursor-pointer items-center gap-3 px-5 py-3 transition-colors hover:bg-[var(--surface-overlay)] ${
-                        idx < checklist.items.length - 1
-                          ? 'border-b border-[var(--border)]'
-                          : ''
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={item.checked}
-                        onChange={() => toggleItem(checklist.id, item.id)}
-                        className="h-4 w-4 shrink-0 rounded border-[var(--border)] text-blue-600 focus:ring-blue-500"
+                    <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-raised)]">
+                      <div
+                        className={`h-full rounded-full transition-all duration-300 ${
+                          pct === 100 ? 'bg-emerald-500' : 'bg-blue-500'
+                        }`}
+                        style={{ width: `${pct}%` }}
                       />
-                      <span
-                        className={`text-sm ${
-                          item.checked
-                            ? 'text-[var(--text-secondary)] line-through'
-                            : 'text-[var(--text-primary)]'
+                    </div>
+                  </div>
+
+                  <div className="border-t border-[var(--border)]">
+                    {items.map((item, idx) => (
+                      <label
+                        key={idx}
+                        className={`flex cursor-pointer items-center gap-3 px-5 py-3 transition-colors hover:bg-[var(--surface-overlay)] ${
+                          idx < items.length - 1 ? 'border-b border-[var(--border)]' : ''
                         }`}
                       >
-                        {item.label}
-                      </span>
-                    </label>
-                  ))}
+                        <input
+                          type="checkbox"
+                          checked={item.done}
+                          onChange={() => toggleItem(wo.id, idx)}
+                          className="h-4 w-4 shrink-0 rounded border-[var(--border)] text-blue-600 focus:ring-blue-500"
+                        />
+                        <span
+                          className={`text-sm ${
+                            item.done
+                              ? 'text-[var(--text-secondary)] line-through'
+                              : 'text-[var(--text-primary)]'
+                          }`}
+                        >
+                          {item.label}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
