@@ -62,7 +62,7 @@ export default function DateRangeFilter({ onChange, onCustomRange }: DateRangeFi
             onClick={() => handleClick(preset)}
             className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
               active === preset
-                ? 'bg-[var(--text-primary)] text-white'
+                ? 'bg-[var(--accent-primary)] text-white'
                 : 'text-[var(--text-secondary)] hover:bg-[var(--surface-raised)]'
             }`}
           >
@@ -114,7 +114,7 @@ export default function DateRangeFilter({ onChange, onCustomRange }: DateRangeFi
             <button
               onClick={handleApply}
               disabled={!startDate || !endDate}
-              className="rounded-md bg-[var(--text-primary)] px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-[var(--text-primary)]/90 disabled:cursor-not-allowed disabled:opacity-40"
+              className="rounded-md bg-[var(--accent-primary)] px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-[var(--accent-primary)]/90 disabled:cursor-not-allowed disabled:opacity-40"
             >
               Apply
             </button>
