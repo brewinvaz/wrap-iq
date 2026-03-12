@@ -261,7 +261,7 @@ export default function CommsPage() {
                 onClick={() => setActiveTab(tab.key)}
                 className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-colors ${
                   activeTab === tab.key
-                    ? 'bg-[#18181b] text-white'
+                    ? 'bg-[var(--accent-primary)] text-white'
                     : 'text-[var(--text-muted)] hover:bg-[var(--surface-overlay)]'
                 }`}
               >

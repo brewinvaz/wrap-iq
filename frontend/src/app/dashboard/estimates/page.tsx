@@ -133,7 +133,7 @@ export default function EstimatesPage() {
               onClick={() => setStatusFilter(s)}
               className={`rounded-full px-3 py-1 text-xs font-medium capitalize transition-colors ${
                 statusFilter === s
-                  ? 'bg-[#18181b] text-white'
+                  ? 'bg-[var(--accent-primary)] text-white'
                   : 'bg-[var(--surface-raised)] text-[var(--text-secondary)] hover:bg-[var(--border)]'
               }`}
             >
