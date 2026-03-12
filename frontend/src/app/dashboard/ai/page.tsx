@@ -236,12 +236,12 @@ function AskAIModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="ask-ai-title"
-        className="relative flex h-[70vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl"
+        className="relative flex h-[70vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-[var(--surface-card)] shadow-xl"
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#e6e6eb] px-6 py-4">
+        <div className="flex items-center justify-between border-b border-[var(--border)] px-6 py-4">
           <div className="flex items-center gap-2">
-            <h3 id="ask-ai-title" className="text-lg font-semibold text-[#18181b]">
+            <h3 id="ask-ai-title" className="text-lg font-semibold text-[var(--text-primary)]">
               Ask AI
             </h3>
             <span className="rounded-full bg-violet-50 px-2 py-0.5 text-xs font-medium text-violet-700">
@@ -250,7 +250,7 @@ function AskAIModal({
           </div>
           <button
             onClick={handleClose}
-            className="rounded-lg p-1 text-[#a8a8b4] transition-colors hover:bg-gray-100 hover:text-[#18181b]"
+            className="rounded-lg p-1 text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-raised)] hover:text-[var(--text-primary)]"
           >
             <svg
               className="h-5 w-5"
@@ -273,10 +273,10 @@ function AskAIModal({
           {messages.length === 0 && (
             <div className="flex h-full flex-col items-center justify-center text-center">
               <span className="text-4xl">{'\uD83E\uDDE0'}</span>
-              <p className="mt-3 text-sm font-medium text-[#18181b]">
+              <p className="mt-3 text-sm font-medium text-[var(--text-primary)]">
                 Ask anything about your shop
               </p>
-              <p className="mt-1 text-xs text-[#a8a8b4]">
+              <p className="mt-1 text-xs text-[var(--text-secondary)]">
                 Get insights about work orders, clients, revenue, and more.
               </p>
             </div>
@@ -290,7 +290,7 @@ function AskAIModal({
                 className={`max-w-[80%] rounded-xl px-4 py-3 text-sm ${
                   msg.role === 'user'
                     ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-[#18181b]'
+                    : 'bg-[var(--surface-raised)] text-[var(--text-primary)]'
                 }`}
               >
                 <p className="whitespace-pre-wrap">{msg.content}</p>
@@ -299,7 +299,7 @@ function AskAIModal({
           ))}
           {isLoading && (
             <div className="mb-4 flex justify-start">
-              <div className="rounded-xl bg-gray-100 px-4 py-3 text-sm text-[#a8a8b4]">
+              <div className="rounded-xl bg-[var(--surface-raised)] px-4 py-3 text-sm text-[var(--text-secondary)]">
                 Thinking...
               </div>
             </div>
@@ -315,14 +315,14 @@ function AskAIModal({
         )}
 
         {/* Input */}
-        <form onSubmit={handleSubmit} className="border-t border-[#e6e6eb] px-6 py-4">
+        <form onSubmit={handleSubmit} className="border-t border-[var(--border)] px-6 py-4">
           <div className="flex gap-3">
             <input
               type="text"
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               placeholder="Ask a question about your shop..."
-              className="flex-1 rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] placeholder-[#a8a8b4] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="flex-1 rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-secondary)] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               disabled={isLoading}
             />
             <button
@@ -342,36 +342,36 @@ function AskAIModal({
 function LoadingSkeleton() {
   return (
     <div className="flex h-full flex-col">
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-7 w-48 animate-pulse rounded bg-gray-200" />
-            <div className="h-5 w-20 animate-pulse rounded-full bg-gray-100" />
+            <div className="h-7 w-48 animate-pulse rounded bg-[var(--surface-overlay)]" />
+            <div className="h-5 w-20 animate-pulse rounded-full bg-[var(--surface-raised)]" />
           </div>
-          <div className="h-9 w-20 animate-pulse rounded-lg bg-gray-200" />
+          <div className="h-9 w-20 animate-pulse rounded-lg bg-[var(--surface-overlay)]" />
         </div>
       </header>
       <div className="flex-1 space-y-6 overflow-auto p-6">
         <div className="grid grid-cols-4 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="rounded-xl border border-[#e6e6eb] bg-white p-4">
-              <div className="h-3 w-24 animate-pulse rounded bg-gray-200" />
-              <div className="mt-3 h-7 w-16 animate-pulse rounded bg-gray-200" />
-              <div className="mt-2 h-3 w-20 animate-pulse rounded bg-gray-100" />
+            <div key={i} className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-4">
+              <div className="h-3 w-24 animate-pulse rounded bg-[var(--surface-overlay)]" />
+              <div className="mt-3 h-7 w-16 animate-pulse rounded bg-[var(--surface-overlay)]" />
+              <div className="mt-2 h-3 w-20 animate-pulse rounded bg-[var(--surface-raised)]" />
             </div>
           ))}
         </div>
-        <div className="rounded-xl border border-[#e6e6eb] bg-white">
-          <div className="border-b border-[#e6e6eb] px-5 py-3">
-            <div className="h-4 w-36 animate-pulse rounded bg-gray-200" />
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)]">
+          <div className="border-b border-[var(--border)] px-5 py-3">
+            <div className="h-4 w-36 animate-pulse rounded bg-[var(--surface-overlay)]" />
           </div>
-          <div className="divide-y divide-[#e6e6eb]">
+          <div className="divide-y divide-[var(--border)]">
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="flex items-start gap-3 px-5 py-4">
-                <div className="h-5 w-20 animate-pulse rounded-full bg-gray-200" />
+                <div className="h-5 w-20 animate-pulse rounded-full bg-[var(--surface-overlay)]" />
                 <div className="flex-1 space-y-2">
-                  <div className="h-4 w-full animate-pulse rounded bg-gray-100" />
-                  <div className="h-3 w-24 animate-pulse rounded bg-gray-100" />
+                  <div className="h-4 w-full animate-pulse rounded bg-[var(--surface-raised)]" />
+                  <div className="h-3 w-24 animate-pulse rounded bg-[var(--surface-raised)]" />
                 </div>
               </div>
             ))}
@@ -415,8 +415,8 @@ export default function AIPage() {
   if (error) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-4">
-        <p className="text-sm font-medium text-[#18181b]">Failed to load shop intelligence</p>
-        <p className="text-xs text-[#60606a]">{error}</p>
+        <p className="text-sm font-medium text-[var(--text-primary)]">Failed to load shop intelligence</p>
+        <p className="text-xs text-[var(--text-muted)]">{error}</p>
         <button
           onClick={() => window.location.reload()}
           className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
@@ -429,10 +429,10 @@ export default function AIPage() {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-[#18181b]">Shop Intelligence</h1>
+            <h1 className="text-xl font-bold text-[var(--text-primary)]">Shop Intelligence</h1>
             <span className="rounded-full bg-violet-50 px-2.5 py-0.5 text-xs font-medium text-violet-700">
               AI Powered
             </span>
@@ -449,25 +449,25 @@ export default function AIPage() {
       <div className="flex-1 space-y-6 overflow-auto p-6">
         <div className="grid grid-cols-4 gap-4">
           {aiStats.map((s) => (
-            <div key={s.label} className="rounded-xl border border-[#e6e6eb] bg-white p-4">
+            <div key={s.label} className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-4">
               <div className="flex items-center gap-2">
                 <span className="text-lg">{s.icon}</span>
-                <p className="text-xs text-[#a8a8b4]">{s.label}</p>
+                <p className="text-xs text-[var(--text-secondary)]">{s.label}</p>
               </div>
-              <p className="mt-2 text-2xl font-bold text-[#18181b]">{s.value}</p>
-              <p className="mt-1 text-xs text-[#60606a]">{s.sub}</p>
+              <p className="mt-2 text-2xl font-bold text-[var(--text-primary)]">{s.value}</p>
+              <p className="mt-1 text-xs text-[var(--text-muted)]">{s.sub}</p>
             </div>
           ))}
         </div>
 
-        <div className="rounded-xl border border-[#e6e6eb] bg-white">
-          <div className="border-b border-[#e6e6eb] px-5 py-3">
-            <h2 className="text-sm font-semibold text-[#18181b]">Recent AI Activity</h2>
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)]">
+          <div className="border-b border-[var(--border)] px-5 py-3">
+            <h2 className="text-sm font-semibold text-[var(--text-primary)]">Recent AI Activity</h2>
           </div>
-          <div className="divide-y divide-[#e6e6eb]">
+          <div className="divide-y divide-[var(--border)]">
             {recentActivity.length === 0 ? (
               <div className="px-5 py-8 text-center">
-                <p className="text-sm text-[#a8a8b4]">No recent activity to display.</p>
+                <p className="text-sm text-[var(--text-secondary)]">No recent activity to display.</p>
               </div>
             ) : (
               recentActivity.map((a) => {
@@ -478,11 +478,11 @@ export default function AIPage() {
                       {style.label}
                     </span>
                     <div className="flex-1">
-                      <p className="text-sm text-[#18181b]">{a.message}</p>
+                      <p className="text-sm text-[var(--text-primary)]">{a.message}</p>
                       <div className="mt-1 flex items-center gap-3">
-                        <span className="text-xs text-[#a8a8b4]">{a.timestamp}</span>
+                        <span className="text-xs text-[var(--text-secondary)]">{a.timestamp}</span>
                         {a.confidence && (
-                          <span className="text-xs text-[#a8a8b4]">{a.confidence}% confidence</span>
+                          <span className="text-xs text-[var(--text-secondary)]">{a.confidence}% confidence</span>
                         )}
                       </div>
                     </div>

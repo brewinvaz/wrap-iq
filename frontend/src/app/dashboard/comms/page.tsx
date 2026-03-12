@@ -79,17 +79,17 @@ function formatTimestamp(dateStr: string): string {
 function LoadingSkeleton() {
   return (
     <div className="flex h-full flex-col">
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
-        <div className="h-7 w-56 animate-pulse rounded bg-gray-200" />
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
+        <div className="h-7 w-56 animate-pulse rounded bg-[var(--surface-overlay)]" />
       </header>
       <div className="flex flex-1 overflow-hidden">
-        <div className="w-80 shrink-0 border-r border-[#e6e6eb] bg-white">
+        <div className="w-80 shrink-0 border-r border-[var(--border)] bg-[var(--surface-card)]">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="flex items-start gap-3 border-b border-[#e6e6eb] px-4 py-3">
-              <div className="h-9 w-9 shrink-0 animate-pulse rounded-full bg-gray-200" />
+            <div key={i} className="flex items-start gap-3 border-b border-[var(--border)] px-4 py-3">
+              <div className="h-9 w-9 shrink-0 animate-pulse rounded-full bg-[var(--surface-overlay)]" />
               <div className="flex-1 space-y-2">
-                <div className="h-4 w-28 animate-pulse rounded bg-gray-200" />
-                <div className="h-3 w-full animate-pulse rounded bg-gray-100" />
+                <div className="h-4 w-28 animate-pulse rounded bg-[var(--surface-overlay)]" />
+                <div className="h-3 w-full animate-pulse rounded bg-[var(--surface-raised)]" />
               </div>
             </div>
           ))}
@@ -98,7 +98,7 @@ function LoadingSkeleton() {
           <div className="space-y-4">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className={`flex ${i % 2 === 0 ? 'justify-start' : 'justify-end'}`}>
-                <div className="h-16 w-72 animate-pulse rounded-xl bg-gray-100" />
+                <div className="h-16 w-72 animate-pulse rounded-xl bg-[var(--surface-raised)]" />
               </div>
             ))}
           </div>
@@ -216,8 +216,8 @@ export default function CommsPage() {
   if (error) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-4">
-        <p className="text-sm font-medium text-[#18181b]">Failed to load communications</p>
-        <p className="text-xs text-[#60606a]">{error}</p>
+        <p className="text-sm font-medium text-[var(--text-primary)]">Failed to load communications</p>
+        <p className="text-xs text-[var(--text-muted)]">{error}</p>
         <button
           onClick={() => fetchData()}
           className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
@@ -230,11 +230,11 @@ export default function CommsPage() {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-[#18181b]">Client Communications</h1>
-            <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-[#60606a]">
+            <h1 className="text-xl font-bold text-[var(--text-primary)]">Client Communications</h1>
+            <span className="rounded-full bg-[var(--surface-raised)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-muted)]">
               {unreadCount} unread
             </span>
           </div>
@@ -252,9 +252,9 @@ export default function CommsPage() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Notification List */}
-        <div className="flex w-80 shrink-0 flex-col border-r border-[#e6e6eb] bg-white">
+        <div className="flex w-80 shrink-0 flex-col border-r border-[var(--border)] bg-[var(--surface-card)]">
           {/* Filter tabs */}
-          <div className="flex gap-1 border-b border-[#e6e6eb] px-4 py-2">
+          <div className="flex gap-1 border-b border-[var(--border)] px-4 py-2">
             {filterTabs.map((tab) => (
               <button
                 key={tab.key}
@@ -262,7 +262,7 @@ export default function CommsPage() {
                 className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-colors ${
                   activeTab === tab.key
                     ? 'bg-[#18181b] text-white'
-                    : 'text-[#60606a] hover:bg-gray-50'
+                    : 'text-[var(--text-muted)] hover:bg-[var(--surface-overlay)]'
                 }`}
               >
                 {tab.label}
@@ -274,7 +274,7 @@ export default function CommsPage() {
           {/* List */}
           <div className="flex-1 overflow-y-auto">
             {filtered.length === 0 ? (
-              <div className="flex h-32 items-center justify-center text-xs text-[#a8a8b4]">
+              <div className="flex h-32 items-center justify-center text-xs text-[var(--text-secondary)]">
                 No notifications
               </div>
             ) : (
@@ -282,8 +282,8 @@ export default function CommsPage() {
                 <button
                   key={n.id}
                   onClick={() => handleSelect(n.id)}
-                  className={`flex w-full items-start gap-3 border-b border-[#e6e6eb] px-4 py-3 text-left transition-colors ${
-                    selectedId === n.id ? 'bg-blue-50/50' : 'hover:bg-[#f4f4f6]'
+                  className={`flex w-full items-start gap-3 border-b border-[var(--border)] px-4 py-3 text-left transition-colors ${
+                    selectedId === n.id ? 'bg-blue-50/50' : 'hover:bg-[var(--surface-overlay)]'
                   }`}
                 >
                   <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white ${getAvatarColor(n.type)}`}>
@@ -291,12 +291,12 @@ export default function CommsPage() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between">
-                      <span className={`text-sm ${!n.is_read ? 'font-semibold' : 'font-medium'} text-[#18181b]`}>
+                      <span className={`text-sm ${!n.is_read ? 'font-semibold' : 'font-medium'} text-[var(--text-primary)]`}>
                         {n.title}
                       </span>
-                      <span className="text-[10px] text-[#a8a8b4]">{formatTimestamp(n.created_at)}</span>
+                      <span className="text-[10px] text-[var(--text-secondary)]">{formatTimestamp(n.created_at)}</span>
                     </div>
-                    <p className="mt-0.5 truncate text-xs text-[#60606a]">{n.body}</p>
+                    <p className="mt-0.5 truncate text-xs text-[var(--text-muted)]">{n.body}</p>
                   </div>
                   {!n.is_read && (
                     <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-blue-600" />
@@ -319,10 +319,10 @@ export default function CommsPage() {
                       {getInitials(selectedNotification.title)}
                     </div>
                     <div>
-                      <h2 className="text-base font-semibold text-[#18181b]">
+                      <h2 className="text-base font-semibold text-[var(--text-primary)]">
                         {selectedNotification.title}
                       </h2>
-                      <p className="mt-0.5 text-xs text-[#a8a8b4]">
+                      <p className="mt-0.5 text-xs text-[var(--text-secondary)]">
                         {new Date(selectedNotification.created_at).toLocaleString('en-US', {
                           month: 'short',
                           day: 'numeric',
@@ -337,20 +337,20 @@ export default function CommsPage() {
                   </div>
                 </div>
 
-                <div className="rounded-xl bg-[#f4f4f6] px-5 py-4">
-                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-[#18181b]">
+                <div className="rounded-xl bg-[var(--surface-raised)] px-5 py-4">
+                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-[var(--text-primary)]">
                     {selectedNotification.body}
                   </p>
                 </div>
 
                 {selectedNotification.updated_at !== selectedNotification.created_at && (
-                  <p className="mt-3 text-[10px] text-[#a8a8b4]">
+                  <p className="mt-3 text-[10px] text-[var(--text-secondary)]">
                     Updated {formatTimestamp(selectedNotification.updated_at)}
                   </p>
                 )}
               </div>
             ) : (
-              <div className="flex h-full items-center justify-center text-sm text-[#a8a8b4]">
+              <div className="flex h-full items-center justify-center text-sm text-[var(--text-secondary)]">
                 Select a notification to view details
               </div>
             )}
@@ -358,8 +358,8 @@ export default function CommsPage() {
 
           {/* Quick-send templates */}
           {templates.length > 0 && (
-            <div className="border-t border-[#e6e6eb] bg-white px-4 py-3">
-              <p className="mb-2 text-[10px] font-medium uppercase tracking-wider text-[#a8a8b4]">
+            <div className="border-t border-[var(--border)] bg-[var(--surface-card)] px-4 py-3">
+              <p className="mb-2 text-[10px] font-medium uppercase tracking-wider text-[var(--text-secondary)]">
                 Quick Send Templates
               </p>
               <div className="flex flex-wrap gap-2">
@@ -368,7 +368,7 @@ export default function CommsPage() {
                     key={t.id}
                     onClick={() => handleSendTemplate(t.id)}
                     disabled={sendingTemplate === t.id}
-                    className="rounded-lg border border-[#e6e6eb] px-3 py-1.5 text-xs font-medium text-[#60606a] transition-colors hover:bg-[#f4f4f6] disabled:opacity-50"
+                    className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-xs font-medium text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-overlay)] disabled:opacity-50"
                     title={t.subject}
                   >
                     {sendingTemplate === t.id ? 'Sending...' : t.name}

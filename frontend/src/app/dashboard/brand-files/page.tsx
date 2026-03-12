@@ -45,11 +45,11 @@ export default function BrandFilesPage() {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-[#18181b]">Brand Files</h1>
-            <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-[#60606a]">
+            <h1 className="text-xl font-bold text-[var(--text-primary)]">Brand Files</h1>
+            <span className="rounded-full bg-[var(--surface-raised)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-muted)]">
               {filtered.length} files
             </span>
           </div>
@@ -60,15 +60,15 @@ export default function BrandFilesPage() {
       </header>
 
       {/* Filters */}
-      <div className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-3">
+      <div className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-3">
         <div className="flex items-center gap-3">
-          <span className="font-mono text-[9.5px] uppercase tracking-wider text-[#a8a8b4]">
+          <span className="font-mono text-[9.5px] uppercase tracking-wider text-[var(--text-secondary)]">
             Filter
           </span>
           <select
             value={clientFilter}
             onChange={(e) => setClientFilter(e.target.value)}
-            className="rounded-lg border border-[#e6e6eb] bg-white px-3 py-1.5 text-sm text-[#18181b] outline-none focus:border-blue-400"
+            className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)] px-3 py-1.5 text-sm text-[var(--text-primary)] outline-none focus:border-blue-400"
           >
             {clients.map((c) => (
               <option key={c}>{c}</option>
@@ -77,7 +77,7 @@ export default function BrandFilesPage() {
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="rounded-lg border border-[#e6e6eb] bg-white px-3 py-1.5 text-sm text-[#18181b] outline-none focus:border-blue-400"
+            className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)] px-3 py-1.5 text-sm text-[var(--text-primary)] outline-none focus:border-blue-400"
           >
             {fileTypes.map((t) => (
               <option key={t}>{t}</option>
@@ -90,34 +90,34 @@ export default function BrandFilesPage() {
       <div className="flex-1 overflow-auto p-6 space-y-8">
         {Object.entries(clientGroups).map(([client, files]) => (
           <section key={client}>
-            <h2 className="mb-3 font-mono text-[10px] uppercase tracking-wider text-[#a8a8b4]">
+            <h2 className="mb-3 font-mono text-[10px] uppercase tracking-wider text-[var(--text-secondary)]">
               {client}
             </h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {files.map((file) => (
                 <div
                   key={file.id}
-                  className="group cursor-pointer rounded-lg border border-[#e6e6eb] bg-white transition-shadow hover:shadow-md"
+                  className="group cursor-pointer rounded-lg border border-[var(--border)] bg-[var(--surface-card)] transition-shadow hover:shadow-md"
                 >
                   {/* Thumbnail area */}
-                  <div className="flex h-32 items-center justify-center rounded-t-lg bg-gray-50 text-4xl">
+                  <div className="flex h-32 items-center justify-center rounded-t-lg bg-[var(--surface-raised)] text-4xl">
                     {file.thumbnail}
                   </div>
                   {/* File info */}
                   <div className="p-3">
                     <div className="flex items-start justify-between gap-2">
-                      <p className="text-sm font-medium text-[#18181b] leading-tight">
+                      <p className="text-sm font-medium text-[var(--text-primary)] leading-tight">
                         {file.name}
                       </p>
                       <span
-                        className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold ${FILE_TYPE_COLORS[file.type] ?? 'bg-gray-100 text-gray-600'}`}
+                        className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold ${FILE_TYPE_COLORS[file.type] ?? 'bg-[var(--surface-raised)] text-[var(--text-secondary)]'}`}
                       >
                         {file.type}
                       </span>
                     </div>
                     <div className="mt-2 flex items-center justify-between">
-                      <span className="font-mono text-[11px] text-[#a8a8b4]">{file.size}</span>
-                      <span className="font-mono text-[11px] text-[#a8a8b4]">{file.modified}</span>
+                      <span className="font-mono text-[11px] text-[var(--text-secondary)]">{file.size}</span>
+                      <span className="font-mono text-[11px] text-[var(--text-secondary)]">{file.modified}</span>
                     </div>
                   </div>
                 </div>
@@ -127,7 +127,7 @@ export default function BrandFilesPage() {
         ))}
 
         {filtered.length === 0 && (
-          <div className="flex h-48 items-center justify-center text-sm text-[#a8a8b4]">
+          <div className="flex h-48 items-center justify-center text-sm text-[var(--text-secondary)]">
             No files match the current filters.
           </div>
         )}
