@@ -55,15 +55,15 @@ export default function DateRangeFilter({ onChange, onCustomRange }: DateRangeFi
 
   return (
     <div className="relative" ref={pickerRef}>
-      <div className="flex items-center gap-1 rounded-lg border border-[#e6e6eb] bg-white p-1">
+      <div className="flex items-center gap-1 rounded-lg border border-[var(--border)] bg-[var(--surface-card)] p-1">
         {presets.map((preset) => (
           <button
             key={preset}
             onClick={() => handleClick(preset)}
             className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
               active === preset
-                ? 'bg-[#18181b] text-white'
-                : 'text-[#60606a] hover:bg-gray-50'
+                ? 'bg-[var(--text-primary)] text-white'
+                : 'text-[var(--text-secondary)] hover:bg-[var(--surface-raised)]'
             }`}
           >
             {preset}
@@ -73,11 +73,11 @@ export default function DateRangeFilter({ onChange, onCustomRange }: DateRangeFi
 
       {/* Custom date range picker popover */}
       {showCustomPicker && (
-        <div className="absolute right-0 top-full z-50 mt-2 rounded-lg border border-[#e6e6eb] bg-white p-4 shadow-lg">
-          <p className="mb-3 text-xs font-medium text-[#60606a]">Select date range</p>
+        <div className="absolute right-0 top-full z-50 mt-2 rounded-lg border border-[var(--border)] bg-[var(--surface-card)] p-4 shadow-lg">
+          <p className="mb-3 text-xs font-medium text-[var(--text-secondary)]">Select date range</p>
           <div className="flex items-center gap-2">
             <div>
-              <label htmlFor="custom-start" className="mb-1 block text-[10px] text-[#a8a8b4]">
+              <label htmlFor="custom-start" className="mb-1 block text-[10px] text-[var(--text-muted)]">
                 Start
               </label>
               <input
@@ -86,12 +86,12 @@ export default function DateRangeFilter({ onChange, onCustomRange }: DateRangeFi
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
                 max={endDate || undefined}
-                className="rounded-md border border-[#e6e6eb] px-2 py-1.5 text-xs text-[#18181b] outline-none focus:border-blue-500"
+                className="rounded-md border border-[var(--border)] px-2 py-1.5 text-xs text-[var(--text-primary)] outline-none focus:border-[var(--accent-primary)]"
               />
             </div>
-            <span className="mt-4 text-xs text-[#a8a8b4]">to</span>
+            <span className="mt-4 text-xs text-[var(--text-muted)]">to</span>
             <div>
-              <label htmlFor="custom-end" className="mb-1 block text-[10px] text-[#a8a8b4]">
+              <label htmlFor="custom-end" className="mb-1 block text-[10px] text-[var(--text-muted)]">
                 End
               </label>
               <input
@@ -100,21 +100,21 @@ export default function DateRangeFilter({ onChange, onCustomRange }: DateRangeFi
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 min={startDate || undefined}
-                className="rounded-md border border-[#e6e6eb] px-2 py-1.5 text-xs text-[#18181b] outline-none focus:border-blue-500"
+                className="rounded-md border border-[var(--border)] px-2 py-1.5 text-xs text-[var(--text-primary)] outline-none focus:border-[var(--accent-primary)]"
               />
             </div>
           </div>
           <div className="mt-3 flex justify-end gap-2">
             <button
               onClick={() => setShowCustomPicker(false)}
-              className="rounded-md px-3 py-1.5 text-xs font-medium text-[#60606a] hover:bg-gray-50"
+              className="rounded-md px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-raised)]"
             >
               Cancel
             </button>
             <button
               onClick={handleApply}
               disabled={!startDate || !endDate}
-              className="rounded-md bg-[#18181b] px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-[#2d2d33] disabled:cursor-not-allowed disabled:opacity-40"
+              className="rounded-md bg-[var(--text-primary)] px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-[var(--text-primary)]/90 disabled:cursor-not-allowed disabled:opacity-40"
             >
               Apply
             </button>

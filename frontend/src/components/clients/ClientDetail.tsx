@@ -20,7 +20,7 @@ const statusStyles: Record<string, { dot: string; text: string }> = {
 
 function CardHeader({ title }: { title: string }) {
   return (
-    <h3 className="mb-3 font-[family-name:var(--font-dm-mono)] text-xs font-medium uppercase tracking-wide text-gray-400">
+    <h3 className="mb-3 font-[family-name:var(--font-dm-mono)] text-[12px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
       {title}
     </h3>
   );
@@ -29,8 +29,8 @@ function CardHeader({ title }: { title: string }) {
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-baseline justify-between gap-4 py-1.5">
-      <span className="shrink-0 text-sm text-gray-500">{label}</span>
-      <span className="truncate text-right text-sm font-medium text-[#18181b]">{value}</span>
+      <span className="shrink-0 text-sm text-[var(--text-secondary)]">{label}</span>
+      <span className="truncate text-right text-sm font-medium text-[var(--text-primary)]">{value}</span>
     </div>
   );
 }
@@ -132,18 +132,18 @@ export default function ClientDetail({ client, onClientUpdated }: ClientDetailPr
   }
 
   return (
-    <div className="flex-1 overflow-y-auto bg-[#f4f4f6]">
+    <div className="flex-1 overflow-y-auto bg-[var(--surface-app)]">
       {/* Header */}
-      <div className="border-b border-[#e6e6eb] bg-white px-8 py-6">
+      <div className="border-b border-[var(--border)] bg-[var(--surface-card)] px-8 py-6">
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-xl font-bold text-[#18181b]">{client.name}</h1>
+              <h1 className="text-[22px] font-[800] tracking-[-0.4px] text-[var(--text-primary)]">{client.name}</h1>
               <span
                 className={`rounded px-2 py-0.5 font-[family-name:var(--font-dm-mono)] text-[10px] font-medium uppercase ${
                   client.type === 'business'
-                    ? 'bg-gray-100 text-gray-600'
-                    : 'bg-gray-50 text-gray-500'
+                    ? 'bg-[var(--surface-raised)] text-[var(--text-secondary)]'
+                    : 'bg-[var(--surface-raised)] text-[var(--text-secondary)]'
                 }`}
               >
                 {client.type}
@@ -152,14 +152,14 @@ export default function ClientDetail({ client, onClientUpdated }: ClientDetailPr
                 <span
                   key={tag}
                   className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                    tagColors[tag] ?? 'bg-gray-100 text-gray-600'
+                    tagColors[tag] ?? 'bg-[var(--surface-raised)] text-[var(--text-secondary)]'
                   }`}
                 >
                   {tag}
                 </span>
               ))}
             </div>
-            <p className="mt-1 font-[family-name:var(--font-dm-mono)] text-xs text-gray-400">
+            <p className="mt-1 font-[family-name:var(--font-dm-mono)] text-xs text-[var(--text-muted)]">
               Client since {new Date(client.joinedDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
               {client.referralSource && <> &middot; Source: {client.referralSource}</>}
             </p>
@@ -170,14 +170,14 @@ export default function ClientDetail({ client, onClientUpdated }: ClientDetailPr
                 <button
                   onClick={handleCancelEdit}
                   disabled={editSaving}
-                  className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-[#18181b] shadow-sm transition-colors hover:bg-gray-50 disabled:opacity-50"
+                  className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)] px-4 py-2 text-sm font-medium text-[var(--text-primary)] shadow-sm transition-colors hover:bg-[var(--surface-raised)] disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSaveEdit}
                   disabled={editSaving}
-                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 disabled:opacity-50"
+                  className="rounded-lg bg-[var(--accent-primary)] px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-[var(--accent-primary)]/90 disabled:opacity-50"
                 >
                   {editSaving ? 'Saving...' : 'Save'}
                 </button>
@@ -186,14 +186,14 @@ export default function ClientDetail({ client, onClientUpdated }: ClientDetailPr
               <>
                 <button
                   onClick={handleStartEdit}
-                  className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-[#18181b] shadow-sm transition-colors hover:bg-gray-50"
+                  className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)] px-4 py-2 text-sm font-medium text-[var(--text-primary)] shadow-sm transition-colors hover:bg-[var(--surface-raised)]"
                 >
                   Edit
                 </button>
                 <button
                   onClick={handleEmail}
                   disabled={!client.email}
-                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 disabled:opacity-50"
+                  className="rounded-lg bg-[var(--accent-primary)] px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-[var(--accent-primary)]/90 disabled:opacity-50"
                 >
                   Email
                 </button>
@@ -208,44 +208,44 @@ export default function ClientDetail({ client, onClientUpdated }: ClientDetailPr
         {/* Info cards grid */}
         <div className="grid grid-cols-2 gap-6">
           {/* Contact Info */}
-          <div className="rounded-xl border border-[#e6e6eb] bg-white p-5 shadow-sm">
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-[18px] shadow-sm transition-all hover:border-[rgba(168,85,247,0.3)] hover:shadow-[0_0_16px_rgba(168,85,247,0.08)]">
             <CardHeader title="Contact Info" />
             {isEditing ? (
               <div className="space-y-3">
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-gray-500">Name</label>
+                  <label className="mb-1 block text-xs font-medium text-[var(--text-secondary)]">Name</label>
                   <input
                     type="text"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
-                    className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-[#18181b] outline-none focus:border-blue-300 focus:ring-1 focus:ring-blue-300"
+                    className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface-raised)] px-3 py-2 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent-primary)]/30 focus:ring-1 focus:ring-[var(--accent-primary)]/30"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-gray-500">Email</label>
+                  <label className="mb-1 block text-xs font-medium text-[var(--text-secondary)]">Email</label>
                   <input
                     type="email"
                     value={editEmail}
                     onChange={(e) => setEditEmail(e.target.value)}
-                    className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-[#18181b] outline-none focus:border-blue-300 focus:ring-1 focus:ring-blue-300"
+                    className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface-raised)] px-3 py-2 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent-primary)]/30 focus:ring-1 focus:ring-[var(--accent-primary)]/30"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-gray-500">Phone</label>
+                  <label className="mb-1 block text-xs font-medium text-[var(--text-secondary)]">Phone</label>
                   <input
                     type="tel"
                     value={editPhone}
                     onChange={(e) => setEditPhone(e.target.value)}
-                    className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-[#18181b] outline-none focus:border-blue-300 focus:ring-1 focus:ring-blue-300"
+                    className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface-raised)] px-3 py-2 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent-primary)]/30 focus:ring-1 focus:ring-[var(--accent-primary)]/30"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-gray-500">Address</label>
+                  <label className="mb-1 block text-xs font-medium text-[var(--text-secondary)]">Address</label>
                   <input
                     type="text"
                     value={editAddress}
                     onChange={(e) => setEditAddress(e.target.value)}
-                    className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-[#18181b] outline-none focus:border-blue-300 focus:ring-1 focus:ring-blue-300"
+                    className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface-raised)] px-3 py-2 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent-primary)]/30 focus:ring-1 focus:ring-[var(--accent-primary)]/30"
                   />
                 </div>
               </div>
@@ -262,7 +262,7 @@ export default function ClientDetail({ client, onClientUpdated }: ClientDetailPr
           </div>
 
           {/* Account Summary */}
-          <div className="rounded-xl border border-[#e6e6eb] bg-white p-5 shadow-sm">
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-[18px] shadow-sm transition-all hover:border-[rgba(168,85,247,0.3)] hover:shadow-[0_0_16px_rgba(168,85,247,0.08)]">
             <CardHeader title="Account Summary" />
             <InfoRow label="Total Projects" value={String(client.projectCount)} />
             <InfoRow
@@ -292,20 +292,20 @@ export default function ClientDetail({ client, onClientUpdated }: ClientDetailPr
 
         {/* Business Contacts */}
         {client.type === 'business' && client.contacts && client.contacts.length > 0 && (
-          <div className="mt-6 rounded-xl border border-[#e6e6eb] bg-white p-5 shadow-sm">
+          <div className="mt-6 rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-[18px] shadow-sm transition-all hover:border-[rgba(168,85,247,0.3)] hover:shadow-[0_0_16px_rgba(168,85,247,0.08)]">
             <CardHeader title="Contacts" />
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-[var(--border-subtle)]">
               {client.contacts.map((contact) => (
                 <div key={contact.email} className="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0">
                   <div>
-                    <p className="text-sm font-medium text-[#18181b]">{contact.name}</p>
-                    <p className="font-[family-name:var(--font-dm-mono)] text-xs text-gray-400">
+                    <p className="text-sm font-medium text-[var(--text-primary)]">{contact.name}</p>
+                    <p className="font-[family-name:var(--font-dm-mono)] text-xs text-[var(--text-muted)]">
                       {contact.role}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-gray-500">{contact.email}</p>
-                    <p className="font-[family-name:var(--font-dm-mono)] text-xs text-gray-400">
+                    <p className="text-sm text-[var(--text-secondary)]">{contact.email}</p>
+                    <p className="font-[family-name:var(--font-dm-mono)] text-xs text-[var(--text-muted)]">
                       {contact.phone}
                     </p>
                   </div>
@@ -317,16 +317,16 @@ export default function ClientDetail({ client, onClientUpdated }: ClientDetailPr
 
         {/* Vehicles */}
         {client.vehicles.length > 0 && (
-          <div className="mt-6 rounded-xl border border-[#e6e6eb] bg-white p-5 shadow-sm">
+          <div className="mt-6 rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-[18px] shadow-sm transition-all hover:border-[rgba(168,85,247,0.3)] hover:shadow-[0_0_16px_rgba(168,85,247,0.08)]">
             <CardHeader title="Tracked Vehicles" />
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-[var(--border-subtle)]">
               {client.vehicles.map((vehicle) => (
                 <div key={vehicle.vin} className="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0">
                   <div>
-                    <p className="text-sm font-medium text-[#18181b]">
+                    <p className="text-sm font-medium text-[var(--text-primary)]">
                       {vehicle.year} {vehicle.make} {vehicle.model}
                     </p>
-                    <p className="font-[family-name:var(--font-dm-mono)] text-xs text-gray-400">
+                    <p className="font-[family-name:var(--font-dm-mono)] text-xs text-[var(--text-muted)]">
                       VIN: {vehicle.vin}
                     </p>
                   </div>
@@ -338,9 +338,9 @@ export default function ClientDetail({ client, onClientUpdated }: ClientDetailPr
 
         {/* Project History */}
         {client.projects.length > 0 && (
-          <div className="mt-6 rounded-xl border border-[#e6e6eb] bg-white p-5 shadow-sm">
+          <div className="mt-6 rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-[18px] shadow-sm transition-all hover:border-[rgba(168,85,247,0.3)] hover:shadow-[0_0_16px_rgba(168,85,247,0.08)]">
             <CardHeader title="Project History" />
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-[var(--border-subtle)]">
               {client.projects.map((project) => {
                 const style = statusStyles[project.status] ?? statusStyles.completed;
                 return (
@@ -348,8 +348,8 @@ export default function ClientDetail({ client, onClientUpdated }: ClientDetailPr
                     <div className="flex items-center gap-3">
                       <span className={`h-2 w-2 shrink-0 rounded-full ${style.dot}`} />
                       <div>
-                        <p className="text-sm font-medium text-[#18181b]">{project.name}</p>
-                        <p className="font-[family-name:var(--font-dm-mono)] text-xs text-gray-400">
+                        <p className="text-sm font-medium text-[var(--text-primary)]">{project.name}</p>
+                        <p className="font-[family-name:var(--font-dm-mono)] text-xs text-[var(--text-muted)]">
                           {new Date(project.date).toLocaleDateString('en-US', {
                             month: 'short',
                             day: 'numeric',
@@ -359,7 +359,7 @@ export default function ClientDetail({ client, onClientUpdated }: ClientDetailPr
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-medium text-[#18181b]">
+                      <p className="font-mono text-sm font-medium text-[var(--text-primary)]">
                         ${project.value.toLocaleString()}
                       </p>
                       <p className={`font-[family-name:var(--font-dm-mono)] text-[10px] font-medium uppercase ${style.text}`}>
@@ -374,10 +374,10 @@ export default function ClientDetail({ client, onClientUpdated }: ClientDetailPr
         )}
 
         {/* Notes */}
-        <div className="mt-6 rounded-xl border border-[#e6e6eb] bg-white p-5 shadow-sm">
+        <div className="mt-6 rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-[18px] shadow-sm transition-all hover:border-[rgba(168,85,247,0.3)] hover:shadow-[0_0_16px_rgba(168,85,247,0.08)]">
           <CardHeader title="Notes" />
           <textarea
-            className="w-full resize-none rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm text-[#18181b] placeholder-gray-400 outline-none focus:border-blue-300 focus:ring-1 focus:ring-blue-300"
+            className="w-full resize-none rounded-lg border border-[var(--border)] bg-[var(--surface-raised)] p-3 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none focus:border-[var(--accent-primary)]/30 focus:ring-1 focus:ring-[var(--accent-primary)]/30"
             rows={4}
             value={notes}
             onChange={(e) => {
@@ -390,7 +390,7 @@ export default function ClientDetail({ client, onClientUpdated }: ClientDetailPr
             <button
               onClick={handleSaveNotes}
               disabled={saving || !isDirty}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-lg bg-[var(--accent-primary)] px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-[var(--accent-primary)]/90 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {saving ? 'Saving...' : 'Save Notes'}
             </button>

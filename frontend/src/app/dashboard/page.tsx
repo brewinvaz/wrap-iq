@@ -132,17 +132,17 @@ function computeKPIs(workOrders: WorkOrderResponse[], stages: KanbanStageRespons
 
 function MetricsBarSkeleton() {
   return (
-    <div className="flex flex-wrap border-b border-[#e6e6eb] bg-white">
+    <div className="flex flex-wrap border-b border-[var(--border)] bg-[var(--surface-card)]">
       {Array.from({ length: 4 }).map((_, i) => (
         <div
           key={i}
           className={`flex flex-1 min-w-[140px] items-center gap-3 px-5 py-3.5 ${
-            i < 3 ? 'border-r border-[#e6e6eb]' : ''
+            i < 3 ? 'border-r border-[var(--border)]' : ''
           }`}
         >
           <div className="min-w-0 space-y-2">
-            <div className="h-3 w-20 animate-pulse rounded bg-gray-200" />
-            <div className="h-7 w-16 animate-pulse rounded bg-gray-200" />
+            <div className="h-3 w-20 animate-pulse rounded bg-[var(--surface-raised)]" />
+            <div className="h-7 w-16 animate-pulse rounded bg-[var(--surface-raised)]" />
           </div>
         </div>
       ))}
@@ -156,12 +156,12 @@ function KanbanBoardSkeleton() {
       {Array.from({ length: 5 }).map((_, colIdx) => (
         <div key={colIdx} className="flex w-72 shrink-0 flex-col">
           {/* Column header skeleton */}
-          <div className="mb-3 rounded-xl bg-white shadow-[0_1px_4px_rgba(0,0,0,.06)]">
-            <div className="h-0.5 animate-pulse rounded-t-xl bg-gray-200" />
+          <div className="mb-3 rounded-xl bg-[var(--surface-card)] shadow-[0_1px_4px_rgba(0,0,0,.06)]">
+            <div className="h-0.5 animate-pulse rounded-t-xl bg-[var(--surface-raised)]" />
             <div className="flex items-center justify-between px-3.5 py-2.5">
               <div className="flex items-center gap-2">
-                <div className="h-4 w-20 animate-pulse rounded bg-gray-200" />
-                <div className="h-5 w-5 animate-pulse rounded-full bg-gray-100" />
+                <div className="h-4 w-20 animate-pulse rounded bg-[var(--surface-raised)]" />
+                <div className="h-5 w-5 animate-pulse rounded-full bg-[var(--surface-raised)]" />
               </div>
             </div>
           </div>
@@ -171,18 +171,18 @@ function KanbanBoardSkeleton() {
               (_, cardIdx) => (
                 <div
                   key={cardIdx}
-                  className="rounded-xl bg-white p-4 shadow-[0_1px_4px_rgba(0,0,0,.06)]"
+                  className="rounded-xl bg-[var(--surface-card)] p-4 shadow-[0_1px_4px_rgba(0,0,0,.06)]"
                 >
                   <div className="space-y-3">
-                    <div className="h-4 w-3/4 animate-pulse rounded bg-gray-200" />
-                    <div className="h-3 w-full animate-pulse rounded bg-gray-100" />
+                    <div className="h-4 w-3/4 animate-pulse rounded bg-[var(--surface-raised)]" />
+                    <div className="h-3 w-full animate-pulse rounded bg-[var(--surface-raised)]" />
                     <div className="flex gap-2">
-                      <div className="h-5 w-14 animate-pulse rounded-full bg-gray-100" />
-                      <div className="h-5 w-10 animate-pulse rounded-full bg-gray-100" />
+                      <div className="h-5 w-14 animate-pulse rounded-full bg-[var(--surface-raised)]" />
+                      <div className="h-5 w-10 animate-pulse rounded-full bg-[var(--surface-raised)]" />
                     </div>
                     <div className="flex items-center justify-between">
-                      <div className="h-3 w-16 animate-pulse rounded bg-gray-100" />
-                      <div className="h-6 w-6 animate-pulse rounded-full bg-gray-200" />
+                      <div className="h-3 w-16 animate-pulse rounded bg-[var(--surface-raised)]" />
+                      <div className="h-6 w-6 animate-pulse rounded-full bg-[var(--surface-raised)]" />
                     </div>
                   </div>
                 </div>
@@ -236,24 +236,24 @@ function ListView({
   stages: KanbanStageResponse[];
 }) {
   return (
-    <div className="overflow-x-auto rounded-xl border border-[#e6e6eb] bg-white shadow-[0_1px_4px_rgba(0,0,0,.06)]">
+    <div className="overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--surface-card)] shadow-[0_1px_4px_rgba(0,0,0,.06)]">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-[#e6e6eb] bg-[#f4f4f6] text-left">
-            <th className="px-4 py-3 font-semibold text-[#18181b]">Job #</th>
-            <th className="px-4 py-3 font-semibold text-[#18181b]">Client</th>
-            <th className="px-4 py-3 font-semibold text-[#18181b]">Vehicle</th>
-            <th className="px-4 py-3 font-semibold text-[#18181b]">Status</th>
-            <th className="px-4 py-3 font-semibold text-[#18181b]">Priority</th>
-            <th className="px-4 py-3 font-semibold text-[#18181b]">Type</th>
-            <th className="px-4 py-3 text-right font-semibold text-[#18181b]">Value</th>
-            <th className="px-4 py-3 font-semibold text-[#18181b]">Date In</th>
+          <tr className="border-b border-[var(--border)] bg-[var(--surface-app)] text-left">
+            <th className="px-4 py-3 font-semibold text-[var(--text-primary)]">Job #</th>
+            <th className="px-4 py-3 font-semibold text-[var(--text-primary)]">Client</th>
+            <th className="px-4 py-3 font-semibold text-[var(--text-primary)]">Vehicle</th>
+            <th className="px-4 py-3 font-semibold text-[var(--text-primary)]">Status</th>
+            <th className="px-4 py-3 font-semibold text-[var(--text-primary)]">Priority</th>
+            <th className="px-4 py-3 font-semibold text-[var(--text-primary)]">Type</th>
+            <th className="px-4 py-3 text-right font-semibold text-[var(--text-primary)]">Value</th>
+            <th className="px-4 py-3 font-semibold text-[var(--text-primary)]">Date In</th>
           </tr>
         </thead>
         <tbody>
           {workOrders.length === 0 ? (
             <tr>
-              <td colSpan={8} className="px-4 py-12 text-center text-[#a8a8b4]">
+              <td colSpan={8} className="px-4 py-12 text-center text-[var(--text-muted)]">
                 No work orders found
               </td>
             </tr>
@@ -268,10 +268,10 @@ function ListView({
                   : 'No vehicle';
 
               return (
-                <tr key={wo.id} className="border-b border-[#e6e6eb] last:border-b-0 hover:bg-[#f9f9fb]">
-                  <td className="px-4 py-3 font-medium text-[#18181b]">{wo.job_number}</td>
-                  <td className="px-4 py-3 text-[#60606a]">{wo.client_name ?? 'Unknown'}</td>
-                  <td className="max-w-[200px] truncate px-4 py-3 text-[#60606a]">{vehicleSummary}</td>
+                <tr key={wo.id} className="border-b border-[var(--border)] last:border-b-0 hover:bg-[var(--surface-raised)]">
+                  <td className="px-4 py-3 font-medium font-mono text-[var(--text-primary)]">{wo.job_number}</td>
+                  <td className="px-4 py-3 text-[var(--text-secondary)]">{wo.client_name ?? 'Unknown'}</td>
+                  <td className="max-w-[200px] truncate px-4 py-3 text-[var(--text-secondary)]">{vehicleSummary}</td>
                   <td className="px-4 py-3">
                     {stage && (
                       <span
@@ -288,11 +288,11 @@ function ListView({
                       {wo.priority}
                     </span>
                   </td>
-                  <td className="px-4 py-3 capitalize text-[#60606a]">{wo.job_type}</td>
-                  <td className="px-4 py-3 text-right font-medium text-[#18181b]">
+                  <td className="px-4 py-3 capitalize text-[var(--text-secondary)]">{wo.job_type}</td>
+                  <td className="px-4 py-3 text-right font-medium font-mono text-[var(--text-primary)]">
                     {formatCurrency(wo.job_value)}
                   </td>
-                  <td className="px-4 py-3 text-[#60606a]">{wo.date_in.slice(0, 10)}</td>
+                  <td className="px-4 py-3 text-[var(--text-secondary)]">{wo.date_in.slice(0, 10)}</td>
                 </tr>
               );
             })
@@ -588,11 +588,11 @@ export default function DashboardPage() {
   return (
     <div className="flex h-full flex-col">
       {/* Top bar */}
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-[#18181b]">Projects</h1>
-            <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-[#60606a]">
+            <h1 className="text-[22px] font-[800] tracking-[-0.4px] text-[var(--text-primary)]">Projects</h1>
+            <span className="rounded-full bg-[var(--surface-raised)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-secondary)]">
               {loading ? '...' : `${totalWorkOrders} total`}
             </span>
           </div>
@@ -603,8 +603,8 @@ export default function DashboardPage() {
                 onClick={() => setFilterOpen((o) => !o)}
                 className={`flex items-center gap-2 rounded-lg border px-3.5 py-2 text-sm font-medium transition-colors ${
                   activeFilterCount > 0
-                    ? 'border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100'
-                    : 'border-[#e6e6eb] bg-white text-[#60606a] hover:bg-gray-50'
+                    ? 'border-[var(--accent-primary)]/30 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/15'
+                    : 'border-[var(--border)] bg-[var(--surface-card)] text-[var(--text-secondary)] hover:bg-[var(--surface-raised)]'
                 }`}
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -612,7 +612,7 @@ export default function DashboardPage() {
                 </svg>
                 Filter
                 {activeFilterCount > 0 && (
-                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-blue-600 px-1 text-[11px] font-semibold text-white">
+                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--accent-primary)] px-1 text-[11px] font-semibold text-white">
                     {activeFilterCount}
                   </span>
                 )}
@@ -621,15 +621,15 @@ export default function DashboardPage() {
               {filterOpen && (
                 <div
                   ref={filterRef}
-                  className="absolute right-0 top-11 z-50 w-64 rounded-xl border border-[#e6e6eb] bg-white shadow-lg"
+                  className="absolute right-0 top-11 z-50 w-64 rounded-xl border border-[var(--border)] bg-[var(--surface-card)] shadow-lg"
                 >
-                  <div className="border-b border-[#e6e6eb] px-4 py-3">
+                  <div className="border-b border-[var(--border)] px-4 py-3">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-[14px] font-semibold text-[#18181b]">Filters</h3>
+                      <h3 className="text-[14px] font-semibold text-[var(--text-primary)]">Filters</h3>
                       {activeFilterCount > 0 && (
                         <button
                           onClick={() => setFilterCriteria({ priority: [], jobType: [] })}
-                          className="text-[12px] font-medium text-blue-600 hover:text-blue-700"
+                          className="text-[12px] font-medium text-[var(--accent-primary)] hover:text-[var(--accent-primary)]"
                         >
                           Clear all
                         </button>
@@ -640,10 +640,10 @@ export default function DashboardPage() {
                   <div className="p-4 space-y-4">
                     {/* Priority filter */}
                     <div>
-                      <p className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-[#a8a8b4]">Priority</p>
+                      <p className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-[var(--text-muted)]">Priority</p>
                       <div className="space-y-1.5">
                         {(['high', 'medium', 'low'] as const).map((p) => (
-                          <label key={p} className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-[#18181b] hover:bg-[#f4f4f6]">
+                          <label key={p} className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-[var(--text-primary)] hover:bg-[var(--surface-raised)]">
                             <input
                               type="checkbox"
                               checked={filterCriteria.priority.includes(p)}
@@ -655,7 +655,7 @@ export default function DashboardPage() {
                                     : [...prev.priority, p],
                                 }))
                               }
-                              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                              className="h-4 w-4 rounded border-[var(--border)] text-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
                             />
                             <span className="capitalize">{p}</span>
                           </label>
@@ -665,10 +665,10 @@ export default function DashboardPage() {
 
                     {/* Job type filter */}
                     <div>
-                      <p className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-[#a8a8b4]">Job Type</p>
+                      <p className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-[var(--text-muted)]">Job Type</p>
                       <div className="space-y-1.5">
                         {(['commercial', 'personal'] as const).map((t) => (
-                          <label key={t} className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-[#18181b] hover:bg-[#f4f4f6]">
+                          <label key={t} className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-[var(--text-primary)] hover:bg-[var(--surface-raised)]">
                             <input
                               type="checkbox"
                               checked={filterCriteria.jobType.includes(t)}
@@ -680,7 +680,7 @@ export default function DashboardPage() {
                                     : [...prev.jobType, t],
                                 }))
                               }
-                              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                              className="h-4 w-4 rounded border-[var(--border)] text-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
                             />
                             <span className="capitalize">{t}</span>
                           </label>
@@ -691,7 +691,7 @@ export default function DashboardPage() {
                     {/* Status filter (by stage) */}
                     {stages.length > 0 && (
                       <div>
-                        <p className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-[#a8a8b4]">Status</p>
+                        <p className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-[var(--text-muted)]">Status</p>
                         <div className="space-y-1.5">
                           {stages.map((s) => {
                             const count = workOrders.filter((wo) => wo.status?.id === s.id).length;
@@ -703,13 +703,13 @@ export default function DashboardPage() {
                                   // For simplicity, we use the quick filter by navigating to the column
                                   setFilterOpen(false);
                                 }}
-                                className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-sm text-[#18181b] hover:bg-[#f4f4f6]"
+                                className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-sm text-[var(--text-primary)] hover:bg-[var(--surface-raised)]"
                               >
                                 <span className="flex items-center gap-2">
                                   <span className="h-2 w-2 rounded-full" style={{ backgroundColor: s.color }} />
                                   {s.name}
                                 </span>
-                                <span className="text-xs text-[#a8a8b4]">{count}</span>
+                                <span className="text-xs text-[var(--text-muted)]">{count}</span>
                               </button>
                             );
                           })}
@@ -722,7 +722,7 @@ export default function DashboardPage() {
             </div>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="rounded-lg bg-blue-600 px-3.5 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+              className="rounded-lg bg-[var(--accent-primary)] px-3.5 py-2 text-sm font-medium text-white transition-colors hover:opacity-90"
             >
               + New Project
             </button>
@@ -760,15 +760,15 @@ export default function DashboardPage() {
 
       {/* View toggle and filters */}
       <div className="shrink-0 flex items-center justify-between px-6 py-3">
-        <div className="flex items-center gap-1 rounded-lg border border-[#e6e6eb] bg-white p-1">
+        <div className="flex items-center gap-1 rounded-lg border border-[var(--border)] bg-[var(--surface-card)] p-1">
           {(['kanban', 'list', 'calendar'] as const).map((mode) => (
             <button
               key={mode}
               onClick={() => handleViewMode(mode)}
               className={`rounded-md px-3 py-1.5 text-xs font-medium capitalize transition-colors ${
                 viewMode === mode
-                  ? 'bg-blue-50 text-blue-600'
-                  : 'text-[#60606a] hover:bg-gray-50'
+                  ? 'bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]'
+                  : 'text-[var(--text-secondary)] hover:bg-[var(--surface-raised)]'
               }`}
             >
               {mode}
@@ -787,8 +787,8 @@ export default function DashboardPage() {
               onClick={() => setFilter((prev) => prev === f.key ? 'all' : f.key)}
               className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                 filter === f.key
-                  ? 'bg-[#18181b] text-white'
-                  : 'bg-white text-[#60606a] border border-[#e6e6eb] hover:bg-gray-50'
+                  ? 'bg-[var(--text-primary)] text-white'
+                  : 'bg-[var(--surface-card)] text-[var(--text-secondary)] border border-[var(--border)] hover:bg-[var(--surface-raised)]'
               }`}
             >
               {f.label}

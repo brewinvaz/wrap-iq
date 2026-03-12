@@ -107,15 +107,15 @@ export default function CreateClientModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="create-client-title"
-        className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
+        className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-[var(--surface-card)] p-6 shadow-xl"
       >
         <div className="mb-6 flex items-center justify-between">
-          <h3 id="create-client-title" className="text-lg font-semibold text-[#18181b]">
+          <h3 id="create-client-title" className="text-lg font-semibold text-[var(--text-primary)]">
             Create New Client
           </h3>
           <button
             onClick={onClose}
-            className="rounded-lg p-1 text-[#a8a8b4] transition-colors hover:bg-gray-100 hover:text-[#18181b]"
+            className="rounded-lg p-1 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-raised)] hover:text-[var(--text-primary)]"
           >
             <svg
               className="h-5 w-5"
@@ -143,7 +143,7 @@ export default function CreateClientModal({
           <div>
             <label
               htmlFor="client-name"
-              className="mb-1.5 block text-sm font-medium text-[#18181b]"
+              className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]"
             >
               Name
             </label>
@@ -154,14 +154,14 @@ export default function CreateClientModal({
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g., John Smith"
               required
-              className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] placeholder-[#a8a8b4] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
             />
           </div>
 
           <div>
             <label
               htmlFor="client-type"
-              className="mb-1.5 block text-sm font-medium text-[#18181b]"
+              className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]"
             >
               Client Type
             </label>
@@ -169,7 +169,7 @@ export default function CreateClientModal({
               id="client-type"
               value={clientType}
               onChange={(e) => setClientType(e.target.value)}
-              className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
             >
               <option value="personal">Personal</option>
               <option value="business">Business</option>
@@ -180,7 +180,7 @@ export default function CreateClientModal({
             <div>
               <label
                 htmlFor="client-email"
-                className="mb-1.5 block text-sm font-medium text-[#18181b]"
+                className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]"
               >
                 Email
               </label>
@@ -190,13 +190,13 @@ export default function CreateClientModal({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="john@example.com"
-                className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] placeholder-[#a8a8b4] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
               />
             </div>
             <div>
               <label
                 htmlFor="client-phone"
-                className="mb-1.5 block text-sm font-medium text-[#18181b]"
+                className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]"
               >
                 Phone
               </label>
@@ -206,7 +206,7 @@ export default function CreateClientModal({
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="(555) 123-4567"
-                className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] placeholder-[#a8a8b4] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
               />
             </div>
           </div>
@@ -214,7 +214,7 @@ export default function CreateClientModal({
           <div>
             <label
               htmlFor="client-address"
-              className="mb-1.5 block text-sm font-medium text-[#18181b]"
+              className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]"
             >
               Address
             </label>
@@ -224,12 +224,12 @@ export default function CreateClientModal({
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               placeholder="123 Main St, City, State"
-              className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] placeholder-[#a8a8b4] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
             />
           </div>
 
           <div role="group" aria-labelledby="tags-label">
-            <span id="tags-label" className="mb-1.5 block text-sm font-medium text-[#18181b]">
+            <span id="tags-label" className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]">
               Tags
             </span>
             <div className="flex flex-wrap gap-2">
@@ -243,8 +243,8 @@ export default function CreateClientModal({
                     onClick={() => toggleTag(tag)}
                     className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                       selected
-                        ? 'border-blue-300 bg-blue-50 text-blue-700'
-                        : 'border-[#e6e6eb] bg-white text-[#60606a] hover:bg-gray-50'
+                        ? 'border-[var(--accent-primary)]/30 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]'
+                        : 'border-[var(--border)] bg-[var(--surface-card)] text-[var(--text-secondary)] hover:bg-[var(--surface-raised)]'
                     }`}
                   >
                     {tag}
@@ -257,7 +257,7 @@ export default function CreateClientModal({
           <div>
             <label
               htmlFor="client-referral"
-              className="mb-1.5 block text-sm font-medium text-[#18181b]"
+              className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]"
             >
               Referral Source
             </label>
@@ -268,7 +268,7 @@ export default function CreateClientModal({
                 setReferralSource(e.target.value);
                 if (e.target.value !== 'other') setCustomReferral('');
               }}
-              className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
             >
               {REFERRAL_SOURCES.map((src) => (
                 <option key={src.value} value={src.value}>
@@ -283,7 +283,7 @@ export default function CreateClientModal({
                 value={customReferral}
                 onChange={(e) => setCustomReferral(e.target.value)}
                 placeholder="Please specify..."
-                className="mt-2 w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] placeholder-[#a8a8b4] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-2 w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
               />
             )}
           </div>
@@ -291,7 +291,7 @@ export default function CreateClientModal({
           <div>
             <label
               htmlFor="client-notes"
-              className="mb-1.5 block text-sm font-medium text-[#18181b]"
+              className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]"
             >
               Notes
             </label>
@@ -301,7 +301,7 @@ export default function CreateClientModal({
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Any additional notes..."
               rows={3}
-              className="w-full rounded-lg border border-[#e6e6eb] px-3.5 py-2.5 text-sm text-[#18181b] placeholder-[#a8a8b4] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
             />
           </div>
 
@@ -309,14 +309,14 @@ export default function CreateClientModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded-lg border border-[#e6e6eb] px-4 py-2.5 text-sm font-medium text-[#60606a] transition-colors hover:bg-gray-50"
+              className="flex-1 rounded-lg border border-[var(--border)] px-4 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-raised)]"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex-1 rounded-lg bg-[var(--accent-primary)] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[var(--accent-primary)]/90 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSubmitting ? 'Creating...' : 'Create Client'}
             </button>
