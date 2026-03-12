@@ -9,10 +9,10 @@ from app.models.base import TenantMixin, TimestampMixin
 
 
 class SystemStatus(enum.StrEnum):
-    LEAD = "LEAD"
-    IN_PROGRESS = "IN_PROGRESS"
-    COMPLETED = "COMPLETED"
-    CANCELLED = "CANCELLED"
+    LEAD = "lead"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
 
 
 class KanbanStage(Base, TenantMixin, TimestampMixin):
