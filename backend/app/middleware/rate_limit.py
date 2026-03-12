@@ -1,6 +1,7 @@
 """Rate limiting middleware using slowapi with Redis backend."""
 
 import logging
+import os
 
 from slowapi import Limiter
 from slowapi.util import get_remote_address
@@ -40,8 +41,6 @@ def get_real_ip(request: Request) -> str:
 # Use Redis for distributed rate limiting across workers.
 # Fall back to in-memory storage if REDIS_URL is not explicitly configured,
 # so the app still starts without Redis.
-import os
-
 _storage_uri: str | None = None
 if os.environ.get("REDIS_URL"):
     _storage_uri = settings.redis_url
