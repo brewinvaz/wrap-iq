@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { TeamMemberDetail } from '@/lib/types';
 import { roleLabels, roleColors } from '@/lib/role-config';
+import Select from '@/components/ui/Select';
 
 const allRoles = [
   'admin',
@@ -93,22 +94,22 @@ export default function TeamList({
                 </td>
                 <td className="px-6 py-4">
                   {editingRole === member.id ? (
-                    <select
-                      value={member.role}
-                      onChange={(e) => {
-                        onRoleChange(member.id, e.target.value);
-                        setEditingRole(null);
-                      }}
-                      onBlur={() => setEditingRole(null)}
-                      autoFocus
-                      className="rounded-lg border border-[var(--border)] px-2 py-1 text-sm text-[var(--text-primary)] focus:border-[var(--accent-primary)] focus:outline-none"
-                    >
-                      {allRoles.map((role) => (
-                        <option key={role} value={role}>
-                          {roleLabels[role]}
-                        </option>
-                      ))}
-                    </select>
+                    <div onBlur={(e) => {
+                      if (!e.currentTarget.contains(e.relatedTarget)) setEditingRole(null);
+                    }}>
+                      <Select
+                        value={member.role}
+                        onChange={(v) => {
+                          onRoleChange(member.id, v);
+                          setEditingRole(null);
+                        }}
+                        options={allRoles.map((role) => ({
+                          value: role,
+                          label: roleLabels[role],
+                        }))}
+                        size="sm"
+                      />
+                    </div>
                   ) : (
                     <button
                       onClick={() => setEditingRole(member.id)}
