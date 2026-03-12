@@ -33,7 +33,7 @@ Available tables and columns (PostgreSQL):
 2. kanban_stages
    - id (UUID, PK), organization_id (UUID, FK to organizations),
      name (VARCHAR), color (VARCHAR), position (INTEGER),
-     system_status (ENUM: LEAD, IN_PROGRESS, COMPLETED, CANCELLED),
+     system_status (ENUM: lead, in_progress, completed, cancelled),
      is_default (BOOLEAN), is_active (BOOLEAN),
      created_at, updated_at
 
