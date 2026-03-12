@@ -3,6 +3,8 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import CalendarHeader from './CalendarHeader';
 import WeekView from './WeekView';
+import DayView from './DayView';
+import MonthView from './MonthView';
 import { api, ApiError } from '@/lib/api-client';
 import { CalendarEvent, Installer } from '@/lib/types';
 
@@ -214,6 +216,23 @@ function formatWeekLabel(monday: Date): string {
   return `${monthNames[monday.getMonth()]} ${monday.getDate()} \u2013 ${monthNames[friday.getMonth()]} ${friday.getDate()}, ${friday.getFullYear()}`;
 }
 
+function formatDayLabel(date: Date): string {
+  return date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+
+function formatMonthLabel(year: number, month: number): string {
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December',
+  ];
+  return `${monthNames[month]} ${year}`;
+}
+
 // ---------------------------------------------------------------------------
 // Skeleton loader
 // ---------------------------------------------------------------------------
@@ -308,6 +327,15 @@ function CalendarError({
 
 export default function CalendarPage() {
   const [weekStart, setWeekStart] = useState(() => getMonday(new Date()));
+  const [selectedDay, setSelectedDay] = useState(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  });
+  const [monthYear, setMonthYear] = useState(() => ({
+    year: new Date().getFullYear(),
+    month: new Date().getMonth(),
+  }));
   const [activeView, setActiveView] = useState<'day' | 'week' | 'month'>('week');
 
   // Data state
@@ -365,9 +393,10 @@ export default function CalendarPage() {
   }, [fetchWorkOrders]);
 
   // -----------------------------------------------------------------------
-  // Week navigation
+  // Navigation handlers
   // -----------------------------------------------------------------------
 
+  // Week
   const weekDays = useMemo(() => {
     const today = formatDateStr(new Date());
     return Array.from({ length: 5 }, (_, i) => {
@@ -382,8 +411,6 @@ export default function CalendarPage() {
       };
     });
   }, [weekStart]);
-
-  const weekLabel = useMemo(() => formatWeekLabel(weekStart), [weekStart]);
 
   const handlePrevWeek = useCallback(() => {
     setWeekStart((prev) => {
@@ -401,8 +428,61 @@ export default function CalendarPage() {
     });
   }, []);
 
-  const handleToday = useCallback(() => {
+  const handleTodayWeek = useCallback(() => {
     setWeekStart(getMonday(new Date()));
+  }, []);
+
+  // Day
+  const handlePrevDay = useCallback(() => {
+    setSelectedDay((prev) => {
+      const d = new Date(prev);
+      d.setDate(d.getDate() - 1);
+      return d;
+    });
+  }, []);
+
+  const handleNextDay = useCallback(() => {
+    setSelectedDay((prev) => {
+      const d = new Date(prev);
+      d.setDate(d.getDate() + 1);
+      return d;
+    });
+  }, []);
+
+  const handleTodayDay = useCallback(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    setSelectedDay(d);
+  }, []);
+
+  // Month
+  const handlePrevMonth = useCallback(() => {
+    setMonthYear((prev) => {
+      if (prev.month === 0) return { year: prev.year - 1, month: 11 };
+      return { ...prev, month: prev.month - 1 };
+    });
+  }, []);
+
+  const handleNextMonth = useCallback(() => {
+    setMonthYear((prev) => {
+      if (prev.month === 11) return { year: prev.year + 1, month: 0 };
+      return { ...prev, month: prev.month + 1 };
+    });
+  }, []);
+
+  const handleTodayMonth = useCallback(() => {
+    const now = new Date();
+    setMonthYear({ year: now.getFullYear(), month: now.getMonth() });
+  }, []);
+
+  // Click a day in month view → switch to day view
+  const handleMonthDayClick = useCallback((date: Date) => {
+    setSelectedDay(date);
+    setActiveView('day');
+  }, []);
+
+  const handleViewChange = useCallback((view: 'day' | 'week' | 'month') => {
+    setActiveView(view);
   }, []);
 
   const handleToggleInstaller = useCallback((id: string) => {
@@ -418,15 +498,65 @@ export default function CalendarPage() {
   }, []);
 
   // -----------------------------------------------------------------------
-  // Summary metrics (derived from loaded events for visible week)
+  // Date label & nav callbacks per view
   // -----------------------------------------------------------------------
 
-  const weekEvents = calendarEvents.filter((e) =>
-    weekDays.some((d) => d.dateStr === e.date),
-  );
-  const totalJobs = weekEvents.length;
-  const shopJobs = weekEvents.filter((e) => e.location === 'shop').length;
-  const onsiteJobs = weekEvents.filter((e) => e.location === 'on-site').length;
+  const dateLabel = useMemo(() => {
+    switch (activeView) {
+      case 'day':
+        return formatDayLabel(selectedDay);
+      case 'month':
+        return formatMonthLabel(monthYear.year, monthYear.month);
+      case 'week':
+      default:
+        return formatWeekLabel(weekStart);
+    }
+  }, [activeView, selectedDay, monthYear, weekStart]);
+
+  const onPrev = activeView === 'day' ? handlePrevDay : activeView === 'month' ? handlePrevMonth : handlePrevWeek;
+  const onNext = activeView === 'day' ? handleNextDay : activeView === 'month' ? handleNextMonth : handleNextWeek;
+  const onToday = activeView === 'day' ? handleTodayDay : activeView === 'month' ? handleTodayMonth : handleTodayWeek;
+
+  // -----------------------------------------------------------------------
+  // Summary metrics
+  // -----------------------------------------------------------------------
+
+  const summaryLabel = useMemo(() => {
+    switch (activeView) {
+      case 'day':
+        return 'Today';
+      case 'month':
+        return 'This month';
+      case 'week':
+      default:
+        return 'This week';
+    }
+  }, [activeView]);
+
+  const visibleEvents = useMemo(() => {
+    switch (activeView) {
+      case 'day': {
+        const dayStr = formatDateStr(selectedDay);
+        return calendarEvents.filter((e) => e.date === dayStr);
+      }
+      case 'month': {
+        const firstDay = new Date(monthYear.year, monthYear.month, 1);
+        const lastDay = new Date(monthYear.year, monthYear.month + 1, 0);
+        const startStr = formatDateStr(firstDay);
+        const endStr = formatDateStr(lastDay);
+        return calendarEvents.filter((e) => e.date >= startStr && e.date <= endStr);
+      }
+      case 'week':
+      default:
+        return calendarEvents.filter((e) =>
+          weekDays.some((d) => d.dateStr === e.date),
+        );
+    }
+  }, [activeView, calendarEvents, selectedDay, monthYear, weekDays]);
+
+  const totalJobs = visibleEvents.length;
+  const shopJobs = visibleEvents.filter((e) => e.location === 'shop').length;
+  const onsiteJobs = visibleEvents.filter((e) => e.location === 'on-site').length;
 
   // -----------------------------------------------------------------------
   // Render
@@ -440,31 +570,58 @@ export default function CalendarPage() {
     return <CalendarError message={error} onRetry={fetchWorkOrders} />;
   }
 
+  const selectedDayStr = formatDateStr(selectedDay);
+  const todayStr = formatDateStr(new Date());
+
   return (
     <div className="flex h-full flex-col">
       <CalendarHeader
-        weekLabel={weekLabel}
-        onPrevWeek={handlePrevWeek}
-        onNextWeek={handleNextWeek}
-        onToday={handleToday}
+        dateLabel={dateLabel}
+        onPrev={onPrev}
+        onNext={onNext}
+        onToday={onToday}
         activeView={activeView}
-        onViewChange={setActiveView}
+        onViewChange={handleViewChange}
         installers={installers}
         activeInstallers={activeInstallers}
         onToggleInstaller={handleToggleInstaller}
       />
 
-      <WeekView
-        weekDays={weekDays}
-        installers={installers}
-        events={calendarEvents}
-        activeInstallers={activeInstallers}
-      />
+      {activeView === 'day' && (
+        <DayView
+          date={selectedDay}
+          dateStr={selectedDayStr}
+          isToday={selectedDayStr === todayStr}
+          installers={installers}
+          events={calendarEvents}
+          activeInstallers={activeInstallers}
+        />
+      )}
+
+      {activeView === 'week' && (
+        <WeekView
+          weekDays={weekDays}
+          installers={installers}
+          events={calendarEvents}
+          activeInstallers={activeInstallers}
+        />
+      )}
+
+      {activeView === 'month' && (
+        <MonthView
+          year={monthYear.year}
+          month={monthYear.month}
+          installers={installers}
+          events={calendarEvents}
+          activeInstallers={activeInstallers}
+          onDayClick={handleMonthDayClick}
+        />
+      )}
 
       {/* Summary bar */}
       <div className="flex items-center gap-6 border-t border-[#e6e6eb] bg-white px-6 py-3">
         <div className="flex items-center gap-2">
-          <span className="text-xs text-[#a8a8b4]">This week:</span>
+          <span className="text-xs text-[#a8a8b4]">{summaryLabel}:</span>
           <span className="text-sm font-semibold text-[#18181b]">{totalJobs} jobs</span>
         </div>
         <div className="flex items-center gap-2">

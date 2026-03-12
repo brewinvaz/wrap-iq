@@ -3,9 +3,9 @@
 import { Installer } from '@/lib/types';
 
 interface CalendarHeaderProps {
-  weekLabel: string;
-  onPrevWeek: () => void;
-  onNextWeek: () => void;
+  dateLabel: string;
+  onPrev: () => void;
+  onNext: () => void;
   onToday: () => void;
   activeView: 'day' | 'week' | 'month';
   onViewChange: (view: 'day' | 'week' | 'month') => void;
@@ -15,9 +15,9 @@ interface CalendarHeaderProps {
 }
 
 export default function CalendarHeader({
-  weekLabel,
-  onPrevWeek,
-  onNextWeek,
+  dateLabel,
+  onPrev,
+  onNext,
   onToday,
   activeView,
   onViewChange,
@@ -32,10 +32,10 @@ export default function CalendarHeader({
       {/* Top row: navigation + view toggle */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          {/* Week navigation */}
+          {/* Navigation */}
           <div className="flex items-center gap-1">
             <button
-              onClick={onPrevWeek}
+              onClick={onPrev}
               className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#e6e6eb] text-[#60606a] transition-colors hover:bg-gray-50 hover:text-[#18181b]"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -43,10 +43,10 @@ export default function CalendarHeader({
               </svg>
             </button>
             <span className="min-w-[200px] text-center text-sm font-semibold text-[#18181b]">
-              {weekLabel}
+              {dateLabel}
             </span>
             <button
-              onClick={onNextWeek}
+              onClick={onNext}
               className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#e6e6eb] text-[#60606a] transition-colors hover:bg-gray-50 hover:text-[#18181b]"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
