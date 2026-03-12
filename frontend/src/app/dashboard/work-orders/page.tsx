@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { api, ApiError } from '@/lib/api-client';
+import { Button } from '@/components/ui/Button';
 import { formatCurrency } from '@/lib/format';
 import CreateWorkOrderModal from '@/components/work-orders/CreateWorkOrderModal';
 
@@ -189,12 +190,9 @@ export default function WorkOrdersPage() {
             >
               Import CSV
             </Link>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="rounded-lg bg-[var(--accent-primary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--accent-primary)]/90"
-            >
+            <Button onClick={() => setShowCreateModal(true)}>
               + New Work Order
-            </button>
+            </Button>
           </div>
         </div>
         {/* Status tabs */}
@@ -227,9 +225,9 @@ export default function WorkOrdersPage() {
       {error && (
         <div className="mx-6 mt-4 flex items-center gap-3 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3">
           <span className="text-sm text-red-400">{error}</span>
-          <button onClick={fetchWorkOrders} className="text-sm font-medium text-red-400 underline">
+          <Button variant="danger" size="sm" onClick={fetchWorkOrders} className="underline">
             Retry
-          </button>
+          </Button>
         </div>
       )}
 
@@ -300,20 +298,22 @@ export default function WorkOrdersPage() {
               Showing {page * limit + 1}–{Math.min((page + 1) * limit, total)} of {total}
             </p>
             <div className="flex gap-1">
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
                 disabled={page === 0}
                 onClick={() => setPage((p) => p - 1)}
-                className="rounded-lg px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-raised)] disabled:opacity-40"
               >
                 Previous
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
                 disabled={page >= totalPages - 1}
                 onClick={() => setPage((p) => p + 1)}
-                className="rounded-lg px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-raised)] disabled:opacity-40"
               >
                 Next
-              </button>
+              </Button>
             </div>
           </div>
         )}
