@@ -94,17 +94,17 @@ function buildMonthlySummary(invoices: InvoiceResponse[]) {
 }
 
 const statusStyle: Record<string, { bg: string; text: string }> = {
-  draft: { bg: 'bg-gray-50', text: 'text-gray-600' },
-  sent: { bg: 'bg-blue-50', text: 'text-blue-700' },
-  viewed: { bg: 'bg-indigo-50', text: 'text-indigo-700' },
-  partial: { bg: 'bg-orange-50', text: 'text-orange-700' },
-  paid: { bg: 'bg-emerald-50', text: 'text-emerald-700' },
-  pending: { bg: 'bg-amber-50', text: 'text-amber-700' },
-  overdue: { bg: 'bg-rose-50', text: 'text-rose-700' },
-  void: { bg: 'bg-gray-50', text: 'text-gray-500' },
+  draft: { bg: 'bg-[var(--surface-raised)]', text: 'text-[var(--text-secondary)]' },
+  sent: { bg: 'bg-blue-500/10', text: 'text-blue-400' },
+  viewed: { bg: 'bg-indigo-500/10', text: 'text-indigo-400' },
+  partial: { bg: 'bg-orange-500/10', text: 'text-orange-400' },
+  paid: { bg: 'bg-emerald-500/10', text: 'text-emerald-400' },
+  pending: { bg: 'bg-amber-500/10', text: 'text-amber-400' },
+  overdue: { bg: 'bg-rose-500/10', text: 'text-rose-400' },
+  void: { bg: 'bg-[var(--surface-raised)]', text: 'text-[var(--text-muted)]' },
 };
 
-const defaultStatus = { bg: 'bg-gray-50', text: 'text-gray-600' };
+const defaultStatus = { bg: 'bg-[var(--surface-raised)]', text: 'text-[var(--text-secondary)]' };
 
 export default function FinancialsPage() {
   const [invoices, setInvoices] = useState<InvoiceResponse[]>([]);

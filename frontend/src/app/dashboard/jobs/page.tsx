@@ -100,10 +100,10 @@ function toJob(wo: ApiWorkOrder): Job {
 
 const phaseStyles: Record<PhaseFilter, { bg: string; text: string; label: string }> = {
   'all': { bg: '', text: '', label: '' },
-  'work-order': { bg: 'bg-blue-50', text: 'text-blue-700', label: 'Work Order' },
-  design: { bg: 'bg-violet-50', text: 'text-violet-700', label: 'Design' },
-  production: { bg: 'bg-amber-50', text: 'text-amber-700', label: 'Production' },
-  install: { bg: 'bg-emerald-50', text: 'text-emerald-700', label: 'Install' },
+  'work-order': { bg: 'bg-blue-500/10', text: 'text-blue-400', label: 'Work Order' },
+  design: { bg: 'bg-violet-500/10', text: 'text-violet-400', label: 'Design' },
+  production: { bg: 'bg-amber-500/10', text: 'text-amber-400', label: 'Production' },
+  install: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', label: 'Install' },
 };
 
 const tabs: { key: PhaseFilter; label: string }[] = [
@@ -237,7 +237,7 @@ export default function JobsPage() {
               key={tab.key}
               onClick={() => setFilter(tab.key)}
               className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                filter === tab.key ? 'bg-blue-50 text-blue-700' : 'text-[var(--text-secondary)] hover:bg-[var(--surface-overlay)]'
+                filter === tab.key ? 'bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]' : 'text-[var(--text-secondary)] hover:bg-[var(--surface-overlay)]'
               }`}
             >
               {tab.label}

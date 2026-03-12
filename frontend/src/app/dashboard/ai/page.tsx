@@ -62,10 +62,10 @@ interface AIActivity {
 }
 
 const typeStyles: Record<AIActivity['type'], { bg: string; text: string; label: string }> = {
-  'new-lead': { bg: 'bg-blue-50', text: 'text-blue-700', label: 'New Lead' },
-  'high-priority': { bg: 'bg-amber-50', text: 'text-amber-700', label: 'High Priority' },
-  completed: { bg: 'bg-violet-50', text: 'text-violet-700', label: 'Completed' },
-  'status-update': { bg: 'bg-emerald-50', text: 'text-emerald-700', label: 'Status Update' },
+  'new-lead': { bg: 'bg-blue-500/10', text: 'text-blue-400', label: 'New Lead' },
+  'high-priority': { bg: 'bg-amber-500/10', text: 'text-amber-400', label: 'High Priority' },
+  completed: { bg: 'bg-violet-500/10', text: 'text-violet-400', label: 'Completed' },
+  'status-update': { bg: 'bg-emerald-500/10', text: 'text-emerald-400', label: 'Status Update' },
 };
 
 function vehicleLabel(vehicles: ApiVehicle[]): string {
@@ -244,7 +244,7 @@ function AskAIModal({
             <h3 id="ask-ai-title" className="text-lg font-semibold text-[var(--text-primary)]">
               Ask AI
             </h3>
-            <span className="rounded-full bg-violet-50 px-2 py-0.5 text-xs font-medium text-violet-700">
+            <span className="rounded-full bg-violet-500/10 px-2 py-0.5 text-xs font-medium text-violet-400">
               Shop Intelligence
             </span>
           </div>
@@ -309,7 +309,7 @@ function AskAIModal({
 
         {/* Error */}
         {error && (
-          <div className="mx-6 mb-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">
+          <div className="mx-6 mb-2 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-2 text-sm text-red-700">
             {error}
           </div>
         )}
@@ -433,7 +433,7 @@ export default function AIPage() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <h1 className="text-xl font-bold text-[var(--text-primary)]">Shop Intelligence</h1>
-            <span className="rounded-full bg-violet-50 px-2.5 py-0.5 text-xs font-medium text-violet-700">
+            <span className="rounded-full bg-violet-500/10 px-2.5 py-0.5 text-xs font-medium text-violet-400">
               AI Powered
             </span>
           </div>

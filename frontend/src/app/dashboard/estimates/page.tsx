@@ -26,15 +26,15 @@ interface EstimateListResponse {
 }
 
 const statusStyle: Record<string, { bg: string; text: string }> = {
-  draft: { bg: 'bg-gray-50', text: 'text-gray-700' },
-  sent: { bg: 'bg-blue-50', text: 'text-blue-700' },
-  viewed: { bg: 'bg-indigo-50', text: 'text-indigo-700' },
-  accepted: { bg: 'bg-emerald-50', text: 'text-emerald-700' },
-  declined: { bg: 'bg-rose-50', text: 'text-rose-700' },
-  expired: { bg: 'bg-amber-50', text: 'text-amber-700' },
+  draft: { bg: 'bg-[var(--surface-raised)]', text: 'text-[var(--text-secondary)]' },
+  sent: { bg: 'bg-blue-500/10', text: 'text-blue-400' },
+  viewed: { bg: 'bg-indigo-500/10', text: 'text-indigo-400' },
+  accepted: { bg: 'bg-emerald-500/10', text: 'text-emerald-400' },
+  declined: { bg: 'bg-rose-500/10', text: 'text-rose-400' },
+  expired: { bg: 'bg-amber-500/10', text: 'text-amber-400' },
 };
 
-const defaultStyle = { bg: 'bg-gray-50', text: 'text-gray-700' };
+const defaultStyle = { bg: 'bg-[var(--surface-raised)]', text: 'text-[var(--text-secondary)]' };
 
 function formatCurrency(cents: number): string {
   return new Intl.NumberFormat('en-US', {
@@ -150,7 +150,7 @@ export default function EstimatesPage() {
         )}
 
         {error && (
-          <div className="rounded-xl border border-rose-200 bg-rose-50 p-4">
+          <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-4">
             <p className="text-sm text-rose-700">{error}</p>
             <button
               onClick={fetchEstimates}

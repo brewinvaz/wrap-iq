@@ -283,7 +283,7 @@ export default function CommsPage() {
                   key={n.id}
                   onClick={() => handleSelect(n.id)}
                   className={`flex w-full items-start gap-3 border-b border-[var(--border)] px-4 py-3 text-left transition-colors ${
-                    selectedId === n.id ? 'bg-blue-50/50' : 'hover:bg-[var(--surface-overlay)]'
+                    selectedId === n.id ? 'bg-blue-500/10' : 'hover:bg-[var(--surface-overlay)]'
                   }`}
                 >
                   <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white ${getAvatarColor(n.type)}`}>

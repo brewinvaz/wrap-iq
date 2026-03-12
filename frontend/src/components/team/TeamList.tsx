@@ -122,7 +122,7 @@ export default function TeamList({
                   <span
                     className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${
                       member.isActive
-                        ? 'bg-emerald-50 text-emerald-700'
+                        ? 'bg-emerald-500/10 text-emerald-400'
                         : 'bg-[var(--surface-raised)] text-[var(--text-secondary)]'
                     }`}
                   >
@@ -142,8 +142,8 @@ export default function TeamList({
                     onClick={() => onToggleActive(member.id)}
                     className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
                       member.isActive
-                        ? 'border border-red-200 text-red-600 hover:bg-red-50'
-                        : 'border border-emerald-200 text-emerald-600 hover:bg-emerald-50'
+                        ? 'border border-red-500/20 text-red-600 hover:bg-red-500/10'
+                        : 'border border-emerald-500/20 text-emerald-600 hover:bg-emerald-500/10'
                     }`}
                   >
                     {member.isActive ? 'Deactivate' : 'Activate'}

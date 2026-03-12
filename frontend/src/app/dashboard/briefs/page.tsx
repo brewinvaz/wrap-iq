@@ -3,9 +3,9 @@
 import { useState } from 'react';
 
 const STATUS_STYLES: Record<string, string> = {
-  New: 'bg-blue-100 text-blue-700',
-  'In Progress': 'bg-violet-100 text-violet-700',
-  Completed: 'bg-emerald-100 text-emerald-700',
+  New: 'bg-blue-500/10 text-blue-400',
+  'In Progress': 'bg-violet-500/10 text-violet-400',
+  Completed: 'bg-emerald-500/10 text-emerald-400',
 };
 
 const briefs = [

@@ -174,10 +174,10 @@ function SaveIndicator({ status }: { status: SaveStatus }) {
     <span
       className={`inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium ${
         status === 'saving'
-          ? 'bg-amber-50 text-amber-600'
+          ? 'bg-amber-500/10 text-amber-400'
           : status === 'saved'
-            ? 'bg-emerald-50 text-emerald-600'
-            : 'bg-red-50 text-red-600'
+            ? 'bg-emerald-500/10 text-emerald-400'
+            : 'bg-red-500/10 text-red-400'
       }`}
     >
       {status === 'saving' && (
@@ -829,7 +829,7 @@ function NotesTab({ project, workOrderId }: { project: ProjectDetail; workOrderI
                 className="rounded-xl border border-[#e6e6eb] bg-white p-5"
               >
                 <div className="mb-2 flex items-center gap-2">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-100 text-[10px] font-semibold text-blue-700">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-500/10 text-[10px] font-semibold text-blue-400">
                     {note.author.slice(0, 2).toUpperCase()}
                   </div>
                   <span className="text-sm font-medium text-[#18181b]">

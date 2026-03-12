@@ -24,9 +24,9 @@ const proofs: Proof[] = [
 ];
 
 const statusStyles: Record<Proof['status'], { bg: string; text: string; label: string }> = {
-  pending: { bg: 'bg-amber-50', text: 'text-amber-700', label: 'Pending Review' },
-  approved: { bg: 'bg-emerald-50', text: 'text-emerald-700', label: 'Approved' },
-  revision: { bg: 'bg-rose-50', text: 'text-rose-700', label: 'Revision Requested' },
+  pending: { bg: 'bg-amber-500/10', text: 'text-amber-400', label: 'Pending Review' },
+  approved: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', label: 'Approved' },
+  revision: { bg: 'bg-rose-500/10', text: 'text-rose-400', label: 'Revision Requested' },
 };
 
 export default function ProofsPage() {
@@ -39,7 +39,7 @@ export default function ProofsPage() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <h1 className="text-xl font-bold text-[var(--text-primary)]">Proof Approvals</h1>
-            <span className="rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
+            <span className="rounded-full bg-amber-500/10 px-2.5 py-0.5 text-xs font-medium text-amber-400">
               {proofs.filter((p) => p.status === 'pending').length} pending
             </span>
           </div>
@@ -55,7 +55,7 @@ export default function ProofsPage() {
               key={tab.key}
               onClick={() => setFilter(tab.key)}
               className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                filter === tab.key ? 'bg-blue-50 text-blue-700' : 'text-[var(--text-secondary)] hover:bg-[var(--surface-overlay)]'
+                filter === tab.key ? 'bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]' : 'text-[var(--text-secondary)] hover:bg-[var(--surface-overlay)]'
               }`}
             >
               {tab.label}

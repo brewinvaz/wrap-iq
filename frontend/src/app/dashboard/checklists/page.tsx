@@ -70,8 +70,8 @@ const INITIAL_CHECKLISTS: JobChecklist[] = [
 ];
 
 const STATUS_STYLES = {
-  'in-progress': { bg: 'bg-amber-50', text: 'text-amber-700', label: 'In Progress' },
-  completed: { bg: 'bg-emerald-50', text: 'text-emerald-700', label: 'Completed' },
+  'in-progress': { bg: 'bg-amber-500/10', text: 'text-amber-400', label: 'In Progress' },
+  completed: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', label: 'Completed' },
   'not-started': { bg: 'bg-[var(--surface-raised)]', text: 'text-[var(--text-muted)]', label: 'Not Started' },
 };
 
