@@ -1,6 +1,7 @@
 'use client';
 
 import type { ContactData, VehicleData, ProjectData, UploadedFile } from '@/app/onboarding/[token]/page';
+import { Button } from '@/components/ui/Button';
 
 interface Props {
   contact: ContactData;
@@ -81,29 +82,23 @@ export function ReviewStep({ contact, vehicle, project, files, submitting, onBac
       </div>
 
       <div className="mt-6 flex justify-between">
-        <button
+        <Button
           type="button"
           onClick={onBack}
           disabled={submitting}
-          className="rounded-[10px] border border-[var(--border)] px-5 py-2.5 text-[13px] font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-raised)] disabled:opacity-50"
+          variant="secondary"
+          size="lg"
         >
           Back
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
           onClick={onSubmit}
-          disabled={submitting}
-          className="rounded-[10px] bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-5 py-2.5 text-[13px] font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          loading={submitting}
+          size="lg"
         >
-          {submitting ? (
-            <span className="flex items-center gap-2">
-              <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-              Submitting...
-            </span>
-          ) : (
-            'Submit'
-          )}
-        </button>
+          {submitting ? 'Submitting...' : 'Submit'}
+        </Button>
       </div>
     </div>
   );
