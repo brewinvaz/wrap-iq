@@ -242,33 +242,33 @@ function filterByDateRange(
 function LoadingSkeleton() {
   return (
     <div className="flex h-full flex-col">
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <div className="h-7 w-48 animate-pulse rounded bg-gray-200" />
-            <div className="mt-1 h-3 w-64 animate-pulse rounded bg-gray-100" />
+            <div className="h-7 w-48 animate-pulse rounded bg-[var(--surface-raised)]" />
+            <div className="mt-1 h-3 w-64 animate-pulse rounded bg-[var(--surface-raised)]" />
           </div>
-          <div className="h-9 w-40 animate-pulse rounded-lg bg-gray-200" />
+          <div className="h-9 w-40 animate-pulse rounded-lg bg-[var(--surface-raised)]" />
         </div>
       </header>
       {/* KPI strip skeleton */}
-      <div className="flex gap-4 border-b border-[#e6e6eb] bg-white px-6 py-3">
+      <div className="flex gap-4 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-3">
         {Array.from({ length: 6 }).map((_, i) => (
           <div key={i} className="flex-1 animate-pulse">
-            <div className="h-3 w-16 rounded bg-gray-100" />
-            <div className="mt-1 h-6 w-20 rounded bg-gray-200" />
+            <div className="h-3 w-16 rounded bg-[var(--surface-raised)]" />
+            <div className="mt-1 h-6 w-20 rounded bg-[var(--surface-raised)]" />
           </div>
         ))}
       </div>
       <div className="flex-1 overflow-auto p-6 space-y-6">
         <div className="grid grid-cols-2 gap-4">
           {Array.from({ length: 2 }).map((_, i) => (
-            <div key={i} className="h-48 animate-pulse rounded-xl bg-gray-200" />
+            <div key={i} className="h-48 animate-pulse rounded-xl bg-[var(--surface-raised)]" />
           ))}
         </div>
         <div className="grid grid-cols-2 gap-4">
-          <div className="h-64 animate-pulse rounded-xl bg-gray-200" />
-          <div className="h-64 animate-pulse rounded-xl bg-gray-200" />
+          <div className="h-64 animate-pulse rounded-xl bg-[var(--surface-raised)]" />
+          <div className="h-64 animate-pulse rounded-xl bg-[var(--surface-raised)]" />
         </div>
       </div>
     </div>
@@ -280,8 +280,8 @@ function LoadingSkeleton() {
 function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
     <div className="flex h-full flex-col">
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
-        <h1 className="text-xl font-bold text-[#18181b]">Reports & Insights</h1>
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
+        <h1 className="text-[22px] font-[800] text-[var(--text-primary)]">Reports & Insights</h1>
       </header>
       <div className="flex flex-1 flex-col items-center justify-center gap-4">
         <div className="rounded-full bg-red-100 p-3">
@@ -289,11 +289,11 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.072 16.5c-.77.833.192 2.5 1.732 2.5z" />
           </svg>
         </div>
-        <p className="text-sm font-medium text-[#18181b]">Failed to load reports</p>
-        <p className="text-xs text-[#60606a]">{message}</p>
+        <p className="text-sm font-medium text-[var(--text-primary)]">Failed to load reports</p>
+        <p className="text-xs text-[var(--text-secondary)]">{message}</p>
         <button
           onClick={onRetry}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+          className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-90"
         >
           Retry
         </button>
@@ -351,11 +351,11 @@ export default function ReportsPage() {
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-[#18181b]">Reports & Insights</h1>
-            <p className="mt-0.5 text-xs text-[#a8a8b4]">
+            <h1 className="text-[22px] font-[800] text-[var(--text-primary)]">Reports & Insights</h1>
+            <p className="mt-0.5 text-xs text-[var(--text-muted)]">
               Business health overview and department performance
             </p>
           </div>
@@ -370,7 +370,7 @@ export default function ReportsPage() {
       <div className="flex-1 overflow-auto p-6 space-y-6">
         {/* Department scorecards */}
         <section>
-          <h2 className="mb-3 font-mono text-[10px] uppercase tracking-wider text-gray-400">
+          <h2 className="mb-3 font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
             Department Scorecards
           </h2>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -379,8 +379,8 @@ export default function ReportsPage() {
             ))}
           </div>
           {scorecards.length === 0 && (
-            <div className="rounded-xl border border-dashed border-[#e6e6eb] bg-white p-8 text-center">
-              <p className="text-sm text-[#a8a8b4]">No work order data available to generate scorecards.</p>
+            <div className="rounded-xl border border-dashed border-[var(--border)] bg-[var(--surface-card)] p-8 text-center">
+              <p className="text-sm text-[var(--text-muted)]">No work order data available to generate scorecards.</p>
             </div>
           )}
         </section>
@@ -390,12 +390,12 @@ export default function ReportsPage() {
           <RevenueChart data={revenue} />
           <div>
             {insights.length > 0 && insights[0].name === 'Analytics Coming Soon' ? (
-              <div className="flex h-full flex-col items-center justify-center rounded-xl border border-dashed border-[#e6e6eb] bg-white p-8">
-                <svg className="mb-3 h-8 w-8 text-[#a8a8b4]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <div className="flex h-full flex-col items-center justify-center rounded-xl border border-dashed border-[var(--border)] bg-[var(--surface-card)] p-8">
+                <svg className="mb-3 h-8 w-8 text-[var(--text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
                 </svg>
-                <p className="text-sm font-medium text-[#60606a]">Installer Insights</p>
-                <p className="mt-1 text-xs text-[#a8a8b4]">
+                <p className="text-sm font-medium text-[var(--text-secondary)]">Installer Insights</p>
+                <p className="mt-1 text-xs text-[var(--text-muted)]">
                   Detailed installer analytics will be available once installer tracking is configured.
                 </p>
               </div>

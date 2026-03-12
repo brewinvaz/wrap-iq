@@ -15,11 +15,11 @@ export default function PlanComparisonGrid({
   onSelectPlan,
 }: PlanComparisonGridProps) {
   return (
-    <div className="rounded-xl border border-[#e6e6eb] bg-white p-6">
-      <h2 className="text-base font-semibold text-[#18181b]">
+    <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-6">
+      <h2 className="text-base font-semibold text-[var(--text-primary)]">
         Available Plans
       </h2>
-      <p className="mt-1 text-sm text-[#60606a]">
+      <p className="mt-1 text-sm text-[var(--text-secondary)]">
         Choose the plan that best fits your team&apos;s needs.
       </p>
 

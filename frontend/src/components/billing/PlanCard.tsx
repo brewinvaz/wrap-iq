@@ -16,14 +16,14 @@ export default function PlanCard({ plan, isCurrent, onSelect }: PlanCardProps) {
     <div
       className={`relative flex flex-col rounded-xl border p-6 ${
         isCurrent
-          ? 'border-blue-500 bg-blue-50/30'
+          ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)]/5'
           : isPopular
-            ? 'border-blue-200 bg-white'
-            : 'border-[#e6e6eb] bg-white'
+            ? 'border-[var(--accent-primary)]/30 bg-[var(--surface-card)]'
+            : 'border-[var(--border)] bg-[var(--surface-card)]'
       }`}
     >
       {isPopular && (
-        <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-blue-600 px-3 py-0.5 text-xs font-medium text-white">
+        <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-3 py-0.5 text-xs font-medium text-white">
           Most Popular
         </span>
       )}
@@ -33,26 +33,26 @@ export default function PlanCard({ plan, isCurrent, onSelect }: PlanCardProps) {
         </span>
       )}
 
-      <h3 className="text-lg font-semibold text-[#18181b]">{plan.name}</h3>
+      <h3 className="text-lg font-semibold text-[var(--text-primary)]">{plan.name}</h3>
 
       <div className="mt-3 flex items-baseline gap-1">
         {price === 0 ? (
-          <span className="text-3xl font-bold text-[#18181b]">Free</span>
+          <span className="text-3xl font-bold text-[var(--text-primary)]">Free</span>
         ) : (
           <>
-            <span className="text-3xl font-bold text-[#18181b]">
+            <span className="text-3xl font-bold text-[var(--text-primary)]">
               ${price}
             </span>
-            <span className="text-sm text-[#60606a]">/month</span>
+            <span className="text-sm text-[var(--text-secondary)]">/month</span>
           </>
         )}
       </div>
 
       <ul className="mt-5 flex-1 space-y-2.5">
         {plan.features.map((feature, i) => (
-          <li key={i} className="flex items-start gap-2 text-sm text-[#60606a]">
+          <li key={i} className="flex items-start gap-2 text-sm text-[var(--text-secondary)]">
             <svg
-              className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500"
+              className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent-primary)]"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -74,10 +74,10 @@ export default function PlanCard({ plan, isCurrent, onSelect }: PlanCardProps) {
         disabled={isCurrent}
         className={`mt-6 w-full rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${
           isCurrent
-            ? 'cursor-default bg-gray-100 text-[#60606a]'
+            ? 'cursor-default bg-[var(--surface-raised)] text-[var(--text-secondary)]'
             : isPopular
-              ? 'bg-blue-600 text-white hover:bg-blue-700'
-              : 'border border-[#e6e6eb] bg-white text-[#18181b] hover:bg-gray-50'
+              ? 'bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-white hover:opacity-90'
+              : 'border border-[var(--border)] bg-[var(--surface-card)] text-[var(--text-primary)] hover:bg-[var(--surface-raised)]'
         }`}
       >
         {isCurrent ? 'Current Plan' : price === 0 ? 'Downgrade' : 'Upgrade'}
