@@ -1,7 +1,7 @@
 """create renders table
 
-Revision ID: 014
-Revises: 013
+Revision ID: 015
+Revises: 014
 Create Date: 2026-03-11
 
 """
@@ -9,17 +9,30 @@ Create Date: 2026-03-11
 from collections.abc import Sequence
 
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
 
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "014"
-down_revision: str = "013"
+revision: str = "015"
+down_revision: str = "014"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
+    op.execute(
+        "DO $$ BEGIN "
+        "CREATE TYPE renderstatus AS ENUM ('pending', 'rendering', 'completed', 'failed'); "
+        "EXCEPTION WHEN duplicate_object THEN NULL; "
+        "END $$"
+    )
+
+    renderstatus = postgresql.ENUM(
+        "pending", "rendering", "completed", "failed",
+        name="renderstatus", create_type=False,
+    )
+
     op.create_table(
         "renders",
         sa.Column("id", sa.Uuid(), primary_key=True),
@@ -45,7 +58,7 @@ def upgrade() -> None:
         sa.Column("description", sa.Text(), nullable=True),
         sa.Column(
             "status",
-            sa.Enum("pending", "rendering", "completed", "failed", name="renderstatus"),
+            renderstatus,
             nullable=False,
             server_default="pending",
         ),
