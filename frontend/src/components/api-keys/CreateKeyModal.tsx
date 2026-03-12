@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { APIKeyScope } from '@/lib/types';
 import ScopeSelector from './ScopeSelector';
 import { useModalAccessibility } from '@/hooks/useModalAccessibility';
+import { Button } from '@/components/ui/Button';
 
 interface CreateKeyModalProps {
   isOpen: boolean;
@@ -65,9 +66,10 @@ export default function CreateKeyModal({
           <h3 id="create-key-title" className="text-lg font-semibold text-[var(--text-primary)]">
             Generate New API Key
           </h3>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onClose}
-            className="rounded-lg p-1 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-raised)] hover:text-[var(--text-primary)]"
           >
             <svg
               className="h-5 w-5"
@@ -82,7 +84,7 @@ export default function CreateKeyModal({
                 d="M6 18L18 6M6 6l12 12"
               />
             </svg>
-          </button>
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -148,19 +150,20 @@ export default function CreateKeyModal({
           </div>
 
           <div className="flex items-center gap-3 pt-2">
-            <button
+            <Button
               type="button"
+              variant="secondary"
               onClick={onClose}
-              className="flex-1 rounded-lg border border-[var(--border)] px-4 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-raised)]"
+              className="flex-1"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
-              className="flex-1 rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90"
+              className="flex-1"
             >
               Generate Key
-            </button>
+            </Button>
           </div>
         </form>
       </div>

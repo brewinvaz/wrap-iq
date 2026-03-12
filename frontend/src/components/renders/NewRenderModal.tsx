@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { api, ApiError } from '@/lib/api-client';
 import { useModalAccessibility } from '@/hooks/useModalAccessibility';
 import Select from '@/components/ui/Select';
+import { Button } from '@/components/ui/Button';
 
 interface NewRenderModalProps {
   isOpen: boolean;
@@ -158,11 +159,11 @@ export default function NewRenderModal({ isOpen, onClose, onCreate }: NewRenderM
       >
         <div className="mb-6 flex items-center justify-between">
           <h3 id="new-render-title" className="text-lg font-semibold text-[var(--text-primary)]">New Render</h3>
-          <button onClick={onClose} className="rounded-lg p-1 text-[var(--text-tertiary)] transition-colors hover:bg-[var(--surface-raised)] hover:text-[var(--text-primary)]">
+          <Button variant="ghost" size="icon" onClick={onClose}>
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </button>
+          </Button>
         </div>
 
         {error && (
@@ -266,14 +267,15 @@ export default function NewRenderModal({ isOpen, onClose, onCreate }: NewRenderM
 
           {/* Buttons */}
           <div className="flex items-center gap-3 pt-2">
-            <button type="button" onClick={() => { resetForm(); onClose(); }} disabled={isSubmitting}
-              className="flex-1 rounded-lg border border-[var(--border)] px-4 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-raised)] disabled:opacity-50">
+            <Button type="button" variant="secondary" onClick={() => { resetForm(); onClose(); }} disabled={isSubmitting}
+              className="flex-1">
               Cancel
-            </button>
-            <button type="submit" disabled={isSubmitting || !vehicleFile || !designFile || !designName.trim()}
-              className="flex-1 rounded-lg bg-[var(--accent-primary)] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[var(--accent-primary)]/90 disabled:opacity-50">
+            </Button>
+            <Button type="submit" disabled={isSubmitting || !vehicleFile || !designFile || !designName.trim()}
+              loading={isSubmitting}
+              className="flex-1">
               {isSubmitting ? 'Creating...' : 'Create Render'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
