@@ -252,7 +252,7 @@ export default function CreateInvoiceModal({
               loading={isSubmitting}
               className="flex-1"
             >
-              {isSubmitting ? 'Creating...' : 'Create Invoice'}
+              Create Invoice
             </Button>
           </div>
         </form>

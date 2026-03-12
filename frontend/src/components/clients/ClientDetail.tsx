@@ -179,7 +179,7 @@ export default function ClientDetail({ client, onClientUpdated }: ClientDetailPr
                   onClick={handleSaveEdit}
                   loading={editSaving}
                 >
-                  {editSaving ? 'Saving...' : 'Save'}
+                  Save
                 </Button>
               </>
             ) : (
@@ -391,7 +391,7 @@ export default function ClientDetail({ client, onClientUpdated }: ClientDetailPr
               disabled={saving || !isDirty}
               loading={saving}
             >
-              {saving ? 'Saving...' : 'Save Notes'}
+              Save Notes
             </Button>
             {feedback && (
               <span

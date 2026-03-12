@@ -417,7 +417,7 @@ function AddToQueueModal({ isOpen, onClose, onAdd }: AddToQueueModalProps) {
               loading={isSubmitting}
               className="flex-1"
             >
-              {isSubmitting ? 'Adding...' : 'Add to Queue'}
+              Add to Queue
             </Button>
           </div>
         </form>

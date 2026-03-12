@@ -103,7 +103,7 @@ export function VehicleStep({ data, onChange, token, onBack, onNext }: Props) {
             variant="secondary"
             loading={vinLoading}
           >
-            {vinLoading ? 'Looking up...' : 'Decode'}
+            Decode
           </Button>
         </div>
         {vinError && (
