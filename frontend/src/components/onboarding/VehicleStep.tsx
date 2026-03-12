@@ -151,8 +151,9 @@ export function VehicleStep({ data, onChange, token, onBack, onNext }: Props) {
       </div>
 
       <div className="mt-4">
-        <label className="mb-1 block text-[13px] font-medium text-[var(--text-primary)]">Vehicle type</label>
+        <label htmlFor="vehicle-type" className="mb-1 block text-[13px] font-medium text-[var(--text-primary)]">Vehicle type</label>
         <Select
+          id="vehicle-type"
           value={data.vehicle_type}
           onChange={(v) => update('vehicle_type', v)}
           options={VEHICLE_TYPES.map((t) => ({

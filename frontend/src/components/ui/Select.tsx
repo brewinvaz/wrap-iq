@@ -89,12 +89,17 @@ export default function Select({
     return () => document.removeEventListener('mousedown', handleMouseDown);
   }, [isOpen]);
 
-  // Focus panel when opened
+  // Focus panel when opened, reposition on scroll/resize
   useEffect(() => {
-    if (isOpen) {
-      requestAnimationFrame(() => panelRef.current?.focus());
-    }
-  }, [isOpen]);
+    if (!isOpen) return;
+    requestAnimationFrame(() => panelRef.current?.focus());
+    window.addEventListener('scroll', updatePosition, true);
+    window.addEventListener('resize', updatePosition);
+    return () => {
+      window.removeEventListener('scroll', updatePosition, true);
+      window.removeEventListener('resize', updatePosition);
+    };
+  }, [isOpen, updatePosition]);
 
   // Scroll active option into view
   useEffect(() => {

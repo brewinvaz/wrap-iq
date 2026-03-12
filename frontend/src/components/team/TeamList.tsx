@@ -94,22 +94,18 @@ export default function TeamList({
                 </td>
                 <td className="px-6 py-4">
                   {editingRole === member.id ? (
-                    <div onBlur={(e) => {
-                      if (!e.currentTarget.contains(e.relatedTarget)) setEditingRole(null);
-                    }}>
-                      <Select
-                        value={member.role}
-                        onChange={(v) => {
-                          onRoleChange(member.id, v);
-                          setEditingRole(null);
-                        }}
-                        options={allRoles.map((role) => ({
-                          value: role,
-                          label: roleLabels[role],
-                        }))}
-                        size="sm"
-                      />
-                    </div>
+                    <Select
+                      value={member.role}
+                      onChange={(v) => {
+                        onRoleChange(member.id, v);
+                        setEditingRole(null);
+                      }}
+                      options={allRoles.map((role) => ({
+                        value: role,
+                        label: roleLabels[role],
+                      }))}
+                      size="sm"
+                    />
                   ) : (
                     <button
                       onClick={() => setEditingRole(member.id)}
