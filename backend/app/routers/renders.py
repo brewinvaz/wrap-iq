@@ -1,6 +1,6 @@
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_current_user, get_session
@@ -57,6 +57,7 @@ async def get_upload_urls(
 @limiter.limit("5/minute")
 async def create_render(
     request: Request,
+    response: Response,
     body: RenderCreate,
     session: AsyncSession = Depends(get_session),
     user: User = Depends(get_current_user),
@@ -151,6 +152,7 @@ async def delete_render(
 @limiter.limit("5/minute")
 async def regenerate_render(
     request: Request,
+    response: Response,
     render_id: uuid.UUID,
     body: RenderRegenerate | None = None,
     session: AsyncSession = Depends(get_session),
