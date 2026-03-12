@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Printer, X, Check } from 'lucide-react';
+import Select from '@/components/ui/Select';
 import { api, ApiError } from '@/lib/api-client';
 import { useModalAccessibility } from '@/hooks/useModalAccessibility';
 
@@ -313,16 +314,16 @@ function AddToQueueModal({ isOpen, onClose, onAdd }: AddToQueueModalProps) {
             <label htmlFor="queue-material" className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]">
               Material Type <span className="text-red-500">*</span>
             </label>
-            <select
+            <Select
               id="queue-material"
               value={material}
-              onChange={(e) => { setMaterial(e.target.value); setValidationErrors((v) => ({ ...v, material: '' })); }}
-              className={validationErrors.material ? errorInputClass : inputClass}
-            >
-              {MATERIAL_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
+              onChange={(v) => { setMaterial(v); setValidationErrors((ve) => ({ ...ve, material: '' })); }}
+              options={MATERIAL_OPTIONS.map((opt) => ({
+                value: opt.value,
+                label: opt.label,
+              }))}
+              error={!!validationErrors.material}
+            />
             {validationErrors.material && (
               <p className="mt-1 text-xs text-red-600">{validationErrors.material}</p>
             )}
@@ -371,15 +372,15 @@ function AddToQueueModal({ isOpen, onClose, onAdd }: AddToQueueModalProps) {
             <label htmlFor="queue-priority" className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]">
               Priority
             </label>
-            <select
+            <Select
               id="queue-priority"
               value={priority}
-              onChange={(e) => setPriority(e.target.value as 'normal' | 'high')}
-              className={inputClass}
-            >
-              <option value="normal">Normal</option>
-              <option value="high">Rush</option>
-            </select>
+              onChange={(v) => setPriority(v as 'normal' | 'high')}
+              options={[
+                { value: 'normal', label: 'Normal' },
+                { value: 'high', label: 'Rush' },
+              ]}
+            />
           </div>
 
           {/* Notes */}
