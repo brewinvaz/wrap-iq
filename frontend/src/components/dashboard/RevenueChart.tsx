@@ -49,7 +49,7 @@ export default function RevenueChart({ data }: RevenueChartProps) {
                       height: mounted ? `${pct}%` : '0%',
                     }}
                   />
-                  <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 rounded bg-[var(--text-primary)] px-2 py-0.5 text-[10px] font-medium text-white opacity-0 transition-opacity group-hover:opacity-100 whitespace-nowrap">
+                  <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 rounded bg-[var(--surface-raised)] px-2 py-0.5 text-[10px] font-medium text-[var(--text-primary)] opacity-0 transition-opacity group-hover:opacity-100 whitespace-nowrap border border-[var(--border)]">
                     ${(point.value / 1000).toFixed(1)}k
                   </div>
                 </div>

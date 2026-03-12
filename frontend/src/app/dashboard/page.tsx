@@ -787,7 +787,7 @@ export default function DashboardPage() {
               onClick={() => setFilter((prev) => prev === f.key ? 'all' : f.key)}
               className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                 filter === f.key
-                  ? 'bg-[var(--text-primary)] text-white'
+                  ? 'bg-[var(--accent-primary)] text-white'
                   : 'bg-[var(--surface-card)] text-[var(--text-secondary)] border border-[var(--border)] hover:bg-[var(--surface-raised)]'
               }`}
             >
