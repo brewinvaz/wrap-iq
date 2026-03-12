@@ -10,6 +10,7 @@ import {
   Plug, Bot, Box, Camera, Settings, File, CheckSquare, Upload,
   FolderOpen, BookOpen, Image, type LucideIcon,
 } from 'lucide-react';
+import ThemeToggle from '@/components/ThemeToggle';
 import { useRole } from '@/lib/role-context';
 import { useUser } from '@/lib/user-context';
 import { useBadgeCounts } from '@/lib/use-badge-counts';
@@ -150,6 +151,8 @@ export default function IconRail({
         >
           <Settings size={20} />
         </Link>
+
+        <ThemeToggle />
 
         <div className="relative" ref={dropdownRef}>
           <button
