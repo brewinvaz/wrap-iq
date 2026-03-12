@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { VehicleData } from '@/app/onboarding/[token]/page';
 import { API_BASE_URL } from '@/lib/config';
+import Select from '@/components/ui/Select';
 
 const API_BASE = API_BASE_URL;
 
@@ -151,15 +152,14 @@ export function VehicleStep({ data, onChange, token, onBack, onNext }: Props) {
 
       <div className="mt-4">
         <label className="mb-1 block text-[13px] font-medium text-[var(--text-primary)]">Vehicle type</label>
-        <select
+        <Select
           value={data.vehicle_type}
-          onChange={(e) => update('vehicle_type', e.target.value)}
-          className="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface-raised)] px-[10px] py-[10px] text-[14px] text-[var(--text-primary)] outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)]"
-        >
-          {VEHICLE_TYPES.map((t) => (
-            <option key={t.value} value={t.value}>{t.label}</option>
-          ))}
-        </select>
+          onChange={(v) => update('vehicle_type', v)}
+          options={VEHICLE_TYPES.map((t) => ({
+            value: t.value,
+            label: t.label,
+          }))}
+        />
       </div>
 
       <div className="mt-6 flex justify-between">
