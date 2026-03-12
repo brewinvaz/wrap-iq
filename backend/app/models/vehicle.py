@@ -37,6 +37,7 @@ class Vehicle(Base, TenantMixin, TimestampMixin):
     year: Mapped[int | None] = mapped_column(Integer, nullable=True)
     make: Mapped[str | None] = mapped_column(String(100), nullable=True)
     model: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    paint_color: Mapped[str | None] = mapped_column(String(100), nullable=True)
     vehicle_unit_number: Mapped[str | None] = mapped_column(String(50), nullable=True)
     vehicle_type: Mapped[VehicleType | None] = mapped_column(
         Enum(VehicleType, values_callable=lambda e: [m.value for m in e]),

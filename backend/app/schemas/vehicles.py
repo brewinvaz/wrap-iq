@@ -11,6 +11,7 @@ class VehicleCreate(BaseModel):
     year: int | None = None
     make: str | None = None
     model: str | None = None
+    paint_color: str | None = None
     vehicle_unit_number: str | None = None
     vehicle_type: VehicleType | None = None
     truck_cab_size: str | None = None
@@ -25,6 +26,7 @@ class VehicleUpdate(BaseModel):
     year: int | None = None
     make: str | None = None
     model: str | None = None
+    paint_color: str | None = None
     vehicle_unit_number: str | None = None
     vehicle_type: VehicleType | None = None
     truck_cab_size: str | None = None
@@ -40,6 +42,7 @@ class VehicleResponse(BaseModel):
     year: int | None = None
     make: str | None = None
     model: str | None = None
+    paint_color: str | None = None
     vehicle_unit_number: str | None = None
     vehicle_type: VehicleType | None = None
     truck_cab_size: str | None = None
