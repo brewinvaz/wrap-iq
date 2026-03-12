@@ -83,6 +83,10 @@ def _to_response(wo) -> WorkOrderResponse:
         }
         for wov in (wo.work_order_vehicles or [])
     ]
+
+    # Get first wrap_details if any exist (wrap_details is a list relationship)
+    wrap = wo.wrap_details[0] if wo.wrap_details else None
+
     return WorkOrderResponse(
         id=wo.id,
         job_number=wo.job_number,
@@ -98,6 +102,10 @@ def _to_response(wo) -> WorkOrderResponse:
         vehicles=vehicles,
         client_id=wo.client_id,
         client_name=wo.client.name if wo.client else None,
+        wrap_details=wrap,
+        design_details=wo.design_details,
+        production_details=wo.production_details,
+        install_details=wo.install_details,
         created_at=wo.created_at,
         updated_at=wo.updated_at,
     )
@@ -127,9 +135,41 @@ async def create(
     await _validate_vehicle_ownership(session, data.vehicle_ids, user.organization_id)
     await _validate_client_ownership(session, data.client_id, user.organization_id)
 
-    wo_data = data.model_dump(exclude={"vehicle_ids"})
+    # Separate base fields from sub-details
+    wo_data = data.model_dump(
+        exclude={
+            "vehicle_ids",
+            "wrap_details",
+            "design_details",
+            "production_details",
+            "install_details",
+        }
+    )
+    sub_details = {
+        "wrap_details": (
+            data.wrap_details.model_dump()
+            if data.wrap_details
+            else None
+        ),
+        "design_details": (
+            data.design_details.model_dump()
+            if data.design_details
+            else None
+        ),
+        "production_details": (
+            data.production_details.model_dump()
+            if data.production_details
+            else None
+        ),
+        "install_details": (
+            data.install_details.model_dump()
+            if data.install_details
+            else None
+        ),
+    }
+
     wo = await create_work_order(
-        session, user.organization_id, stage.id, wo_data, data.vehicle_ids
+        session, user.organization_id, stage.id, wo_data, data.vehicle_ids, sub_details
     )
     return _to_response(wo)
 
