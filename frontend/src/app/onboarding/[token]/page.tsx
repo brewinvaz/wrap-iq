@@ -165,7 +165,7 @@ export default function OnboardingPage() {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
         <div className="w-full max-w-md rounded-[12px] border border-[var(--border)] bg-[var(--surface-card)] p-8 text-center shadow-sm">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-500/10">
             <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -237,7 +237,7 @@ export default function OnboardingPage() {
 
       {/* Error banner */}
       {error && (
-        <div className="mb-4 rounded-[10px] border border-red-200 bg-red-50 px-4 py-3">
+        <div className="mb-4 rounded-[10px] border border-red-500/20 bg-red-500/10 px-4 py-3">
           <p className="text-[13px] text-red-700">{error}</p>
         </div>
       )}
