@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { TeamMemberDetail } from '@/lib/types';
 import { roleLabels, roleColors } from '@/lib/role-config';
 import Select from '@/components/ui/Select';
+import { Button } from '@/components/ui/Button';
 
 const allRoles = [
   'admin',
@@ -38,12 +39,9 @@ export default function TeamList({
             {members.filter((m) => m.isActive).length} active
           </span>
         </div>
-        <button
-          onClick={onInvite}
-          className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-90"
-        >
+        <Button onClick={onInvite}>
           + Invite Member
-        </button>
+        </Button>
       </div>
 
       <div className="overflow-x-auto">
@@ -135,16 +133,13 @@ export default function TeamList({
                   {member.joinedDate}
                 </td>
                 <td className="px-6 py-4 text-right">
-                  <button
+                  <Button
+                    variant={member.isActive ? 'danger' : 'secondary'}
+                    size="sm"
                     onClick={() => onToggleActive(member.id)}
-                    className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                      member.isActive
-                        ? 'border border-red-500/20 text-red-400 hover:bg-red-500/10'
-                        : 'border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/10'
-                    }`}
                   >
                     {member.isActive ? 'Deactivate' : 'Activate'}
-                  </button>
+                  </Button>
                 </td>
               </tr>
             ))}

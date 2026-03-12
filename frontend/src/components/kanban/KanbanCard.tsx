@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { formatCurrency } from '@/lib/format';
 import { ProjectCard } from '@/lib/types';
+import { Button } from '@/components/ui/Button';
 
 const priorityColors: Record<string, string> = {
   high: 'bg-rose-500',
@@ -170,23 +171,21 @@ export default function KanbanCard({ card, onDragStart, onAdvance, isPending }: 
 
       {/* Advance button */}
       {onAdvance && (
-        <button
+        <Button
+          variant="secondary"
+          size="sm"
           onClick={(e) => {
             e.stopPropagation();
             if (!isPending) onAdvance(card.id);
           }}
           disabled={isPending}
-          className={`mt-2.5 flex w-full items-center justify-center gap-1 rounded-md border border-[var(--border)] bg-[var(--surface-raised)] py-1.5 text-[11px] font-medium text-[var(--text-secondary)] transition-colors ${
-            isPending
-              ? 'cursor-not-allowed opacity-50'
-              : 'hover:border-[var(--accent-primary)]/30 hover:bg-[var(--accent-primary)]/10 hover:text-[var(--accent-primary)]'
-          }`}
+          className="mt-2.5 flex w-full items-center justify-center gap-1"
         >
           Advance to next stage
           <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
           </svg>
-        </button>
+        </Button>
       )}
     </div>
   );

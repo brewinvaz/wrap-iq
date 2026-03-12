@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { KanbanColumn as KanbanColumnType } from '@/lib/types';
 import KanbanCard from './KanbanCard';
+import { Button } from '@/components/ui/Button';
 
 type SortMode = 'default' | 'priority';
 
@@ -77,15 +78,16 @@ export default function KanbanColumn({
             </span>
           </div>
           <div className="relative">
-            <button
+            <Button
               ref={menuBtnRef}
+              variant="ghost"
+              size="icon"
               onClick={() => setMenuOpen((o) => !o)}
-              className="rounded-md p-1 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-raised)] hover:text-[var(--text-secondary)]"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
               </svg>
-            </button>
+            </Button>
             {menuOpen && (
               <div
                 ref={menuRef}
@@ -156,15 +158,17 @@ export default function KanbanColumn({
 
           {/* Add project button */}
           {onAddProject && (
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={onAddProject}
-              className="flex items-center justify-center gap-1.5 rounded-lg border-2 border-dashed border-[var(--border)] py-3 text-xs font-medium text-[var(--text-muted)] transition-colors hover:border-[var(--accent-primary)]/40 hover:text-[var(--accent-primary)]"
+              className="flex w-full items-center justify-center gap-1.5 border-2 border-dashed border-[var(--border)] py-3 hover:border-[var(--accent-primary)]/40"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
               </svg>
               Add project
-            </button>
+            </Button>
           )}
         </div>
       )}

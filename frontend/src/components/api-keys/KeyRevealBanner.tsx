@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Button } from '@/components/ui/Button';
 
 interface KeyRevealBannerProps {
   fullKey: string;
@@ -49,17 +50,20 @@ export default function KeyRevealBanner({
             <code className="flex-1 rounded-lg border border-amber-200 bg-[var(--surface-card)] px-3 py-2 font-mono text-sm text-[var(--text-primary)]">
               {fullKey}
             </code>
-            <button
+            <Button
+              variant="secondary"
               onClick={handleCopy}
-              className="shrink-0 rounded-lg border border-amber-500/30 bg-[var(--surface-card)] px-3 py-2 text-sm font-medium text-amber-400 transition-colors hover:bg-amber-500/10"
+              className="shrink-0"
             >
               {copied ? 'Copied!' : 'Copy'}
-            </button>
+            </Button>
           </div>
         </div>
-        <button
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={onDismiss}
-          className="shrink-0 rounded-lg p-1 text-amber-400 transition-colors hover:bg-amber-500/10 hover:text-amber-300"
+          className="shrink-0"
         >
           <svg
             className="h-5 w-5"
@@ -74,7 +78,7 @@ export default function KeyRevealBanner({
               d="M6 18L18 6M6 6l12 12"
             />
           </svg>
-        </button>
+        </Button>
       </div>
     </div>
   );
