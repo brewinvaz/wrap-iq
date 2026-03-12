@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { api, ApiError } from '@/lib/api-client';
 import NewRenderModal from '@/components/renders/NewRenderModal';
+import { useModalAccessibility } from '@/hooks/useModalAccessibility';
 
 // --- API response types ---
 
@@ -79,6 +80,85 @@ function LoadingSkeleton() {
   );
 }
 
+// --- Lightbox ---
+
+function RenderLightbox({ render, onClose }: { render: RenderResponse; onClose: () => void }) {
+  const modalRef = useModalAccessibility(true, onClose);
+  const style = statusStyles[render.status] ?? statusStyles.pending;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Render: ${render.design_name}`}
+    >
+      <div
+        ref={modalRef}
+        className="relative flex h-full w-full items-center justify-center"
+        onClick={(e) => e.stopPropagation()}
+        tabIndex={-1}
+      >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 z-10 rounded-full bg-black/50 p-2 text-white/80 backdrop-blur-sm transition-colors hover:bg-black/70 hover:text-white"
+          aria-label="Close lightbox"
+        >
+          <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        {/* Image */}
+        {render.result_image_url ? (
+          <img
+            src={render.result_image_url}
+            alt={render.design_name}
+            className="max-h-[90vh] max-w-[90vw] object-contain"
+          />
+        ) : (
+          <div className="flex h-64 w-96 items-center justify-center rounded-xl bg-[var(--surface-raised)]">
+            <svg className="h-16 w-16 text-[var(--text-muted)]" fill="none" stroke="currentColor" strokeWidth={1} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+            </svg>
+          </div>
+        )}
+
+        {/* Metadata overlay */}
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent px-6 py-6 pt-16">
+          <div className="mx-auto max-w-3xl">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-semibold text-white">{render.design_name}</h2>
+                {render.description && (
+                  <p className="mt-1 text-sm text-white/70">{render.description}</p>
+                )}
+              </div>
+              <span className={`inline-flex shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${style.bg} ${style.text}`}>
+                {style.label}
+              </span>
+            </div>
+            <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-white/60">
+              {render.created_by_name && (
+                <span>By {render.created_by_name}</span>
+              )}
+              <span>{formatDate(render.created_at)}</span>
+              {render.updated_at !== render.created_at && (
+                <span>Updated {formatDate(render.updated_at)}</span>
+              )}
+              {render.error_message && (
+                <span className="text-red-400">Error: {render.error_message}</span>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // --- Main page ---
 
 type FilterStatus = 'all' | 'rendering' | 'completed' | 'failed';
@@ -92,6 +172,7 @@ export default function ThreeDPage() {
   const [filter, setFilter] = useState<FilterStatus>('all');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [showNewRender, setShowNewRender] = useState(false);
+  const [lightboxRender, setLightboxRender] = useState<RenderResponse | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [page, setPage] = useState(0);
   const limit = 12;
@@ -265,22 +346,29 @@ export default function ThreeDPage() {
                   className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-card)] transition-colors hover:border-[var(--accent-primary)]/30"
                 >
                   {/* Thumbnail */}
-                  {r.result_image_url ? (
-                    <img
-                      src={r.result_image_url}
-                      alt={r.design_name}
-                      className="h-40 w-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-40 items-center justify-center bg-gradient-to-br from-[var(--surface-raised)] to-[var(--surface-overlay)]">
-                      <div className="text-center">
-                        <svg className="mx-auto h-10 w-10 text-[var(--text-muted)]" fill="none" stroke="currentColor" strokeWidth={1} viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
-                        </svg>
-                        <p className="mt-1 text-[10px] text-[var(--text-muted)]">3D Preview</p>
+                  <button
+                    type="button"
+                    onClick={() => setLightboxRender(r)}
+                    className="w-full cursor-pointer text-left"
+                    aria-label={`View ${r.design_name}`}
+                  >
+                    {r.result_image_url ? (
+                      <img
+                        src={r.result_image_url}
+                        alt={r.design_name}
+                        className="h-40 w-full object-cover transition-opacity hover:opacity-80"
+                      />
+                    ) : (
+                      <div className="flex h-40 items-center justify-center bg-gradient-to-br from-[var(--surface-raised)] to-[var(--surface-overlay)] transition-opacity hover:opacity-80">
+                        <div className="text-center">
+                          <svg className="mx-auto h-10 w-10 text-[var(--text-muted)]" fill="none" stroke="currentColor" strokeWidth={1} viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+                          </svg>
+                          <p className="mt-1 text-[10px] text-[var(--text-muted)]">3D Preview</p>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </button>
                   <div className="p-4">
                     <div className="flex items-start justify-between gap-2">
                       <h3 className="text-sm font-semibold text-[var(--text-primary)] leading-snug">{r.design_name}</h3>
@@ -341,19 +429,26 @@ export default function ThreeDPage() {
                     <tr key={r.id} className="border-b border-[var(--border)] last:border-0 hover:bg-[var(--surface-raised)]/50">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
-                          {r.result_image_url ? (
-                            <img
-                              src={r.result_image_url}
-                              alt={r.design_name}
-                              className="h-10 w-14 rounded object-cover shrink-0"
-                            />
-                          ) : (
-                            <div className="flex h-10 w-14 shrink-0 items-center justify-center rounded bg-gradient-to-br from-[var(--surface-raised)] to-[var(--surface-overlay)]">
-                              <svg className="h-5 w-5 text-[var(--text-muted)]" fill="none" stroke="currentColor" strokeWidth={1} viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
-                              </svg>
-                            </div>
-                          )}
+                          <button
+                            type="button"
+                            onClick={() => setLightboxRender(r)}
+                            className="shrink-0 cursor-pointer"
+                            aria-label={`View ${r.design_name}`}
+                          >
+                            {r.result_image_url ? (
+                              <img
+                                src={r.result_image_url}
+                                alt={r.design_name}
+                                className="h-10 w-14 rounded object-cover transition-opacity hover:opacity-80"
+                              />
+                            ) : (
+                              <div className="flex h-10 w-14 items-center justify-center rounded bg-gradient-to-br from-[var(--surface-raised)] to-[var(--surface-overlay)] transition-opacity hover:opacity-80">
+                                <svg className="h-5 w-5 text-[var(--text-muted)]" fill="none" stroke="currentColor" strokeWidth={1} viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+                                </svg>
+                              </div>
+                            )}
+                          </button>
                           <span className="font-medium text-[var(--text-primary)]">{r.design_name}</span>
                         </div>
                       </td>
@@ -423,6 +518,13 @@ export default function ThreeDPage() {
           </div>
         )}
       </div>
+
+      {lightboxRender && (
+        <RenderLightbox
+          render={lightboxRender}
+          onClose={() => setLightboxRender(null)}
+        />
+      )}
 
       <NewRenderModal
         isOpen={showNewRender}
