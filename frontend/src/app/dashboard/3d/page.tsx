@@ -82,13 +82,37 @@ function LoadingSkeleton() {
 
 // --- Lightbox ---
 
-function RenderLightbox({ render, onClose }: { render: RenderResponse; onClose: () => void }) {
+function RenderLightbox({
+  render,
+  onClose,
+  onPrev,
+  onNext,
+}: {
+  render: RenderResponse;
+  onClose: () => void;
+  onPrev: (() => void) | null;
+  onNext: (() => void) | null;
+}) {
   const modalRef = useModalAccessibility(true, onClose);
   const style = statusStyles[render.status] ?? statusStyles.pending;
 
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'ArrowLeft' && onPrev) {
+        e.preventDefault();
+        onPrev();
+      } else if (e.key === 'ArrowRight' && onNext) {
+        e.preventDefault();
+        onNext();
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onPrev, onNext]);
+
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/95"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -96,14 +120,14 @@ function RenderLightbox({ render, onClose }: { render: RenderResponse; onClose: 
     >
       <div
         ref={modalRef}
-        className="relative flex h-full w-full items-center justify-center"
+        className="relative flex h-full w-full flex-col"
         onClick={(e) => e.stopPropagation()}
         tabIndex={-1}
       >
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 z-10 rounded-full bg-black/50 p-2 text-white/80 backdrop-blur-sm transition-colors hover:bg-black/70 hover:text-white"
+          className="absolute right-4 top-4 z-10 rounded-full bg-white/10 p-2 text-white/80 backdrop-blur-sm transition-colors hover:bg-white/20 hover:text-white"
           aria-label="Close lightbox"
         >
           <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
@@ -111,36 +135,62 @@ function RenderLightbox({ render, onClose }: { render: RenderResponse; onClose: 
           </svg>
         </button>
 
-        {/* Image */}
-        {render.result_image_url ? (
-          <img
-            src={render.result_image_url}
-            alt={render.design_name}
-            className="max-h-[90vh] max-w-[90vw] object-contain"
-          />
-        ) : (
-          <div className="flex h-64 w-96 items-center justify-center rounded-xl bg-[var(--surface-raised)]">
-            <svg className="h-16 w-16 text-[var(--text-muted)]" fill="none" stroke="currentColor" strokeWidth={1} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+        {/* Prev / Next arrows */}
+        {onPrev && (
+          <button
+            onClick={onPrev}
+            className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/10 p-2.5 text-white/80 backdrop-blur-sm transition-colors hover:bg-white/20 hover:text-white"
+            aria-label="Previous render"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
             </svg>
-          </div>
+          </button>
+        )}
+        {onNext && (
+          <button
+            onClick={onNext}
+            className="absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/10 p-2.5 text-white/80 backdrop-blur-sm transition-colors hover:bg-white/20 hover:text-white"
+            aria-label="Next render"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
+          </button>
         )}
 
-        {/* Metadata overlay */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent px-6 py-6 pt-16">
+        {/* Image area */}
+        <div className="flex flex-1 items-center justify-center px-16 pt-4">
+          {render.result_image_url ? (
+            <img
+              src={render.result_image_url}
+              alt={render.design_name}
+              className="max-h-[70vh] max-w-full object-contain"
+            />
+          ) : (
+            <div className="flex h-64 w-96 items-center justify-center rounded-xl bg-white/5">
+              <svg className="h-16 w-16 text-white/20" fill="none" stroke="currentColor" strokeWidth={1} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+              </svg>
+            </div>
+          )}
+        </div>
+
+        {/* Metadata panel — below the image */}
+        <div className="shrink-0 border-t border-white/10 bg-black px-6 py-4">
           <div className="mx-auto max-w-3xl">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-lg font-semibold text-white">{render.design_name}</h2>
+                <h2 className="text-base font-semibold text-white">{render.design_name}</h2>
                 {render.description && (
-                  <p className="mt-1 text-sm text-white/70">{render.description}</p>
+                  <p className="mt-0.5 text-sm text-white/60">{render.description}</p>
                 )}
               </div>
               <span className={`inline-flex shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${style.bg} ${style.text}`}>
                 {style.label}
               </span>
             </div>
-            <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-white/60">
+            <div className="mt-2 flex flex-wrap items-center gap-4 text-xs text-white/50">
               {render.created_by_name && (
                 <span>By {render.created_by_name}</span>
               )}
@@ -172,7 +222,7 @@ export default function ThreeDPage() {
   const [filter, setFilter] = useState<FilterStatus>('all');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [showNewRender, setShowNewRender] = useState(false);
-  const [lightboxRender, setLightboxRender] = useState<RenderResponse | null>(null);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [page, setPage] = useState(0);
   const limit = 12;
@@ -338,7 +388,7 @@ export default function ThreeDPage() {
           </div>
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-3 gap-4">
-            {renders.map((r) => {
+            {renders.map((r, idx) => {
               const style = statusStyles[r.status] ?? statusStyles.pending;
               return (
                 <div
@@ -348,7 +398,7 @@ export default function ThreeDPage() {
                   {/* Thumbnail */}
                   <button
                     type="button"
-                    onClick={() => setLightboxRender(r)}
+                    onClick={() => setLightboxIndex(idx)}
                     className="w-full cursor-pointer text-left"
                     aria-label={`View ${r.design_name}`}
                   >
@@ -423,7 +473,7 @@ export default function ThreeDPage() {
                 </tr>
               </thead>
               <tbody>
-                {renders.map((r) => {
+                {renders.map((r, idx) => {
                   const style = statusStyles[r.status] ?? statusStyles.pending;
                   return (
                     <tr key={r.id} className="border-b border-[var(--border)] last:border-0 hover:bg-[var(--surface-raised)]/50">
@@ -431,7 +481,7 @@ export default function ThreeDPage() {
                         <div className="flex items-center gap-3">
                           <button
                             type="button"
-                            onClick={() => setLightboxRender(r)}
+                            onClick={() => setLightboxIndex(idx)}
                             className="shrink-0 cursor-pointer"
                             aria-label={`View ${r.design_name}`}
                           >
@@ -519,10 +569,12 @@ export default function ThreeDPage() {
         )}
       </div>
 
-      {lightboxRender && (
+      {lightboxIndex !== null && renders[lightboxIndex] && (
         <RenderLightbox
-          render={lightboxRender}
-          onClose={() => setLightboxRender(null)}
+          render={renders[lightboxIndex]}
+          onClose={() => setLightboxIndex(null)}
+          onPrev={lightboxIndex > 0 ? () => setLightboxIndex(lightboxIndex - 1) : null}
+          onNext={lightboxIndex < renders.length - 1 ? () => setLightboxIndex(lightboxIndex + 1) : null}
         />
       )}
 
