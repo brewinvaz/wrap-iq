@@ -240,6 +240,30 @@ def test_ensure_outer_limit_no_limit_at_all():
 
 
 @patch("app.services.ai_assistant.settings")
+@patch("app.services.ai_assistant.genai.Client")
+async def test_answer_question_uses_model_from_settings(mock_genai_cls, mock_settings):
+    mock_settings.gemini_api_key = "test-key"
+    mock_settings.gemini_model = "gemini-custom-model"
+    mock_client = MagicMock()
+    mock_genai_cls.return_value = mock_client
+
+    mock_aio_models = AsyncMock()
+    mock_aio_models.generate_content.return_value = _mock_text_response(
+        "No late jobs."
+    )
+    mock_client.aio.models = mock_aio_models
+
+    service = AIAssistantService()
+    user = _mock_user()
+    session = AsyncMock()
+
+    await service.answer_question("Any late jobs?", user, session)
+
+    call_kwargs = mock_aio_models.generate_content.call_args
+    assert call_kwargs.kwargs["model"] == "gemini-custom-model"
+
+
+@patch("app.services.ai_assistant.settings")
 async def test_service_raises_without_api_key(mock_settings):
     mock_settings.gemini_api_key = ""
     with pytest.raises(ValueError, match="not configured"):

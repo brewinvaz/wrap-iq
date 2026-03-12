@@ -1,5 +1,5 @@
 import uuid
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -185,6 +185,39 @@ class TestBuildRenderResponse:
 
         assert response.created_by_name == "test@test.com"
         assert response.result_image_url is None
+
+
+class TestRenderModelSetting:
+    @patch("app.services.renders.download_object")
+    @patch("app.services.renders.settings")
+    @patch("app.services.renders.genai.Client")
+    async def test_generate_image_uses_render_model_setting(
+        self, mock_genai_cls, mock_settings, mock_download
+    ):
+        mock_settings.gemini_api_key = "test-key"
+        mock_settings.gemini_render_model = "gemini-custom-render"
+
+        mock_download.return_value = b"fake-image-bytes"
+
+        mock_part = MagicMock()
+        mock_part.inline_data = MagicMock()
+        mock_part.inline_data.data = b"result-image"
+        mock_response = MagicMock()
+        mock_response.parts = [mock_part]
+
+        mock_aio_models = AsyncMock()
+        mock_aio_models.generate_content.return_value = mock_response
+        mock_client = MagicMock()
+        mock_client.aio.models = mock_aio_models
+        mock_genai_cls.return_value = mock_client
+
+        result = await render_service.generate_image(
+            "org/renders/photo.jpg", "org/renders/design.png", None
+        )
+
+        call_kwargs = mock_aio_models.generate_content.call_args
+        assert call_kwargs.kwargs["model"] == "gemini-custom-render"
+        assert result == b"result-image"
 
 
 class TestBuildPrompt:

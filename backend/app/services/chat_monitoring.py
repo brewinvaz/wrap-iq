@@ -111,7 +111,7 @@ class ChatMonitoringService:
         )
 
         response = await self._client.aio.models.generate_content(
-            model="gemini-2.5-flash",
+            model=settings.gemini_model,
             contents=prompt,
             config=types.GenerateContentConfig(
                 system_instruction=_SYSTEM_INSTRUCTION,

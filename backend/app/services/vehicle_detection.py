@@ -56,7 +56,7 @@ async def detect_vehicle_from_image(
     client = genai.Client(api_key=settings.gemini_api_key)
 
     response = await client.aio.models.generate_content(
-        model="gemini-2.5-flash",
+        model=settings.gemini_model,
         contents=[
             types.Part.from_bytes(data=image_data, mime_type=content_type),
             DETECTION_PROMPT,

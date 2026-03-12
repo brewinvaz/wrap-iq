@@ -26,6 +26,8 @@ class Settings(BaseSettings):
 
     # AI / Gemini
     gemini_api_key: str = ""
+    gemini_model: str = "gemini-2.5-flash"
+    gemini_render_model: str = "gemini-2.5-flash-image"
 
     # Email
     resend_api_key: str = ""

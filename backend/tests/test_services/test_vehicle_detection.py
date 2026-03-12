@@ -162,6 +162,23 @@ async def test_detect_vehicle_invalid_json(_set_api_key):
     assert result.make is None
 
 
+async def test_detect_vehicle_uses_model_from_settings(_set_api_key):
+    _set_api_key.gemini_model = "gemini-custom-model"
+    mock_aio_models = AsyncMock()
+    mock_aio_models.generate_content.return_value = _mock_response(_detection_json())
+    mock_client = MagicMock()
+    mock_client.aio.models = mock_aio_models
+
+    with patch(
+        "app.services.vehicle_detection.genai.Client",
+        return_value=mock_client,
+    ):
+        await detect_vehicle_from_image(b"fake-image", "image/jpeg")
+
+    call_kwargs = mock_aio_models.generate_content.call_args
+    assert call_kwargs.kwargs["model"] == "gemini-custom-model"
+
+
 async def test_detect_vehicle_empty_api_key():
     with patch("app.services.vehicle_detection.settings") as mock_settings:
         mock_settings.gemini_api_key = ""

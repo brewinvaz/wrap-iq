@@ -256,7 +256,7 @@ class AIAssistantService:
 
         # First call: ask Gemini to answer or generate SQL via function calling
         response = await self._client.aio.models.generate_content(
-            model="gemini-2.5-flash",
+            model=settings.gemini_model,
             contents=question,
             config=types.GenerateContentConfig(
                 system_instruction=system_prompt,
@@ -326,7 +326,7 @@ class AIAssistantService:
         )
 
         summary_response = await self._client.aio.models.generate_content(
-            model="gemini-2.5-flash",
+            model=settings.gemini_model,
             contents=summary_prompt,
             config=types.GenerateContentConfig(
                 system_instruction=system_prompt,
