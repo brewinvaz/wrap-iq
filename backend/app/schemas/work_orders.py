@@ -5,6 +5,13 @@ from pydantic import BaseModel, field_validator
 
 from app.models.kanban_stage import SystemStatus
 from app.models.work_order import JobType, Priority
+from app.schemas.design_details import DesignDetailsCreate, DesignDetailsResponse
+from app.schemas.install_details import InstallDetailsCreate, InstallDetailsResponse
+from app.schemas.production_details import (
+    ProductionDetailsCreate,
+    ProductionDetailsResponse,
+)
+from app.schemas.wrap_details import WrapDetailsCreate, WrapDetailsResponse
 
 
 class ChecklistItem(BaseModel):
@@ -34,6 +41,11 @@ class WorkOrderCreate(BaseModel):
             except ValueError:
                 raise ValueError("client_id must be a valid UUID")  # noqa: B904
         return v
+
+    wrap_details: WrapDetailsCreate | None = None
+    design_details: DesignDetailsCreate | None = None
+    production_details: ProductionDetailsCreate | None = None
+    install_details: InstallDetailsCreate | None = None
 
 
 class WorkOrderUpdate(BaseModel):
@@ -96,6 +108,10 @@ class WorkOrderResponse(BaseModel):
     vehicles: list[VehicleInWorkOrder] = []
     client_id: uuid.UUID | None = None
     client_name: str | None = None
+    wrap_details: WrapDetailsResponse | None = None
+    design_details: DesignDetailsResponse | None = None
+    production_details: ProductionDetailsResponse | None = None
+    install_details: InstallDetailsResponse | None = None
     created_at: datetime
     updated_at: datetime
 
