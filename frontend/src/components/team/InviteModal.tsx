@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { roleLabels } from '@/lib/role-config';
 import { useModalAccessibility } from '@/hooks/useModalAccessibility';
+import Select from '@/components/ui/Select';
 
 const invitableRoles = [
   'project_manager',
@@ -104,18 +105,15 @@ export default function InviteModal({
             >
               Role
             </label>
-            <select
+            <Select
               id="invite-role"
               value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
-            >
-              {invitableRoles.map((r) => (
-                <option key={r} value={r}>
-                  {roleLabels[r]}
-                </option>
-              ))}
-            </select>
+              onChange={setRole}
+              options={invitableRoles.map((r) => ({
+                value: r,
+                label: roleLabels[r],
+              }))}
+            />
           </div>
 
           <div className="flex items-center gap-3 pt-2">
