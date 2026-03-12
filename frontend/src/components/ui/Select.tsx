@@ -193,8 +193,7 @@ export default function Select({
         id={id}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
-        aria-controls={listboxId}
-        aria-disabled={disabled || undefined}
+        aria-controls={isOpen ? listboxId : undefined}
         disabled={disabled}
         onClick={() => (isOpen ? close() : open())}
         onKeyDown={handleTriggerKeyDown}
@@ -229,7 +228,7 @@ export default function Select({
             aria-activedescendant={activeOptionId}
             onKeyDown={handlePanelKeyDown}
             style={panelStyle}
-            className="z-50 max-h-60 overflow-y-auto rounded-lg border border-[var(--border)] bg-[var(--surface-overlay)] shadow-lg animate-select-in"
+            className="z-50 max-h-60 overflow-y-auto rounded-lg border border-[var(--border)] bg-[var(--surface-overlay)] shadow-lg outline-none animate-select-in"
           >
             {options.map((option, index) => {
               const isSelected = option.value === value;
