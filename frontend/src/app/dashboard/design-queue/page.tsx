@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { Paintbrush } from 'lucide-react';
 import { api, ApiError } from '@/lib/api-client';
 
 type FilterTab = 'all' | 'in_design' | 'in_revision' | 'proof_sent' | 'approved';
@@ -99,8 +100,8 @@ const filterTabs: { key: FilterTab; label: string }[] = [
 
 const priorityStyles: Record<string, string> = {
   high: 'text-rose-600 font-medium',
-  medium: 'text-[#60606a]',
-  low: 'text-[#a8a8b4]',
+  medium: 'text-[var(--text-secondary)]',
+  low: 'text-[var(--text-muted)]',
 };
 
 function formatDate(dateStr: string | null): string {
@@ -119,18 +120,18 @@ function isOverdue(dueDate: string | null): boolean {
 function LoadingSkeleton() {
   return (
     <div className="flex h-full flex-col">
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
-        <div className="h-7 w-48 animate-pulse rounded bg-gray-200" />
-        <div className="mt-1 h-3 w-64 animate-pulse rounded bg-gray-100" />
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
+        <div className="h-7 w-48 animate-pulse rounded bg-[var(--surface-overlay)]" />
+        <div className="mt-1 h-3 w-64 animate-pulse rounded bg-[var(--surface-raised)]" />
       </header>
-      <div className="flex gap-2 border-b border-[#e6e6eb] bg-white px-6 py-3">
+      <div className="flex gap-2 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-3">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="h-8 w-20 animate-pulse rounded-lg bg-gray-200" />
+          <div key={i} className="h-8 w-20 animate-pulse rounded-lg bg-[var(--surface-overlay)]" />
         ))}
       </div>
       <div className="flex-1 overflow-auto p-6">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="mb-3 h-14 animate-pulse rounded-lg bg-gray-100" />
+          <div key={i} className="mb-3 h-14 animate-pulse rounded-lg bg-[var(--surface-raised)]" />
         ))}
       </div>
     </div>
@@ -185,11 +186,11 @@ export default function DesignQueuePage() {
   if (error) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-4">
-        <p className="text-sm font-medium text-[#18181b]">Failed to load design queue</p>
-        <p className="text-xs text-[#60606a]">{error}</p>
+        <p className="text-sm font-medium text-[var(--text-primary)]">Failed to load design queue</p>
+        <p className="text-xs text-[var(--text-secondary)]">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          className="rounded-lg bg-[var(--accent-primary)] px-4 py-2 text-sm font-medium text-white hover:opacity-80"
         >
           Retry
         </button>
@@ -200,16 +201,16 @@ export default function DesignQueuePage() {
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-[#18181b]">Design Queue</h1>
-            <p className="mt-0.5 text-xs text-[#a8a8b4]">
+            <h1 className="text-[22px] font-[800] text-[var(--text-primary)]">Design Queue</h1>
+            <p className="mt-0.5 text-xs text-[var(--text-muted)]">
               Track design progress across all active jobs
             </p>
           </div>
-          <div className="flex items-center gap-2 text-sm text-[#60606a]">
-            <span className="rounded-full bg-pink-100 px-2.5 py-0.5 text-xs font-medium text-pink-700">
+          <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+            <span className="rounded-full bg-[var(--phase-design)]/10 px-2.5 py-0.5 text-[10px] font-bold uppercase text-[var(--phase-design)]">
               {items.length} jobs
             </span>
           </div>
@@ -217,15 +218,15 @@ export default function DesignQueuePage() {
       </header>
 
       {/* Filter tabs */}
-      <div className="flex gap-1 border-b border-[#e6e6eb] bg-white px-6 py-2">
+      <div className="flex gap-1 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-2">
         {filterTabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
               activeTab === tab.key
-                ? 'bg-[#18181b] text-white'
-                : 'text-[#60606a] hover:bg-gray-50'
+                ? 'bg-[var(--accent-primary)] text-white'
+                : 'text-[var(--text-secondary)] hover:bg-[var(--surface-raised)]'
             }`}
           >
             {tab.label}
@@ -238,16 +239,14 @@ export default function DesignQueuePage() {
       <div className="flex-1 overflow-auto">
         {filtered.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center">
-            <svg className="mb-3 h-10 w-10 text-[#a8a8b4]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" />
-            </svg>
-            <p className="text-sm font-medium text-[#60606a]">No items in this view</p>
-            <p className="mt-1 text-xs text-[#a8a8b4]">Design queue items will appear here as jobs come in.</p>
+            <Paintbrush className="mb-3 h-10 w-10 text-[var(--text-muted)]" strokeWidth={1.5} />
+            <p className="text-sm font-medium text-[var(--text-secondary)]">No items in this view</p>
+            <p className="mt-1 text-xs text-[var(--text-muted)]">Design queue items will appear here as jobs come in.</p>
           </div>
         ) : (
           <table className="w-full">
-            <thead className="sticky top-0 z-10 bg-[#fafafa]">
-              <tr className="text-left text-[10px] uppercase tracking-wider text-[#a8a8b4]">
+            <thead className="sticky top-0 z-10 bg-[var(--surface-raised)]">
+              <tr className="text-left text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
                 <th className="px-6 py-2.5 font-medium">Job #</th>
                 <th className="px-4 py-2.5 font-medium">Client</th>
                 <th className="px-4 py-2.5 font-medium">Vehicle</th>
@@ -257,28 +256,28 @@ export default function DesignQueuePage() {
                 <th className="px-4 py-2.5 font-medium">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#f0f0f5]">
+            <tbody className="divide-y divide-[var(--border-subtle)]">
               {filtered.map((item) => (
-                <tr key={item.id} className="transition-colors hover:bg-[#fafafa]">
-                  <td className="px-6 py-3 text-sm font-medium text-[#18181b]">
+                <tr key={item.id} className="transition-colors hover:bg-[var(--surface-raised)]">
+                  <td className="px-6 py-3 font-mono text-sm font-medium text-[var(--text-primary)]">
                     {item.jobNumber}
                   </td>
-                  <td className="px-4 py-3 text-sm text-[#60606a]">{item.clientName}</td>
-                  <td className="px-4 py-3 text-sm text-[#60606a]">{item.vehicle}</td>
+                  <td className="px-4 py-3 text-sm text-[var(--text-secondary)]">{item.clientName}</td>
+                  <td className="px-4 py-3 text-sm text-[var(--text-secondary)]">{item.vehicle}</td>
                   <td className="px-4 py-3">
-                    <span className={`text-xs font-medium capitalize ${priorityStyles[item.priority] ?? ''}`}>
+                    <span className={`text-[10px] font-bold uppercase ${priorityStyles[item.priority] ?? ''}`}>
                       {item.priority}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-[#60606a]">{formatDate(item.dateIn)}</td>
+                  <td className="px-4 py-3 font-mono text-sm text-[var(--text-secondary)]">{formatDate(item.dateIn)}</td>
                   <td className="px-4 py-3">
-                    <span className={`text-sm ${isOverdue(item.dueDate) ? 'font-medium text-rose-600' : 'text-[#60606a]'}`}>
+                    <span className={`font-mono text-sm ${isOverdue(item.dueDate) ? 'font-medium text-rose-600' : 'text-[var(--text-secondary)]'}`}>
                       {formatDate(item.dueDate)}
                     </span>
                   </td>
                   <td className="px-4 py-3">
                     <span
-                      className="inline-block rounded-full px-2.5 py-0.5 text-xs font-medium"
+                      className="inline-block rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase"
                       style={{
                         backgroundColor: `${item.statusColor}15`,
                         color: item.statusColor,

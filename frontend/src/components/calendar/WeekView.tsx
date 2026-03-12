@@ -37,25 +37,25 @@ export default function WeekView({
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
-    <div className="flex-1 overflow-auto bg-white">
+    <div className="flex-1 overflow-auto bg-[var(--surface-card)]">
       <div className="grid min-w-[700px] grid-cols-[140px_repeat(5,1fr)]">
         {/* Header row */}
-        <div className="sticky top-0 z-10 border-b border-r border-[#e6e6eb] bg-gray-50 px-4 py-3">
-          <span className="text-xs font-medium text-[#a8a8b4]">Installer</span>
+        <div className="sticky top-0 z-10 border-b border-r border-[var(--border)] bg-[var(--surface-raised)] px-4 py-3">
+          <span className="text-xs font-medium text-[var(--text-muted)]">Installer</span>
         </div>
         {weekDays.map((day) => (
           <div
             key={day.dateStr}
-            className={`sticky top-0 z-10 border-b border-r border-[#e6e6eb] px-3 py-3 text-center last:border-r-0 ${
-              day.isToday ? 'bg-blue-50/50' : 'bg-gray-50'
+            className={`sticky top-0 z-10 border-b border-r border-[var(--border)] px-3 py-3 text-center last:border-r-0 ${
+              day.isToday ? 'bg-[var(--surface-overlay)]' : 'bg-[var(--surface-raised)]'
             }`}
           >
-            <div className="text-xs font-medium text-[#a8a8b4]">
+            <div className="text-xs font-medium text-[var(--text-muted)]">
               {dayNames[day.date.getDay()]}
             </div>
             <div
               className={`mt-0.5 text-sm font-semibold ${
-                day.isToday ? 'text-blue-600' : 'text-[#18181b]'
+                day.isToday ? 'text-[var(--accent-primary)]' : 'text-[var(--text-primary)]'
               }`}
             >
               {day.date.getDate()}
@@ -75,7 +75,7 @@ export default function WeekView({
       </div>
 
       {filteredInstallers.length === 0 && (
-        <div className="flex h-48 items-center justify-center text-sm text-[#a8a8b4]">
+        <div className="flex h-48 items-center justify-center text-sm text-[var(--text-muted)]">
           No installers selected. Use the filter chips above to show installers.
         </div>
       )}
@@ -95,14 +95,14 @@ function InstallerRow({
   return (
     <>
       {/* Installer name cell */}
-      <div className="flex items-start gap-2 border-b border-r border-[#e6e6eb] px-3 py-3">
+      <div className="flex items-start gap-2 border-b border-r border-[var(--border)] px-3 py-3">
         <div
           className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white"
           style={{ backgroundColor: installer.color }}
         >
           {installer.initials}
         </div>
-        <span className="mt-0.5 text-xs font-medium text-[#18181b]">
+        <span className="mt-0.5 text-xs font-medium text-[var(--text-primary)]">
           {installer.name}
         </span>
       </div>
@@ -131,8 +131,8 @@ function DayCell({
 }) {
   return (
     <div
-      className={`group relative min-h-[80px] border-b border-r border-[#e6e6eb] p-1.5 last:border-r-0 ${
-        isToday ? 'bg-blue-50/30' : ''
+      className={`group relative min-h-[80px] border-b border-r border-[var(--border)] p-1.5 last:border-r-0 ${
+        isToday ? 'bg-[var(--surface-overlay)]/30' : ''
       }`}
     >
       {events.map((evt) => (
@@ -143,7 +143,7 @@ function DayCell({
           onClick={() => {}}
           className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100"
         >
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 text-xs text-[#a8a8b4] transition-colors hover:bg-gray-200 hover:text-[#60606a]">
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--surface-raised)] text-xs text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-overlay)] hover:text-[var(--text-secondary)]">
             +
           </span>
         </button>
@@ -168,10 +168,10 @@ function EventBlock({ event }: { event: CalendarEvent }) {
       >
         {event.title}
       </div>
-      <div className="mt-0.5 truncate font-mono text-[10px] text-[#60606a]">
+      <div className="mt-0.5 truncate font-mono text-[10px] text-[var(--text-secondary)]">
         {event.vehicle}
       </div>
-      <div className="mt-0.5 text-[10px] text-[#a8a8b4]">
+      <div className="mt-0.5 font-mono text-[10px] text-[var(--text-muted)]">
         {event.startTime} – {event.endTime}
       </div>
     </button>

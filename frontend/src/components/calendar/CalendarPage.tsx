@@ -241,37 +241,37 @@ function CalendarSkeleton() {
   return (
     <div className="flex h-full flex-col">
       {/* Header skeleton */}
-      <div className="flex flex-col gap-4 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <div className="flex flex-col gap-4 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
-          <div className="h-8 w-64 animate-pulse rounded-lg bg-gray-200" />
-          <div className="h-8 w-40 animate-pulse rounded-lg bg-gray-200" />
+          <div className="h-8 w-64 animate-pulse rounded-lg bg-[var(--surface-overlay)]" />
+          <div className="h-8 w-40 animate-pulse rounded-lg bg-[var(--surface-overlay)]" />
         </div>
         <div className="flex items-center gap-2">
-          <div className="h-6 w-16 animate-pulse rounded bg-gray-200" />
+          <div className="h-6 w-16 animate-pulse rounded bg-[var(--surface-overlay)]" />
           {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
-              className="h-7 w-24 animate-pulse rounded-full bg-gray-200"
+              className="h-7 w-24 animate-pulse rounded-full bg-[var(--surface-overlay)]"
             />
           ))}
         </div>
       </div>
       {/* Grid skeleton */}
-      <div className="flex-1 overflow-auto bg-white p-4">
+      <div className="flex-1 overflow-auto bg-[var(--surface-card)] p-4">
         <div className="grid grid-cols-6 gap-2">
           {Array.from({ length: 30 }).map((_, i) => (
             <div
               key={i}
-              className="h-20 animate-pulse rounded-lg bg-gray-100"
+              className="h-20 animate-pulse rounded-lg bg-[var(--surface-raised)]"
             />
           ))}
         </div>
       </div>
       {/* Summary bar skeleton */}
-      <div className="flex items-center gap-6 border-t border-[#e6e6eb] bg-white px-6 py-3">
-        <div className="h-4 w-32 animate-pulse rounded bg-gray-200" />
-        <div className="h-4 w-20 animate-pulse rounded bg-gray-200" />
-        <div className="h-4 w-20 animate-pulse rounded bg-gray-200" />
+      <div className="flex items-center gap-6 border-t border-[var(--border)] bg-[var(--surface-card)] px-6 py-3">
+        <div className="h-4 w-32 animate-pulse rounded bg-[var(--surface-overlay)]" />
+        <div className="h-4 w-20 animate-pulse rounded bg-[var(--surface-overlay)]" />
+        <div className="h-4 w-20 animate-pulse rounded bg-[var(--surface-overlay)]" />
       </div>
     </div>
   );
@@ -289,8 +289,8 @@ function CalendarError({
   onRetry: () => void;
 }) {
   return (
-    <div className="flex h-full flex-col items-center justify-center gap-4 bg-white">
-      <div className="rounded-full bg-red-50 p-3">
+    <div className="flex h-full flex-col items-center justify-center gap-4 bg-[var(--surface-card)]">
+      <div className="rounded-full bg-red-500/10 p-3">
         <svg
           className="h-6 w-6 text-red-500"
           fill="none"
@@ -306,14 +306,14 @@ function CalendarError({
         </svg>
       </div>
       <div className="text-center">
-        <h3 className="text-sm font-semibold text-[#18181b]">
+        <h3 className="text-sm font-semibold text-[var(--text-primary)]">
           Failed to load calendar
         </h3>
-        <p className="mt-1 text-xs text-[#60606a]">{message}</p>
+        <p className="mt-1 text-xs text-[var(--text-secondary)]">{message}</p>
       </div>
       <button
         onClick={onRetry}
-        className="rounded-lg border border-[#e6e6eb] px-4 py-2 text-xs font-medium text-[#60606a] transition-colors hover:bg-gray-50 hover:text-[#18181b]"
+        className="rounded-lg border border-[var(--border)] px-4 py-2 text-xs font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-raised)] hover:text-[var(--text-primary)]"
       >
         Retry
       </button>
@@ -619,18 +619,18 @@ export default function CalendarPage() {
       )}
 
       {/* Summary bar */}
-      <div className="flex items-center gap-6 border-t border-[#e6e6eb] bg-white px-6 py-3">
+      <div className="flex items-center gap-6 border-t border-[var(--border)] bg-[var(--surface-card)] px-6 py-3">
         <div className="flex items-center gap-2">
-          <span className="text-xs text-[#a8a8b4]">{summaryLabel}:</span>
-          <span className="text-sm font-semibold text-[#18181b]">{totalJobs} jobs</span>
+          <span className="text-xs text-[var(--text-muted)]">{summaryLabel}:</span>
+          <span className="text-sm font-semibold text-[var(--text-primary)]">{totalJobs} jobs</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="inline-block h-2 w-2 rounded-full bg-blue-500" />
-          <span className="text-xs text-[#60606a]">{shopJobs} shop</span>
+          <span className="inline-block h-2 w-2 rounded-full bg-[var(--phase-production)]" />
+          <span className="text-xs text-[var(--text-secondary)]">{shopJobs} shop</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="inline-block h-2 w-2 rounded-full bg-amber-500" />
-          <span className="text-xs text-[#60606a]">{onsiteJobs} on-site</span>
+          <span className="text-xs text-[var(--text-secondary)]">{onsiteJobs} on-site</span>
         </div>
       </div>
     </div>

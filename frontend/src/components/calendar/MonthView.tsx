@@ -74,13 +74,13 @@ export default function MonthView({
   );
 
   return (
-    <div className="flex-1 overflow-auto bg-white p-4">
-      <div className="grid grid-cols-7 gap-px rounded-lg border border-[#e6e6eb] bg-[#e6e6eb]">
+    <div className="flex-1 overflow-auto bg-[var(--surface-card)] p-4">
+      <div className="grid grid-cols-7 gap-px rounded-lg border border-[var(--border)] bg-[var(--border)]">
         {/* Day-of-week headers */}
         {dayHeaders.map((dh) => (
           <div
             key={dh}
-            className="bg-gray-50 px-3 py-2 text-center text-xs font-medium text-[#a8a8b4]"
+            className="bg-[var(--surface-raised)] px-3 py-2 text-center text-xs font-medium text-[var(--text-muted)]"
           >
             {dh}
           </div>
@@ -89,7 +89,7 @@ export default function MonthView({
         {/* Calendar cells */}
         {weeks.flat().map((date, idx) => {
           if (!date) {
-            return <div key={`empty-${idx}`} className="min-h-[100px] bg-gray-50/50" />;
+            return <div key={`empty-${idx}`} className="min-h-[100px] bg-[var(--surface-raised)]/50" />;
           }
 
           const dateStr = formatDateStr(date);
@@ -102,22 +102,22 @@ export default function MonthView({
             <button
               key={dateStr}
               onClick={() => onDayClick(date)}
-              className={`group min-h-[100px] cursor-pointer p-2 text-left transition-colors hover:bg-blue-50/30 ${
-                isToday ? 'bg-blue-50/40' : 'bg-white'
+              className={`group min-h-[100px] cursor-pointer p-2 text-left transition-colors hover:bg-[var(--surface-raised)] ${
+                isToday ? 'bg-[var(--surface-overlay)]' : 'bg-[var(--surface-card)]'
               }`}
             >
               <div className="flex items-center justify-between">
                 <span
                   className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold ${
                     isToday
-                      ? 'bg-blue-600 text-white'
-                      : 'text-[#18181b] group-hover:bg-gray-100'
+                      ? 'bg-[var(--accent-primary)] text-white'
+                      : 'text-[var(--text-primary)] group-hover:bg-[var(--surface-overlay)]'
                   }`}
                 >
                   {date.getDate()}
                 </span>
                 {dayEvents.length > 0 && (
-                  <span className="text-[10px] font-medium text-[#a8a8b4]">
+                  <span className="text-[10px] font-medium text-[var(--text-muted)]">
                     {dayEvents.length} job{dayEvents.length !== 1 ? 's' : ''}
                   </span>
                 )}
@@ -139,7 +139,7 @@ export default function MonthView({
                   </div>
                 ))}
                 {dayEvents.length > 3 && (
-                  <div className="px-1.5 text-[10px] text-[#a8a8b4]">
+                  <div className="px-1.5 text-[10px] text-[var(--text-muted)]">
                     +{dayEvents.length - 3} more
                   </div>
                 )}
