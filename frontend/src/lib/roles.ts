@@ -6,6 +6,7 @@ export type BadgeVariant = 'default' | 'amber';
 export type BadgeKey = 'work_orders' | 'unread_notifications' | 'design_queue';
 
 export interface NavItem {
+  /** Lucide icon name (e.g. 'ClipboardList', 'Palette') */
   icon: string;
   label: string;
   href: string;
@@ -41,42 +42,42 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
       {
         label: 'Workspace',
         items: [
-          { icon: '📋', label: 'Jobs Board', href: '/dashboard', badgeKey: 'work_orders' },
-          { icon: '📊', label: 'All Jobs Board', href: '/dashboard/jobs' },
-          { icon: '📦', label: 'Work Orders', href: '/dashboard/work-orders' },
-          { icon: '📅', label: 'Calendar', href: '/dashboard/calendar', badgeKey: 'unread_notifications', badgeVariant: 'amber' },
-          { icon: '💬', label: 'Communications', href: '/dashboard/comms' },
-          { icon: '🗓️', label: 'Schedule', href: '/dashboard/schedule' },
-          { icon: '👥', label: 'Customers', href: '/dashboard/customers' },
+          { icon: 'ClipboardList', label: 'Jobs Board', href: '/dashboard', badgeKey: 'work_orders' },
+          { icon: 'BarChart3', label: 'All Jobs Board', href: '/dashboard/jobs' },
+          { icon: 'Package', label: 'Work Orders', href: '/dashboard/work-orders' },
+          { icon: 'Calendar', label: 'Calendar', href: '/dashboard/calendar', badgeKey: 'unread_notifications', badgeVariant: 'amber' },
+          { icon: 'MessageSquare', label: 'Communications', href: '/dashboard/comms' },
+          { icon: 'CalendarDays', label: 'Schedule', href: '/dashboard/schedule' },
+          { icon: 'Users', label: 'Customers', href: '/dashboard/customers' },
         ],
       },
       {
         label: 'Production',
         items: [
-          { icon: '🎨', label: 'Design Queue', href: '/dashboard/design-queue', badgeKey: 'design_queue' },
-          { icon: '🖨️', label: 'Print / Lam', href: '/dashboard/print' },
-          { icon: '🔧', label: 'Install Schedule', href: '/dashboard/install-schedule' },
+          { icon: 'Palette', label: 'Design Queue', href: '/dashboard/design-queue', badgeKey: 'design_queue' },
+          { icon: 'Printer', label: 'Print / Lam', href: '/dashboard/print' },
+          { icon: 'Wrench', label: 'Install Schedule', href: '/dashboard/install-schedule' },
         ],
       },
       {
         label: 'Business',
         items: [
-          { icon: '💰', label: 'Financials', href: '/dashboard/financials' },
-          { icon: '📝', label: 'Estimates', href: '/dashboard/estimates' },
-          { icon: '🧾', label: 'Invoices', href: '/dashboard/invoices' },
-          { icon: '📈', label: 'Reports', href: '/dashboard/reports' },
-          { icon: '⏱️', label: 'Time Tracking', href: '/dashboard/time-logs' },
-          { icon: '👤', label: 'User Management', href: '/dashboard/team' },
-          { icon: '💳', label: 'Billing & Settings', href: '/dashboard/settings/billing' },
-          { icon: '🔑', label: 'API Keys', href: '/dashboard/settings/api-keys' },
-          { icon: '🔌', label: 'Integrations', href: '/dashboard/integrations' },
+          { icon: 'DollarSign', label: 'Financials', href: '/dashboard/financials' },
+          { icon: 'FileText', label: 'Estimates', href: '/dashboard/estimates' },
+          { icon: 'Receipt', label: 'Invoices', href: '/dashboard/invoices' },
+          { icon: 'TrendingUp', label: 'Reports', href: '/dashboard/reports' },
+          { icon: 'Clock', label: 'Time Tracking', href: '/dashboard/time-logs' },
+          { icon: 'User', label: 'User Management', href: '/dashboard/team' },
+          { icon: 'CreditCard', label: 'Billing & Settings', href: '/dashboard/settings/billing' },
+          { icon: 'Key', label: 'API Keys', href: '/dashboard/settings/api-keys' },
+          { icon: 'Plug', label: 'Integrations', href: '/dashboard/integrations' },
         ],
       },
       {
-        label: 'AI',
+        label: 'AI & Tools',
         items: [
-          { icon: '🤖', label: 'Shop Intelligence', href: '/dashboard/ai' },
-          { icon: '🧊', label: '3D Rendering', href: '/dashboard/3d' },
+          { icon: 'Bot', label: 'Shop Intelligence', href: '/dashboard/ai' },
+          { icon: 'Box', label: '3D Rendering', href: '/dashboard/3d' },
         ],
       },
     ],
@@ -91,25 +92,25 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
       {
         label: 'Projects',
         items: [
-          { icon: '📋', label: 'My Jobs', href: '/dashboard', badgeKey: 'work_orders' },
-          { icon: '📊', label: 'All Jobs Board', href: '/dashboard/jobs' },
-          { icon: '📅', label: 'Schedule', href: '/dashboard/schedule' },
-          { icon: '👥', label: 'Team Assignments', href: '/dashboard/team' },
+          { icon: 'ClipboardList', label: 'My Jobs', href: '/dashboard', badgeKey: 'work_orders' },
+          { icon: 'BarChart3', label: 'All Jobs Board', href: '/dashboard/jobs' },
+          { icon: 'CalendarDays', label: 'Schedule', href: '/dashboard/schedule' },
+          { icon: 'Users', label: 'Team Assignments', href: '/dashboard/team' },
         ],
       },
       {
         label: 'Clients',
         items: [
-          { icon: '💬', label: 'Client Comms', href: '/dashboard/comms', badgeKey: 'unread_notifications', badgeVariant: 'amber' },
-          { icon: '📄', label: 'Contracts & Docs', href: '/dashboard/contracts' },
-          { icon: '✅', label: 'Proof Approvals', href: '/dashboard/proofs' },
+          { icon: 'MessageSquare', label: 'Client Comms', href: '/dashboard/comms', badgeKey: 'unread_notifications', badgeVariant: 'amber' },
+          { icon: 'File', label: 'Contracts & Docs', href: '/dashboard/contracts' },
+          { icon: 'CheckSquare', label: 'Proof Approvals', href: '/dashboard/proofs' },
         ],
       },
       {
         label: 'Reports',
         items: [
-          { icon: '⏱️', label: 'Time Tracking', href: '/dashboard/time-logs' },
-          { icon: '📈', label: 'Job Reports', href: '/dashboard/reports' },
+          { icon: 'Clock', label: 'Time Tracking', href: '/dashboard/time-logs' },
+          { icon: 'TrendingUp', label: 'Job Reports', href: '/dashboard/reports' },
         ],
       },
     ],
@@ -124,20 +125,20 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
       {
         label: 'My Work',
         items: [
-          { icon: '📋', label: 'My Jobs', href: '/dashboard', badgeKey: 'work_orders' },
-          { icon: '📅', label: 'My Schedule', href: '/dashboard/schedule' },
-          { icon: '📸', label: 'Photos', href: '/dashboard/photos' },
-          { icon: '⏱️', label: 'Time Tracking', href: '/dashboard/time-logs' },
-          { icon: '⚙️', label: 'Equipment', href: '/dashboard/equipment' },
-          { icon: '📦', label: 'Materials', href: '/dashboard/materials' },
+          { icon: 'ClipboardList', label: 'My Jobs', href: '/dashboard', badgeKey: 'work_orders' },
+          { icon: 'CalendarDays', label: 'My Schedule', href: '/dashboard/schedule' },
+          { icon: 'Camera', label: 'Photos', href: '/dashboard/photos' },
+          { icon: 'Clock', label: 'Time Tracking', href: '/dashboard/time-logs' },
+          { icon: 'Settings', label: 'Equipment', href: '/dashboard/equipment' },
+          { icon: 'Package', label: 'Materials', href: '/dashboard/materials' },
         ],
       },
       {
         label: 'Job Tools',
         items: [
-          { icon: '✅', label: 'Checklists', href: '/dashboard/checklists' },
-          { icon: '📄', label: 'Proofs & Instructions', href: '/dashboard/proofs' },
-          { icon: '💬', label: 'Job Chat', href: '/dashboard/comms' },
+          { icon: 'CheckSquare', label: 'Checklists', href: '/dashboard/checklists' },
+          { icon: 'File', label: 'Proofs & Instructions', href: '/dashboard/proofs' },
+          { icon: 'MessageSquare', label: 'Job Chat', href: '/dashboard/comms' },
         ],
       },
     ],
@@ -152,18 +153,18 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
       {
         label: 'Design',
         items: [
-          { icon: '🎨', label: 'My Queue', href: '/dashboard', badgeKey: 'design_queue' },
-          { icon: '📤', label: 'Proofs Sent', href: '/dashboard/proofs', badgeKey: 'unread_notifications', badgeVariant: 'amber' },
-          { icon: '⏱️', label: 'Design Hours', href: '/dashboard/hours' },
-          { icon: '💬', label: 'Team Comms', href: '/dashboard/comms' },
+          { icon: 'Palette', label: 'My Queue', href: '/dashboard', badgeKey: 'design_queue' },
+          { icon: 'Upload', label: 'Proofs Sent', href: '/dashboard/proofs', badgeKey: 'unread_notifications', badgeVariant: 'amber' },
+          { icon: 'Clock', label: 'Design Hours', href: '/dashboard/hours' },
+          { icon: 'MessageSquare', label: 'Team Comms', href: '/dashboard/comms' },
         ],
       },
       {
         label: 'Assets',
         items: [
-          { icon: '📁', label: 'Brand Files', href: '/dashboard/brand-files' },
-          { icon: '🧊', label: '3D Rendering', href: '/dashboard/3d' },
-          { icon: '📝', label: 'Job Briefs', href: '/dashboard/briefs' },
+          { icon: 'FolderOpen', label: 'Brand Files', href: '/dashboard/brand-files' },
+          { icon: 'Box', label: '3D Rendering', href: '/dashboard/3d' },
+          { icon: 'BookOpen', label: 'Job Briefs', href: '/dashboard/briefs' },
         ],
       },
     ],
@@ -178,17 +179,17 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
       {
         label: 'My Queue',
         items: [
-          { icon: '🖨️', label: 'Print Queue', href: '/dashboard', badgeKey: 'work_orders' },
-          { icon: '⚙️', label: 'My Equipment', href: '/dashboard/equipment' },
-          { icon: '📦', label: 'Materials', href: '/dashboard/materials' },
-          { icon: '⏱️', label: 'Time Tracking', href: '/dashboard/time-logs' },
+          { icon: 'Printer', label: 'Print Queue', href: '/dashboard', badgeKey: 'work_orders' },
+          { icon: 'Settings', label: 'My Equipment', href: '/dashboard/equipment' },
+          { icon: 'Package', label: 'Materials', href: '/dashboard/materials' },
+          { icon: 'Clock', label: 'Time Tracking', href: '/dashboard/time-logs' },
         ],
       },
       {
         label: 'Jobs',
         items: [
-          { icon: '📋', label: 'Assigned Jobs', href: '/dashboard/jobs' },
-          { icon: '📅', label: 'Schedule', href: '/dashboard/schedule' },
+          { icon: 'ClipboardList', label: 'Assigned Jobs', href: '/dashboard/jobs' },
+          { icon: 'CalendarDays', label: 'Schedule', href: '/dashboard/schedule' },
         ],
       },
     ],

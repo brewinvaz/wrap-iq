@@ -1,11 +1,83 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-dm-mono), ui-monospace, monospace;
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
 }
 
-/* Scrollbar styling */
+/* ── Dark theme (default) ── */
+:root,
+[data-theme="dark"] {
+  --surface-base: #0d0d14;
+  --surface-app: #111118;
+  --surface-card: #15151f;
+  --surface-raised: #18181f;
+  --surface-overlay: #1e1e2a;
+  --border: #2e2e3a;
+  --border-subtle: #1e1e2a;
+
+  --text-primary: #e4e4e7;
+  --text-secondary: #a1a1aa;
+  --text-tertiary: #71717a;
+  --text-muted: #52525b;
+
+  --accent-primary: #a855f7;
+  --accent-secondary: #ec4899;
+
+  --phase-design: #a855f7;
+  --phase-production: #06b6d4;
+  --phase-install: #10b981;
+  --phase-done: #71717a;
+
+  --scrollbar-thumb: #2e2e3a;
+  --scrollbar-thumb-hover: #52525b;
+
+  color-scheme: dark;
+}
+
+/* ── Light theme ── */
+[data-theme="light"] {
+  --surface-base: #f0f0f3;
+  --surface-app: #fafafb;
+  --surface-card: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-overlay: #ffffff;
+  --border: #e4e4e7;
+  --border-subtle: #f0f0f3;
+
+  --text-primary: #18181b;
+  --text-secondary: #52525b;
+  --text-tertiary: #71717a;
+  --text-muted: #a1a1aa;
+
+  --accent-primary: #9333ea;
+  --accent-secondary: #db2777;
+
+  --phase-design: #a855f7;
+  --phase-production: #06b6d4;
+  --phase-install: #10b981;
+  --phase-done: #71717a;
+
+  --scrollbar-thumb: #d1d5db;
+  --scrollbar-thumb-hover: #9ca3af;
+
+  color-scheme: light;
+}
+
+/* ── Grid texture (dark mode only) ── */
+[data-theme="dark"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* ── Scrollbar styling ── */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -16,15 +88,22 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+  background: var(--scrollbar-thumb);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+  background: var(--scrollbar-thumb-hover);
 }
 
-/* Drag ghost styling */
+/* ── Drag ghost styling ── */
 .dragging {
   opacity: 0.5;
+}
+
+/* ── Focus ring utility ── */
+.focus-accent:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.15);
+  border-color: var(--accent-primary);
 }
