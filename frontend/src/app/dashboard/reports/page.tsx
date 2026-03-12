@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { Button } from '@/components/ui/Button';
 import MetricsBar from '@/components/dashboard/MetricsBar';
 import DepartmentCard from '@/components/dashboard/DepartmentCard';
 import InsightsTable from '@/components/dashboard/InsightsTable';
@@ -291,12 +292,9 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
         </div>
         <p className="text-sm font-medium text-[var(--text-primary)]">Failed to load reports</p>
         <p className="text-xs text-[var(--text-secondary)]">{message}</p>
-        <button
-          onClick={onRetry}
-          className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-90"
-        >
+        <Button onClick={onRetry}>
           Retry
-        </button>
+        </Button>
       </div>
     </div>
   );

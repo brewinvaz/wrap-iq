@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { Button } from '@/components/ui/Button';
 import { APIKey, APIKeyScope, APIKeyUsageStats } from '@/lib/types';
 import {
   fetchApiKeys,
@@ -168,12 +169,9 @@ export default function APIKeysPage() {
         <div className="flex flex-1 items-center justify-center">
           <div className="space-y-3 text-center">
             <p className="text-sm text-red-400">{error}</p>
-            <button
-              onClick={loadKeys}
-              className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-90"
-            >
+            <Button onClick={loadKeys}>
               Retry
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -190,12 +188,9 @@ export default function APIKeysPage() {
               {activeCount} active
             </span>
           </div>
-          <button
-            onClick={() => setShowCreate(true)}
-            className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-90"
-          >
+          <Button onClick={() => setShowCreate(true)}>
             + Generate New Key
-          </button>
+          </Button>
         </div>
       </header>
 
@@ -203,12 +198,14 @@ export default function APIKeysPage() {
         {actionError && (
           <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
             {actionError}
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => setActionError(null)}
-              className="ml-2 font-medium underline"
+              className="ml-2 underline"
             >
               Dismiss
-            </button>
+            </Button>
           </div>
         )}
 
@@ -233,9 +230,11 @@ export default function APIKeysPage() {
                 <h3 className="text-lg font-semibold text-[var(--text-primary)]">
                   {selectedKey.name}
                 </h3>
-                <button
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={() => setSelectedKey(null)}
-                  className="rounded-lg p-1 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-overlay)] hover:text-[var(--text-primary)]"
+                  className="text-[var(--text-muted)] hover:bg-[var(--surface-overlay)] hover:text-[var(--text-primary)]"
                 >
                   <svg
                     className="h-5 w-5"
@@ -250,7 +249,7 @@ export default function APIKeysPage() {
                       d="M6 18L18 6M6 6l12 12"
                     />
                   </svg>
-                </button>
+                </Button>
               </div>
 
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">

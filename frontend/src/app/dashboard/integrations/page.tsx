@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/Button';
 import { api, ApiError } from '@/lib/api-client';
 
 interface Webhook {
@@ -118,12 +119,9 @@ export default function IntegrationsPage() {
       <div className="flex h-full flex-col items-center justify-center gap-4">
         <p className="text-sm font-medium text-[var(--text-primary)]">Failed to load integrations</p>
         <p className="text-xs text-[var(--text-secondary)]">{error}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-        >
+        <Button onClick={() => window.location.reload()}>
           Retry
-        </button>
+        </Button>
       </div>
     );
   }
@@ -191,12 +189,13 @@ export default function IntegrationsPage() {
                     >
                       {webhook.is_active ? 'Active' : 'Inactive'}
                     </button>
-                    <button
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={() => testWebhook(webhook.id)}
-                      className="rounded-lg bg-[var(--surface-app)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-raised)]"
                     >
                       Test
-                    </button>
+                    </Button>
                   </div>
                 </div>
               ))}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Clock } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 import { api, ApiError } from '@/lib/api-client';
 
 interface TimeLogUser {
@@ -231,22 +232,21 @@ export default function TimeLogsPage() {
               {total} total
             </span>
           </div>
-          <button
+          <Button
             onClick={handleExportCsv}
             disabled={logs.length === 0}
-            className="rounded-lg bg-[var(--accent-primary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-80 disabled:opacity-50"
           >
             Export CSV
-          </button>
+          </Button>
         </div>
       </header>
 
       {error && (
         <div className="mx-6 mt-4 flex items-center gap-3 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3">
           <span className="text-sm text-red-400">{error}</span>
-          <button onClick={fetchLogs} className="text-sm font-medium text-red-400 underline">
+          <Button variant="danger" size="sm" onClick={fetchLogs} className="underline">
             Retry
-          </button>
+          </Button>
         </div>
       )}
 
@@ -316,12 +316,14 @@ export default function TimeLogsPage() {
                     </td>
                     <td className="px-4 py-3">
                       {log.status === 'submitted' && (
-                        <button
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={() => handleApprove(log.id)}
-                          className="text-xs font-medium text-[var(--phase-install)] hover:opacity-80"
+                          className="text-[var(--phase-install)] hover:opacity-80"
                         >
                           Approve
-                        </button>
+                        </Button>
                       )}
                     </td>
                   </tr>
