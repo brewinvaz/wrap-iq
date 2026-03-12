@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { api, ApiError } from '@/lib/api-client';
+import { Button } from '@/components/ui/Button';
 
 interface ApiKanbanStage {
   id: string;
@@ -230,12 +231,9 @@ export default function SchedulePage() {
       <div className="flex h-full flex-col items-center justify-center gap-4">
         <p className="text-sm font-medium text-[var(--text-primary)]">Failed to load schedule</p>
         <p className="text-xs text-[var(--text-secondary)]">{error}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--accent-primary)]/90"
-        >
+        <Button onClick={() => window.location.reload()}>
           Retry
-        </button>
+        </Button>
       </div>
     );
   }
@@ -251,24 +249,15 @@ export default function SchedulePage() {
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setWeekOffset((w) => w - 1)}
-              className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-overlay)]"
-            >
+            <Button variant="secondary" size="sm" onClick={() => setWeekOffset((w) => w - 1)}>
               ← Prev
-            </button>
-            <button
-              onClick={() => setWeekOffset(0)}
-              className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-overlay)]"
-            >
+            </Button>
+            <Button variant="secondary" size="sm" onClick={() => setWeekOffset(0)}>
               Today
-            </button>
-            <button
-              onClick={() => setWeekOffset((w) => w + 1)}
-              className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-overlay)]"
-            >
+            </Button>
+            <Button variant="secondary" size="sm" onClick={() => setWeekOffset((w) => w + 1)}>
               Next →
-            </button>
+            </Button>
           </div>
         </div>
       </header>
