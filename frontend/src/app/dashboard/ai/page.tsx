@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { api, ApiError } from '@/lib/api-client';
+import { Button } from '@/components/ui/Button';
 import { useModalAccessibility } from '@/hooks/useModalAccessibility';
 
 interface AIQueryResponse {
@@ -248,9 +249,10 @@ function AskAIModal({
               Shop Intelligence
             </span>
           </div>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={handleClose}
-            className="rounded-lg p-1 text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-raised)] hover:text-[var(--text-primary)]"
           >
             <svg
               className="h-5 w-5"
@@ -265,7 +267,7 @@ function AskAIModal({
                 d="M6 18L18 6M6 6l12 12"
               />
             </svg>
-          </button>
+          </Button>
         </div>
 
         {/* Messages */}
@@ -325,13 +327,12 @@ function AskAIModal({
               className="flex-1 rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-secondary)] transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               disabled={isLoading}
             />
-            <button
+            <Button
               type="submit"
               disabled={isLoading || !question.trim()}
-              className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Send
-            </button>
+            </Button>
           </div>
         </form>
       </div>
@@ -417,12 +418,9 @@ export default function AIPage() {
       <div className="flex h-full flex-col items-center justify-center gap-4">
         <p className="text-sm font-medium text-[var(--text-primary)]">Failed to load shop intelligence</p>
         <p className="text-xs text-[var(--text-muted)]">{error}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-        >
+        <Button onClick={() => window.location.reload()}>
           Retry
-        </button>
+        </Button>
       </div>
     );
   }
@@ -437,12 +435,9 @@ export default function AIPage() {
               AI Powered
             </span>
           </div>
-          <button
-            onClick={() => setShowAskAI(true)}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
-          >
+          <Button onClick={() => setShowAskAI(true)}>
             Ask AI
-          </button>
+          </Button>
         </div>
       </header>
 
