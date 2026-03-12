@@ -125,28 +125,28 @@ function formatDate(dateStr: string | null): string {
 function LoadingSkeleton() {
   return (
     <div className="flex h-full flex-col">
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-7 w-40 animate-pulse rounded bg-gray-200" />
-            <div className="h-5 w-16 animate-pulse rounded-full bg-gray-100" />
+            <div className="h-7 w-40 animate-pulse rounded bg-[var(--surface-raised)]" />
+            <div className="h-5 w-16 animate-pulse rounded-full bg-[var(--surface-app)]" />
           </div>
-          <div className="h-9 w-24 animate-pulse rounded-lg bg-gray-200" />
+          <div className="h-9 w-24 animate-pulse rounded-lg bg-[var(--surface-raised)]" />
         </div>
         <div className="mt-3 flex gap-1">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="h-8 w-24 animate-pulse rounded-lg bg-gray-200" />
+            <div key={i} className="h-8 w-24 animate-pulse rounded-lg bg-[var(--surface-raised)]" />
           ))}
         </div>
       </header>
       <div className="flex-1 overflow-auto p-6">
-        <div className="overflow-hidden rounded-xl border border-[#e6e6eb] bg-white">
-          <div className="border-b border-[#e6e6eb] bg-[#f4f4f6] px-4 py-3">
-            <div className="h-4 w-full animate-pulse rounded bg-gray-200" />
+        <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-card)]">
+          <div className="border-b border-[var(--border)] bg-[var(--surface-app)] px-4 py-3">
+            <div className="h-4 w-full animate-pulse rounded bg-[var(--surface-raised)]" />
           </div>
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="border-b border-[#e6e6eb] px-4 py-3">
-              <div className="h-5 w-full animate-pulse rounded bg-gray-100" />
+            <div key={i} className="border-b border-[var(--border)] px-4 py-3">
+              <div className="h-5 w-full animate-pulse rounded bg-[var(--surface-app)]" />
             </div>
           ))}
         </div>
@@ -202,11 +202,11 @@ export default function JobsPage() {
   if (error) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-4">
-        <p className="text-sm font-medium text-[#18181b]">Failed to load jobs</p>
-        <p className="text-xs text-[#60606a]">{error}</p>
+        <p className="text-sm font-medium text-[var(--text-primary)]">Failed to load jobs</p>
+        <p className="text-xs text-[var(--text-secondary)]">{error}</p>
         <button
           onClick={() => fetchJobs()}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
         >
           Retry
         </button>
@@ -216,17 +216,17 @@ export default function JobsPage() {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-[#18181b]">All Jobs Board</h1>
-            <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-[#60606a]">
+            <h1 className="text-xl font-bold text-[var(--text-primary)]">All Jobs Board</h1>
+            <span className="rounded-full bg-[var(--surface-app)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-secondary)]">
               {jobs.length} jobs
             </span>
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+            className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
           >
             + New Job
           </button>
@@ -237,7 +237,7 @@ export default function JobsPage() {
               key={tab.key}
               onClick={() => setFilter(tab.key)}
               className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                filter === tab.key ? 'bg-blue-50 text-blue-700' : 'text-[#60606a] hover:bg-gray-50'
+                filter === tab.key ? 'bg-blue-50 text-blue-700' : 'text-[var(--text-secondary)] hover:bg-[var(--surface-overlay)]'
               }`}
             >
               {tab.label}
@@ -250,38 +250,38 @@ export default function JobsPage() {
       <div className="flex-1 overflow-auto p-6">
         {filtered.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center">
-            <svg className="mb-3 h-10 w-10 text-[#a8a8b4]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <svg className="mb-3 h-10 w-10 text-[var(--text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0" />
             </svg>
-            <p className="text-sm font-medium text-[#60606a]">No jobs found</p>
-            <p className="mt-1 text-xs text-[#a8a8b4]">Jobs will appear here as work orders are created.</p>
+            <p className="text-sm font-medium text-[var(--text-secondary)]">No jobs found</p>
+            <p className="mt-1 text-xs text-[var(--text-muted)]">Jobs will appear here as work orders are created.</p>
           </div>
         ) : (
-          <div className="overflow-hidden rounded-xl border border-[#e6e6eb] bg-white">
+          <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-card)]">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#e6e6eb] bg-[#f4f4f6]">
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Job</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Client</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Vehicle</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Phase</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Status</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#60606a]">Due</th>
+                <tr className="border-b border-[var(--border)] bg-[var(--surface-app)]">
+                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Job</th>
+                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Client</th>
+                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Vehicle</th>
+                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Phase</th>
+                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Status</th>
+                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Due</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.map((job) => {
                   const phase = phaseStyles[job.phase];
                   return (
-                    <tr key={job.id} className="border-b border-[#e6e6eb] last:border-0 hover:bg-[#f4f4f6]/50">
-                      <td className="px-4 py-3 font-medium text-[#18181b]">
+                    <tr key={job.id} className="border-b border-[var(--border)] last:border-0 hover:bg-[var(--surface-overlay)]">
+                      <td className="px-4 py-3 font-medium text-[var(--text-primary)]">
                         {job.jobNumber}
                         {job.jobType && (
-                          <span className="ml-2 text-xs font-normal text-[#a8a8b4]">{job.jobType}</span>
+                          <span className="ml-2 text-xs font-normal text-[var(--text-muted)]">{job.jobType}</span>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-[#60606a]">{job.clientName}</td>
-                      <td className="px-4 py-3 text-[#60606a]">{job.vehicle}</td>
+                      <td className="px-4 py-3 text-[var(--text-secondary)]">{job.clientName}</td>
+                      <td className="px-4 py-3 text-[var(--text-secondary)]">{job.vehicle}</td>
                       <td className="px-4 py-3">
                         <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${phase.bg} ${phase.text}`}>
                           {phase.label}
@@ -298,7 +298,7 @@ export default function JobsPage() {
                           {job.status}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-[#60606a]">{formatDate(job.dueDate)}</td>
+                      <td className="px-4 py-3 text-[var(--text-secondary)]">{formatDate(job.dueDate)}</td>
                     </tr>
                   );
                 })}

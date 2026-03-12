@@ -82,25 +82,25 @@ function transformApiUser(user: ApiUserResponse, index: number): TeamMemberDetai
 function LoadingSkeleton() {
   return (
     <div className="flex h-full flex-col">
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-7 w-48 animate-pulse rounded bg-gray-200" />
-            <div className="h-5 w-20 animate-pulse rounded-full bg-gray-100" />
+            <div className="h-7 w-48 animate-pulse rounded bg-[var(--surface-raised)]" />
+            <div className="h-5 w-20 animate-pulse rounded-full bg-[var(--surface-app)]" />
           </div>
-          <div className="h-9 w-32 animate-pulse rounded-lg bg-gray-200" />
+          <div className="h-9 w-32 animate-pulse rounded-lg bg-[var(--surface-raised)]" />
         </div>
       </header>
       <div className="flex-1 space-y-6 overflow-auto p-6">
         <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="flex animate-pulse items-center gap-4 rounded-xl border border-[#e6e6eb] bg-white p-4">
-              <div className="h-10 w-10 rounded-full bg-gray-200" />
+            <div key={i} className="flex animate-pulse items-center gap-4 rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-4">
+              <div className="h-10 w-10 rounded-full bg-[var(--surface-raised)]" />
               <div className="flex-1 space-y-2">
-                <div className="h-4 w-48 rounded bg-gray-200" />
-                <div className="h-3 w-32 rounded bg-gray-100" />
+                <div className="h-4 w-48 rounded bg-[var(--surface-raised)]" />
+                <div className="h-3 w-32 rounded bg-[var(--surface-app)]" />
               </div>
-              <div className="h-6 w-24 rounded-full bg-gray-100" />
+              <div className="h-6 w-24 rounded-full bg-[var(--surface-app)]" />
             </div>
           ))}
         </div>
@@ -114,8 +114,8 @@ function LoadingSkeleton() {
 function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
     <div className="flex h-full flex-col">
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
-        <h1 className="text-xl font-bold text-[#18181b]">Team Management</h1>
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
+        <h1 className="text-xl font-bold text-[var(--text-primary)]">Team Management</h1>
       </header>
       <div className="flex flex-1 flex-col items-center justify-center gap-4">
         <div className="rounded-full bg-red-100 p-3">
@@ -123,11 +123,11 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.072 16.5c-.77.833.192 2.5 1.732 2.5z" />
           </svg>
         </div>
-        <p className="text-sm font-medium text-[#18181b]">Failed to load team members</p>
-        <p className="text-xs text-[#60606a]">{message}</p>
+        <p className="text-sm font-medium text-[var(--text-primary)]">Failed to load team members</p>
+        <p className="text-xs text-[var(--text-secondary)]">{message}</p>
         <button
           onClick={onRetry}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+          className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
         >
           Retry
         </button>
@@ -220,19 +220,19 @@ export default function TeamPage() {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-[#18181b]">
+            <h1 className="text-xl font-bold text-[var(--text-primary)]">
               Team Management
             </h1>
-            <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-[#60606a]">
+            <span className="rounded-full bg-[var(--surface-app)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-secondary)]">
               {members.length} members
             </span>
           </div>
           <button
             onClick={() => setShowInvite(true)}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+            className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
           >
             + Invite Member
           </button>
