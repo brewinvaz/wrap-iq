@@ -132,9 +132,9 @@ function toScheduleBlock(wo: ApiWorkOrder): ScheduleBlock | null {
 }
 
 const phaseColors: Record<ScheduleBlock['phase'], string> = {
-  design: 'border-l-violet-500 bg-violet-50/50',
-  production: 'border-l-amber-500 bg-amber-50/50',
-  install: 'border-l-emerald-500 bg-emerald-50/50',
+  design: 'border-l-violet-500 bg-violet-500/10',
+  production: 'border-l-amber-500 bg-amber-500/10',
+  install: 'border-l-emerald-500 bg-emerald-500/10',
 };
 
 function LoadingSkeleton() {
@@ -232,7 +232,7 @@ export default function SchedulePage() {
         <p className="text-xs text-[var(--text-secondary)]">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--accent-primary)]/90"
         >
           Retry
         </button>

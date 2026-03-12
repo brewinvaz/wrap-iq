@@ -53,7 +53,7 @@ export default function BrandFilesPage() {
               {filtered.length} files
             </span>
           </div>
-          <button className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700">
+          <button className="rounded-lg bg-[var(--accent-primary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--accent-primary)]/90">
             + Upload File
           </button>
         </div>
@@ -68,7 +68,7 @@ export default function BrandFilesPage() {
           <select
             value={clientFilter}
             onChange={(e) => setClientFilter(e.target.value)}
-            className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)] px-3 py-1.5 text-sm text-[var(--text-primary)] outline-none focus:border-blue-400"
+            className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)] px-3 py-1.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent-primary)]"
           >
             {clients.map((c) => (
               <option key={c}>{c}</option>
@@ -77,7 +77,7 @@ export default function BrandFilesPage() {
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)] px-3 py-1.5 text-sm text-[var(--text-primary)] outline-none focus:border-blue-400"
+            className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)] px-3 py-1.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent-primary)]"
           >
             {fileTypes.map((t) => (
               <option key={t}>{t}</option>

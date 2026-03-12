@@ -41,7 +41,7 @@ export default function MaterialsPage() {
               </span>
             )}
           </div>
-          <button className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700">
+          <button className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--accent-primary)]/90">
             + Add Material
           </button>
         </div>

@@ -44,7 +44,7 @@ export default function ContractsPage() {
               {documents.length} documents
             </span>
           </div>
-          <button className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700">
+          <button className="rounded-lg bg-[var(--accent-primary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--accent-primary)]/90">
             + Upload Document
           </button>
         </div>
@@ -83,7 +83,7 @@ export default function ContractsPage() {
                     </td>
                     <td className="px-4 py-3 text-[var(--text-muted)]">{doc.date}</td>
                     <td className="px-4 py-3">
-                      <button className="text-xs font-medium text-blue-600 hover:text-blue-800">View</button>
+                      <button className="text-xs font-medium text-[var(--accent-primary)] hover:text-[var(--accent-primary)]/80">View</button>
                     </td>
                   </tr>
                 );
