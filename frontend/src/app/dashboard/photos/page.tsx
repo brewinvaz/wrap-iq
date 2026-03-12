@@ -95,15 +95,15 @@ export default function PhotosPage() {
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-[#18181b]">Job Photos</h1>
-            <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-[#60606a]">
+            <h1 className="text-xl font-bold text-[var(--text-primary)]">Job Photos</h1>
+            <span className="rounded-full bg-[var(--surface-app)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-secondary)]">
               {totalPhotos} photos
             </span>
           </div>
-          <button className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700">
+          <button className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700">
             + Upload Photos
           </button>
         </div>
@@ -117,25 +117,25 @@ export default function PhotosPage() {
             return (
               <div
                 key={group.id}
-                className="rounded-lg border border-[#e6e6eb] bg-white"
+                className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)]"
               >
                 {/* Group header */}
                 <button
                   onClick={() =>
                     setExpandedGroup(isExpanded ? null : group.id)
                   }
-                  className="flex w-full items-center justify-between px-5 py-4 text-left transition-colors hover:bg-gray-50"
+                  className="flex w-full items-center justify-between px-5 py-4 text-left transition-colors hover:bg-[var(--surface-overlay)]"
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <p className="text-sm font-semibold text-[#18181b]">
+                      <p className="text-sm font-semibold text-[var(--text-primary)]">
                         {group.jobName}
                       </p>
                       <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-700">
                         {group.photos.length} photos
                       </span>
                     </div>
-                    <p className="mt-0.5 text-xs text-[#60606a]">
+                    <p className="mt-0.5 text-xs text-[var(--text-secondary)]">
                       {group.vehicle} &middot; {group.date}
                     </p>
                   </div>
@@ -144,7 +144,7 @@ export default function PhotosPage() {
                     height="16"
                     fill="none"
                     viewBox="0 0 16 16"
-                    className={`shrink-0 text-[#a8a8b4] transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                    className={`shrink-0 text-[var(--text-muted)] transition-transform ${isExpanded ? 'rotate-180' : ''}`}
                   >
                     <path
                       d="M4 6l4 4 4-4"
@@ -158,12 +158,12 @@ export default function PhotosPage() {
 
                 {/* Photo grid */}
                 {isExpanded && (
-                  <div className="border-t border-[#e6e6eb] px-5 py-4">
+                  <div className="border-t border-[var(--border)] px-5 py-4">
                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                       {group.photos.map((photo) => (
                         <div
                           key={photo.id}
-                          className="group cursor-pointer overflow-hidden rounded-lg border border-[#e6e6eb] transition-shadow hover:shadow-md"
+                          className="group cursor-pointer overflow-hidden rounded-lg border border-[var(--border)] transition-shadow hover:shadow-md"
                         >
                           {/* Placeholder thumbnail */}
                           <div
@@ -174,7 +174,7 @@ export default function PhotosPage() {
                               height="32"
                               fill="none"
                               viewBox="0 0 24 24"
-                              className="text-gray-400"
+                              className="text-[var(--text-muted)]"
                             >
                               <rect
                                 x="3"
@@ -202,10 +202,10 @@ export default function PhotosPage() {
                             </svg>
                           </div>
                           <div className="p-2">
-                            <p className="truncate text-xs font-medium text-[#18181b]">
+                            <p className="truncate text-xs font-medium text-[var(--text-primary)]">
                               {photo.label}
                             </p>
-                            <p className="mt-0.5 font-mono text-[10px] text-[#a8a8b4]">
+                            <p className="mt-0.5 font-mono text-[10px] text-[var(--text-muted)]">
                               {photo.timestamp}
                             </p>
                           </div>
@@ -213,14 +213,14 @@ export default function PhotosPage() {
                       ))}
 
                       {/* Upload placeholder card */}
-                      <div className="flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-[#e6e6eb] transition-colors hover:border-blue-300 hover:bg-blue-50/30">
+                      <div className="flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-[var(--border)] transition-colors hover:border-blue-300 hover:bg-blue-50/30">
                         <div className="py-8 text-center">
                           <svg
                             width="24"
                             height="24"
                             fill="none"
                             viewBox="0 0 24 24"
-                            className="mx-auto text-[#a8a8b4]"
+                            className="mx-auto text-[var(--text-muted)]"
                           >
                             <path
                               d="M12 5v14m-7-7h14"
@@ -229,7 +229,7 @@ export default function PhotosPage() {
                               strokeLinecap="round"
                             />
                           </svg>
-                          <p className="mt-1 text-[10px] font-medium text-[#a8a8b4]">
+                          <p className="mt-1 text-[10px] font-medium text-[var(--text-muted)]">
                             Add Photo
                           </p>
                         </div>

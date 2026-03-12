@@ -105,15 +105,15 @@ export default function BillingPage() {
   if (loading) {
     return (
       <div className="flex h-full flex-col">
-        <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
-          <h1 className="text-xl font-bold text-[#18181b]">
+        <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
+          <h1 className="text-xl font-bold text-[var(--text-primary)]">
             Billing &amp; Subscription
           </h1>
         </header>
         <div className="flex flex-1 items-center justify-center">
           <div className="space-y-3 text-center">
             <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
-            <p className="text-sm text-[#60606a]">Loading billing data...</p>
+            <p className="text-sm text-[var(--text-secondary)]">Loading billing data...</p>
           </div>
         </div>
       </div>
@@ -123,8 +123,8 @@ export default function BillingPage() {
   if (error) {
     return (
       <div className="flex h-full flex-col">
-        <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
-          <h1 className="text-xl font-bold text-[#18181b]">
+        <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
+          <h1 className="text-xl font-bold text-[var(--text-primary)]">
             Billing &amp; Subscription
           </h1>
         </header>
@@ -133,7 +133,7 @@ export default function BillingPage() {
             <p className="text-sm text-red-600">{error}</p>
             <button
               onClick={loadData}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+              className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
             >
               Retry
             </button>
@@ -148,10 +148,10 @@ export default function BillingPage() {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-[#18181b]">
+            <h1 className="text-xl font-bold text-[var(--text-primary)]">
               Billing &amp; Subscription
             </h1>
             {subscription && (
@@ -180,16 +180,16 @@ export default function BillingPage() {
 
         {/* Current plan summary */}
         {subscription && (
-          <div className="rounded-xl border border-[#e6e6eb] bg-white p-6">
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-6">
             <div className="flex items-start justify-between">
               <div>
-                <h2 className="text-base font-semibold text-[#18181b]">
+                <h2 className="text-base font-semibold text-[var(--text-primary)]">
                   Current Plan
                 </h2>
-                <p className="mt-1 text-2xl font-bold text-[#18181b]">
+                <p className="mt-1 text-2xl font-bold text-[var(--text-primary)]">
                   {subscription.planName}
                 </p>
-                <p className="mt-1 text-sm text-[#60606a]">
+                <p className="mt-1 text-sm text-[var(--text-secondary)]">
                   {price === 0 ? 'Free forever' : `$${price}/month`}{' '}
                   &middot; Renews{' '}
                   {new Date(
@@ -221,19 +221,19 @@ export default function BillingPage() {
         />
 
         {/* Payment methods */}
-        <div className="rounded-xl border border-[#e6e6eb] bg-white p-6">
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold text-[#18181b]">
+            <h2 className="text-base font-semibold text-[var(--text-primary)]">
               Payment Methods
             </h2>
-            <button className="rounded-lg border border-[#e6e6eb] px-4 py-2 text-sm font-medium text-[#18181b] transition-colors hover:bg-gray-50">
+            <button className="rounded-lg border border-[var(--border)] px-4 py-2 text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-overlay)]">
               + Add Method
             </button>
           </div>
 
           <div className="mt-4 space-y-3">
             {methods.length === 0 ? (
-              <p className="text-sm text-[#60606a]">
+              <p className="text-sm text-[var(--text-secondary)]">
                 No payment methods on file.
               </p>
             ) : (

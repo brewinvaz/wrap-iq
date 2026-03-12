@@ -140,16 +140,16 @@ const phaseColors: Record<ScheduleBlock['phase'], string> = {
 function LoadingSkeleton() {
   return (
     <div className="flex h-full flex-col">
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-7 w-32 animate-pulse rounded bg-gray-200" />
-            <div className="h-5 w-20 animate-pulse rounded-full bg-gray-100" />
+            <div className="h-7 w-32 animate-pulse rounded bg-[var(--surface-raised)]" />
+            <div className="h-5 w-20 animate-pulse rounded-full bg-[var(--surface-app)]" />
           </div>
           <div className="flex items-center gap-2">
-            <div className="h-8 w-16 animate-pulse rounded-lg bg-gray-200" />
-            <div className="h-8 w-16 animate-pulse rounded-lg bg-gray-200" />
-            <div className="h-8 w-16 animate-pulse rounded-lg bg-gray-200" />
+            <div className="h-8 w-16 animate-pulse rounded-lg bg-[var(--surface-raised)]" />
+            <div className="h-8 w-16 animate-pulse rounded-lg bg-[var(--surface-raised)]" />
+            <div className="h-8 w-16 animate-pulse rounded-lg bg-[var(--surface-raised)]" />
           </div>
         </div>
       </header>
@@ -157,10 +157,10 @@ function LoadingSkeleton() {
         <div className="grid grid-cols-5 gap-4">
           {Array.from({ length: 5 }).map((_, col) => (
             <div key={col}>
-              <div className="mb-3 h-4 w-16 animate-pulse rounded bg-gray-200" />
+              <div className="mb-3 h-4 w-16 animate-pulse rounded bg-[var(--surface-raised)]" />
               <div className="space-y-2">
                 {Array.from({ length: 2 }).map((_, row) => (
-                  <div key={row} className="h-20 animate-pulse rounded-lg bg-gray-100" />
+                  <div key={row} className="h-20 animate-pulse rounded-lg bg-[var(--surface-app)]" />
                 ))}
               </div>
             </div>
@@ -228,11 +228,11 @@ export default function SchedulePage() {
   if (error) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-4">
-        <p className="text-sm font-medium text-[#18181b]">Failed to load schedule</p>
-        <p className="text-xs text-[#60606a]">{error}</p>
+        <p className="text-sm font-medium text-[var(--text-primary)]">Failed to load schedule</p>
+        <p className="text-xs text-[var(--text-secondary)]">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
         >
           Retry
         </button>
@@ -242,30 +242,30 @@ export default function SchedulePage() {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-[#18181b]">Schedule</h1>
-            <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-[#60606a]">
+            <h1 className="text-xl font-bold text-[var(--text-primary)]">Schedule</h1>
+            <span className="rounded-full bg-[var(--surface-app)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-secondary)]">
               {weekLabel}
             </span>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setWeekOffset((w) => w - 1)}
-              className="rounded-lg border border-[#e6e6eb] px-3 py-1.5 text-xs font-medium text-[#60606a] hover:bg-gray-50"
+              className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-overlay)]"
             >
               ← Prev
             </button>
             <button
               onClick={() => setWeekOffset(0)}
-              className="rounded-lg border border-[#e6e6eb] px-3 py-1.5 text-xs font-medium text-[#60606a] hover:bg-gray-50"
+              className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-overlay)]"
             >
               Today
             </button>
             <button
               onClick={() => setWeekOffset((w) => w + 1)}
-              className="rounded-lg border border-[#e6e6eb] px-3 py-1.5 text-xs font-medium text-[#60606a] hover:bg-gray-50"
+              className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-overlay)]"
             >
               Next →
             </button>
@@ -277,7 +277,7 @@ export default function SchedulePage() {
         <div className="grid grid-cols-5 gap-4">
           {weekDays.map((day) => (
             <div key={day.key}>
-              <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#a8a8b4]">
+              <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
                 {day.label}
               </h3>
               <div className="space-y-2">
@@ -286,10 +286,10 @@ export default function SchedulePage() {
                     key={block.id}
                     className={`rounded-lg border-l-[3px] p-3 ${phaseColors[block.phase]}`}
                   >
-                    <p className="text-xs font-semibold text-[#18181b]">{block.jobName}</p>
-                    <p className="mt-0.5 text-[11px] text-[#60606a]">{block.client}</p>
+                    <p className="text-xs font-semibold text-[var(--text-primary)]">{block.jobName}</p>
+                    <p className="mt-0.5 text-[11px] text-[var(--text-secondary)]">{block.client}</p>
                     {block.vehicle && (
-                      <p className="mt-0.5 text-[10px] text-[#a8a8b4]">{block.vehicle}</p>
+                      <p className="mt-0.5 text-[10px] text-[var(--text-muted)]">{block.vehicle}</p>
                     )}
                     <div className="mt-1 flex items-center gap-1.5">
                       <span
@@ -305,7 +305,7 @@ export default function SchedulePage() {
                   </div>
                 ))}
                 {!(scheduleData[day.key]?.length) && (
-                  <div className="rounded-lg border border-dashed border-[#e6e6eb] p-4 text-center text-xs text-[#a8a8b4]">
+                  <div className="rounded-lg border border-dashed border-[var(--border)] p-4 text-center text-xs text-[var(--text-muted)]">
                     No jobs scheduled
                   </div>
                 )}

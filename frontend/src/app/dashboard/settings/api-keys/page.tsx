@@ -142,15 +142,15 @@ export default function APIKeysPage() {
   if (loading) {
     return (
       <div className="flex h-full flex-col">
-        <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+        <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-[#18181b]">API Keys</h1>
+            <h1 className="text-xl font-bold text-[var(--text-primary)]">API Keys</h1>
           </div>
         </header>
         <div className="flex flex-1 items-center justify-center">
           <div className="space-y-3 text-center">
             <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
-            <p className="text-sm text-[#60606a]">Loading API keys...</p>
+            <p className="text-sm text-[var(--text-secondary)]">Loading API keys...</p>
           </div>
         </div>
       </div>
@@ -160,9 +160,9 @@ export default function APIKeysPage() {
   if (error) {
     return (
       <div className="flex h-full flex-col">
-        <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+        <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-[#18181b]">API Keys</h1>
+            <h1 className="text-xl font-bold text-[var(--text-primary)]">API Keys</h1>
           </div>
         </header>
         <div className="flex flex-1 items-center justify-center">
@@ -170,7 +170,7 @@ export default function APIKeysPage() {
             <p className="text-sm text-red-600">{error}</p>
             <button
               onClick={loadKeys}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+              className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
             >
               Retry
             </button>
@@ -182,17 +182,17 @@ export default function APIKeysPage() {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-[#18181b]">API Keys</h1>
-            <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-[#60606a]">
+            <h1 className="text-xl font-bold text-[var(--text-primary)]">API Keys</h1>
+            <span className="rounded-full bg-[var(--surface-app)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-secondary)]">
               {activeCount} active
             </span>
           </div>
           <button
             onClick={() => setShowCreate(true)}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+            className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
           >
             + Generate New Key
           </button>
@@ -228,14 +228,14 @@ export default function APIKeysPage() {
 
         {selectedKey && (
           <div className="space-y-4">
-            <div className="rounded-xl border border-[#e6e6eb] bg-white p-6">
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-6">
               <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-[#18181b]">
+                <h3 className="text-lg font-semibold text-[var(--text-primary)]">
                   {selectedKey.name}
                 </h3>
                 <button
                   onClick={() => setSelectedKey(null)}
-                  className="rounded-lg p-1 text-[#a8a8b4] transition-colors hover:bg-gray-100 hover:text-[#18181b]"
+                  className="rounded-lg p-1 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-overlay)] hover:text-[var(--text-primary)]"
                 >
                   <svg
                     className="h-5 w-5"
@@ -255,18 +255,18 @@ export default function APIKeysPage() {
 
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                 <div>
-                  <p className="text-xs text-[#60606a]">Key Prefix</p>
-                  <code className="text-sm font-medium text-[#18181b]">
+                  <p className="text-xs text-[var(--text-secondary)]">Key Prefix</p>
+                  <code className="text-sm font-medium text-[var(--text-primary)]">
                     {selectedKey.keyPrefix}...
                   </code>
                 </div>
                 <div>
-                  <p className="text-xs text-[#60606a]">Status</p>
+                  <p className="text-xs text-[var(--text-secondary)]">Status</p>
                   <span
                     className={`inline-flex items-center gap-1.5 text-sm font-medium ${
                       selectedKey.isActive
                         ? 'text-emerald-700'
-                        : 'text-gray-500'
+                        : 'text-[var(--text-secondary)]'
                     }`}
                   >
                     <span
@@ -280,15 +280,15 @@ export default function APIKeysPage() {
                   </span>
                 </div>
                 <div>
-                  <p className="text-xs text-[#60606a]">Rate Limit</p>
-                  <p className="text-sm font-medium text-[#18181b]">
+                  <p className="text-xs text-[var(--text-secondary)]">Rate Limit</p>
+                  <p className="text-sm font-medium text-[var(--text-primary)]">
                     {selectedKey.rateLimitPerMinute}/min,{' '}
                     {selectedKey.rateLimitPerDay.toLocaleString()}/day
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-[#60606a]">Expires</p>
-                  <p className="text-sm font-medium text-[#18181b]">
+                  <p className="text-xs text-[var(--text-secondary)]">Expires</p>
+                  <p className="text-sm font-medium text-[var(--text-primary)]">
                     {selectedKey.expiresAt
                       ? new Date(selectedKey.expiresAt).toLocaleDateString()
                       : 'Never'}
@@ -297,7 +297,7 @@ export default function APIKeysPage() {
               </div>
 
               <div className="mt-4">
-                <p className="mb-2 text-xs text-[#60606a]">Scopes</p>
+                <p className="mb-2 text-xs text-[var(--text-secondary)]">Scopes</p>
                 <div className="flex flex-wrap gap-2">
                   {selectedKey.scopes.map((scope) => (
                     <span
