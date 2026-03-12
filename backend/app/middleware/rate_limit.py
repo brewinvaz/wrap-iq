@@ -1,10 +1,14 @@
 """Rate limiting middleware using slowapi with Redis backend."""
 
+import logging
+
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from starlette.requests import Request
 
 from app.config import settings
+
+logger = logging.getLogger("wrapiq")
 
 
 def get_real_ip(request: Request) -> str:
@@ -34,8 +38,18 @@ def get_real_ip(request: Request) -> str:
 
 
 # Use Redis for distributed rate limiting across workers.
+# Fall back to in-memory storage if REDIS_URL is not explicitly configured,
+# so the app still starts without Redis.
+import os
+
+_storage_uri: str | None = None
+if os.environ.get("REDIS_URL"):
+    _storage_uri = settings.redis_url
+else:
+    logger.info("Rate limiter: using in-memory storage (REDIS_URL not set)")
+
 limiter = Limiter(
     key_func=get_real_ip,
-    storage_uri=settings.redis_url,
+    storage_uri=_storage_uri,
     headers_enabled=True,
 )
