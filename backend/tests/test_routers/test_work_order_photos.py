@@ -1,7 +1,7 @@
 """Tests for work order photo endpoints."""
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -98,7 +98,7 @@ class TestRegisterPhotos:
     async def test_registers_photos_successfully(
         self, mock_download, mock_validate, mock_r2, client, mock_session
     ):
-        now = datetime.now(tz=timezone.utc)
+        now = datetime.now(tz=UTC)
 
         # Patch commit to set timestamps on FileUpload objects added to session
         added_objects: list[FileUpload] = []
@@ -233,7 +233,7 @@ class TestUpdatePhoto:
     async def test_update_photo_type(
         self, mock_download, mock_r2, client, mock_session
     ):
-        now = datetime.now(tz=timezone.utc)
+        now = datetime.now(tz=UTC)
         upload = MagicMock(spec=FileUpload)
         upload.id = PHOTO_ID
         upload.filename = "photo.jpg"

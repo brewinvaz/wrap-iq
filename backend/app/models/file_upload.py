@@ -19,7 +19,9 @@ class FileUpload(Base, TenantMixin, TimestampMixin):
     filename: Mapped[str] = mapped_column(String(255))
     content_type: Mapped[str] = mapped_column(String(100))
     size_bytes: Mapped[int] = mapped_column(Integer)
-    photo_type: Mapped[str | None] = mapped_column(String(20), nullable=True, index=True)
+    photo_type: Mapped[str | None] = mapped_column(
+        String(20), nullable=True, index=True
+    )
     caption: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
     uploader = relationship("User", lazy="selectin")
