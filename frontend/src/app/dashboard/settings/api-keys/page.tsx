@@ -149,7 +149,7 @@ export default function APIKeysPage() {
         </header>
         <div className="flex flex-1 items-center justify-center">
           <div className="space-y-3 text-center">
-            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-[var(--accent-primary)] border-t-transparent" />
             <p className="text-sm text-[var(--text-secondary)]">Loading API keys...</p>
           </div>
         </div>
@@ -167,10 +167,10 @@ export default function APIKeysPage() {
         </header>
         <div className="flex flex-1 items-center justify-center">
           <div className="space-y-3 text-center">
-            <p className="text-sm text-red-600">{error}</p>
+            <p className="text-sm text-red-400">{error}</p>
             <button
               onClick={loadKeys}
-              className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+              className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-90"
             >
               Retry
             </button>
@@ -192,7 +192,7 @@ export default function APIKeysPage() {
           </div>
           <button
             onClick={() => setShowCreate(true)}
-            className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+            className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-90"
           >
             + Generate New Key
           </button>
@@ -201,7 +201,7 @@ export default function APIKeysPage() {
 
       <div className="flex-1 space-y-6 overflow-auto p-6">
         {actionError && (
-          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
             {actionError}
             <button
               onClick={() => setActionError(null)}
@@ -265,15 +265,15 @@ export default function APIKeysPage() {
                   <span
                     className={`inline-flex items-center gap-1.5 text-sm font-medium ${
                       selectedKey.isActive
-                        ? 'text-emerald-700'
+                        ? 'text-emerald-400'
                         : 'text-[var(--text-secondary)]'
                     }`}
                   >
                     <span
                       className={`h-1.5 w-1.5 rounded-full ${
                         selectedKey.isActive
-                          ? 'bg-emerald-500'
-                          : 'bg-gray-400'
+                          ? 'bg-emerald-400'
+                          : 'bg-[var(--text-muted)]'
                       }`}
                     />
                     {selectedKey.isActive ? 'Active' : 'Revoked'}
@@ -302,7 +302,7 @@ export default function APIKeysPage() {
                   {selectedKey.scopes.map((scope) => (
                     <span
                       key={scope}
-                      className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700"
+                      className="rounded-full bg-[var(--accent-primary)]/10 px-3 py-1 text-xs font-medium text-[var(--accent-primary)]"
                     >
                       {scope}
                     </span>
