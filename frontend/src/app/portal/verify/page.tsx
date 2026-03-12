@@ -74,12 +74,12 @@ function VerifyContent() {
 
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
-      <div className="w-full max-w-md rounded-xl border border-[#e6e6eb] bg-white p-8 shadow-sm">
+      <div className="w-full max-w-md rounded-[12px] border border-[var(--border)] bg-[var(--surface-card)] p-8 shadow-sm">
         {state === 'verifying' && (
           <div className="text-center">
-            <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-[#e6e6eb] border-t-blue-600" />
-            <h2 className="text-lg font-semibold text-[#18181b]">Verifying your link...</h2>
-            <p className="mt-2 text-[14px] text-[#60606a]">Please wait while we sign you in.</p>
+            <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-[var(--border)] border-t-[var(--accent-primary)]" />
+            <h2 className="text-lg font-semibold text-[var(--text-primary)]">Verifying your link...</h2>
+            <p className="mt-2 text-[14px] text-[var(--text-secondary)]">Please wait while we sign you in.</p>
           </div>
         )}
 
@@ -96,8 +96,8 @@ function VerifyContent() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
               </svg>
             </div>
-            <h2 className="text-lg font-semibold text-[#18181b]">Signed in successfully</h2>
-            <p className="mt-2 text-[14px] text-[#60606a]">Redirecting to your portal...</p>
+            <h2 className="text-lg font-semibold text-[var(--text-primary)]">Signed in successfully</h2>
+            <p className="mt-2 text-[14px] text-[var(--text-secondary)]">Redirecting to your portal...</p>
           </div>
         )}
 
@@ -114,33 +114,33 @@ function VerifyContent() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </div>
-            <h2 className="text-lg font-semibold text-[#18181b]">Link expired or invalid</h2>
-            <p className="mt-2 text-[14px] text-[#60606a]">
+            <h2 className="text-lg font-semibold text-[var(--text-primary)]">Link expired or invalid</h2>
+            <p className="mt-2 text-[14px] text-[var(--text-secondary)]">
               This magic link has expired or has already been used.
             </p>
 
             {!requestSent ? (
               <div className="mt-6">
-                <p className="mb-3 text-[13px] text-[#60606a]">Request a new link:</p>
+                <p className="mb-3 text-[13px] text-[var(--text-secondary)]">Request a new link:</p>
                 <div className="flex gap-2">
                   <input
                     type="email"
                     placeholder="your@email.com"
                     value={requestEmail}
                     onChange={(e) => setRequestEmail(e.target.value)}
-                    className="flex-1 rounded-lg border border-[#e6e6eb] px-3 py-2 text-[14px] text-[#18181b] placeholder-[#a8a8b4] outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="flex-1 rounded-[10px] border border-[var(--border)] bg-[var(--surface-raised)] px-[10px] py-2 text-[14px] text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)]"
                   />
                   <button
                     onClick={handleRequestNewLink}
-                    className="rounded-lg bg-blue-600 px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-blue-700"
+                    className="rounded-[10px] bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-[13px] font-medium text-white transition-opacity hover:opacity-90"
                   >
                     Send
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="mt-6 rounded-lg bg-blue-50 p-3">
-                <p className="text-[13px] text-blue-700">
+              <div className="mt-6 rounded-[10px] bg-[var(--accent-primary)]/10 p-3">
+                <p className="text-[13px] text-[var(--accent-primary)]">
                   If that email is registered, a new magic link has been sent. Check your inbox.
                 </p>
               </div>
@@ -157,7 +157,7 @@ export default function PortalVerifyPage() {
     <Suspense
       fallback={
         <div className="flex min-h-[60vh] items-center justify-center">
-          <div className="h-10 w-10 animate-spin rounded-full border-2 border-[#e6e6eb] border-t-blue-600" />
+          <div className="h-10 w-10 animate-spin rounded-full border-2 border-[var(--border)] border-t-[var(--accent-primary)]" />
         </div>
       }
     >

@@ -38,44 +38,44 @@ export default function SharedRenderPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f4f4f6]">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+      <div className="flex min-h-screen items-center justify-center bg-[var(--surface-app)]">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--accent-primary)] border-t-transparent" />
       </div>
     );
   }
 
   if (error || !render) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-[#f4f4f6]">
-        <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-[#18181b]">
-          <span className="font-mono text-sm font-bold text-white">WF</span>
+      <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--surface-app)]">
+        <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)]">
+          <span className="font-mono text-sm font-bold text-white">W</span>
         </div>
-        <h1 className="text-lg font-semibold text-[#18181b]">Render Not Found</h1>
-        <p className="mt-1 text-sm text-[#60606a]">{error || 'This render may have been deleted.'}</p>
+        <h1 className="text-lg font-semibold text-[var(--text-primary)]">Render Not Found</h1>
+        <p className="mt-1 text-sm text-[var(--text-secondary)]">{error || 'This render may have been deleted.'}</p>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-[#f4f4f6] px-4 py-8">
+    <div className="flex min-h-screen flex-col items-center bg-[var(--surface-app)] px-4 py-8">
       <div className="mb-6 flex items-center gap-2">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#18181b]">
-          <span className="font-mono text-xs font-bold text-white">WF</span>
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)]">
+          <span className="font-mono text-xs font-bold text-white">W</span>
         </div>
-        <span className="text-sm font-medium text-[#60606a]">
-          Wrap<span className="text-blue-600">Flow</span>
+        <span className="text-sm font-medium text-[var(--text-secondary)]">
+          Wrap<span className="text-[var(--accent-primary)]">Flow</span>
         </span>
       </div>
 
-      <div className="w-full max-w-3xl overflow-hidden rounded-2xl border border-[#e6e6eb] bg-white shadow-sm">
+      <div className="w-full max-w-3xl overflow-hidden rounded-[12px] border border-[var(--border)] bg-[var(--surface-card)] shadow-sm">
         <img
           src={render.result_image_url}
           alt={render.design_name}
           className="w-full object-contain"
         />
-        <div className="border-t border-[#e6e6eb] px-6 py-4">
-          <h1 className="text-lg font-semibold text-[#18181b]">{render.design_name}</h1>
-          <p className="mt-1 text-sm text-[#a8a8b4]">
+        <div className="border-t border-[var(--border)] px-6 py-4">
+          <h1 className="text-lg font-semibold text-[var(--text-primary)]">{render.design_name}</h1>
+          <p className="mt-1 text-sm text-[var(--text-muted)]">
             Created {new Date(render.created_at).toLocaleDateString()}
           </p>
         </div>
