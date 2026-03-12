@@ -4,7 +4,6 @@ import { useState, useCallback, useRef } from 'react';
 import { RoleProvider } from '@/lib/role-context';
 import { SidebarProvider } from '@/lib/sidebar-context';
 import { UserProvider } from '@/lib/user-context';
-import { ThemeProvider } from '@/lib/theme';
 import AuthGuard from '@/components/AuthGuard';
 import IconRail from '@/components/IconRail';
 import FlyoutPanel from '@/components/FlyoutPanel';
@@ -44,7 +43,6 @@ export default function DashboardLayout({
       <RoleProvider>
         <UserProvider>
           <SidebarProvider>
-            <ThemeProvider>
               <div className="flex h-screen bg-[var(--surface-app)]">
                 <IconRail
                   onHoverGroup={showFlyout}
@@ -60,7 +58,6 @@ export default function DashboardLayout({
                 </main>
                 <CommandPalette />
               </div>
-            </ThemeProvider>
           </SidebarProvider>
         </UserProvider>
       </RoleProvider>

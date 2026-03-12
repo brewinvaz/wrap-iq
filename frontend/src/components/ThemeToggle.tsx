@@ -1,33 +1,36 @@
 'use client';
 
 import { Moon, Sun, Monitor } from 'lucide-react';
-import { useTheme } from '@/lib/theme';
+import { useTheme, type Theme } from '@/lib/theme';
+
+const CYCLE: Theme[] = ['dark', 'light', 'system'];
 
 export default function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { theme, resolvedTheme, setTheme } = useTheme();
 
-  const options = [
-    { value: 'dark' as const, icon: Moon, label: 'Dark' },
-    { value: 'light' as const, icon: Sun, label: 'Light' },
-    { value: 'system' as const, icon: Monitor, label: 'System' },
-  ];
+  function cycleTheme() {
+    const currentIndex = CYCLE.indexOf(theme);
+    const nextIndex = (currentIndex + 1) % CYCLE.length;
+    setTheme(CYCLE[nextIndex]);
+  }
+
+  const label =
+    theme === 'system'
+      ? `System (${resolvedTheme})`
+      : theme === 'dark'
+        ? 'Dark mode'
+        : 'Light mode';
+
+  const Icon = theme === 'system' ? Monitor : resolvedTheme === 'dark' ? Sun : Moon;
 
   return (
-    <div className="flex gap-0.5 rounded-lg bg-[var(--surface-raised)] p-0.5 border border-[var(--border)]">
-      {options.map(({ value, icon: Icon, label }) => (
-        <button
-          key={value}
-          onClick={() => setTheme(value)}
-          aria-label={label}
-          className={`flex h-7 w-7 items-center justify-center rounded-md transition-colors ${
-            theme === value
-              ? 'bg-[var(--accent-primary)] text-white'
-              : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
-          }`}
-        >
-          <Icon size={14} />
-        </button>
-      ))}
-    </div>
+    <button
+      onClick={cycleTheme}
+      title={label}
+      aria-label={label}
+      className="flex h-[42px] w-[42px] items-center justify-center rounded-xl text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-overlay)] hover:text-[var(--text-secondary)]"
+    >
+      <Icon size={20} />
+    </button>
   );
 }
