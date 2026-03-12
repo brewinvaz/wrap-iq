@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { api, ApiError } from '@/lib/api-client';
 import { setTokens, isAuthenticated } from '@/lib/auth';
+import { Button } from '@/components/ui/Button';
 
 interface AuthResponse {
   access_token: string;
@@ -165,13 +166,14 @@ export default function RegisterPage() {
               <p className="text-[13px] text-red-400">{error}</p>
             )}
 
-            <button
+            <Button
               type="submit"
-              disabled={loading}
-              className="flex h-10 w-full items-center justify-center rounded-[10px] bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-[14px] font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+              size="lg"
+              loading={loading}
+              className="w-full"
             >
               {loading ? 'Creating account...' : 'Create account'}
-            </button>
+            </Button>
           </form>
         </div>
 
