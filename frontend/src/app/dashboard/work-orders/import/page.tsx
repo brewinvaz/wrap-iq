@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, type DragEvent, type ChangeEvent } from 'react';
 import Link from 'next/link';
+import { Button } from '@/components/ui/Button';
 import { ApiError } from '@/lib/api-client';
 import { API_BASE_URL } from '@/lib/config';
 import { getAccessToken } from '@/lib/auth';
@@ -185,12 +186,14 @@ export default function ImportWorkOrdersPage() {
       {error && (
         <div className="mx-6 mt-4 flex items-center gap-3 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3">
           <span className="text-sm text-red-400">{error}</span>
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => setError(null)}
-            className="ml-auto text-sm font-medium text-red-400 underline"
+            className="ml-auto text-red-400 underline"
           >
             Dismiss
-          </button>
+          </Button>
         </div>
       )}
 
@@ -253,12 +256,9 @@ export default function ImportWorkOrdersPage() {
                     Download a pre-formatted template with the expected columns.
                   </p>
                 </div>
-                <button
-                  onClick={handleDownloadTemplate}
-                  className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)] px-4 py-2 text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-raised)]"
-                >
+                <Button variant="secondary" onClick={handleDownloadTemplate}>
                   Download Template
-                </button>
+                </Button>
               </div>
             </div>
           )}
@@ -352,18 +352,12 @@ export default function ImportWorkOrdersPage() {
 
               {/* Actions */}
               <div className="flex items-center gap-3">
-                <button
-                  onClick={handleUpload}
-                  className="rounded-lg bg-[var(--accent-primary)] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[var(--accent-primary)]/80"
-                >
+                <Button size="lg" onClick={handleUpload}>
                   Import {preview.total_rows} Work Orders
-                </button>
-                <button
-                  onClick={handleReset}
-                  className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)] px-5 py-2.5 text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-raised)]"
-                >
+                </Button>
+                <Button variant="secondary" size="lg" onClick={handleReset}>
                   Cancel
-                </button>
+                </Button>
               </div>
             </div>
           )}
@@ -430,12 +424,9 @@ export default function ImportWorkOrdersPage() {
                 >
                   View Work Orders
                 </Link>
-                <button
-                  onClick={handleReset}
-                  className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)] px-5 py-2.5 text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-raised)]"
-                >
+                <Button variant="secondary" size="lg" onClick={handleReset}>
                   Import Another File
-                </button>
+                </Button>
               </div>
             </div>
           )}

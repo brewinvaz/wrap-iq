@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { Button } from '@/components/ui/Button';
 import { api, ApiError } from '@/lib/api-client';
 
 type FilterTab = 'all' | 'unread' | 'read';
@@ -218,12 +219,9 @@ export default function CommsPage() {
       <div className="flex h-full flex-col items-center justify-center gap-4">
         <p className="text-sm font-medium text-[var(--text-primary)]">Failed to load communications</p>
         <p className="text-xs text-[var(--text-muted)]">{error}</p>
-        <button
-          onClick={() => fetchData()}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-        >
+        <Button onClick={() => fetchData()}>
           Retry
-        </button>
+        </Button>
       </div>
     );
   }
@@ -239,13 +237,15 @@ export default function CommsPage() {
             </span>
           </div>
           {unreadCount > 0 && (
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={handleMarkAllRead}
               disabled={markingRead}
-              className="text-xs font-medium text-[var(--accent-primary)] hover:text-[var(--accent-primary)]/80 disabled:opacity-50"
+              className="text-[var(--accent-primary)] hover:text-[var(--accent-primary)]/80"
             >
               {markingRead ? 'Marking...' : 'Mark all as read'}
-            </button>
+            </Button>
           )}
         </div>
       </header>
@@ -364,15 +364,16 @@ export default function CommsPage() {
               </p>
               <div className="flex flex-wrap gap-2">
                 {templates.map((t) => (
-                  <button
+                  <Button
                     key={t.id}
+                    variant="secondary"
+                    size="sm"
                     onClick={() => handleSendTemplate(t.id)}
                     disabled={sendingTemplate === t.id}
-                    className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-xs font-medium text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-overlay)] disabled:opacity-50"
                     title={t.subject}
                   >
                     {sendingTemplate === t.id ? 'Sending...' : t.name}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>

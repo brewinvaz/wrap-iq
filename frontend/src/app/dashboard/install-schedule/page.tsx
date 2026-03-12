@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { CalendarDays } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 import { api, ApiError } from '@/lib/api-client';
 
 type ViewMode = 'list' | 'week';
@@ -256,12 +257,9 @@ export default function InstallSchedulePage() {
       <div className="flex h-full flex-col items-center justify-center gap-4">
         <p className="text-sm font-medium text-[var(--text-primary)]">Failed to load install schedule</p>
         <p className="text-xs text-[var(--text-secondary)]">{error}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="rounded-lg bg-[var(--accent-primary)] px-4 py-2 text-sm font-medium text-white hover:opacity-80"
-        >
+        <Button onClick={() => window.location.reload()}>
           Retry
-        </button>
+        </Button>
       </div>
     );
   }

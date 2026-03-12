@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Printer, X, Check } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 import Select from '@/components/ui/Select';
 import { api, ApiError } from '@/lib/api-client';
 import { useModalAccessibility } from '@/hooks/useModalAccessibility';
@@ -140,9 +141,9 @@ function SuccessToast({ message, onDismiss }: { message: string; onDismiss: () =
     <div className="fixed bottom-6 right-6 z-[60] flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-sm font-medium text-white shadow-lg">
       <Check className="h-4 w-4 shrink-0" strokeWidth={2} />
       {message}
-      <button onClick={onDismiss} className="ml-2 rounded p-0.5 hover:bg-emerald-500">
+      <Button variant="ghost" size="icon" onClick={onDismiss} className="ml-2 p-0.5 hover:bg-emerald-500">
         <X className="h-3.5 w-3.5" strokeWidth={2} />
-      </button>
+      </Button>
     </div>
   );
 }
@@ -282,12 +283,14 @@ function AddToQueueModal({ isOpen, onClose, onAdd }: AddToQueueModalProps) {
           <h3 id="add-queue-title" className="text-lg font-semibold text-[var(--text-primary)]">
             Add to Print Queue
           </h3>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onClose}
-            className="rounded-lg p-1 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-raised)] hover:text-[var(--text-primary)]"
+            className="text-[var(--text-muted)] hover:bg-[var(--surface-raised)] hover:text-[var(--text-primary)]"
           >
             <X className="h-5 w-5" strokeWidth={1.5} />
-          </button>
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -400,20 +403,22 @@ function AddToQueueModal({ isOpen, onClose, onAdd }: AddToQueueModalProps) {
 
           {/* Actions */}
           <div className="flex items-center gap-3 pt-2">
-            <button
+            <Button
               type="button"
+              variant="secondary"
               onClick={onClose}
-              className="flex-1 rounded-lg border border-[var(--border)] px-4 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-raised)]"
+              className="flex-1"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 rounded-lg bg-[var(--accent-primary)] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
+              loading={isSubmitting}
+              className="flex-1"
             >
-              {isSubmitting ? 'Adding...' : 'Add to Queue'}
-            </button>
+              Add to Queue
+            </Button>
           </div>
         </form>
       </div>
@@ -490,12 +495,9 @@ export default function PrintPage() {
       <div className="flex h-full flex-col items-center justify-center gap-4">
         <p className="text-sm font-medium text-[var(--text-primary)]">Failed to load print queue</p>
         <p className="text-xs text-[var(--text-secondary)]">{error}</p>
-        <button
-          onClick={() => setFetchKey((k) => k + 1)}
-          className="rounded-lg bg-[var(--accent-primary)] px-4 py-2 text-sm font-medium text-white hover:opacity-80"
-        >
+        <Button onClick={() => setFetchKey((k) => k + 1)}>
           Retry
-        </button>
+        </Button>
       </div>
     );
   }
@@ -510,12 +512,9 @@ export default function PrintPage() {
               {jobs.length} jobs
             </span>
           </div>
-          <button
-            onClick={() => setModalOpen(true)}
-            className="rounded-lg bg-[var(--accent-primary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-80"
-          >
+          <Button onClick={() => setModalOpen(true)}>
             + Add to Queue
-          </button>
+          </Button>
         </div>
         <div className="mt-3 flex gap-1">
           {tabs.map((tab) => (

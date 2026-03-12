@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Client } from '@/lib/types';
 import { api, ApiError } from '@/lib/api-client';
 import { formatCurrency } from '@/lib/format';
+import { Button } from '@/components/ui/Button';
 
 const tagColors: Record<string, string> = {
   VIP: 'bg-amber-500/10 text-amber-400',
@@ -167,36 +168,34 @@ export default function ClientDetail({ client, onClientUpdated }: ClientDetailPr
           <div className="flex gap-2">
             {isEditing ? (
               <>
-                <button
+                <Button
+                  variant="secondary"
                   onClick={handleCancelEdit}
                   disabled={editSaving}
-                  className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)] px-4 py-2 text-sm font-medium text-[var(--text-primary)] shadow-sm transition-colors hover:bg-[var(--surface-raised)] disabled:opacity-50"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={handleSaveEdit}
-                  disabled={editSaving}
-                  className="rounded-lg bg-[var(--accent-primary)] px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-[var(--accent-primary)]/90 disabled:opacity-50"
+                  loading={editSaving}
                 >
-                  {editSaving ? 'Saving...' : 'Save'}
-                </button>
+                  Save
+                </Button>
               </>
             ) : (
               <>
-                <button
+                <Button
+                  variant="secondary"
                   onClick={handleStartEdit}
-                  className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)] px-4 py-2 text-sm font-medium text-[var(--text-primary)] shadow-sm transition-colors hover:bg-[var(--surface-raised)]"
                 >
                   Edit
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={handleEmail}
                   disabled={!client.email}
-                  className="rounded-lg bg-[var(--accent-primary)] px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-[var(--accent-primary)]/90 disabled:opacity-50"
                 >
                   Email
-                </button>
+                </Button>
               </>
             )}
           </div>
@@ -387,13 +386,13 @@ export default function ClientDetail({ client, onClientUpdated }: ClientDetailPr
             placeholder="Add notes about this client..."
           />
           <div className="mt-2 flex items-center gap-3">
-            <button
+            <Button
               onClick={handleSaveNotes}
               disabled={saving || !isDirty}
-              className="rounded-lg bg-[var(--accent-primary)] px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-[var(--accent-primary)]/90 disabled:cursor-not-allowed disabled:opacity-50"
+              loading={saving}
             >
-              {saving ? 'Saving...' : 'Save Notes'}
-            </button>
+              Save Notes
+            </Button>
             {feedback && (
               <span
                 className={`text-sm font-medium ${

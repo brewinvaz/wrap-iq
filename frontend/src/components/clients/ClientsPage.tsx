@@ -6,6 +6,7 @@ import { api, ApiError } from '@/lib/api-client';
 import ClientList from './ClientList';
 import ClientDetail from './ClientDetail';
 import CreateClientModal from './CreateClientModal';
+import { Button } from '@/components/ui/Button';
 
 // --- API response types ---
 
@@ -107,12 +108,9 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
       </div>
       <p className="text-sm font-medium text-[var(--text-primary)]">Failed to load clients</p>
       <p className="text-xs text-[var(--text-secondary)]">{message}</p>
-      <button
-        onClick={onRetry}
-        className="rounded-lg bg-[var(--accent-primary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--accent-primary)]/90"
-      >
+      <Button onClick={onRetry}>
         Retry
-      </button>
+      </Button>
     </div>
   );
 }
@@ -161,12 +159,9 @@ export default function ClientsPage() {
             {clients.length} total
           </span>
         </div>
-        <button
-          onClick={() => setIsAddModalOpen(true)}
-          className="rounded-lg bg-[var(--accent-primary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--accent-primary)]/90"
-        >
+        <Button onClick={() => setIsAddModalOpen(true)}>
           + New Client
-        </button>
+        </Button>
       </header>
 
       <div className="flex min-h-0 flex-1">

@@ -1,6 +1,7 @@
 'use client';
 
 import type { ContactData } from '@/app/onboarding/[token]/page';
+import { Button } from '@/components/ui/Button';
 
 interface Props {
   data: ContactData;
@@ -88,13 +89,13 @@ export function ContactStep({ data, onChange, onNext }: Props) {
       </div>
 
       <div className="mt-6 flex justify-end">
-        <button
+        <Button
           type="submit"
           disabled={!isValid}
-          className="rounded-[10px] bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-5 py-2.5 text-[13px] font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          size="lg"
         >
           Next
-        </button>
+        </Button>
       </div>
     </form>
   );

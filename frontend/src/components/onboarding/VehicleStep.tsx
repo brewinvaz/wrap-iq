@@ -4,6 +4,7 @@ import { useState } from 'react';
 import type { VehicleData } from '@/app/onboarding/[token]/page';
 import { API_BASE_URL } from '@/lib/config';
 import Select from '@/components/ui/Select';
+import { Button } from '@/components/ui/Button';
 
 const API_BASE = API_BASE_URL;
 
@@ -95,21 +96,15 @@ export function VehicleStep({ data, onChange, token, onBack, onNext }: Props) {
             className="flex-1 rounded-[10px] border border-[var(--border)] bg-[var(--surface-raised)] px-[10px] py-[10px] font-mono text-[14px] text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)]"
             placeholder="1HGCM82633A123456"
           />
-          <button
+          <Button
             type="button"
             onClick={handleVinDecode}
             disabled={vinLoading || data.vin.length < 17}
-            className="rounded-[10px] border border-[var(--border)] bg-[var(--surface-card)] px-4 py-2 text-[13px] font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-raised)] disabled:cursor-not-allowed disabled:opacity-50"
+            variant="secondary"
+            loading={vinLoading}
           >
-            {vinLoading ? (
-              <span className="flex items-center gap-1.5">
-                <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[var(--border)] border-t-[var(--accent-primary)]" />
-                Looking up...
-              </span>
-            ) : (
-              'Decode'
-            )}
-          </button>
+            Decode
+          </Button>
         </div>
         {vinError && (
           <p className="mt-1.5 text-[12px] text-red-400">{vinError}</p>
@@ -164,19 +159,20 @@ export function VehicleStep({ data, onChange, token, onBack, onNext }: Props) {
       </div>
 
       <div className="mt-6 flex justify-between">
-        <button
+        <Button
           type="button"
           onClick={onBack}
-          className="rounded-[10px] border border-[var(--border)] px-5 py-2.5 text-[13px] font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-raised)]"
+          variant="secondary"
+          size="lg"
         >
           Back
-        </button>
-        <button
+        </Button>
+        <Button
           type="submit"
-          className="rounded-[10px] bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-5 py-2.5 text-[13px] font-medium text-white transition-opacity hover:opacity-90"
+          size="lg"
         >
           Next
-        </button>
+        </Button>
       </div>
     </form>
   );

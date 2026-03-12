@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { api, ApiError } from '@/lib/api-client';
 import { useModalAccessibility } from '@/hooks/useModalAccessibility';
 import Select from '@/components/ui/Select';
+import { Button } from '@/components/ui/Button';
 
 interface Client {
   id: string;
@@ -134,9 +135,10 @@ export default function CreateWorkOrderModal({
           <h3 id="create-work-order-title" className="text-lg font-semibold text-[var(--text-primary)]">
             Create Work Order
           </h3>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onClose}
-            className="rounded-lg p-1 text-[var(--text-tertiary)] transition-colors hover:bg-[var(--surface-raised)] hover:text-[var(--text-primary)]"
           >
             <svg
               className="h-5 w-5"
@@ -151,7 +153,7 @@ export default function CreateWorkOrderModal({
                 d="M6 18L18 6M6 6l12 12"
               />
             </svg>
-          </button>
+          </Button>
         </div>
 
         {error && (
@@ -289,20 +291,21 @@ export default function CreateWorkOrderModal({
           </div>
 
           <div className="flex items-center gap-3 pt-2">
-            <button
+            <Button
               type="button"
+              variant="secondary"
               onClick={onClose}
-              className="flex-1 rounded-lg border border-[var(--border)] px-4 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-raised)]"
+              className="flex-1"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
-              disabled={isSubmitting}
-              className="flex-1 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+              loading={isSubmitting}
+              className="flex-1"
             >
-              {isSubmitting ? 'Creating...' : 'Create Work Order'}
-            </button>
+              Create Work Order
+            </Button>
           </div>
         </form>
       </div>

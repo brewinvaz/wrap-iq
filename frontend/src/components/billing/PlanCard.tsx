@@ -1,6 +1,7 @@
 'use client';
 
 import { BillingPlan } from '@/lib/types';
+import { Button } from '@/components/ui/Button';
 
 interface PlanCardProps {
   plan: BillingPlan;
@@ -69,19 +70,14 @@ export default function PlanCard({ plan, isCurrent, onSelect }: PlanCardProps) {
         ))}
       </ul>
 
-      <button
+      <Button
         onClick={() => onSelect(plan.id)}
         disabled={isCurrent}
-        className={`mt-6 w-full rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${
-          isCurrent
-            ? 'cursor-default bg-[var(--surface-raised)] text-[var(--text-secondary)]'
-            : isPopular
-              ? 'bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-white hover:opacity-90'
-              : 'border border-[var(--border)] bg-[var(--surface-card)] text-[var(--text-primary)] hover:bg-[var(--surface-raised)]'
-        }`}
+        variant={isCurrent ? 'ghost' : isPopular ? 'primary' : 'secondary'}
+        className="mt-6 w-full"
       >
         {isCurrent ? 'Current Plan' : price === 0 ? 'Downgrade' : 'Upgrade'}
-      </button>
+      </Button>
     </div>
   );
 }

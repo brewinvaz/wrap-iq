@@ -1,5 +1,7 @@
 'use client';
 
+import { Button } from '@/components/ui/Button';
+
 export default function DashboardError({
   reset,
 }: {
@@ -13,12 +15,13 @@ export default function DashboardError({
         <p className="mt-2 text-sm text-[var(--text-secondary)]">
           Something went wrong while loading this page. Please try again.
         </p>
-        <button
+        <Button
           onClick={reset}
-          className="mt-6 rounded-lg bg-[var(--accent-primary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--accent-primary)]/90"
+          variant="secondary"
+          className="mt-6"
         >
           Try again
-        </button>
+        </Button>
       </div>
     </div>
   );

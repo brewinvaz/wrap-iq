@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { Button } from '@/components/ui/Button';
 import PlanComparisonGrid from '@/components/billing/PlanComparisonGrid';
 import PaymentMethodCard from '@/components/billing/PaymentMethodCard';
 import InvoiceTable from '@/components/billing/InvoiceTable';
@@ -131,12 +132,9 @@ export default function BillingPage() {
         <div className="flex flex-1 items-center justify-center">
           <div className="space-y-3 text-center">
             <p className="text-sm text-red-400">{error}</p>
-            <button
-              onClick={loadData}
-              className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-90"
-            >
+            <Button onClick={loadData}>
               Retry
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -169,12 +167,14 @@ export default function BillingPage() {
         {actionError && (
           <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
             {actionError}
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => setActionError(null)}
-              className="ml-2 font-medium underline"
+              className="ml-2 underline"
             >
               Dismiss
-            </button>
+            </Button>
           </div>
         )}
 
@@ -226,9 +226,9 @@ export default function BillingPage() {
             <h2 className="text-base font-semibold text-[var(--text-primary)]">
               Payment Methods
             </h2>
-            <button className="rounded-lg border border-[var(--border)] px-4 py-2 text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-overlay)]">
+            <Button variant="secondary">
               + Add Method
-            </button>
+            </Button>
           </div>
 
           <div className="mt-4 space-y-3">

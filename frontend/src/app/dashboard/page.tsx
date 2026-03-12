@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/Button';
 import KanbanBoard from '@/components/kanban/KanbanBoard';
 import MetricsBar from '@/components/dashboard/MetricsBar';
 import CreateWorkOrderModal from '@/components/work-orders/CreateWorkOrderModal';
@@ -208,12 +209,13 @@ function ErrorBanner({ message, onRetry }: { message: string; onRetry: () => voi
         </svg>
         {message}
       </div>
-      <button
+      <Button
+        variant="danger"
+        size="sm"
         onClick={onRetry}
-        className="rounded-md bg-rose-500/20 px-3 py-1.5 text-xs font-medium text-rose-400 transition-colors hover:bg-rose-500/30"
       >
         Retry
-      </button>
+      </Button>
     </div>
   );
 }
@@ -598,13 +600,14 @@ export default function DashboardPage() {
           </div>
           <div className="flex items-center gap-3">
             <div className="relative">
-              <button
+              <Button
                 ref={filterBtnRef}
+                variant="secondary"
                 onClick={() => setFilterOpen((o) => !o)}
-                className={`flex items-center gap-2 rounded-lg border px-3.5 py-2 text-sm font-medium transition-colors ${
+                className={`flex items-center gap-2 ${
                   activeFilterCount > 0
                     ? 'border-[var(--accent-primary)]/30 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/15'
-                    : 'border-[var(--border)] bg-[var(--surface-card)] text-[var(--text-secondary)] hover:bg-[var(--surface-raised)]'
+                    : ''
                 }`}
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -616,7 +619,7 @@ export default function DashboardPage() {
                     {activeFilterCount}
                   </span>
                 )}
-              </button>
+              </Button>
 
               {filterOpen && (
                 <div
@@ -720,12 +723,11 @@ export default function DashboardPage() {
                 </div>
               )}
             </div>
-            <button
+            <Button
               onClick={() => setShowCreateModal(true)}
-              className="rounded-lg bg-[var(--accent-primary)] px-3.5 py-2 text-sm font-medium text-white transition-colors hover:opacity-90"
             >
               + New Project
-            </button>
+            </Button>
           </div>
         </div>
       </header>
@@ -747,14 +749,16 @@ export default function DashboardPage() {
             />
           </svg>
           <span className="text-sm text-rose-400">{statusError}</span>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => setStatusError(null)}
-            className="ml-2 rounded-md p-1 text-rose-400 transition-colors hover:bg-rose-500/10 hover:text-rose-300"
+            className="ml-2 text-rose-400 hover:bg-rose-500/10 hover:text-rose-300"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </button>
+          </Button>
         </div>
       )}
 

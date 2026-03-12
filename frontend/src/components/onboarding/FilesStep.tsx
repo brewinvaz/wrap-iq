@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react';
 import type { ProjectData, UploadedFile } from '@/app/onboarding/[token]/page';
 import { API_BASE_URL } from '@/lib/config';
+import { Button } from '@/components/ui/Button';
 
 const API_BASE = API_BASE_URL;
 
@@ -275,20 +276,21 @@ export function FilesStep({ data, onChange, files, onFilesChange, token, onBack,
       </div>
 
       <div className="mt-6 flex justify-between">
-        <button
+        <Button
           type="button"
           onClick={onBack}
-          className="rounded-[10px] border border-[var(--border)] px-5 py-2.5 text-[13px] font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-raised)]"
+          variant="secondary"
+          size="lg"
         >
           Back
-        </button>
-        <button
+        </Button>
+        <Button
           type="submit"
           disabled={activeUploads.length > 0}
-          className="rounded-[10px] bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-5 py-2.5 text-[13px] font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          size="lg"
         >
           Next
-        </button>
+        </Button>
       </div>
     </form>
   );

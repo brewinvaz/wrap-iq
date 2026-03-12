@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { api, ApiError } from '@/lib/api-client';
 import { useModalAccessibility } from '@/hooks/useModalAccessibility';
+import { Button } from '@/components/ui/Button';
 
 interface CreateInvoiceModalProps {
   isOpen: boolean;
@@ -94,9 +95,10 @@ export default function CreateInvoiceModal({
           <h3 id="create-invoice-title" className="text-lg font-semibold text-[var(--text-primary)]">
             Create Invoice
           </h3>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onClose}
-            className="rounded-lg p-1 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-raised)] hover:text-[var(--text-primary)]"
           >
             <svg
               className="h-5 w-5"
@@ -111,7 +113,7 @@ export default function CreateInvoiceModal({
                 d="M6 18L18 6M6 6l12 12"
               />
             </svg>
-          </button>
+          </Button>
         </div>
 
         {error && (
@@ -237,20 +239,21 @@ export default function CreateInvoiceModal({
           </div>
 
           <div className="flex items-center gap-3 pt-2">
-            <button
+            <Button
               type="button"
+              variant="secondary"
               onClick={onClose}
-              className="flex-1 rounded-lg border border-[var(--border)] px-4 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-raised)]"
+              className="flex-1"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
-              disabled={isSubmitting}
-              className="flex-1 rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+              loading={isSubmitting}
+              className="flex-1"
             >
-              {isSubmitting ? 'Creating...' : 'Create Invoice'}
-            </button>
+              Create Invoice
+            </Button>
           </div>
         </form>
       </div>

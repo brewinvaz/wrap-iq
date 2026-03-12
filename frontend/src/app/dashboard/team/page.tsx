@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { Button } from '@/components/ui/Button';
 import TeamList from '@/components/team/TeamList';
 import PermissionsMatrix from '@/components/team/PermissionsMatrix';
 import InviteModal from '@/components/team/InviteModal';
@@ -125,12 +126,9 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
         </div>
         <p className="text-sm font-medium text-[var(--text-primary)]">Failed to load team members</p>
         <p className="text-xs text-[var(--text-secondary)]">{message}</p>
-        <button
-          onClick={onRetry}
-          className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
-        >
+        <Button onClick={onRetry}>
           Retry
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -230,12 +228,9 @@ export default function TeamPage() {
               {members.length} members
             </span>
           </div>
-          <button
-            onClick={() => setShowInvite(true)}
-            className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
-          >
+          <Button onClick={() => setShowInvite(true)}>
             + Invite Member
-          </button>
+          </Button>
         </div>
       </header>
 

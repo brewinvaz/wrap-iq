@@ -7,6 +7,7 @@ import DayView from './DayView';
 import MonthView from './MonthView';
 import { api, ApiError } from '@/lib/api-client';
 import { CalendarEvent, Installer } from '@/lib/types';
+import { Button } from '@/components/ui/Button';
 
 // ---------------------------------------------------------------------------
 // API response interfaces
@@ -311,12 +312,12 @@ function CalendarError({
         </h3>
         <p className="mt-1 text-xs text-[var(--text-secondary)]">{message}</p>
       </div>
-      <button
+      <Button
+        variant="secondary"
         onClick={onRetry}
-        className="rounded-lg border border-[var(--border)] px-4 py-2 text-xs font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-raised)] hover:text-[var(--text-primary)]"
       >
         Retry
-      </button>
+      </Button>
     </div>
   );
 }

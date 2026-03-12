@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { api, ApiError } from '@/lib/api-client';
 import { useModalAccessibility } from '@/hooks/useModalAccessibility';
 import Select from '@/components/ui/Select';
+import { Button } from '@/components/ui/Button';
 
 interface CreateClientModalProps {
   isOpen: boolean;
@@ -114,9 +115,10 @@ export default function CreateClientModal({
           <h3 id="create-client-title" className="text-lg font-semibold text-[var(--text-primary)]">
             Create New Client
           </h3>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onClose}
-            className="rounded-lg p-1 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-raised)] hover:text-[var(--text-primary)]"
           >
             <svg
               className="h-5 w-5"
@@ -131,7 +133,7 @@ export default function CreateClientModal({
                 d="M6 18L18 6M6 6l12 12"
               />
             </svg>
-          </button>
+          </Button>
         </div>
 
         {error && (
@@ -304,20 +306,21 @@ export default function CreateClientModal({
           </div>
 
           <div className="flex items-center gap-3 pt-2">
-            <button
+            <Button
               type="button"
+              variant="secondary"
               onClick={onClose}
-              className="flex-1 rounded-lg border border-[var(--border)] px-4 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-raised)]"
+              className="flex-1"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
-              disabled={isSubmitting}
-              className="flex-1 rounded-lg bg-[var(--accent-primary)] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[var(--accent-primary)]/90 disabled:cursor-not-allowed disabled:opacity-50"
+              loading={isSubmitting}
+              className="flex-1"
             >
-              {isSubmitting ? 'Creating...' : 'Create Client'}
-            </button>
+              Create Client
+            </Button>
           </div>
         </form>
       </div>

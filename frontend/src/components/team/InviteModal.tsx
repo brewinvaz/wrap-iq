@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { roleLabels } from '@/lib/role-config';
 import { useModalAccessibility } from '@/hooks/useModalAccessibility';
 import Select from '@/components/ui/Select';
+import { Button } from '@/components/ui/Button';
 
 const invitableRoles = [
   'project_manager',
@@ -59,9 +60,10 @@ export default function InviteModal({
           <h3 id="invite-modal-title" className="text-lg font-semibold text-[var(--text-primary)]">
             Invite Team Member
           </h3>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onClose}
-            className="rounded-lg p-1 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-raised)] hover:text-[var(--text-primary)]"
           >
             <svg
               className="h-5 w-5"
@@ -76,7 +78,7 @@ export default function InviteModal({
                 d="M6 18L18 6M6 6l12 12"
               />
             </svg>
-          </button>
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -117,19 +119,20 @@ export default function InviteModal({
           </div>
 
           <div className="flex items-center gap-3 pt-2">
-            <button
+            <Button
               type="button"
+              variant="secondary"
               onClick={onClose}
-              className="flex-1 rounded-lg border border-[var(--border)] px-4 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-raised)]"
+              className="flex-1"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
-              className="flex-1 rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90"
+              className="flex-1"
             >
               Send Invite
-            </button>
+            </Button>
           </div>
         </form>
       </div>
