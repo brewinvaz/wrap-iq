@@ -1,4 +1,4 @@
-.PHONY: help up down restart build rebuild logs logs-api logs-web ps migrate test lint clean docker-prune-all prune-branches
+.PHONY: help up down restart build rebuild logs logs-api logs-web ps migrate test lint clean docker-prune-all prune-branches release
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -65,3 +65,34 @@ docker-prune-all: ## Remove all unused Docker data (containers, images, volumes,
 prune-branches: ## Delete local branches already merged to main on remote
 	git fetch -p
 	git branch -vv | grep 'origin/.*: gone]' | awk '{print $$1}' | xargs -r git branch -d
+
+# ---------------------------------------------------------------------------
+# Release / Deploy
+# ---------------------------------------------------------------------------
+# Usage: make release type=patch  (default)
+#        make release type=minor
+#        make release type=major
+
+RELEASE_TYPE ?= patch
+
+release: ## Create a semver tag and push it (type=patch|minor|major)
+	@latest=$$(git tag -l 'v*' --sort=-v:refname | head -n1); \
+	if [ -z "$$latest" ]; then \
+		major=0; minor=0; patch=0; \
+	else \
+		version=$${latest#v}; \
+		major=$$(echo $$version | cut -d. -f1); \
+		minor=$$(echo $$version | cut -d. -f2); \
+		patch=$$(echo $$version | cut -d. -f3); \
+	fi; \
+	case "$(type)" in \
+		major) major=$$((major + 1)); minor=0; patch=0;; \
+		minor) minor=$$((minor + 1)); patch=0;; \
+		patch) patch=$$((patch + 1));; \
+		*) echo "Invalid type: $(type). Use patch, minor, or major."; exit 1;; \
+	esac; \
+	next="v$$major.$$minor.$$patch"; \
+	echo "Current: $${latest:-none} → Next: $$next"; \
+	git tag -a "$$next" -m "Release $$next"; \
+	git push origin "$$next"; \
+	echo "Tagged and pushed $$next"
