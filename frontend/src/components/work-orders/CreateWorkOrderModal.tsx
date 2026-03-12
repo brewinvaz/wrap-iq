@@ -178,7 +178,7 @@ export default function CreateWorkOrderModal({
       // Add design details only if user has added files or extra versions
       const hasDesignWork =
         design.proofingData.versions.some(
-          (v) => v.files.length > 0 || v.version !== 1
+          (v) => (v.files && v.files.length > 0) || v.status !== 'draft'
         ) || design.proofingData.versions.length > 1;
       if (hasDesignWork) {
         payload.design_details = {
