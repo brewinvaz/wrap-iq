@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { api, ApiError } from '@/lib/api-client';
 import { useModalAccessibility } from '@/hooks/useModalAccessibility';
+import Select from '@/components/ui/Select';
 
 interface NewRenderModalProps {
   isOpen: boolean;
@@ -208,31 +209,40 @@ export default function NewRenderModal({ isOpen, onClose, onCreate }: NewRenderM
           {/* Client dropdown */}
           <div>
             <label htmlFor="client" className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]">Client <span className="text-[var(--text-tertiary)]">(optional)</span></label>
-            <select id="client" value={clientId} onChange={(e) => setClientId(e.target.value)}
-              className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]">
-              <option value="">— None —</option>
-              {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
+            <Select
+              id="client"
+              value={clientId}
+              onChange={setClientId}
+              placeholder="— None —"
+              options={clients.map((c) => ({ value: c.id, label: c.name }))}
+            />
           </div>
 
           {/* Vehicle dropdown */}
           <div>
             <label htmlFor="vehicle" className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]">Vehicle <span className="text-[var(--text-tertiary)]">(optional)</span></label>
-            <select id="vehicle" value={vehicleId} onChange={(e) => setVehicleId(e.target.value)}
-              className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]">
-              <option value="">— None —</option>
-              {vehicles.map(v => <option key={v.id} value={v.id}>{[v.year, v.make, v.model].filter(Boolean).join(' ') || 'Unknown'}</option>)}
-            </select>
+            <Select
+              id="vehicle"
+              value={vehicleId}
+              onChange={setVehicleId}
+              placeholder="— None —"
+              options={vehicles.map((v) => ({
+                value: v.id,
+                label: [v.year, v.make, v.model].filter(Boolean).join(' ') || 'Unknown',
+              }))}
+            />
           </div>
 
           {/* Work Order dropdown */}
           <div>
             <label htmlFor="work-order" className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]">Work Order <span className="text-[var(--text-tertiary)]">(optional)</span></label>
-            <select id="work-order" value={workOrderId} onChange={(e) => setWorkOrderId(e.target.value)}
-              className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]">
-              <option value="">— None —</option>
-              {workOrders.map(wo => <option key={wo.id} value={wo.id}>{wo.job_number}</option>)}
-            </select>
+            <Select
+              id="work-order"
+              value={workOrderId}
+              onChange={setWorkOrderId}
+              placeholder="— None —"
+              options={workOrders.map((wo) => ({ value: wo.id, label: wo.job_number }))}
+            />
           </div>
 
           {/* Notes */}
