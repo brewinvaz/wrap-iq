@@ -148,7 +148,7 @@ export default function PaymentPage() {
         </div>
 
         <p className="mt-4 text-center text-[12px] text-[#a8a8b4]">
-          Powered by WrapIQ
+          Powered by WrapFlow
         </p>
       </div>
     </div>

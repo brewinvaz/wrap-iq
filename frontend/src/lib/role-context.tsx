@@ -17,8 +17,8 @@ interface RoleContextValue {
 
 const RoleContext = createContext<RoleContextValue | null>(null);
 
-const STORAGE_KEY = 'wrapiq_selected_role';
-const USER_CHOSEN_KEY = 'wrapiq_role_user_chosen';
+const STORAGE_KEY = 'wrapflow_selected_role';
+const USER_CHOSEN_KEY = 'wrapflow_role_user_chosen';
 
 /**
  * Return the role stored in localStorage, falling back to the

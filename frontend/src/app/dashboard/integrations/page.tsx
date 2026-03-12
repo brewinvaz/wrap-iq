@@ -154,7 +154,7 @@ export default function IntegrationsPage() {
             <div className="rounded-xl border border-dashed border-[#e6e6eb] bg-[#fafafa] px-6 py-8 text-center">
               <p className="text-sm text-[#60606a]">No webhooks configured</p>
               <p className="mt-1 text-xs text-[#a8a8b4]">
-                Webhooks let external services receive real-time updates from WrapIQ.
+                Webhooks let external services receive real-time updates from WrapFlow.
               </p>
             </div>
           ) : (
@@ -216,7 +216,7 @@ export default function IntegrationsPage() {
             <div className="rounded-xl border border-dashed border-[#e6e6eb] bg-[#fafafa] px-6 py-8 text-center">
               <p className="text-sm text-[#60606a]">No API keys created</p>
               <p className="mt-1 text-xs text-[#a8a8b4]">
-                API keys allow external applications to authenticate with WrapIQ.
+                API keys allow external applications to authenticate with WrapFlow.
               </p>
             </div>
           ) : (
