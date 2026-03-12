@@ -112,7 +112,7 @@ export default function BillingPage() {
         </header>
         <div className="flex flex-1 items-center justify-center">
           <div className="space-y-3 text-center">
-            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-[var(--accent-primary)] border-t-transparent" />
             <p className="text-sm text-[var(--text-secondary)]">Loading billing data...</p>
           </div>
         </div>
@@ -130,10 +130,10 @@ export default function BillingPage() {
         </header>
         <div className="flex flex-1 items-center justify-center">
           <div className="space-y-3 text-center">
-            <p className="text-sm text-red-600">{error}</p>
+            <p className="text-sm text-red-400">{error}</p>
             <button
               onClick={loadData}
-              className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+              className="rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-90"
             >
               Retry
             </button>
@@ -155,7 +155,7 @@ export default function BillingPage() {
               Billing &amp; Subscription
             </h1>
             {subscription && (
-              <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
+              <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-400">
                 {subscription.status === 'active'
                   ? 'Active'
                   : subscription.status}
@@ -167,7 +167,7 @@ export default function BillingPage() {
 
       <div className="flex-1 space-y-6 overflow-auto p-6">
         {actionError && (
-          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
             {actionError}
             <button
               onClick={() => setActionError(null)}
@@ -202,7 +202,7 @@ export default function BillingPage() {
                 </p>
               </div>
               {subscription.cancelAtPeriodEnd && (
-                <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700">
+                <span className="rounded-full bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-400">
                   Cancels at period end
                 </span>
               )}

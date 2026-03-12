@@ -85,9 +85,9 @@ function VerifyContent() {
 
         {state === 'success' && (
           <div className="text-center">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/10">
               <svg
-                className="h-6 w-6 text-emerald-600"
+                className="h-6 w-6 text-emerald-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -103,9 +103,9 @@ function VerifyContent() {
 
         {state === 'error' && (
           <div className="text-center">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-500/10">
               <svg
-                className="h-6 w-6 text-red-600"
+                className="h-6 w-6 text-red-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"

@@ -168,26 +168,26 @@ export default function ImportWorkOrdersPage() {
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
-      <header className="shrink-0 border-b border-[#e6e6eb] bg-white px-6 py-4">
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center gap-3">
           <Link
             href="/dashboard/work-orders"
-            className="text-sm text-[#60606a] transition-colors hover:text-[#18181b]"
+            className="text-sm text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)]"
           >
             Work Orders
           </Link>
-          <span className="text-sm text-[#a8a8b4]">/</span>
-          <h1 className="text-xl font-bold text-[#18181b]">Import CSV</h1>
+          <span className="text-sm text-[var(--text-muted)]">/</span>
+          <h1 className="text-xl font-bold text-[var(--text-primary)]">Import CSV</h1>
         </div>
       </header>
 
       {/* Error banner */}
       {error && (
-        <div className="mx-6 mt-4 flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
-          <span className="text-sm text-red-700">{error}</span>
+        <div className="mx-6 mt-4 flex items-center gap-3 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3">
+          <span className="text-sm text-red-400">{error}</span>
           <button
             onClick={() => setError(null)}
-            className="ml-auto text-sm font-medium text-red-700 underline"
+            className="ml-auto text-sm font-medium text-red-400 underline"
           >
             Dismiss
           </button>
@@ -211,12 +211,12 @@ export default function ImportWorkOrdersPage() {
                 onClick={() => inputRef.current?.click()}
                 className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-16 transition-colors ${
                   dragOver
-                    ? 'border-blue-400 bg-blue-50'
-                    : 'border-[#e6e6eb] bg-white hover:border-blue-300 hover:bg-blue-50/30'
+                    ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)]/10'
+                    : 'border-[var(--border)] bg-[var(--surface-card)] hover:border-[var(--accent-primary)]/50 hover:bg-[var(--accent-primary)]/5'
                 }`}
               >
                 <svg
-                  className="mb-3 h-10 w-10 text-[#a8a8b4]"
+                  className="mb-3 h-10 w-10 text-[var(--text-muted)]"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -228,10 +228,10 @@ export default function ImportWorkOrdersPage() {
                     d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
                   />
                 </svg>
-                <p className="text-sm font-medium text-[#18181b]">
+                <p className="text-sm font-medium text-[var(--text-primary)]">
                   Drag and drop your CSV file here
                 </p>
-                <p className="mt-1 text-xs text-[#60606a]">
+                <p className="mt-1 text-xs text-[var(--text-secondary)]">
                   or click to browse files
                 </p>
                 <input
@@ -244,18 +244,18 @@ export default function ImportWorkOrdersPage() {
               </div>
 
               {/* Template download */}
-              <div className="flex items-center justify-between rounded-lg border border-[#e6e6eb] bg-white px-4 py-3">
+              <div className="flex items-center justify-between rounded-lg border border-[var(--border)] bg-[var(--surface-card)] px-4 py-3">
                 <div>
-                  <p className="text-sm font-medium text-[#18181b]">
+                  <p className="text-sm font-medium text-[var(--text-primary)]">
                     Need the CSV template?
                   </p>
-                  <p className="text-xs text-[#60606a]">
+                  <p className="text-xs text-[var(--text-secondary)]">
                     Download a pre-formatted template with the expected columns.
                   </p>
                 </div>
                 <button
                   onClick={handleDownloadTemplate}
-                  className="rounded-lg border border-[#e6e6eb] bg-white px-4 py-2 text-sm font-medium text-[#18181b] transition-colors hover:bg-[#f4f4f6]"
+                  className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)] px-4 py-2 text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-raised)]"
                 >
                   Download Template
                 </button>
@@ -267,21 +267,21 @@ export default function ImportWorkOrdersPage() {
           {step === 'preview' && preview && (
             <div className="space-y-4">
               {/* File info */}
-              <div className="flex items-center justify-between rounded-lg border border-[#e6e6eb] bg-white px-4 py-3">
+              <div className="flex items-center justify-between rounded-lg border border-[var(--border)] bg-[var(--surface-card)] px-4 py-3">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]">
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
                     </svg>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-[#18181b]">{file?.name}</p>
-                    <p className="text-xs text-[#60606a]">{preview.total_rows} rows detected</p>
+                    <p className="text-sm font-medium text-[var(--text-primary)]">{file?.name}</p>
+                    <p className="text-xs text-[var(--text-secondary)]">{preview.total_rows} rows detected</p>
                   </div>
                 </div>
                 <button
                   onClick={handleReset}
-                  className="text-sm font-medium text-[#60606a] transition-colors hover:text-[#18181b]"
+                  className="text-sm font-medium text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)]"
                 >
                   Change file
                 </button>
@@ -289,19 +289,19 @@ export default function ImportWorkOrdersPage() {
 
               {/* Validation errors */}
               {hasValidationErrors && (
-                <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
-                  <p className="text-sm font-medium text-amber-800">
+                <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-4 py-3">
+                  <p className="text-sm font-medium text-amber-400">
                     {preview.validation_errors.length} validation{' '}
                     {preview.validation_errors.length === 1 ? 'issue' : 'issues'} found
                   </p>
                   <ul className="mt-2 space-y-1">
                     {preview.validation_errors.slice(0, 10).map((ve, i) => (
-                      <li key={i} className="text-xs text-amber-700">
+                      <li key={i} className="text-xs text-amber-400">
                         Row {ve.row}{ve.field ? `, ${ve.field}` : ''}: {ve.message}
                       </li>
                     ))}
                     {preview.validation_errors.length > 10 && (
-                      <li className="text-xs font-medium text-amber-700">
+                      <li className="text-xs font-medium text-amber-400">
                         ... and {preview.validation_errors.length - 10} more
                       </li>
                     )}
@@ -311,20 +311,20 @@ export default function ImportWorkOrdersPage() {
 
               {/* Preview table */}
               {preview.sample_rows.length > 0 && (
-                <div className="overflow-hidden rounded-xl border border-[#e6e6eb] bg-white">
-                  <div className="border-b border-[#e6e6eb] bg-[#f4f4f6] px-4 py-2">
-                    <p className="text-xs font-medium text-[#60606a]">
+                <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-card)]">
+                  <div className="border-b border-[var(--border)] bg-[var(--surface-raised)] px-4 py-2">
+                    <p className="text-xs font-medium text-[var(--text-secondary)]">
                       Preview (first {preview.sample_rows.length} of {preview.total_rows} rows)
                     </p>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="border-b border-[#e6e6eb]">
+                        <tr className="border-b border-[var(--border)]">
                           {preview.headers.map((h) => (
                             <th
                               key={h}
-                              className="whitespace-nowrap px-3 py-2 text-left text-xs font-medium text-[#60606a]"
+                              className="whitespace-nowrap px-3 py-2 text-left text-xs font-medium text-[var(--text-secondary)]"
                             >
                               {h}
                             </th>
@@ -333,11 +333,11 @@ export default function ImportWorkOrdersPage() {
                       </thead>
                       <tbody>
                         {preview.sample_rows.map((row, idx) => (
-                          <tr key={idx} className="border-b border-[#e6e6eb] last:border-0">
+                          <tr key={idx} className="border-b border-[var(--border)] last:border-0">
                             {preview.headers.map((h) => (
                               <td
                                 key={h}
-                                className="whitespace-nowrap px-3 py-2 text-xs text-[#18181b]"
+                                className="whitespace-nowrap px-3 py-2 text-xs text-[var(--text-primary)]"
                               >
                                 {row[h] || ''}
                               </td>
@@ -354,13 +354,13 @@ export default function ImportWorkOrdersPage() {
               <div className="flex items-center gap-3">
                 <button
                   onClick={handleUpload}
-                  className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                  className="rounded-lg bg-[var(--accent-primary)] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[var(--accent-primary)]/80"
                 >
                   Import {preview.total_rows} Work Orders
                 </button>
                 <button
                   onClick={handleReset}
-                  className="rounded-lg border border-[#e6e6eb] bg-white px-5 py-2.5 text-sm font-medium text-[#18181b] transition-colors hover:bg-[#f4f4f6]"
+                  className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)] px-5 py-2.5 text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-raised)]"
                 >
                   Cancel
                 </button>
@@ -370,10 +370,10 @@ export default function ImportWorkOrdersPage() {
 
           {/* ---- Step: Uploading ---- */}
           {step === 'uploading' && (
-            <div className="flex flex-col items-center justify-center rounded-xl border border-[#e6e6eb] bg-white px-6 py-16">
-              <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600" />
-              <p className="mt-4 text-sm font-medium text-[#18181b]">Importing work orders...</p>
-              <p className="mt-1 text-xs text-[#60606a]">This may take a moment.</p>
+            <div className="flex flex-col items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface-card)] px-6 py-16">
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--border)] border-t-[var(--accent-primary)]" />
+              <p className="mt-4 text-sm font-medium text-[var(--text-primary)]">Importing work orders...</p>
+              <p className="mt-1 text-xs text-[var(--text-secondary)]">This may take a moment.</p>
             </div>
           )}
 
@@ -384,13 +384,13 @@ export default function ImportWorkOrdersPage() {
               <div
                 className={`rounded-lg border px-4 py-4 ${
                   result.failed === 0
-                    ? 'border-green-200 bg-green-50'
-                    : 'border-amber-200 bg-amber-50'
+                    ? 'border-green-500/20 bg-green-500/10'
+                    : 'border-amber-500/20 bg-amber-500/10'
                 }`}
               >
                 <p
                   className={`text-sm font-medium ${
-                    result.failed === 0 ? 'text-green-800' : 'text-amber-800'
+                    result.failed === 0 ? 'text-green-400' : 'text-amber-400'
                   }`}
                 >
                   {result.failed === 0
@@ -398,7 +398,7 @@ export default function ImportWorkOrdersPage() {
                     : `Imported ${result.successful} of ${result.total_rows} work orders.`}
                 </p>
                 {result.failed > 0 && (
-                  <p className="mt-1 text-xs text-amber-700">
+                  <p className="mt-1 text-xs text-amber-400">
                     {result.failed} row{result.failed === 1 ? '' : 's'} failed.
                   </p>
                 )}
@@ -406,15 +406,15 @@ export default function ImportWorkOrdersPage() {
 
               {/* Row errors */}
               {result.errors.length > 0 && (
-                <div className="overflow-hidden rounded-xl border border-[#e6e6eb] bg-white">
-                  <div className="border-b border-[#e6e6eb] bg-[#f4f4f6] px-4 py-2">
-                    <p className="text-xs font-medium text-[#60606a]">Errors</p>
+                <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-card)]">
+                  <div className="border-b border-[var(--border)] bg-[var(--surface-raised)] px-4 py-2">
+                    <p className="text-xs font-medium text-[var(--text-secondary)]">Errors</p>
                   </div>
-                  <ul className="divide-y divide-[#e6e6eb]">
+                  <ul className="divide-y divide-[var(--border)]">
                     {result.errors.map((e, i) => (
-                      <li key={i} className="px-4 py-2 text-xs text-[#18181b]">
+                      <li key={i} className="px-4 py-2 text-xs text-[var(--text-primary)]">
                         <span className="font-medium">Row {e.row}</span>
-                        {e.field ? <span className="text-[#60606a]"> ({e.field})</span> : null}
+                        {e.field ? <span className="text-[var(--text-secondary)]"> ({e.field})</span> : null}
                         : {e.message}
                       </li>
                     ))}
@@ -426,13 +426,13 @@ export default function ImportWorkOrdersPage() {
               <div className="flex items-center gap-3">
                 <Link
                   href="/dashboard/work-orders"
-                  className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                  className="rounded-lg bg-[var(--accent-primary)] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[var(--accent-primary)]/80"
                 >
                   View Work Orders
                 </Link>
                 <button
                   onClick={handleReset}
-                  className="rounded-lg border border-[#e6e6eb] bg-white px-5 py-2.5 text-sm font-medium text-[#18181b] transition-colors hover:bg-[#f4f4f6]"
+                  className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)] px-5 py-2.5 text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-raised)]"
                 >
                   Import Another File
                 </button>
@@ -442,9 +442,9 @@ export default function ImportWorkOrdersPage() {
 
           {/* Loading state for preview fetch */}
           {step === 'preview' && !preview && !error && (
-            <div className="flex flex-col items-center justify-center rounded-xl border border-[#e6e6eb] bg-white px-6 py-16">
-              <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600" />
-              <p className="mt-4 text-sm font-medium text-[#18181b]">Analyzing CSV...</p>
+            <div className="flex flex-col items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface-card)] px-6 py-16">
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--border)] border-t-[var(--accent-primary)]" />
+              <p className="mt-4 text-sm font-medium text-[var(--text-primary)]">Analyzing CSV...</p>
             </div>
           )}
         </div>

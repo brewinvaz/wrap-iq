@@ -69,7 +69,7 @@ export default function PaymentPage() {
             </div>
           </div>
           <div className="rounded-[12px] border border-[var(--border)] bg-[var(--surface-card)] p-8 shadow-sm">
-            <p className="text-[15px] text-red-600">{error}</p>
+            <p className="text-[15px] text-red-400">{error}</p>
           </div>
         </div>
       </div>
@@ -116,7 +116,7 @@ export default function PaymentPage() {
             {data.amount_paid > 0 && (
               <div className="flex items-center justify-between border-b border-[var(--border)] pb-4">
                 <span className="text-[13px] font-medium text-[var(--text-secondary)]">Paid</span>
-                <span className="text-[14px] text-green-600">{formatCents(data.amount_paid)}</span>
+                <span className="text-[14px] text-green-400">{formatCents(data.amount_paid)}</span>
               </div>
             )}
 
@@ -136,7 +136,7 @@ export default function PaymentPage() {
 
           <div className="mt-6">
             {isPaid ? (
-              <div className="flex h-10 w-full items-center justify-center rounded-[10px] bg-green-50 text-[14px] font-medium text-green-700">
+              <div className="flex h-10 w-full items-center justify-center rounded-[10px] bg-green-500/10 text-[14px] font-medium text-green-400">
                 This invoice has been paid in full
               </div>
             ) : (
