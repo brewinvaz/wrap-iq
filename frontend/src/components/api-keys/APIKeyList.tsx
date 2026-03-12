@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { APIKey } from '@/lib/types';
+import { Button } from '@/components/ui/Button';
 
 interface APIKeyListProps {
   keys: APIKey[];
@@ -134,34 +135,31 @@ export default function APIKeyList({
                 >
                   {key.isActive && (
                     <div className="flex items-center justify-end gap-2">
-                      <button
-                        onClick={() => handleAction(key.id, 'rotate')}
-                        className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+                      <Button
+                        size="sm"
+                        variant={
                           confirmAction?.id === key.id &&
                           confirmAction?.type === 'rotate'
-                            ? 'bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-white'
-                            : 'border border-[var(--accent-primary)]/30 text-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/10'
-                        }`}
+                            ? 'primary'
+                            : 'secondary'
+                        }
+                        onClick={() => handleAction(key.id, 'rotate')}
                       >
                         {confirmAction?.id === key.id &&
                         confirmAction?.type === 'rotate'
                           ? 'Confirm?'
                           : 'Rotate'}
-                      </button>
-                      <button
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="danger"
                         onClick={() => handleAction(key.id, 'revoke')}
-                        className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                          confirmAction?.id === key.id &&
-                          confirmAction?.type === 'revoke'
-                            ? 'bg-red-600 text-white'
-                            : 'border border-red-500/20 text-red-400 hover:bg-red-500/10'
-                        }`}
                       >
                         {confirmAction?.id === key.id &&
                         confirmAction?.type === 'revoke'
                           ? 'Confirm?'
                           : 'Revoke'}
-                      </button>
+                      </Button>
                     </div>
                   )}
                 </td>

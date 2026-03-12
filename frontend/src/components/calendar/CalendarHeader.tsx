@@ -2,6 +2,7 @@
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Installer } from '@/lib/types';
+import { Button } from '@/components/ui/Button';
 
 interface CalendarHeaderProps {
   dateLabel: string;
@@ -35,28 +36,31 @@ export default function CalendarHeader({
         <div className="flex items-center gap-3">
           {/* Navigation */}
           <div className="flex items-center gap-1">
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={onPrev}
-              className="flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--border)] text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-raised)] hover:text-[var(--text-primary)]"
             >
               <ChevronLeft className="h-4 w-4" strokeWidth={2} />
-            </button>
+            </Button>
             <span className="min-w-[200px] text-center text-sm font-semibold text-[var(--text-primary)]">
               {dateLabel}
             </span>
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={onNext}
-              className="flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--border)] text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-raised)] hover:text-[var(--text-primary)]"
             >
               <ChevronRight className="h-4 w-4" strokeWidth={2} />
-            </button>
+            </Button>
           </div>
-          <button
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={onToday}
-            className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-raised)] hover:text-[var(--text-primary)]"
           >
             Today
-          </button>
+          </Button>
         </div>
 
         {/* View toggle */}

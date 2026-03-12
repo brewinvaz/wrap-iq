@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { Button } from '@/components/ui/Button';
 
 const presets = ['7D', '30D', '90D', 'YTD', 'Custom'] as const;
 
@@ -105,19 +106,20 @@ export default function DateRangeFilter({ onChange, onCustomRange }: DateRangeFi
             </div>
           </div>
           <div className="mt-3 flex justify-end gap-2">
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => setShowCustomPicker(false)}
-              className="rounded-md px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-raised)]"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
+              size="sm"
               onClick={handleApply}
               disabled={!startDate || !endDate}
-              className="rounded-md bg-[var(--accent-primary)] px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-[var(--accent-primary)]/90 disabled:cursor-not-allowed disabled:opacity-40"
             >
               Apply
-            </button>
+            </Button>
           </div>
         </div>
       )}

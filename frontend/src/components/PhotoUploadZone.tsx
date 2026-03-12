@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useState } from 'react';
 import { api } from '@/lib/api-client';
+import { Button } from '@/components/ui/Button';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -226,12 +227,13 @@ export default function PhotoUploadZone({ workOrderId, onUploadComplete }: Photo
               {item.status === 'error' ? (
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-red-500">{item.error}</span>
-                  <button
+                  <Button
+                    variant="danger"
+                    size="sm"
                     onClick={() => handleFiles([item.file])}
-                    className="rounded bg-red-500/10 px-2 py-0.5 text-xs text-red-400 hover:bg-red-500/20"
                   >
                     Retry
-                  </button>
+                  </Button>
                 </div>
               ) : item.status === 'done' ? (
                 <span className="text-xs text-green-400">Done</span>

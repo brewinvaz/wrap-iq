@@ -1,6 +1,7 @@
 'use client';
 
 import { BillingPaymentMethod } from '@/lib/types';
+import { Button } from '@/components/ui/Button';
 
 interface PaymentMethodCardProps {
   method: BillingPaymentMethod;
@@ -36,19 +37,21 @@ export default function PaymentMethodCard({
 
       <div className="flex items-center gap-2">
         {!method.isDefault && (
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => onSetDefault(method.id)}
-            className="rounded-md px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-raised)]"
           >
             Set Default
-          </button>
+          </Button>
         )}
-        <button
+        <Button
+          variant="danger"
+          size="sm"
           onClick={() => onRemove(method.id)}
-          className="rounded-md px-3 py-1.5 text-xs font-medium text-red-400 transition-colors hover:bg-red-500/10"
         >
           Remove
-        </button>
+        </Button>
       </div>
     </div>
   );
