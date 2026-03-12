@@ -33,9 +33,9 @@ function AccessIndicator({ access }: { access: 'full' | 'read' | 'none' }) {
   if (access === 'read') {
     return (
       <div className="flex items-center justify-center" title="Read only">
-        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-100">
+        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-500/10">
           <svg
-            className="h-3.5 w-3.5 text-amber-600"
+            className="h-3.5 w-3.5 text-amber-400"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -156,9 +156,9 @@ export default function PermissionsMatrix({
           Full access
         </div>
         <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
-          <span className="flex h-4 w-4 items-center justify-center rounded-full bg-amber-100">
+          <span className="flex h-4 w-4 items-center justify-center rounded-full bg-amber-500/10">
             <svg
-              className="h-2.5 w-2.5 text-amber-600"
+              className="h-2.5 w-2.5 text-amber-400"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

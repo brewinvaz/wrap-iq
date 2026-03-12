@@ -256,7 +256,7 @@ export default function FinancialsPage() {
         </header>
         <div className="flex flex-1 items-center justify-center p-6">
           <div className="text-center">
-            <p className="text-sm text-red-600">{error}</p>
+            <p className="text-sm text-red-400">{error}</p>
             <button
               onClick={fetchData}
               className="mt-3 rounded-lg bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-90"
@@ -306,7 +306,7 @@ export default function FinancialsPage() {
             <div key={s.label} className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-[18px]">
               <p className="text-xs text-[var(--text-muted)]">{s.label}</p>
               <p className="mt-1 text-2xl font-bold text-[var(--text-primary)] font-mono">{s.value}</p>
-              <p className={`mt-1 text-xs font-medium ${s.up ? 'text-emerald-600' : 'text-[var(--text-secondary)]'}`}>
+              <p className={`mt-1 text-xs font-medium ${s.up ? 'text-emerald-400' : 'text-[var(--text-secondary)]'}`}>
                 {s.change}
               </p>
             </div>

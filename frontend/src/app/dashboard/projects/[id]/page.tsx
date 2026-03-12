@@ -288,8 +288,8 @@ function LoadingSkeleton() {
 function ErrorState({ message, onRetry, onBack }: { message: string; onRetry: () => void; onBack: () => void }) {
   return (
     <div className="flex h-full flex-col items-center justify-center gap-4">
-      <div className="rounded-full bg-red-100 p-3">
-        <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <div className="rounded-full bg-red-500/10 p-3">
+        <svg className="h-6 w-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.072 16.5c-.77.833.192 2.5 1.732 2.5z" />
         </svg>
       </div>
@@ -441,11 +441,11 @@ function OverviewTab({ project }: { project: ProjectDetail }) {
             {formatCurrency(project.cost)}
           </p>
         </div>
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-5">
-          <p className="font-mono text-[10px] uppercase tracking-wider text-emerald-600">
+        <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-5">
+          <p className="font-mono text-[10px] uppercase tracking-wider text-emerald-400">
             Margin
           </p>
-          <p className="mt-1 text-2xl font-bold text-emerald-700">
+          <p className="mt-1 text-2xl font-bold text-emerald-400">
             {formatCurrency(margin)}{' '}
             <span className="text-sm font-medium">({marginPct}%)</span>
           </p>
@@ -1196,7 +1196,7 @@ export default function ProjectDetailPage({
               onClick={() => setActiveTab(tab.key)}
               className={`relative px-4 py-3 text-sm font-medium transition-colors ${
                 activeTab === tab.key
-                  ? 'text-blue-600'
+                  ? 'text-[var(--accent-primary)]'
                   : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >

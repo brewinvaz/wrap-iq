@@ -9,9 +9,9 @@ export function SuccessPage({ jobNumber, orgName }: Props) {
   return (
     <div className="flex min-h-[50vh] items-center justify-center">
       <div className="w-full max-w-md rounded-[12px] border border-[var(--border)] bg-[var(--surface-card)] p-8 text-center shadow-sm">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10">
           <svg
-            className="h-7 w-7 text-emerald-600"
+            className="h-7 w-7 text-emerald-400"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

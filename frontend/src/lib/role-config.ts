@@ -10,12 +10,12 @@ export const roleLabels: Record<string, string> = {
 };
 
 export const roleColors: Record<string, string> = {
-  admin: 'bg-blue-100 text-blue-700',
-  project_manager: 'bg-violet-100 text-violet-700',
-  installer: 'bg-emerald-100 text-emerald-700',
-  designer: 'bg-amber-100 text-amber-700',
-  production: 'bg-slate-100 text-slate-700',
-  client: 'bg-rose-100 text-rose-700',
+  admin: 'bg-blue-500/10 text-blue-400',
+  project_manager: 'bg-violet-500/10 text-violet-400',
+  installer: 'bg-emerald-500/10 text-emerald-400',
+  designer: 'bg-amber-500/10 text-amber-400',
+  production: 'bg-slate-500/10 text-slate-400',
+  client: 'bg-rose-500/10 text-rose-400',
 };
 
 const allRoles = [

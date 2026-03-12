@@ -26,9 +26,9 @@ export default function MetricsBar({ metrics }: MetricsBarProps) {
             <span
               className={`shrink-0 text-xs font-medium ${
                 metric.trend === 'up'
-                  ? 'text-emerald-600'
+                  ? 'text-emerald-400'
                   : metric.trend === 'down'
-                    ? 'text-rose-600'
+                    ? 'text-rose-400'
                     : 'text-[var(--text-muted)]'
               }`}
             >

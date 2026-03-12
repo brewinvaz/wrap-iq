@@ -121,7 +121,7 @@ const statusStyles: Record<PrintJob['status'], { bg: string; text: string; label
 };
 
 const priorityStyles: Record<PrintJob['priority'], string> = {
-  high: 'text-rose-600',
+  high: 'text-rose-400',
   normal: 'text-[var(--text-secondary)]',
   low: 'text-[var(--text-muted)]',
 };
@@ -305,7 +305,7 @@ function AddToQueueModal({ isOpen, onClose, onAdd }: AddToQueueModalProps) {
               className={validationErrors.jobName ? errorInputClass : inputClass}
             />
             {validationErrors.jobName && (
-              <p className="mt-1 text-xs text-red-600">{validationErrors.jobName}</p>
+              <p className="mt-1 text-xs text-red-400">{validationErrors.jobName}</p>
             )}
           </div>
 
@@ -325,7 +325,7 @@ function AddToQueueModal({ isOpen, onClose, onAdd }: AddToQueueModalProps) {
               error={!!validationErrors.material}
             />
             {validationErrors.material && (
-              <p className="mt-1 text-xs text-red-600">{validationErrors.material}</p>
+              <p className="mt-1 text-xs text-red-400">{validationErrors.material}</p>
             )}
           </div>
 
@@ -345,7 +345,7 @@ function AddToQueueModal({ isOpen, onClose, onAdd }: AddToQueueModalProps) {
                 className={validationErrors.width ? errorInputClass : inputClass}
               />
               {validationErrors.width && (
-                <p className="mt-1 text-xs text-red-600">{validationErrors.width}</p>
+                <p className="mt-1 text-xs text-red-400">{validationErrors.width}</p>
               )}
             </div>
             <div>
@@ -362,7 +362,7 @@ function AddToQueueModal({ isOpen, onClose, onAdd }: AddToQueueModalProps) {
                 className={validationErrors.height ? errorInputClass : inputClass}
               />
               {validationErrors.height && (
-                <p className="mt-1 text-xs text-red-600">{validationErrors.height}</p>
+                <p className="mt-1 text-xs text-red-400">{validationErrors.height}</p>
               )}
             </div>
           </div>

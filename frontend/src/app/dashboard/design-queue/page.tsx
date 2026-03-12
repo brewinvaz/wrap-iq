@@ -99,7 +99,7 @@ const filterTabs: { key: FilterTab; label: string }[] = [
 ];
 
 const priorityStyles: Record<string, string> = {
-  high: 'text-rose-600 font-medium',
+  high: 'text-rose-400 font-medium',
   medium: 'text-[var(--text-secondary)]',
   low: 'text-[var(--text-muted)]',
 };
@@ -271,7 +271,7 @@ export default function DesignQueuePage() {
                   </td>
                   <td className="px-4 py-3 font-mono text-sm text-[var(--text-secondary)]">{formatDate(item.dateIn)}</td>
                   <td className="px-4 py-3">
-                    <span className={`font-mono text-sm ${isOverdue(item.dueDate) ? 'font-medium text-rose-600' : 'text-[var(--text-secondary)]'}`}>
+                    <span className={`font-mono text-sm ${isOverdue(item.dueDate) ? 'font-medium text-rose-400' : 'text-[var(--text-secondary)]'}`}>
                       {formatDate(item.dueDate)}
                     </span>
                   </td>

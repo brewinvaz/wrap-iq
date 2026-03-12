@@ -243,8 +243,8 @@ export default function TimeLogsPage() {
 
       {error && (
         <div className="mx-6 mt-4 flex items-center gap-3 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3">
-          <span className="text-sm text-red-700">{error}</span>
-          <button onClick={fetchLogs} className="text-sm font-medium text-red-700 underline">
+          <span className="text-sm text-red-400">{error}</span>
+          <button onClick={fetchLogs} className="text-sm font-medium text-red-400 underline">
             Retry
           </button>
         </div>

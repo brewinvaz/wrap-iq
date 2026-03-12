@@ -228,13 +228,13 @@ export default function PhotoUploadZone({ workOrderId, onUploadComplete }: Photo
                   <span className="text-xs text-red-500">{item.error}</span>
                   <button
                     onClick={() => handleFiles([item.file])}
-                    className="rounded bg-red-50 px-2 py-0.5 text-xs text-red-600 hover:bg-red-100"
+                    className="rounded bg-red-500/10 px-2 py-0.5 text-xs text-red-400 hover:bg-red-500/20"
                   >
                     Retry
                   </button>
                 </div>
               ) : item.status === 'done' ? (
-                <span className="text-xs text-green-600">Done</span>
+                <span className="text-xs text-green-400">Done</span>
               ) : (
                 <div className="flex items-center gap-2">
                   <div className="h-1.5 w-24 rounded-full bg-[var(--border)]">
