@@ -24,6 +24,10 @@
   --accent-primary: #a855f7;
   --accent-secondary: #ec4899;
 
+  --danger-bg: rgba(244, 63, 94, 0.2);
+  --danger-text: #fb7185;
+  --danger-hover: rgba(244, 63, 94, 0.3);
+
   --phase-design: #a855f7;
   --phase-production: #06b6d4;
   --phase-install: #10b981;
@@ -52,6 +56,10 @@
 
   --accent-primary: #9333ea;
   --accent-secondary: #db2777;
+
+  --danger-bg: rgba(244, 63, 94, 0.1);
+  --danger-text: #e11d48;
+  --danger-hover: rgba(244, 63, 94, 0.2);
 
   --phase-design: #a855f7;
   --phase-production: #06b6d4;
