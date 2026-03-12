@@ -13,7 +13,7 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 # Copy dependency files
 COPY pyproject.toml uv.lock ./
 
-# Install dependencies
+# Install dependencies (cached layer)
 RUN uv sync --no-dev --no-install-project
 
 # Copy application code
@@ -24,18 +24,16 @@ RUN uv sync --no-dev
 
 # Create non-root user
 RUN groupadd --system --gid 1001 appgroup && \
-    useradd --system --uid 1001 --gid appgroup appuser
+    useradd --system --uid 1001 --gid appgroup --create-home appuser
 
-# Set ownership of app directory and uv cache
-RUN chown -R appuser:appgroup /app && \
-    chown -R appuser:appgroup /root/.cache/uv 2>/dev/null; \
-    mkdir -p /home/appuser/.cache/uv && \
-    chown -R appuser:appgroup /home/appuser
+# Set ownership
+RUN chown -R appuser:appgroup /app
 
 ENV UV_CACHE_DIR=/home/appuser/.cache/uv
 
 USER appuser
 
-EXPOSE 8000
+# Railway injects PORT env var at runtime
+EXPOSE ${PORT:-8000}
 
 CMD ["bash", "-c", "uv run alembic upgrade head && uv run uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
