@@ -65,7 +65,7 @@ async def _ensure_superadmin(session, email: str, password: str) -> None:
 
 
 async def seed_superadmin() -> None:
-    engine = create_async_engine(settings.database_url, echo=False)
+    engine = create_async_engine(settings.async_database_url, echo=False)
     session_factory = async_sessionmaker(engine, expire_on_commit=False)
 
     async with session_factory() as session:

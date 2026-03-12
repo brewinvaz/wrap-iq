@@ -36,7 +36,7 @@ async def _cleanup(conn):
 
 @pytest.fixture(autouse=True)
 async def setup_db():
-    engine = create_async_engine(settings.test_database_url, echo=False)
+    engine = create_async_engine(settings.async_test_database_url, echo=False)
     async with engine.begin() as conn:
         await _cleanup(conn)
     async with engine.begin() as conn:

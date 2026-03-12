@@ -13,6 +13,27 @@ class Settings(BaseSettings):
     test_database_url: str = (
         "postgresql+asyncpg://postgres:postgres@localhost:5433/wrapiq_test"
     )
+
+    @staticmethod
+    def _normalize_pg_url(url: str) -> str:
+        """Normalize Postgres URLs for SQLAlchemy async compatibility.
+
+        Railway (and others) provide postgres:// which SQLAlchemy doesn't
+        recognize. Convert to postgresql+asyncpg://.
+        """
+        if url.startswith("postgres://"):
+            return url.replace("postgres://", "postgresql+asyncpg://", 1)
+        if url.startswith("postgresql://"):
+            return url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        return url
+
+    @property
+    def async_database_url(self) -> str:
+        return self._normalize_pg_url(self.database_url)
+
+    @property
+    def async_test_database_url(self) -> str:
+        return self._normalize_pg_url(self.test_database_url)
     redis_url: str = "redis://localhost:6379/0"
     secret_key: str = _DEV_SECRET_KEY
     cors_origins: str = "http://localhost:3000"
