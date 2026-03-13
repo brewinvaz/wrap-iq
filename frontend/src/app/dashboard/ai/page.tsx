@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { api, ApiError } from '@/lib/api-client';
 import { Button } from '@/components/ui/Button';
 import { useModalAccessibility } from '@/hooks/useModalAccessibility';
+import { formatCurrencyCompact } from '@/lib/format';
 
 interface AIQueryResponse {
   answer: string;
@@ -100,10 +101,7 @@ function deriveStats(workOrders: ApiWorkOrder[]): AIStat[] {
   ).length;
   const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
   const totalRevenue = workOrders.reduce((sum, wo) => sum + (wo.job_value || 0), 0);
-  const revenueStr =
-    totalRevenue >= 1000
-      ? `$${(totalRevenue / 1000).toFixed(totalRevenue >= 10000 ? 0 : 1)}K`
-      : `$${totalRevenue.toLocaleString()}`;
+  const revenueStr = formatCurrencyCompact(totalRevenue);
 
   return [
     { label: 'Total Work Orders', value: total.toLocaleString(), sub: 'All time', icon: '\uD83D\uDCCB' },
