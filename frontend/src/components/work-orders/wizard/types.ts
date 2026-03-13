@@ -24,6 +24,7 @@ export interface BasicDetailsState {
   paintColor: string;
   unitNumber: string;
   wrapCoverage: WrapCoverage | '';
+  vehiclePhotos: Record<string, File>;
 }
 
 export interface JobPricingState {
@@ -48,7 +49,7 @@ export interface WrapDetailsState {
 export interface DesignState {
   designerIds: string[];
   proofingData: {
-    versions: { name: string; status: string; files?: string[] }[];
+    versions: { name: string; status: string; files?: string[]; localFiles?: File[]; designUrl?: string }[];
   };
 }
 
@@ -87,6 +88,7 @@ export const INITIAL_BASIC_DETAILS: BasicDetailsState = {
   paintColor: '',
   unitNumber: '',
   wrapCoverage: '',
+  vehiclePhotos: {},
 };
 
 export const INITIAL_JOB_PRICING: JobPricingState = {

@@ -178,7 +178,7 @@ export default function CreateWorkOrderModal({
       // Add design details only if user has added files or extra versions
       const hasDesignWork =
         design.proofingData.versions.some(
-          (v) => (v.files && v.files.length > 0) || v.status !== 'draft'
+          (v) => (v.files && v.files.length > 0) || (v.localFiles && v.localFiles.length > 0) || v.designUrl || v.status !== 'draft'
         ) || design.proofingData.versions.length > 1;
       if (hasDesignWork) {
         payload.design_details = {
@@ -214,7 +214,29 @@ export default function CreateWorkOrderModal({
         };
       }
 
-      await api.post('/api/work-orders', payload);
+      const woResp = await api.post<{ id: string }>('/api/work-orders', payload);
+      const workOrderId = woResp.id;
+
+      // Step 3: Upload vehicle photos
+      const photoEntries = Object.entries(basicDetails.vehiclePhotos);
+      for (const [photoType, file] of photoEntries) {
+        try {
+          const { upload_url, r2_key } = await api.post<{ upload_url: string; r2_key: string }>(
+            `/api/work-orders/${workOrderId}/photos/upload-url`,
+            { filename: file.name, content_type: file.type }
+          );
+          await fetch(upload_url, {
+            method: 'PUT',
+            body: file,
+            headers: { 'Content-Type': file.type },
+          });
+          await api.post(`/api/work-orders/${workOrderId}/photos`, {
+            files: [{ r2_key, filename: file.name, content_type: file.type, size_bytes: file.size }],
+          });
+        } catch {
+          console.error(`Failed to upload ${photoType} photo`);
+        }
+      }
 
       // Reset form
       resetForm();
