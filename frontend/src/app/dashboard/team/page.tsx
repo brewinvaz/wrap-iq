@@ -221,10 +221,10 @@ export default function TeamPage() {
       <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-[var(--text-primary)]">
+            <h1 className="text-[22px] font-[800] text-[var(--text-primary)]">
               Team Management
             </h1>
-            <span className="rounded-full bg-[var(--surface-app)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-secondary)]">
+            <span className="rounded-full bg-[var(--surface-raised)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-secondary)]">
               {members.length} members
             </span>
           </div>
@@ -237,7 +237,6 @@ export default function TeamPage() {
       <div className="flex-1 space-y-6 overflow-auto p-6">
         <TeamList
           members={members}
-          onInvite={() => setShowInvite(true)}
           onRoleChange={handleRoleChange}
           onToggleActive={handleToggleActive}
         />
