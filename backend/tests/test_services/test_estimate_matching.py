@@ -12,7 +12,7 @@ async def _seed_org(db_session):
     db_session.add(plan)
     await db_session.flush()
 
-    org = Organization(id=uuid.uuid4(), name="Match Shop", plan_id=plan.id)
+    org = Organization(id=uuid.uuid4(), name="Match Shop", slug="match-shop", plan_id=plan.id)
     db_session.add(org)
     await db_session.flush()
     return org.id
