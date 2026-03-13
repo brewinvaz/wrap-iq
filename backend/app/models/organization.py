@@ -19,6 +19,7 @@ class Organization(Base, TimestampMixin):
     default_tax_rate: Mapped[Decimal | None] = mapped_column(
         Numeric(5, 2), nullable=True
     )
+    hourly_cost: Mapped[Decimal | None] = mapped_column(Numeric(8, 2), nullable=True)
 
     plan = relationship("Plan", lazy="selectin")
     users = relationship("User", back_populates="organization", lazy="selectin")

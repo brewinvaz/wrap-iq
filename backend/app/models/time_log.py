@@ -10,6 +10,13 @@ from app.db import Base
 from app.models.base import TenantMixin, TimestampMixin
 
 
+class Phase(enum.StrEnum):
+    DESIGN = "design"
+    PRODUCTION = "production"
+    INSTALL = "install"
+    OTHER = "other"
+
+
 class TimeLogStatus(enum.StrEnum):
     SUBMITTED = "submitted"
     APPROVED = "approved"
@@ -29,6 +36,10 @@ class TimeLog(Base, TenantMixin, TimestampMixin):
     status: Mapped[TimeLogStatus] = mapped_column(
         Enum(TimeLogStatus, values_callable=lambda e: [m.value for m in e]),
         default=TimeLogStatus.SUBMITTED,
+    )
+    phase: Mapped[Phase | None] = mapped_column(
+        Enum(Phase, values_callable=lambda e: [m.value for m in e]),
+        nullable=True,
     )
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
 

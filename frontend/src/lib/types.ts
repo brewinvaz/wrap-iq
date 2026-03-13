@@ -175,7 +175,7 @@ export interface WrapDetails {
 }
 
 export interface DesignDetails {
-  designHours: number;
+  estimatedHours: number;
   versionCount: number;
   revisionCount: number;
 }

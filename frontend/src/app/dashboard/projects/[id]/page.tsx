@@ -92,7 +92,7 @@ function transformWorkOrderToProject(wo: ApiWorkOrderResponse): ProjectDetail {
       miscItems: [],
     },
     designDetails: {
-      designHours: 0,
+      estimatedHours: 0,
       versionCount: 0,
       revisionCount: 0,
     },
@@ -486,11 +486,11 @@ function OverviewTab({ project }: { project: ProjectDetail }) {
         )}
 
         {/* Design */}
-        {project.designDetails.designHours > 0 && (
+        {project.designDetails.estimatedHours > 0 && (
           <InfoCard title="Design">
             <FieldRow
               label="Design Hours"
-              value={`${project.designDetails.designHours}h`}
+              value={`${project.designDetails.estimatedHours}h`}
             />
             <FieldRow
               label="Versions"

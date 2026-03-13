@@ -41,6 +41,9 @@ class ProductionDetails(Base, TenantMixin, TimestampMixin):
     sq_ft_printed_and_waste: Mapped[Decimal | None] = mapped_column(
         Numeric(10, 2), nullable=True
     )
+    estimated_hours: Mapped[Decimal | None] = mapped_column(
+        Numeric(8, 2), nullable=True
+    )
 
     work_order = relationship("WorkOrder", back_populates="production_details")
     printer = relationship("Equipment", foreign_keys=[printer_id])

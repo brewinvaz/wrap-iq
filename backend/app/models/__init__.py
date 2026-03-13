@@ -6,6 +6,7 @@ from app.models.client_invite import ClientInvite
 from app.models.design_details import DesignDetails
 from app.models.equipment import Equipment, EquipmentType
 from app.models.estimate import Estimate, EstimateStatus
+from app.models.estimate_defaults import EstimateDefaults
 from app.models.estimate_line_item import EstimateLineItem
 from app.models.file_upload import FileUpload
 from app.models.install_details import (
@@ -33,7 +34,7 @@ from app.models.subscription import (
     Subscription,
     SubscriptionStatus,
 )
-from app.models.time_log import TimeLog, TimeLogStatus
+from app.models.time_log import Phase, TimeLog, TimeLogStatus
 from app.models.user import Role, User
 from app.models.user_profile import UserProfile
 from app.models.vehicle import Vehicle, VehicleType
@@ -62,6 +63,7 @@ __all__ = [
     "Equipment",
     "EquipmentType",
     "Estimate",
+    "EstimateDefaults",
     "EstimateLineItem",
     "EstimateStatus",
     "FileUpload",
@@ -84,6 +86,7 @@ __all__ = [
     "Payment",
     "PaymentMethod",
     "PaymentMethodType",
+    "Phase",
     "Plan",
     "Priority",
     "ProductionDetails",
