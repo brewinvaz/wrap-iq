@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui/Button';
 import { api, ApiError } from '@/lib/api-client';
 import NewRenderModal from '@/components/renders/NewRenderModal';
@@ -64,7 +65,7 @@ function LoadingSkeleton() {
         </div>
       </div>
       <div className="flex-1 overflow-auto p-6">
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 12 }).map((_, i) => (
             <div key={i} className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-card)]">
               <div className="h-40 w-full animate-pulse bg-[var(--surface-raised)]" />
@@ -113,7 +114,7 @@ function RenderLightbox({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/95"
+      className="fixed inset-0 z-[200] flex items-center justify-center bg-black"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -161,46 +162,82 @@ function RenderLightbox({
         )}
 
         {/* Image area */}
-        <div className="flex flex-1 items-center justify-center px-16 pt-4">
+        <div className="relative flex flex-1 items-center justify-center px-16">
           {render.result_image_url ? (
             <img
               src={render.result_image_url}
               alt={render.design_name}
-              className="max-h-[70vh] max-w-full object-contain"
+              className="max-h-[70vh] max-w-full rounded-lg object-contain"
             />
           ) : (
-            <div className="flex h-64 w-96 items-center justify-center rounded-xl bg-white/5">
+            <div className="flex h-64 w-96 items-center justify-center rounded-xl bg-white/5 border border-white/5">
               <svg className="h-16 w-16 text-white/20" fill="none" stroke="currentColor" strokeWidth={1} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
               </svg>
             </div>
           )}
+          {/* Gradient fade overlapping bottom of image */}
+          <div className="absolute inset-x-0 bottom-0 h-24 pointer-events-none bg-gradient-to-t from-black/80 to-transparent" />
         </div>
 
-        {/* Metadata panel — below the image */}
-        <div className="shrink-0 border-t border-white/10 bg-black px-6 py-4">
-          <div className="mx-auto max-w-3xl">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h2 className="text-base font-semibold text-white">{render.design_name}</h2>
+        {/* Metadata panel */}
+        <div className="shrink-0 relative bg-black/80 backdrop-blur-xl px-6 pb-6 pt-4">
+          {/* Accent line */}
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-500/40 to-transparent" />
+
+          <div className="mx-auto max-w-4xl">
+            <div className="flex items-start justify-between gap-6">
+              {/* Left: title + description */}
+              <div className="min-w-0 flex-1">
+                <h2 className="text-lg font-bold tracking-tight text-white truncate">
+                  {render.design_name}
+                </h2>
                 {render.description && (
-                  <p className="mt-0.5 text-sm text-white/60">{render.description}</p>
+                  <p className="mt-1 text-sm text-white/50 leading-relaxed">{render.description}</p>
                 )}
               </div>
-              <span className={`inline-flex shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${style.bg} ${style.text}`}>
+
+              {/* Right: status badge */}
+              <span
+                className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold tracking-wide uppercase ${style.bg} ${style.text}`}
+                style={{ boxShadow: render.status === 'completed' ? '0 0 12px rgba(16, 185, 129, 0.15)' : render.status === 'failed' ? '0 0 12px rgba(244, 63, 94, 0.15)' : 'none' }}
+              >
+                <span className={`h-1.5 w-1.5 rounded-full ${render.status === 'completed' ? 'bg-emerald-400' : render.status === 'failed' ? 'bg-red-400' : render.status === 'rendering' ? 'bg-amber-400 animate-pulse' : 'bg-gray-400'}`} />
                 {style.label}
               </span>
             </div>
-            <div className="mt-2 flex flex-wrap items-center gap-4 text-xs text-white/50">
+
+            {/* Metadata row */}
+            <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-white/40">
               {render.created_by_name && (
-                <span>By {render.created_by_name}</span>
+                <span className="inline-flex items-center gap-1.5">
+                  <svg className="h-3 w-3 text-white/25" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0" />
+                  </svg>
+                  {render.created_by_name}
+                </span>
               )}
-              <span>{formatDate(render.created_at)}</span>
+              <span className="inline-flex items-center gap-1.5">
+                <svg className="h-3 w-3 text-white/25" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                </svg>
+                <span className="font-mono">{formatDate(render.created_at)}</span>
+              </span>
               {render.updated_at !== render.created_at && (
-                <span>Updated {formatDate(render.updated_at)}</span>
+                <span className="inline-flex items-center gap-1.5">
+                  <svg className="h-3 w-3 text-white/25" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" />
+                  </svg>
+                  <span className="font-mono">{formatDate(render.updated_at)}</span>
+                </span>
               )}
               {render.error_message && (
-                <span className="text-red-400">Error: {render.error_message}</span>
+                <span className="inline-flex items-center gap-1.5 text-red-400/80">
+                  <svg className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                  </svg>
+                  {render.error_message}
+                </span>
               )}
             </div>
           </div>
@@ -418,7 +455,7 @@ export default function ThreeDPage() {
             </p>
           </div>
         ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {renders.map((r, idx) => {
               const style = statusStyles[r.status] ?? statusStyles.pending;
               return (
@@ -607,13 +644,14 @@ export default function ThreeDPage() {
         )}
       </div>
 
-      {lightboxIndex !== null && renders[lightboxIndex] && (
+      {lightboxIndex !== null && renders[lightboxIndex] && createPortal(
         <RenderLightbox
           render={renders[lightboxIndex]}
           onClose={() => setLightboxIndex(null)}
           onPrev={lightboxIndex > 0 ? () => setLightboxIndex(lightboxIndex - 1) : null}
           onNext={lightboxIndex < renders.length - 1 ? () => setLightboxIndex(lightboxIndex + 1) : null}
-        />
+        />,
+        document.body
       )}
 
       <NewRenderModal
