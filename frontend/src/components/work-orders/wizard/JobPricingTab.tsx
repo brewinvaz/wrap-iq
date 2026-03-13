@@ -1,15 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { api } from '@/lib/api-client';
-import Select from '@/components/ui/Select';
+import Combobox from '@/components/ui/Combobox';
+import type { SelectOption } from '@/components/ui/Combobox';
 import DatePicker from '@/components/ui/DatePicker';
 import type { JobPricingState } from './types';
-
-interface Client {
-  id: string;
-  name: string;
-}
 
 interface Props {
   data: JobPricingState;
@@ -26,28 +21,16 @@ const toggleInactive =
 
 const toggleActive = 'rounded-lg bg-blue-600 px-4 py-2 text-sm text-white';
 
+async function searchClients(query: string): Promise<SelectOption[]> {
+  const params = new URLSearchParams({ limit: '25' });
+  if (query) params.set('search', query);
+  const res = await api.get<{ items: { id: string; name: string }[] }>(
+    `/api/clients/lookup?${params}`,
+  );
+  return res.items.map((c) => ({ value: c.id, label: c.name }));
+}
+
 export default function JobPricingTab({ data, onChange }: Props) {
-  const [clients, setClients] = useState<Client[]>([]);
-  const [isLoadingClients, setIsLoadingClients] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-    api
-      .get<{ items: { id: string; name: string }[] }>('/api/clients?limit=500')
-      .then((res) => {
-        if (!cancelled) setClients(res.items);
-      })
-      .catch(() => {
-        /* clients will remain empty */
-      })
-      .finally(() => {
-        if (!cancelled) setIsLoadingClients(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
   function update(patch: Partial<JobPricingState>) {
     onChange({ ...data, ...patch });
   }
@@ -156,15 +139,12 @@ export default function JobPricingTab({ data, onChange }: Props) {
         <label htmlFor="client-id" className={labelClass}>
           Client
         </label>
-        <Select
+        <Combobox
           id="client-id"
           value={data.clientId}
           onChange={(v) => update({ clientId: v })}
-          disabled={isLoadingClients}
-          placeholder={
-            isLoadingClients ? 'Loading clients...' : 'Select a client (optional)'
-          }
-          options={clients.map((c) => ({ value: c.id, label: c.name }))}
+          onSearch={searchClients}
+          placeholder="Search for a client (optional)"
         />
       </div>
 
