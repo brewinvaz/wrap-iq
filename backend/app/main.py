@@ -12,6 +12,7 @@ from starlette.responses import JSONResponse
 
 from app.config import settings
 from app.db import async_session
+from app.services.arq import close_arq_pool
 from app.logging_config import setup_logging
 from app.middleware.rate_limit import limiter
 from app.routers.admin import router as admin_router
@@ -73,6 +74,7 @@ async def lifespan(app: FastAPI):
     )
     yield
     # Shutdown
+    await close_arq_pool()
 
 
 app = FastAPI(

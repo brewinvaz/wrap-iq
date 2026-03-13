@@ -1,3 +1,4 @@
+import uuid
 from collections.abc import AsyncGenerator
 
 import pytest
@@ -9,6 +10,9 @@ import app.models  # noqa: F401
 from app.config import settings
 from app.db import Base
 from app.middleware.rate_limit import limiter
+from app.models.organization import Organization
+from app.models.plan import Plan
+from app.models.user import User
 
 # Disable rate limiting during tests (no Redis available)
 limiter.enabled = False
@@ -53,3 +57,28 @@ async def db_session(setup_db) -> AsyncGenerator[AsyncSession]:
     async with session_factory() as session:
         yield session
         await session.rollback()
+
+
+@pytest.fixture
+async def seed_org_and_user(db_session) -> tuple:
+    """Create a plan, org, and user for testing."""
+    plan = Plan(id=uuid.uuid4(), name="Free", price_cents=0, is_default=True)
+    db_session.add(plan)
+    await db_session.flush()
+
+    org = Organization(
+        id=uuid.uuid4(), name="Test Org", slug="test-org", plan_id=plan.id
+    )
+    db_session.add(org)
+    await db_session.flush()
+
+    user = User(
+        id=uuid.uuid4(),
+        email="worker@test.com",
+        password_hash="hashed",
+        organization_id=org.id,
+        role="admin",
+    )
+    db_session.add(user)
+    await db_session.flush()
+    return org, user
