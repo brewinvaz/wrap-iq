@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { api } from '@/lib/api-client';
 import type {
   BasicDetailsState,
@@ -128,7 +128,12 @@ const WRAP_COVERAGE_COLORS: Record<WrapCoverage, { selected: string; ring: strin
 /*  Photo placeholder labels                                           */
 /* ------------------------------------------------------------------ */
 
-const PHOTO_LABELS = ['Driver Side', 'Passenger Side', 'Front', 'Back'];
+const PHOTO_SLOTS = [
+  { key: 'driver_side', label: 'Driver Side' },
+  { key: 'passenger_side', label: 'Passenger Side' },
+  { key: 'front', label: 'Front' },
+  { key: 'back', label: 'Back' },
+];
 
 /* ------------------------------------------------------------------ */
 /*  Shared style constants                                             */
@@ -150,6 +155,23 @@ const HELPER_TEXT = 'mt-1 text-xs text-[var(--text-muted)]';
 export function BasicDetailsTab({ data, onChange }: Props) {
   const [vinLoading, setVinLoading] = useState(false);
   const [vinError, setVinError] = useState('');
+  const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+  const [previewUrls, setPreviewUrls] = useState<Record<string, string>>({});
+
+  // Generate and clean up preview URLs when vehiclePhotos change
+  useEffect(() => {
+    const newUrls: Record<string, string> = {};
+    for (const [key, file] of Object.entries(data.vehiclePhotos)) {
+      newUrls[key] = URL.createObjectURL(file);
+    }
+    setPreviewUrls(newUrls);
+
+    return () => {
+      for (const url of Object.values(newUrls)) {
+        URL.revokeObjectURL(url);
+      }
+    };
+  }, [data.vehiclePhotos]);
 
   const update = <K extends keyof BasicDetailsState>(field: K, value: BasicDetailsState[K]) => {
     onChange({ ...data, [field]: value });
@@ -335,20 +357,66 @@ export function BasicDetailsTab({ data, onChange }: Props) {
       <div>
         <h3 className={SECTION_HEADING}>Vehicle Photos</h3>
         <div className="mt-2 grid grid-cols-4 gap-2">
-          {PHOTO_LABELS.map((label) => (
-            <div
-              key={label}
-              className="flex flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed border-[var(--border)] px-2 py-6 text-[var(--text-muted)] transition-colors hover:border-[var(--text-muted)] hover:text-[var(--text-secondary)] cursor-pointer"
-            >
-              {/* Camera icon */}
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-6 w-6">
-                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2v11z" strokeLinecap="round" strokeLinejoin="round" />
-                <circle cx="12" cy="13" r="4" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              <span className="text-[10px] font-medium">{label}</span>
-              <span className="text-[10px]">Click to upload</span>
-            </div>
-          ))}
+          {PHOTO_SLOTS.map(({ key, label }) => {
+            const hasFile = !!data.vehiclePhotos[key];
+            return (
+              <div key={key} className="relative">
+                <input
+                  ref={(el) => { fileInputRefs.current[key] = el; }}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const updated = { ...data.vehiclePhotos, [key]: file };
+                      onChange({ ...data, vehiclePhotos: updated });
+                    }
+                    // Reset so same file can be re-selected
+                    e.target.value = '';
+                  }}
+                />
+                {hasFile ? (
+                  <div className="relative rounded-lg border border-[var(--border)] overflow-hidden">
+                    <img
+                      src={previewUrls[key]}
+                      alt={label}
+                      className="h-24 w-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const next = { ...data.vehiclePhotos };
+                        delete next[key];
+                        onChange({ ...data, vehiclePhotos: next });
+                      }}
+                      className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors"
+                      aria-label={`Remove ${label} photo`}
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-3 w-3">
+                        <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </button>
+                    <div className="bg-black/50 px-1.5 py-0.5 text-center">
+                      <span className="text-[10px] font-medium text-white">{label}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    onClick={() => fileInputRefs.current[key]?.click()}
+                    className="flex flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed border-[var(--border)] px-2 py-6 text-[var(--text-muted)] transition-colors hover:border-[var(--text-muted)] hover:text-[var(--text-secondary)] cursor-pointer"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-6 w-6">
+                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2v11z" strokeLinecap="round" strokeLinejoin="round" />
+                      <circle cx="12" cy="13" r="4" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <span className="text-[10px] font-medium">{label}</span>
+                    <span className="text-[10px]">Click to upload</span>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
         <p className={HELPER_TEXT}>
           Upload photos from each angle to help with design and installation planning.
