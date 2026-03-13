@@ -4,10 +4,10 @@ import { useRouter } from 'next/navigation';
 import { formatCurrency } from '@/lib/format';
 import { ProjectCard } from '@/lib/types';
 
-const priorityColors: Record<string, string> = {
-  high: 'bg-rose-500',
-  medium: 'bg-amber-500',
-  low: 'bg-emerald-500',
+const priorityBadgeStyles: Record<string, { bg: string; label: string }> = {
+  high: { bg: 'bg-rose-500/15 text-rose-400', label: 'High' },
+  medium: { bg: 'bg-amber-500/15 text-amber-400', label: 'Medium' },
+  low: { bg: 'bg-emerald-500/15 text-emerald-400', label: 'Low' },
 };
 
 const tagStyles: Record<string, { bg: string; text: string }> = {
@@ -38,6 +38,11 @@ export default function KanbanCard({ card, onDragStart, isPending }: KanbanCardP
   const completedTasks = card.tasks?.filter((t) => t.done).length ?? 0;
   const totalTasks = card.tasks?.length ?? 0;
 
+  // Title fallback: client → vehicle → WO number
+  const title = card.client || card.vehicle || card.name;
+  // Show vehicle line only if client is the title and vehicle exists
+  const showVehicle = !!card.client && !!card.vehicle;
+
   return (
     <div
       draggable={!isPending}
@@ -61,20 +66,26 @@ export default function KanbanCard({ card, onDragStart, isPending }: KanbanCardP
           <div className="h-0.5 w-full animate-pulse rounded-t-lg bg-[var(--accent-primary)]" />
         </div>
       )}
-      {/* Header: ID + Priority */}
+      {/* Header: WO ID + Priority badge */}
       <div className="mb-2 flex items-center justify-between">
         <span className="font-mono text-xs tracking-wide text-[var(--text-muted)]">{card.id}</span>
-        <span
-          className={`inline-block h-2 w-2 rounded-full ${priorityColors[card.priority]}`}
-          title={`${card.priority} priority`}
-        />
+        <span className={`inline-block rounded px-1.5 py-0.5 text-[10px] font-medium ${priorityBadgeStyles[card.priority].bg}`}>
+          {priorityBadgeStyles[card.priority].label}
+        </span>
       </div>
 
-      {/* Name */}
-      <h4 className="mb-1 text-[15px] font-semibold text-[var(--text-primary)]">{card.name}</h4>
+      {/* Title */}
+      <h4 className="mb-1 text-[15px] font-semibold text-[var(--text-primary)]">{title}</h4>
 
-      {/* Vehicle */}
-      <p className="mb-2.5 text-xs text-[var(--text-secondary)]">{card.vehicle}</p>
+      {/* Vehicle (only when client is title and vehicle exists) */}
+      {showVehicle && (
+        <p data-testid="vehicle-line" className="mb-2.5 flex items-center gap-1.5 text-xs text-[var(--text-secondary)]">
+          <svg className="h-3 w-3 text-[var(--text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0H21M3.375 14.25h17.25M3.375 14.25V6.375c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v7.875m6.75 0v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v3.375" />
+          </svg>
+          {card.vehicle}
+        </p>
+      )}
 
       {/* Tags */}
       <div className="mb-3 flex flex-wrap gap-1.5">
@@ -150,7 +161,11 @@ export default function KanbanCard({ card, onDragStart, isPending }: KanbanCardP
       {/* Footer: Value, Date, Team */}
       <div className="mt-auto flex items-center justify-between border-t border-[var(--border)] pt-2.5">
         <div className="flex items-center gap-3">
-          <span className="text-xs font-semibold font-mono text-[var(--text-primary)]">{formatCurrency(card.value)}</span>
+          {card.value > 0 && (
+            <span data-testid="card-value" className="text-xs font-semibold font-mono text-[var(--text-primary)]">
+              {formatCurrency(card.value)}
+            </span>
+          )}
           <span className="text-[11px] text-[var(--text-muted)]">{formatDate(card.date)}</span>
         </div>
         <div className="flex -space-x-1.5">
