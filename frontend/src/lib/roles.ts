@@ -57,6 +57,7 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
           { icon: 'Palette', label: 'Design Queue', href: '/dashboard/design-queue', badgeKey: 'design_queue' },
           { icon: 'Printer', label: 'Print / Lam', href: '/dashboard/print' },
           { icon: 'Wrench', label: 'Install Schedule', href: '/dashboard/install-schedule' },
+          { icon: 'Settings', label: 'Equipment', href: '/dashboard/equipment' },
         ],
       },
       {
