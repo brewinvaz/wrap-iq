@@ -187,16 +187,16 @@ export default function CreateWorkOrderModal({
       }
 
       // Add production details if any are set
-      if (production.printMedia || production.laminate || production.printer) {
+      if (production.printMedia || production.laminate || production.printerId) {
         payload.production_details = {
-          assigned_equipment: JSON.stringify({
-            printer: production.printer || null,
-            laminator: production.laminator || null,
-            plotter_cutter: production.plotterCutter || null,
-          }),
+          printer_id: production.printerId || null,
+          laminator_id: production.laminatorId || null,
+          plotter_id: production.plotterId || null,
           print_media_brand_type: production.printMedia || null,
           laminate_brand_type: production.laminate || null,
-          window_perf_details: production.windowPerf ? { type: production.windowPerf } : null,
+          window_perf_details: production.windowPerf
+            ? { type: production.windowPerf }
+            : null,
         };
       }
 
