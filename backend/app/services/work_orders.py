@@ -3,8 +3,9 @@ import logging
 import uuid
 from datetime import UTC, datetime
 
+from sqlalchemy import String as SAString
+from sqlalchemy import cast, func, or_, select
 from sqlalchemy import delete as sa_delete
-from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -18,6 +19,7 @@ from app.models.invoice import Invoice
 from app.models.production_details import ProductionDetails
 from app.models.render import Render
 from app.models.time_log import TimeLog
+from app.models.vehicle import Vehicle
 from app.models.work_order import WorkOrder, WorkOrderVehicle
 from app.models.wrap_details import WrapDetails
 from app.services.r2 import delete_object, is_r2_configured
@@ -158,9 +160,22 @@ async def list_work_orders(
 
     if search:
         pattern = f"%{search}%"
+        # Subquery: find work order IDs that match via vehicle fields
+        vehicle_subquery = (
+            select(WorkOrderVehicle.work_order_id)
+            .join(Vehicle, Vehicle.id == WorkOrderVehicle.vehicle_id)
+            .where(
+                or_(
+                    Vehicle.make.ilike(pattern),
+                    Vehicle.model.ilike(pattern),
+                    cast(Vehicle.year, SAString).ilike(pattern),
+                )
+            )
+        )
         search_filter = or_(
             WorkOrder.job_number.ilike(pattern),
             WorkOrder.client.has(Client.name.ilike(pattern)),
+            WorkOrder.id.in_(vehicle_subquery),
         )
         query = query.where(search_filter)
         count_query = count_query.where(
@@ -169,6 +184,7 @@ async def list_work_orders(
                 WorkOrder.client_id.in_(
                     select(Client.id).where(Client.name.ilike(pattern))
                 ),
+                WorkOrder.id.in_(vehicle_subquery),
             )
         )
 

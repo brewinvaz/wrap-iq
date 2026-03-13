@@ -34,6 +34,7 @@ from app.models.subscription import (
     Subscription,
     SubscriptionStatus,
 )
+from app.models.task_preset import TaskPreset
 from app.models.time_log import Phase, TimeLog, TimeLogStatus
 from app.models.user import Role, User
 from app.models.user_profile import UserProfile
@@ -97,6 +98,7 @@ __all__ = [
     "Subscription",
     "SubscriptionStatus",
     "SystemStatus",
+    "TaskPreset",
     "TenantMixin",
     "TimeLog",
     "TimeLogStatus",

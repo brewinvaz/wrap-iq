@@ -1,15 +1,12 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { api, ApiError } from '@/lib/api-client';
 import { useModalAccessibility } from '@/hooks/useModalAccessibility';
-import Select from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
-
-interface WorkOrderOption {
-  id: string;
-  job_number: string;
-}
+import WorkOrderSearch from './WorkOrderSearch';
+import QuickHours from './QuickHours';
+import TaskSelector from './TaskSelector';
 
 interface LogTimeModalProps {
   isOpen: boolean;
@@ -20,12 +17,11 @@ interface LogTimeModalProps {
   defaultPhase?: string;
 }
 
-const PHASE_OPTIONS = [
-  { value: '', label: 'Select phase...' },
-  { value: 'design', label: 'Design' },
-  { value: 'production', label: 'Production' },
-  { value: 'install', label: 'Install' },
-  { value: 'other', label: 'Other' },
+const PHASES = [
+  { value: 'design', label: 'Design', color: 'var(--phase-design, #8b5cf6)' },
+  { value: 'production', label: 'Production', color: 'var(--phase-production, #f59e0b)' },
+  { value: 'install', label: 'Install', color: 'var(--phase-install, #22c55e)' },
+  { value: 'other', label: 'Other', color: 'var(--phase-other, #3b82f6)' },
 ];
 
 function todayISO(): string {
@@ -46,10 +42,6 @@ export default function LogTimeModal({
 }: LogTimeModalProps) {
   const [selectedWorkOrderId, setSelectedWorkOrderId] = useState(workOrderId ?? '');
   const [selectedWorkOrderLabel, setSelectedWorkOrderLabel] = useState(workOrderJobNumber ?? '');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<WorkOrderOption[]>([]);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [searchLoading, setSearchLoading] = useState(false);
 
   const [phase, setPhase] = useState(defaultPhase ?? '');
   const [task, setTask] = useState('');
@@ -61,8 +53,6 @@ export default function LogTimeModal({
   const [error, setError] = useState<string | null>(null);
 
   const modalRef = useModalAccessibility(isOpen, onClose);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const isLockedWorkOrder = Boolean(workOrderId);
 
   // Reset form when modal opens
@@ -70,9 +60,6 @@ export default function LogTimeModal({
     if (isOpen) {
       setSelectedWorkOrderId(workOrderId ?? '');
       setSelectedWorkOrderLabel(workOrderJobNumber ?? '');
-      setSearchQuery('');
-      setSearchResults([]);
-      setShowDropdown(false);
       setPhase(defaultPhase ?? '');
       setTask('');
       setHours('');
@@ -82,57 +69,10 @@ export default function LogTimeModal({
     }
   }, [isOpen, workOrderId, workOrderJobNumber, defaultPhase]);
 
-  // Debounced work order search
-  const searchWorkOrders = useCallback(async (query: string) => {
-    if (!query.trim()) {
-      setSearchResults([]);
-      setShowDropdown(false);
-      return;
-    }
-    setSearchLoading(true);
-    try {
-      const data = await api.get<{ items: WorkOrderOption[] }>(
-        `/api/work-orders?search=${encodeURIComponent(query)}&limit=10`
-      );
-      setSearchResults(data.items);
-      setShowDropdown(true);
-    } catch {
-      setSearchResults([]);
-    } finally {
-      setSearchLoading(false);
-    }
-  }, []);
-
-  function handleSearchChange(value: string) {
-    setSearchQuery(value);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => searchWorkOrders(value), 300);
+  function handlePhaseChange(newPhase: string) {
+    setPhase(newPhase);
+    setTask(''); // Reset task when phase changes
   }
-
-  function handleSelectWorkOrder(wo: WorkOrderOption) {
-    setSelectedWorkOrderId(wo.id);
-    setSelectedWorkOrderLabel(wo.job_number);
-    setSearchQuery('');
-    setShowDropdown(false);
-    setSearchResults([]);
-  }
-
-  function clearWorkOrder() {
-    setSelectedWorkOrderId('');
-    setSelectedWorkOrderLabel('');
-  }
-
-  // Close dropdown on outside click
-  useEffect(() => {
-    if (!showDropdown) return;
-    function handleMouseDown(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setShowDropdown(false);
-      }
-    }
-    document.addEventListener('mousedown', handleMouseDown);
-    return () => document.removeEventListener('mousedown', handleMouseDown);
-  }, [showDropdown]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -221,131 +161,85 @@ export default function LogTimeModal({
             >
               Work Order <span className="text-[var(--text-muted)]">(optional)</span>
             </label>
-            {isLockedWorkOrder ? (
-              <div className="flex w-full items-center rounded-lg border border-[var(--border)] bg-[var(--surface-raised)] px-3.5 py-2.5 text-sm text-[var(--text-primary)]">
-                <span className="font-mono">{selectedWorkOrderLabel}</span>
-              </div>
-            ) : (
-              <div className="relative" ref={dropdownRef}>
-                {selectedWorkOrderId ? (
-                  <div className="flex w-full items-center justify-between rounded-lg border border-[var(--border)] bg-[var(--surface-raised)] px-3.5 py-2.5 text-sm">
-                    <span className="font-mono text-[var(--text-primary)]">{selectedWorkOrderLabel}</span>
-                    <button
-                      type="button"
-                      onClick={clearWorkOrder}
-                      className="ml-2 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
-                    >
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-                ) : (
-                  <input
-                    id="log-work-order"
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => handleSearchChange(e.target.value)}
-                    placeholder="Search by job number..."
-                    autoComplete="off"
-                    className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface-raised)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
-                  />
-                )}
-                {showDropdown && searchResults.length > 0 && (
-                  <div className="absolute left-0 right-0 top-full z-10 mt-1 max-h-48 overflow-y-auto rounded-lg border border-[var(--border)] bg-[var(--surface-overlay)] shadow-lg">
-                    {searchResults.map((wo) => (
-                      <button
-                        key={wo.id}
-                        type="button"
-                        onClick={() => handleSelectWorkOrder(wo)}
-                        className="flex w-full items-center px-3.5 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--accent-primary)]/10"
-                      >
-                        <span className="font-mono">{wo.job_number}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-                {showDropdown && searchResults.length === 0 && !searchLoading && searchQuery.trim() && (
-                  <div className="absolute left-0 right-0 top-full z-10 mt-1 rounded-lg border border-[var(--border)] bg-[var(--surface-overlay)] px-3.5 py-2 shadow-lg">
-                    <span className="text-sm text-[var(--text-muted)]">No work orders found</span>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Phase */}
-          <div>
-            <label
-              htmlFor="log-phase"
-              className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]"
-            >
-              Phase
-            </label>
-            <Select
-              id="log-phase"
-              value={phase}
-              onChange={setPhase}
-              options={PHASE_OPTIONS}
+            <WorkOrderSearch
+              selectedId={selectedWorkOrderId}
+              selectedLabel={selectedWorkOrderLabel}
+              onSelect={(id, label) => {
+                setSelectedWorkOrderId(id);
+                setSelectedWorkOrderLabel(label);
+              }}
+              onClear={() => {
+                setSelectedWorkOrderId('');
+                setSelectedWorkOrderLabel('');
+              }}
+              isLocked={isLockedWorkOrder}
             />
           </div>
 
-          {/* Task */}
+          {/* Phase — segmented buttons */}
           <div>
-            <label
-              htmlFor="log-task"
-              className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]"
-            >
+            <label className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]">
+              Phase
+            </label>
+            <div className="flex gap-2">
+              {PHASES.map((p) => (
+                <button
+                  key={p.value}
+                  type="button"
+                  onClick={() => handlePhaseChange(p.value)}
+                  className={`flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
+                    phase === p.value
+                      ? 'font-semibold'
+                      : 'border-[var(--border)] bg-[var(--surface-raised)] text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                  }`}
+                  style={
+                    phase === p.value
+                      ? {
+                          borderColor: `color-mix(in srgb, ${p.color} 40%, transparent)`,
+                          backgroundColor: `color-mix(in srgb, ${p.color} 12%, transparent)`,
+                          color: p.color,
+                        }
+                      : undefined
+                  }
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Task — phase-based presets */}
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]">
               Task
             </label>
+            <TaskSelector phase={phase} value={task} onChange={setTask} />
+          </div>
+
+          {/* Hours — quick-select */}
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]">
+              Hours
+            </label>
+            <QuickHours value={hours} onChange={setHours} />
+          </div>
+
+          {/* Date */}
+          <div>
+            <label
+              htmlFor="log-date"
+              className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]"
+            >
+              Date
+            </label>
             <input
-              id="log-task"
-              type="text"
-              value={task}
-              onChange={(e) => setTask(e.target.value)}
-              placeholder="e.g., Vehicle wrap installation"
+              id="log-date"
+              type="date"
+              value={logDate}
+              onChange={(e) => setLogDate(e.target.value)}
               required
               className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
             />
-          </div>
-
-          {/* Hours and Date */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label
-                htmlFor="log-hours"
-                className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]"
-              >
-                Hours
-              </label>
-              <input
-                id="log-hours"
-                type="number"
-                value={hours}
-                onChange={(e) => setHours(e.target.value)}
-                placeholder="0.00"
-                required
-                min="0.25"
-                step="0.25"
-                className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="log-date"
-                className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]"
-              >
-                Date
-              </label>
-              <input
-                id="log-date"
-                type="date"
-                value={logDate}
-                onChange={(e) => setLogDate(e.target.value)}
-                required
-                className="w-full rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
-              />
-            </div>
           </div>
 
           {/* Notes */}
