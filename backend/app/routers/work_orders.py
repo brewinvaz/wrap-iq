@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_current_user, get_session
 from app.models.client import Client
+from app.models.equipment import Equipment, EquipmentType
 from app.models.kanban_stage import KanbanStage
 from app.models.user import User
 from app.models.vehicle import Vehicle
@@ -71,6 +72,44 @@ async def _validate_client_ownership(
             status_code=403,
             detail="Client not found in your organization",
         )
+
+
+_EQUIPMENT_SLOTS: dict[str, EquipmentType] = {
+    "printer_id": EquipmentType.printer,
+    "laminator_id": EquipmentType.laminator,
+    "plotter_id": EquipmentType.plotter,
+}
+
+
+async def _validate_equipment_ownership(
+    session: AsyncSession,
+    production_data: dict | None,
+    org_id: uuid.UUID,
+) -> None:
+    if not production_data:
+        return
+    for field, expected_type in _EQUIPMENT_SLOTS.items():
+        eq_id = production_data.get(field)
+        if eq_id is None:
+            continue
+        result = await session.execute(
+            select(Equipment).where(
+                Equipment.id == eq_id,
+                Equipment.organization_id == org_id,
+            )
+        )
+        equipment = result.scalar_one_or_none()
+        if equipment is None:
+            raise HTTPException(
+                status_code=403,
+                detail="Equipment not found in your organization",
+            )
+        if equipment.equipment_type != expected_type:
+            raise HTTPException(
+                status_code=400,
+                detail=f"{field} must reference equipment of type "
+                f"{expected_type.value}",
+            )
 
 
 def _to_response(wo) -> WorkOrderResponse:
@@ -159,6 +198,12 @@ async def create(
             data.install_details.model_dump() if data.install_details else None
         ),
     }
+
+    await _validate_equipment_ownership(
+        session,
+        sub_details.get("production_details"),
+        user.organization_id,
+    )
 
     wo = await create_work_order(
         session, user.organization_id, stage.id, wo_data, data.vehicle_ids, sub_details
