@@ -69,14 +69,14 @@ function toProjectCard(wo: WorkOrderResponse): ProjectCard {
       ? wo.vehicles
           .map((v) => [v.year, v.make, v.model].filter(Boolean).join(' '))
           .join(', ')
-      : 'No vehicle';
+      : '';
 
   return {
     id: wo.job_number,
     workOrderId: wo.id,
     name: wo.job_number,
     vehicle: vehicleSummary,
-    client: wo.client_name ?? 'Unknown Client',
+    client: wo.client_name ?? '',
     value: wo.job_value,
     date: wo.estimated_completion_date
       ? wo.estimated_completion_date.slice(0, 10)
