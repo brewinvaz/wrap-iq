@@ -16,6 +16,7 @@ from app.logging_config import setup_logging
 from app.middleware.rate_limit import limiter
 from app.routers.admin import router as admin_router
 from app.routers.ai_assistant import router as ai_assistant_router
+from app.routers.analytics import router as analytics_router
 from app.routers.api_keys import router as api_keys_router
 from app.routers.audit_logs import router as audit_logs_router
 from app.routers.auth import router as auth_router
@@ -160,6 +161,7 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 
 app.include_router(ai_assistant_router)
+app.include_router(analytics_router)
 app.include_router(api_keys_router)
 app.include_router(chat_monitoring_router)
 app.include_router(client_invites_router)
