@@ -257,6 +257,80 @@ class TestMimeTypeFromKey:
         assert render_service._mime_type_from_key("org/renders/unknown") == "image/jpeg"
 
 
+class TestCreateRenderEnqueue:
+    @patch("app.services.renders.get_arq_pool", new_callable=AsyncMock)
+    async def test_create_render_enqueues_job(
+        self, mock_get_pool, db_session, seed_org_and_user
+    ):
+        """create_render should create record as PENDING and enqueue job."""
+        mock_pool = AsyncMock()
+        mock_get_pool.return_value = mock_pool
+
+        org, user = seed_org_and_user
+
+        render = await render_service.create_render(
+            session=db_session,
+            user=user,
+            design_name="Async Test",
+            description=None,
+            vehicle_photo_key=f"{org.id}/renders/photo.jpg",
+            wrap_design_key=f"{org.id}/renders/design.png",
+            work_order_id=None,
+            client_id=None,
+            vehicle_id=None,
+        )
+
+        assert render.status == RenderStatus.PENDING
+        mock_pool.enqueue_job.assert_called_once()
+        call_args = mock_pool.enqueue_job.call_args
+        assert call_args.args[0] == "render_generate"
+        assert call_args.args[1] == str(render.id)
+
+    @patch("app.services.renders.get_arq_pool", new_callable=AsyncMock)
+    async def test_regenerate_enqueues_job(
+        self, mock_get_pool, db_session, seed_org_and_user
+    ):
+        """regenerate_render should set PENDING and enqueue job."""
+        mock_pool = AsyncMock()
+        mock_get_pool.return_value = mock_pool
+
+        org, user = seed_org_and_user
+        render = Render(
+            organization_id=org.id,
+            design_name="Test",
+            vehicle_photo_key=f"{org.id}/renders/photo.jpg",
+            wrap_design_key=f"{org.id}/renders/design.png",
+            created_by=user.id,
+            status=RenderStatus.COMPLETED,
+        )
+        db_session.add(render)
+        await db_session.commit()
+
+        result = await render_service.regenerate_render(db_session, render, "New desc")
+        assert result.status == RenderStatus.PENDING
+        assert result.description == "New desc"
+        mock_pool.enqueue_job.assert_called_once()
+
+    async def test_regenerate_rejects_rendering_state(
+        self, db_session, seed_org_and_user
+    ):
+        """regenerate_render should raise ValueError if render is RENDERING."""
+        org, user = seed_org_and_user
+        render = Render(
+            organization_id=org.id,
+            design_name="Test",
+            vehicle_photo_key=f"{org.id}/renders/photo.jpg",
+            wrap_design_key=f"{org.id}/renders/design.png",
+            created_by=user.id,
+            status=RenderStatus.RENDERING,
+        )
+        db_session.add(render)
+        await db_session.commit()
+
+        with pytest.raises(ValueError, match="already rendering"):
+            await render_service.regenerate_render(db_session, render)
+
+
 @pytest.fixture
 async def seed_plan(db_session):
     plan = Plan(id=uuid.uuid4(), name="Free", price_cents=0, is_default=True)
