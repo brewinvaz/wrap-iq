@@ -189,8 +189,9 @@ async def test_delete_work_order_with_invoice_blocked(client, db_session):
     wo_id = wo_data["id"]
 
     # Manually insert an invoice linked to this work order
-    from app.models.user import User
     from sqlalchemy import select
+
+    from app.models.user import User
 
     user_result = await db_session.execute(select(User).limit(1))
     user = user_result.scalar_one()

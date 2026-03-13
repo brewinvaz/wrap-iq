@@ -1,7 +1,5 @@
 import uuid
 
-import pytest
-
 from app.models.equipment import EquipmentType
 from app.models.organization import Organization
 from app.models.plan import Plan

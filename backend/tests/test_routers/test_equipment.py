@@ -1,4 +1,3 @@
-import pytest
 
 
 async def _register_and_get_token(client):

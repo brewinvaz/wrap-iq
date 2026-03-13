@@ -1,6 +1,5 @@
 """Tests for work order photo schemas."""
 
-import uuid
 
 import pytest
 from pydantic import ValidationError
