@@ -299,7 +299,7 @@ function PhotosTab({ workOrderId }: { workOrderId: string }) {
     setError(null);
     try {
       const data = await api.get<{ photos: PhotoResponse[] }>(`/api/work-orders/${workOrderId}/photos`);
-      setPhotos(data.photos);
+      setPhotos(data.photos ?? []);
     } catch (err) {
       if (err instanceof ApiError && err.status === 503) {
         setError('Photos are not available in this environment');
