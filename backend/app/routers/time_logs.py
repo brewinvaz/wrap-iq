@@ -57,6 +57,7 @@ async def list_time_logs(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=100),
     status_filter: str | None = Query(None, alias="status"),
+    work_order_id: uuid.UUID | None = Query(None),
     session: AsyncSession = Depends(get_session),
     user: User = Depends(get_current_user),
 ):
@@ -70,6 +71,10 @@ async def list_time_logs(
     if status_filter:
         query = query.where(TimeLog.status == status_filter)
         count_query = count_query.where(TimeLog.status == status_filter)
+
+    if work_order_id:
+        query = query.where(TimeLog.work_order_id == work_order_id)
+        count_query = count_query.where(TimeLog.work_order_id == work_order_id)
 
     query = query.order_by(TimeLog.log_date.desc(), TimeLog.created_at.desc())
     query = query.offset(skip).limit(limit)
