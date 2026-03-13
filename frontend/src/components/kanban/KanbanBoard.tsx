@@ -7,7 +7,7 @@ import KanbanColumn from './KanbanColumn';
 interface KanbanBoardProps {
   /** Columns to display on the board. */
   columns?: KanbanColumnType[];
-  /** Called after a card is moved to a new column (drag-drop or advance). */
+  /** Called after a card is moved to a new column (drag-drop). */
   onStatusChange?: (cardId: string, targetColumnId: string) => void;
   /** Set of card IDs that have a pending status change in flight. */
   pendingCards?: Set<string>;
@@ -106,33 +106,18 @@ export default function KanbanBoard({ columns: externalColumns, onStatusChange, 
     [moveCard]
   );
 
-  const handleAdvanceCard = useCallback(
-    (cardId: string) => {
-      const currentColumnIndex = columns.findIndex((col) =>
-        col.cards.some((c) => c.id === cardId)
-      );
-      if (currentColumnIndex >= 0 && currentColumnIndex < columns.length - 1) {
-        const nextColumnId = columns[currentColumnIndex + 1].id;
-        moveCard(cardId, nextColumnId);
-      }
-    },
-    [columns, moveCard]
-  );
-
   return (
     <div className="flex gap-5 overflow-x-auto pb-4">
-      {columns.map((column, index) => (
+      {columns.map((column) => (
         <KanbanColumn
           key={column.id}
           column={column}
-          isLastColumn={index === columns.length - 1}
           onDragStart={handleDragStart}
           onDragOver={handleDragOver}
           onDrop={handleDrop}
           onDragEnter={handleDragEnter}
           onDragLeave={handleDragLeave}
           dragOverColumnId={dragOverColumnId}
-          onAdvanceCard={handleAdvanceCard}
           pendingCards={pendingCards}
           onAddProject={onAddProject}
         />
