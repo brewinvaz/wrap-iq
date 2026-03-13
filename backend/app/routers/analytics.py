@@ -95,13 +95,9 @@ async def get_summary(
         .having(func.sum(TimeLog.hours) > 0)
     )
     if start_date:
-        rate_subq = rate_subq.where(
-            func.date(WorkOrder.completion_date) >= start_date
-        )
+        rate_subq = rate_subq.where(func.date(WorkOrder.completion_date) >= start_date)
     if end_date:
-        rate_subq = rate_subq.where(
-            func.date(WorkOrder.completion_date) <= end_date
-        )
+        rate_subq = rate_subq.where(func.date(WorkOrder.completion_date) <= end_date)
     rate_subq = rate_subq.subquery()
     avg_rate_result = await session.execute(
         select(func.avg(rate_subq.c.effective_rate))
@@ -126,17 +122,11 @@ async def get_summary(
         .group_by(WorkOrder.id, WorkOrder.estimated_hours)
     )
     if start_date:
-        eff_subq = eff_subq.where(
-            func.date(WorkOrder.completion_date) >= start_date
-        )
+        eff_subq = eff_subq.where(func.date(WorkOrder.completion_date) >= start_date)
     if end_date:
-        eff_subq = eff_subq.where(
-            func.date(WorkOrder.completion_date) <= end_date
-        )
+        eff_subq = eff_subq.where(func.date(WorkOrder.completion_date) <= end_date)
     eff_subq = eff_subq.subquery()
-    avg_eff_result = await session.execute(
-        select(func.avg(eff_subq.c.efficiency_pct))
-    )
+    avg_eff_result = await session.execute(select(func.avg(eff_subq.c.efficiency_pct)))
     avg_efficiency_pct = avg_eff_result.scalar()
 
     return AnalyticsSummaryResponse(
@@ -273,9 +263,7 @@ async def get_roi_trend(
         if total_value and total_hrs and total_hrs > 0:
             effective_rate = round(total_value / total_hrs, 2)
             if hourly_cost and hourly_cost > 0:
-                roi_pct = round(
-                    (effective_rate - hourly_cost) / hourly_cost * 100, 2
-                )
+                roi_pct = round((effective_rate - hourly_cost) / hourly_cost * 100, 2)
 
         items.append(
             RoiTrendItem(
