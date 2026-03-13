@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui/Button';
 import { api, ApiError } from '@/lib/api-client';
 import NewRenderModal from '@/components/renders/NewRenderModal';
+import DataTable, { Column } from '@/components/ui/DataTable';
 import { useModalAccessibility } from '@/hooks/useModalAccessibility';
 
 // --- API response types ---
@@ -365,6 +366,88 @@ export default function ThreeDPage() {
     { key: 'failed', label: 'Failed' },
   ];
 
+  const tableColumns: Column<RenderResponse>[] = [
+    {
+      key: 'design',
+      header: 'Design',
+      render: (r) => {
+        const idx = renders.indexOf(r);
+        return (
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setLightboxIndex(idx)}
+              className="shrink-0 cursor-pointer"
+              aria-label={`View ${r.design_name}`}
+            >
+              {r.result_image_url ? (
+                <img
+                  src={r.result_image_url}
+                  alt={r.design_name}
+                  className="h-10 w-14 rounded object-cover transition-opacity hover:opacity-80"
+                />
+              ) : (
+                <div className="flex h-10 w-14 items-center justify-center rounded bg-gradient-to-br from-[var(--surface-raised)] to-[var(--surface-overlay)] transition-opacity hover:opacity-80">
+                  <svg className="h-5 w-5 text-[var(--text-muted)]" fill="none" stroke="currentColor" strokeWidth={1} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+                  </svg>
+                </div>
+              )}
+            </button>
+            <span className="font-medium text-[var(--text-primary)]">{r.design_name}</span>
+          </div>
+        );
+      },
+    },
+    {
+      key: 'creator',
+      header: 'Creator',
+      render: (r) => (
+        <span className="text-[var(--text-secondary)]">{r.created_by_name ?? '—'}</span>
+      ),
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      render: (r) => {
+        const s = statusStyles[r.status] ?? statusStyles.pending;
+        return (
+          <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${s.bg} ${s.text}`}>
+            {s.label}
+          </span>
+        );
+      },
+    },
+    {
+      key: 'date',
+      header: 'Date',
+      render: (r) => (
+        <span className="text-[var(--text-secondary)]">{formatDate(r.created_at)}</span>
+      ),
+    },
+    {
+      key: 'actions',
+      header: 'Actions',
+      render: (r) => (
+        <div className="flex items-center gap-2">
+          {r.status === 'completed' && (
+            <Button variant="secondary" size="sm" onClick={() => handleShare(r.id)}>
+              Share
+            </Button>
+          )}
+          {(r.status === 'completed' || r.status === 'failed') && (
+            <Button variant="secondary" size="sm" onClick={() => handleRegenerate(r.id)}>
+              Regenerate
+            </Button>
+          )}
+          <Button variant="danger" size="sm" onClick={() => handleDelete(r.id)}>
+            Delete
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="flex h-full flex-col">
       {/* Toast */}
@@ -533,87 +616,11 @@ export default function ThreeDPage() {
             })}
           </div>
         ) : (
-          <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-card)]">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-[var(--border)] bg-[var(--surface-raised)]">
-                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Design</th>
-                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Creator</th>
-                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Status</th>
-                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Date</th>
-                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {renders.map((r, idx) => {
-                  const style = statusStyles[r.status] ?? statusStyles.pending;
-                  return (
-                    <tr key={r.id} className="border-b border-[var(--border)] last:border-0 hover:bg-[var(--surface-raised)]/50">
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-3">
-                          <button
-                            type="button"
-                            onClick={() => setLightboxIndex(idx)}
-                            className="shrink-0 cursor-pointer"
-                            aria-label={`View ${r.design_name}`}
-                          >
-                            {r.result_image_url ? (
-                              <img
-                                src={r.result_image_url}
-                                alt={r.design_name}
-                                className="h-10 w-14 rounded object-cover transition-opacity hover:opacity-80"
-                              />
-                            ) : (
-                              <div className="flex h-10 w-14 items-center justify-center rounded bg-gradient-to-br from-[var(--surface-raised)] to-[var(--surface-overlay)] transition-opacity hover:opacity-80">
-                                <svg className="h-5 w-5 text-[var(--text-muted)]" fill="none" stroke="currentColor" strokeWidth={1} viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
-                                </svg>
-                              </div>
-                            )}
-                          </button>
-                          <span className="font-medium text-[var(--text-primary)]">{r.design_name}</span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-[var(--text-secondary)]">{r.created_by_name ?? '—'}</td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${style.bg} ${style.text}`}>
-                          {style.label}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-[var(--text-secondary)]">{formatDate(r.created_at)}</td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-2">
-                          {r.status === 'completed' && (
-                            <button
-                              onClick={() => handleShare(r.id)}
-                              className="rounded-md border border-[var(--border)] px-2.5 py-1 text-[11px] font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-raised)]"
-                            >
-                              Share
-                            </button>
-                          )}
-                          {(r.status === 'completed' || r.status === 'failed') && (
-                            <button
-                              onClick={() => handleRegenerate(r.id)}
-                              className="rounded-md border border-[var(--border)] px-2.5 py-1 text-[11px] font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-raised)]"
-                            >
-                              Regenerate
-                            </button>
-                          )}
-                          <Button
-                            variant="danger"
-                            size="sm"
-                            onClick={() => handleDelete(r.id)}
-                          >
-                            Delete
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <DataTable<RenderResponse>
+            columns={tableColumns}
+            data={renders}
+            rowKey={(r) => r.id}
+          />
         )}
 
         {/* Pagination */}

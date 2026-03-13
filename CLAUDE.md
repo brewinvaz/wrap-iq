@@ -32,6 +32,10 @@ Monorepo: `frontend/` (Next.js 15, React 19) + `backend/` (FastAPI, Python 3.13)
 - Frontend styling: Tailwind CSS 4 via @tailwindcss/postcss
 - Next.js output: standalone (for Docker production builds)
 
+## Playwright MCP
+- All Playwright MCP screenshots MUST be saved to `.playwright-mcp/` directory
+- Use `SCREENSHOT_DIR=.playwright-mcp` when taking screenshots via the Playwright MCP tools
+
 ## Code Change Workflow
 All code changes MUST follow this workflow:
 1. **GitHub Issue** — Create a GH issue first and add it to the WrapIQ GitHub project board (#7, owner: brewinvaz)
