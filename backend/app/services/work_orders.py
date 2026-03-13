@@ -257,9 +257,7 @@ async def delete_work_order(session: AsyncSession, wo: WorkOrder) -> None:
     await session.execute(
         sa_delete(FileUpload).where(FileUpload.work_order_id == wo_id)
     )
-    await session.execute(
-        sa_delete(TimeLog).where(TimeLog.work_order_id == wo_id)
-    )
+    await session.execute(sa_delete(TimeLog).where(TimeLog.work_order_id == wo_id))
 
     # EstimateLineItems → Estimates
     est_ids_result = await session.execute(
@@ -268,17 +266,11 @@ async def delete_work_order(session: AsyncSession, wo: WorkOrder) -> None:
     est_ids = [row[0] for row in est_ids_result.all()]
     if est_ids:
         await session.execute(
-            sa_delete(EstimateLineItem).where(
-                EstimateLineItem.estimate_id.in_(est_ids)
-            )
+            sa_delete(EstimateLineItem).where(EstimateLineItem.estimate_id.in_(est_ids))
         )
-    await session.execute(
-        sa_delete(Estimate).where(Estimate.work_order_id == wo_id)
-    )
+    await session.execute(sa_delete(Estimate).where(Estimate.work_order_id == wo_id))
 
-    await session.execute(
-        sa_delete(Render).where(Render.work_order_id == wo_id)
-    )
+    await session.execute(sa_delete(Render).where(Render.work_order_id == wo_id))
     await session.execute(
         sa_delete(WrapDetails).where(WrapDetails.work_order_id == wo_id)
     )
