@@ -1,7 +1,9 @@
+import asyncio
 import logging
 import uuid
 from datetime import UTC, datetime
 
+from fastapi import HTTPException
 from sqlalchemy import delete as sa_delete, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -215,8 +217,6 @@ async def delete_work_order(session: AsyncSession, wo: WorkOrder) -> None:
     Raises HTTPException(409) if invoices are linked.
     R2 cleanup is best-effort — failures are logged but do not block deletion.
     """
-    from fastapi import HTTPException
-
     # Invoice guard
     invoice_count = await session.execute(
         select(func.count(Invoice.id)).where(Invoice.work_order_id == wo.id)
@@ -236,7 +236,7 @@ async def delete_work_order(session: AsyncSession, wo: WorkOrder) -> None:
         )
         for (key,) in file_result.all():
             try:
-                delete_object(key)
+                await asyncio.to_thread(delete_object, key)
             except Exception:
                 logger.warning("Failed to delete R2 object: %s", key)
 
@@ -252,7 +252,7 @@ async def delete_work_order(session: AsyncSession, wo: WorkOrder) -> None:
             for key in row:
                 if key:
                     try:
-                        delete_object(key)
+                        await asyncio.to_thread(delete_object, key)
                     except Exception:
                         logger.warning("Failed to delete R2 object: %s", key)
 
