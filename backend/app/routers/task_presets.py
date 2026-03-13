@@ -57,9 +57,7 @@ async def list_task_presets(
     )
 
 
-@router.post(
-    "", response_model=TaskPresetResponse, status_code=status.HTTP_201_CREATED
-)
+@router.post("", response_model=TaskPresetResponse, status_code=status.HTTP_201_CREATED)
 async def create_task_preset(
     data: TaskPresetCreate,
     session: AsyncSession = Depends(get_session),

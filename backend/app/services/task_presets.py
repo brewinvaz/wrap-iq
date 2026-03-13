@@ -77,9 +77,7 @@ class TaskPresetService:
             await self.seed_defaults(organization_id)
 
         # Build query
-        query = select(TaskPreset).where(
-            TaskPreset.organization_id == organization_id
-        )
+        query = select(TaskPreset).where(TaskPreset.organization_id == organization_id)
         count_query = (
             select(func.count())
             .select_from(TaskPreset)
