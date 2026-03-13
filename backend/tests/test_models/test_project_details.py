@@ -5,6 +5,7 @@ from decimal import Decimal
 from sqlalchemy import select
 
 from app.models.design_details import DesignDetails
+from app.models.equipment import Equipment, EquipmentType
 from app.models.install_details import (
     InstallDetails,
     InstallDifficulty,
@@ -117,11 +118,20 @@ async def test_design_details(db_session):
 async def test_production_details(db_session):
     org, wo, vehicle = await _seed(db_session)
 
+    printer = Equipment(
+        id=uuid.uuid4(),
+        organization_id=org.id,
+        name="Roland TrueVIS VG3-640",
+        equipment_type=EquipmentType.printer,
+    )
+    db_session.add(printer)
+    await db_session.flush()
+
     pd = ProductionDetails(
         id=uuid.uuid4(),
         organization_id=org.id,
         work_order_id=wo.id,
-        assigned_equipment="Roland TrueVIS VG3-640",
+        printer_id=printer.id,
         print_media_brand_type="3M IJ180Cv3",
         print_media_width="54in",
         media_print_length=Decimal("120.50"),
@@ -134,7 +144,7 @@ async def test_production_details(db_session):
         select(ProductionDetails).where(ProductionDetails.id == pd.id)
     )
     saved = result.scalar_one()
-    assert saved.assigned_equipment == "Roland TrueVIS VG3-640"
+    assert saved.printer_id == printer.id
     assert saved.media_print_length == Decimal("120.50")
     assert saved.sq_ft_printed_and_waste == Decimal("540.00")
 
