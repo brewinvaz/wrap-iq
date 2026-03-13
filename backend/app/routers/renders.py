@@ -166,6 +166,8 @@ async def regenerate_render(
         render = await render_service.regenerate_render(
             session, render, description=body.description if body else None
         )
+    except ValueError as e:
+        raise HTTPException(status_code=409, detail=str(e))
     except RuntimeError as e:
         raise HTTPException(status_code=503, detail=str(e))
     return render_service.build_render_response(render)

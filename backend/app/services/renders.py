@@ -14,6 +14,7 @@ from app.models.user import User
 from app.models.vehicle import Vehicle
 from app.models.work_order import WorkOrder
 from app.schemas.renders import RenderResponse
+from app.services.arq import get_arq_pool
 from app.services.r2 import (
     delete_object,
     download_object,
@@ -189,28 +190,16 @@ async def create_render(
         status=RenderStatus.PENDING,
     )
     session.add(render)
-    await session.flush()
-
-    render.status = RenderStatus.RENDERING
-    await session.flush()
-
-    try:
-        result_bytes = await generate_image(
-            vehicle_photo_key, wrap_design_key, description
-        )
-        result_key = generate_object_key(
-            user.organization_id, "result.jpg", prefix="renders"
-        )
-        upload_object(result_key, result_bytes, "image/jpeg")
-        render.result_image_key = result_key
-        render.status = RenderStatus.COMPLETED
-    except Exception as exc:
-        logger.exception("Render generation failed")
-        render.status = RenderStatus.FAILED
-        render.error_message = str(exc)[:500]
-
     await session.commit()
     await session.refresh(render)
+
+    pool = await get_arq_pool()
+    await pool.enqueue_job(
+        "render_generate",
+        str(render.id),
+        _job_id=f"render:{render.id}",
+    )
+
     return render
 
 
@@ -285,38 +274,25 @@ async def regenerate_render(
     render: Render,
     description: str | None = None,
 ) -> Render:
+    if render.status == RenderStatus.RENDERING:
+        raise ValueError("Render is already rendering")
+
     if description is not None:
         render.description = description
 
-    render.status = RenderStatus.RENDERING
+    render.status = RenderStatus.PENDING
     render.error_message = None
-    await session.flush()
-
-    try:
-        result_bytes = await generate_image(
-            render.vehicle_photo_key,
-            render.wrap_design_key,
-            render.description,
-        )
-        result_key = generate_object_key(
-            render.organization_id, "result.jpg", prefix="renders"
-        )
-        # Delete old result if exists
-        if render.result_image_key:
-            try:
-                delete_object(render.result_image_key)
-            except Exception:
-                pass
-        upload_object(result_key, result_bytes, "image/jpeg")
-        render.result_image_key = result_key
-        render.status = RenderStatus.COMPLETED
-    except Exception as exc:
-        logger.exception("Render regeneration failed")
-        render.status = RenderStatus.FAILED
-        render.error_message = str(exc)[:500]
-
     await session.commit()
     await session.refresh(render)
+
+    pool = await get_arq_pool()
+    await pool.enqueue_job(
+        "render_generate",
+        str(render.id),
+        delete_old=True,
+        _job_id=f"render:{render.id}",
+    )
+
     return render
 
 
