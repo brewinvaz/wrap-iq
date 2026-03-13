@@ -13,7 +13,7 @@ jobs:
     name: Deploy API
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Install Railway CLI
         run: npm install -g @railway/cli
@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: deploy-api  # frontend build needs backend URL; deploy after API is up
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Install Railway CLI
         run: npm install -g @railway/cli
