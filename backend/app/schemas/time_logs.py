@@ -10,6 +10,7 @@ class TimeLogCreate(BaseModel):
     task: str = Field(max_length=255)
     hours: Decimal = Field(gt=0, le=24)
     log_date: date
+    phase: str | None = None
     notes: str | None = None
 
 
@@ -36,11 +37,21 @@ class TimeLogResponse(BaseModel):
     hours: Decimal
     log_date: date
     status: str
+    phase: str | None = None
     notes: str | None = None
     created_at: datetime
     updated_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class TimeLogUpdate(BaseModel):
+    task: str | None = None
+    hours: Decimal | None = Field(default=None, gt=0, le=24)
+    log_date: date | None = None
+    phase: str | None = None
+    notes: str | None = None
+    work_order_id: uuid.UUID | None = None
 
 
 class TimeLogListResponse(BaseModel):
