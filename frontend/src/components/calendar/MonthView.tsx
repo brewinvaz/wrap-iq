@@ -75,12 +75,12 @@ export default function MonthView({
 
   return (
     <div className="flex-1 overflow-auto bg-[var(--surface-card)] p-4">
-      <div className="grid grid-cols-7 gap-px rounded-lg border border-[var(--border)] bg-[var(--border)]">
+      <div className="grid grid-cols-7 gap-px overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--border)]">
         {/* Day-of-week headers */}
         {dayHeaders.map((dh) => (
           <div
             key={dh}
-            className="bg-[var(--surface-raised)] px-3 py-2 text-center text-xs font-medium text-[var(--text-muted)]"
+            className="bg-[var(--surface-raised)] px-3 py-2.5 text-center text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]"
           >
             {dh}
           </div>
@@ -89,7 +89,7 @@ export default function MonthView({
         {/* Calendar cells */}
         {weeks.flat().map((date, idx) => {
           if (!date) {
-            return <div key={`empty-${idx}`} className="min-h-[100px] bg-[var(--surface-raised)]/50" />;
+            return <div key={`empty-${idx}`} className="min-h-[110px] bg-[var(--surface-raised)]/50" />;
           }
 
           const dateStr = formatDateStr(date);
@@ -102,13 +102,13 @@ export default function MonthView({
             <button
               key={dateStr}
               onClick={() => onDayClick(date)}
-              className={`group min-h-[100px] cursor-pointer p-2 text-left transition-colors hover:bg-[var(--surface-raised)] ${
-                isToday ? 'bg-[var(--surface-overlay)]' : 'bg-[var(--surface-card)]'
+              className={`group min-h-[110px] cursor-pointer p-2.5 text-left transition-colors hover:bg-[var(--surface-raised)] ${
+                isToday ? 'bg-[var(--accent-primary)]/5' : 'bg-[var(--surface-card)]'
               }`}
             >
               <div className="flex items-center justify-between">
                 <span
-                  className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold ${
+                  className={`inline-flex h-7 w-7 items-center justify-center rounded-full text-sm font-semibold ${
                     isToday
                       ? 'bg-[var(--accent-primary)] text-white'
                       : 'text-[var(--text-primary)] group-hover:bg-[var(--surface-overlay)]'
@@ -117,18 +117,18 @@ export default function MonthView({
                   {date.getDate()}
                 </span>
                 {dayEvents.length > 0 && (
-                  <span className="text-[10px] font-medium text-[var(--text-muted)]">
+                  <span className="text-xs font-medium text-[var(--text-muted)]">
                     {dayEvents.length} job{dayEvents.length !== 1 ? 's' : ''}
                   </span>
                 )}
               </div>
 
               {/* Event previews (max 3) */}
-              <div className="mt-1 space-y-0.5">
+              <div className="mt-1.5 space-y-1">
                 {dayEvents.slice(0, 3).map((evt) => (
                   <div
                     key={evt.id}
-                    className="truncate rounded px-1.5 py-0.5 text-[10px] font-medium"
+                    className="truncate rounded px-2 py-0.5 text-xs font-medium"
                     style={{
                       backgroundColor: colorWithOpacity(evt.color, 0.1),
                       color: evt.color,
@@ -139,7 +139,7 @@ export default function MonthView({
                   </div>
                 ))}
                 {dayEvents.length > 3 && (
-                  <div className="px-1.5 text-[10px] text-[var(--text-muted)]">
+                  <div className="px-2 text-xs text-[var(--text-muted)]">
                     +{dayEvents.length - 3} more
                   </div>
                 )}

@@ -54,7 +54,7 @@ export default function DayView({
     <div className="flex-1 overflow-auto bg-[var(--surface-card)]">
       {/* Day header */}
       <div
-        className={`border-b border-[var(--border)] px-6 py-3 ${isToday ? 'bg-[var(--surface-overlay)]' : 'bg-[var(--surface-raised)]'}`}
+        className={`border-b border-[var(--border)] px-6 py-3 ${isToday ? 'bg-[var(--accent-primary)]/5' : 'bg-[var(--surface-raised)]'}`}
       >
         <span
           className={`text-sm font-semibold ${isToday ? 'text-[var(--accent-primary)]' : 'text-[var(--text-primary)]'}`}
@@ -66,7 +66,7 @@ export default function DayView({
       <div className="grid min-w-[600px] grid-cols-[80px_repeat(var(--cols),1fr)]" style={{ '--cols': filteredInstallers.length } as React.CSSProperties}>
         {/* Column headers: time + installer names */}
         <div className="sticky top-0 z-10 border-b border-r border-[var(--border)] bg-[var(--surface-raised)] px-2 py-3">
-          <span className="text-xs font-medium text-[var(--text-muted)]">Time</span>
+          <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">Time</span>
         </div>
         {filteredInstallers.map((installer) => (
           <div
@@ -75,12 +75,12 @@ export default function DayView({
           >
             <div className="flex items-center justify-center gap-2">
               <div
-                className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white"
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
                 style={{ backgroundColor: installer.color }}
               >
                 {installer.initials}
               </div>
-              <span className="text-xs font-medium text-[var(--text-primary)]">
+              <span className="text-sm font-medium text-[var(--text-primary)]">
                 {installer.name}
               </span>
             </div>
@@ -122,7 +122,7 @@ function TimeRow({
   return (
     <>
       <div className="border-b border-r border-[var(--border)] px-2 py-3">
-        <span className="font-mono text-[11px] font-medium text-[var(--text-muted)]">
+        <span className="font-mono text-xs font-medium text-[var(--text-muted)]">
           {formatHour(hour)}
         </span>
       </div>
@@ -137,7 +137,7 @@ function TimeRow({
         return (
           <div
             key={installer.id}
-            className="group relative min-h-[50px] border-b border-r border-[var(--border)] p-1 last:border-r-0"
+            className="group relative min-h-[56px] border-b border-r border-[var(--border)] p-1.5 last:border-r-0"
           >
             {cellEvents.map((evt) => {
               const startHour = parseInt(evt.startTime.split(':')[0], 10);
@@ -149,27 +149,27 @@ function TimeRow({
                 <button
                   key={evt.id}
                   onClick={() => {}}
-                  className="w-full cursor-pointer rounded-lg p-2 text-left transition-all hover:-translate-y-0.5 hover:shadow-md"
+                  className="w-full cursor-pointer rounded-lg p-2.5 text-left transition-all hover:-translate-y-0.5 hover:shadow-md"
                   style={{
                     backgroundColor: colorWithOpacity(evt.color, 0.1),
                     borderLeft: `3px solid ${evt.color}`,
-                    height: span > 1 ? `${span * 50 - 8}px` : undefined,
+                    height: span > 1 ? `${span * 56 - 8}px` : undefined,
                     position: span > 1 ? 'absolute' : undefined,
                     zIndex: span > 1 ? 5 : undefined,
-                    left: span > 1 ? '4px' : undefined,
-                    right: span > 1 ? '4px' : undefined,
+                    left: span > 1 ? '6px' : undefined,
+                    right: span > 1 ? '6px' : undefined,
                   }}
                 >
                   <div
-                    className="truncate text-[11px] font-bold leading-tight"
+                    className="truncate text-xs font-semibold leading-tight"
                     style={{ color: evt.color }}
                   >
                     {evt.title}
                   </div>
-                  <div className="mt-0.5 truncate font-mono text-[10px] text-[var(--text-secondary)]">
+                  <div className="mt-1 truncate text-xs text-[var(--text-secondary)]">
                     {evt.vehicle}
                   </div>
-                  <div className="mt-0.5 font-mono text-[10px] text-[var(--text-muted)]">
+                  <div className="mt-0.5 font-mono text-xs text-[var(--text-muted)]">
                     {evt.startTime} – {evt.endTime}
                   </div>
                 </button>

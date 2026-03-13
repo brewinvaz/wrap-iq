@@ -43,7 +43,7 @@ export default function CalendarHeader({
             >
               <ChevronLeft className="h-4 w-4" strokeWidth={2} />
             </Button>
-            <span className="min-w-[200px] text-center text-sm font-semibold text-[var(--text-primary)]">
+            <span className="min-w-[240px] text-center text-base font-bold text-[var(--text-primary)]">
               {dateLabel}
             </span>
             <Button
@@ -64,7 +64,7 @@ export default function CalendarHeader({
         </div>
 
         {/* View toggle */}
-        <div className="flex rounded-lg border border-[var(--border)] p-0.5">
+        <div className="flex rounded-lg border border-[var(--border)] bg-[var(--surface-card)] p-0.5">
           {views.map((view) => (
             <button
               key={view}
@@ -72,7 +72,7 @@ export default function CalendarHeader({
               className={`rounded-md px-3 py-1.5 text-xs font-medium capitalize transition-colors ${
                 activeView === view
                   ? 'bg-[var(--accent-primary)] text-white'
-                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-raised)]'
               }`}
             >
               {view}
@@ -82,30 +82,32 @@ export default function CalendarHeader({
       </div>
 
       {/* Bottom row: installer filter chips */}
-      <div className="flex items-center gap-2">
-        <span className="text-xs font-medium text-[var(--text-muted)]">Installers:</span>
-        {installers.map((installer) => {
-          const isActive = activeInstallers.has(installer.id);
-          return (
-            <button
-              key={installer.id}
-              onClick={() => onToggleInstaller(installer.id)}
-              className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
-                isActive
-                  ? 'border-transparent text-white'
-                  : 'border-[var(--border)] text-[var(--text-muted)]'
-              }`}
-              style={isActive ? { backgroundColor: installer.color } : undefined}
-            >
-              <span
-                className="inline-block h-2 w-2 rounded-full"
-                style={{ backgroundColor: isActive ? '#fff' : installer.color }}
-              />
-              {installer.name}
-            </button>
-          );
-        })}
-      </div>
+      {installers.length > 0 && (
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">Installers</span>
+          {installers.map((installer) => {
+            const isActive = activeInstallers.has(installer.id);
+            return (
+              <button
+                key={installer.id}
+                onClick={() => onToggleInstaller(installer.id)}
+                className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all ${
+                  isActive
+                    ? 'border-transparent text-white shadow-sm'
+                    : 'border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--text-muted)]'
+                }`}
+                style={isActive ? { backgroundColor: installer.color } : undefined}
+              >
+                <span
+                  className="inline-block h-2 w-2 rounded-full"
+                  style={{ backgroundColor: isActive ? '#fff' : installer.color }}
+                />
+                {installer.name}
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
