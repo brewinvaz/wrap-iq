@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import uuid
 
 from sqlalchemy import func, select
@@ -81,6 +83,25 @@ class ClientService:
         )
         result = await self.session.execute(query)
         return list(result.scalars().all()), total
+
+    async def lookup(
+        self,
+        org_id: uuid.UUID,
+        search: str | None = None,
+        limit: int = 25,
+    ) -> list[Client]:
+        query = select(Client).where(
+            Client.organization_id == org_id,
+            Client.is_active.is_(True),
+        )
+
+        if search and search.strip():
+            escaped = search.strip().replace("%", r"\%").replace("_", r"\_")
+            query = query.where(Client.name.ilike(f"%{escaped}%"))
+
+        query = query.order_by(Client.name.asc()).limit(limit)
+        result = await self.session.execute(query)
+        return list(result.scalars().all())
 
     async def update(
         self, client_id: uuid.UUID, org_id: uuid.UUID, data: ClientUpdate

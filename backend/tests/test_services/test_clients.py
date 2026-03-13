@@ -226,3 +226,99 @@ async def test_get_aggregate_report(db_session):
     assert report["sub_client_revenue"] == 3000
     assert report["combined_projects"] == 2
     assert report["combined_revenue"] == 8000
+
+
+async def test_lookup_returns_active_clients(db_session):
+    org = await _seed(db_session)
+    service = ClientService(db_session)
+
+    await service.create(org.id, ClientCreate(name="Alpha Corp"))
+    await service.create(org.id, ClientCreate(name="Beta LLC"))
+
+    items = await service.lookup(org.id)
+    assert len(items) == 2
+    # Ordered alphabetically by name
+    assert items[0].name == "Alpha Corp"
+    assert items[1].name == "Beta LLC"
+
+
+async def test_lookup_excludes_inactive_clients(db_session):
+    org = await _seed(db_session)
+    service = ClientService(db_session)
+
+    c = await service.create(org.id, ClientCreate(name="Inactive Co"))
+    await service.update(c.id, org.id, ClientUpdate(is_active=False))
+    await service.create(org.id, ClientCreate(name="Active Co"))
+
+    items = await service.lookup(org.id)
+    assert len(items) == 1
+    assert items[0].name == "Active Co"
+
+
+async def test_lookup_filters_by_search_term(db_session):
+    org = await _seed(db_session)
+    service = ClientService(db_session)
+
+    await service.create(org.id, ClientCreate(name="Alpha Corp"))
+    await service.create(org.id, ClientCreate(name="Beta LLC"))
+    await service.create(org.id, ClientCreate(name="Gamma Alpha Inc"))
+
+    items = await service.lookup(org.id, search="alpha")
+    assert len(items) == 2
+    names = {i.name for i in items}
+    assert names == {"Alpha Corp", "Gamma Alpha Inc"}
+
+
+async def test_lookup_search_is_case_insensitive(db_session):
+    org = await _seed(db_session)
+    service = ClientService(db_session)
+
+    await service.create(org.id, ClientCreate(name="UPPER CASE"))
+
+    items = await service.lookup(org.id, search="upper")
+    assert len(items) == 1
+    assert items[0].name == "UPPER CASE"
+
+
+async def test_lookup_escapes_ilike_wildcards(db_session):
+    org = await _seed(db_session)
+    service = ClientService(db_session)
+
+    await service.create(org.id, ClientCreate(name="100% Wraps"))
+    await service.create(org.id, ClientCreate(name="Normal Client"))
+
+    items = await service.lookup(org.id, search="100%")
+    assert len(items) == 1
+    assert items[0].name == "100% Wraps"
+
+
+async def test_lookup_respects_limit(db_session):
+    org = await _seed(db_session)
+    service = ClientService(db_session)
+
+    for i in range(5):
+        await service.create(org.id, ClientCreate(name=f"Client {i:02d}"))
+
+    items = await service.lookup(org.id, limit=3)
+    assert len(items) == 3
+
+
+async def test_lookup_treats_whitespace_search_as_empty(db_session):
+    org = await _seed(db_session)
+    service = ClientService(db_session)
+
+    await service.create(org.id, ClientCreate(name="Any Client"))
+
+    items = await service.lookup(org.id, search="   ")
+    assert len(items) == 1
+
+
+async def test_lookup_scoped_to_organization(db_session):
+    org = await _seed(db_session)
+    service = ClientService(db_session)
+
+    await service.create(org.id, ClientCreate(name="My Client"))
+
+    other_org_id = uuid.uuid4()
+    items = await service.lookup(other_org_id)
+    assert len(items) == 0
