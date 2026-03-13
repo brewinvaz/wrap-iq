@@ -17,12 +17,12 @@ export default function RulerOverlay() {
   }, []);
 
   const isLight = resolvedTheme === 'light';
-  const tickColor = isLight ? '#64748b' : '#06b6d4';
-  const rulerOpacity = isLight ? 1 : 0.15;
-  const rulerBg = isLight ? '#e2e8f0' : 'transparent';
-  const cornerBg = isLight ? '#cbd5e1' : 'rgba(6, 182, 212, 0.04)';
-  const cornerBorder = isLight ? '#94a3b8' : 'rgba(6, 182, 212, 0.08)';
-  const borderLine = isLight ? '#94a3b8' : 'rgba(6,182,212,0.08)';
+  const tickColor = isLight ? '#0891b2' : '#06b6d4';
+  const rulerOpacity = isLight ? 0.15 : 0.15;
+  const rulerBg = 'transparent';
+  const cornerBg = isLight ? 'rgba(8, 145, 178, 0.04)' : 'rgba(6, 182, 212, 0.04)';
+  const cornerBorder = isLight ? 'rgba(8, 145, 178, 0.08)' : 'rgba(6, 182, 212, 0.08)';
+  const borderLine = isLight ? 'rgba(8,145,178,0.08)' : 'rgba(6,182,212,0.08)';
 
   const horizontalTicks = useMemo(() => {
     const ticks: React.JSX.Element[] = [];
