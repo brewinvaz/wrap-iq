@@ -98,6 +98,7 @@ def _to_response(wo) -> WorkOrderResponse:
         completion_date=wo.completion_date,
         internal_notes=wo.internal_notes,
         checklist=wo.checklist,
+        status_timestamps=wo.status_timestamps,
         status=wo.status,
         vehicles=vehicles,
         client_id=wo.client_id,
