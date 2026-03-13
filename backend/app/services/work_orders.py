@@ -3,7 +3,8 @@ import logging
 import uuid
 from datetime import UTC, datetime
 
-from sqlalchemy import delete as sa_delete, func, or_, select
+from sqlalchemy import delete as sa_delete
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
