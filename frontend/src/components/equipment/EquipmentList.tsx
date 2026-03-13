@@ -38,8 +38,8 @@ export default function EquipmentList({ items, selectedId, onSelect }: Props) {
             <span
               className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
                 eq.isActive
-                  ? 'bg-green-500/10 text-green-400'
-                  : 'bg-amber-500/10 text-amber-400'
+                  ? 'bg-green-500/15 text-green-700 dark:text-green-400'
+                  : 'bg-amber-500/15 text-amber-700 dark:text-amber-400'
               }`}
             >
               {eq.isActive ? 'Active' : 'Inactive'}

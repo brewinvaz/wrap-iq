@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Clock } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import DataTable, { type Column } from '@/components/ui/DataTable';
 import { api, ApiError } from '@/lib/api-client';
 import LogTimeModal from '@/components/time-logs/LogTimeModal';
 
@@ -202,6 +203,74 @@ export default function TimeLogsPage() {
     showToast('CSV exported successfully');
   }, [logs, showToast]);
 
+  const timeLogColumns: Column<TimeLog>[] = useMemo(() => [
+    {
+      key: 'team_member',
+      header: 'Team Member',
+      render: (log) => (
+        <div className="flex items-center gap-2">
+          <div className={`flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-semibold text-white ${getAvatarColor(log.user.id)}`}>
+            {getInitials(log.user.full_name, log.user.email)}
+          </div>
+          <span className="font-medium text-[var(--text-primary)]">{log.user.full_name || log.user.email}</span>
+        </div>
+      ),
+    },
+    {
+      key: 'project',
+      header: 'Project',
+      className: 'font-mono text-[var(--text-secondary)]',
+      render: (log) => <>{log.work_order?.job_number || '\u2014'}</>,
+    },
+    {
+      key: 'task',
+      header: 'Task',
+      className: 'text-[var(--text-secondary)]',
+      render: (log) => <>{log.task}</>,
+    },
+    {
+      key: 'hours',
+      header: 'Hours',
+      className: 'font-mono font-medium text-[var(--text-primary)]',
+      render: (log) => <>{log.hours}h</>,
+    },
+    {
+      key: 'date',
+      header: 'Date',
+      className: 'font-mono text-[var(--text-secondary)]',
+      render: (log) => <>{formatDate(log.log_date)}</>,
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      render: (log) => (
+        <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium uppercase ${
+          log.status === 'approved'
+            ? 'bg-[var(--phase-install)]/10 text-[var(--phase-install)]'
+            : 'bg-amber-500/15 text-amber-700 dark:text-amber-400'
+        }`}>
+          {log.status === 'approved' ? 'Approved' : 'Submitted'}
+        </span>
+      ),
+    },
+    {
+      key: 'action',
+      header: 'Action',
+      render: (log) => (
+        log.status === 'submitted' ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleApprove(log.id)}
+            className="text-[var(--phase-install)] hover:opacity-80"
+          >
+            Approve
+          </Button>
+        ) : null
+      ),
+    },
+  ], [handleApprove]);
+
   if (loading && logs.length === 0) return <LoadingSkeleton />;
 
   const summaryStats = summary
@@ -272,13 +341,16 @@ export default function TimeLogsPage() {
           ))}
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-card)]">
-          <div className="border-b border-[var(--border-subtle)] px-5 py-3">
-            <h2 className="text-sm font-semibold text-[var(--text-primary)]">All Time Entries</h2>
-          </div>
+        <div className="border-b border-[var(--border-subtle)] px-5 py-3">
+          <h2 className="text-sm font-semibold text-[var(--text-primary)]">All Time Entries</h2>
+        </div>
 
-          {logs.length === 0 && !loading ? (
-            <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+        <DataTable<TimeLog>
+          columns={timeLogColumns}
+          data={logs}
+          rowKey={(row) => row.id}
+          emptyState={
+            <div className="flex flex-col items-center justify-center py-4 px-6 text-center">
               <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--surface-raised)]">
                 <Clock className="h-6 w-6 text-[var(--text-muted)]" strokeWidth={1.5} />
               </div>
@@ -287,61 +359,8 @@ export default function TimeLogsPage() {
                 Time entries will appear here as team members log their hours.
               </p>
             </div>
-          ) : (
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-[var(--border-subtle)] bg-[var(--surface-raised)]">
-                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Team Member</th>
-                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Project</th>
-                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Task</th>
-                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Hours</th>
-                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Date</th>
-                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Status</th>
-                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {logs.map((log) => (
-                  <tr key={log.id} className="border-b border-[var(--border-subtle)] last:border-0 hover:bg-[var(--surface-raised)]">
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <div className={`flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-semibold text-white ${getAvatarColor(log.user.id)}`}>
-                          {getInitials(log.user.full_name, log.user.email)}
-                        </div>
-                        <span className="font-medium text-[var(--text-primary)]">{log.user.full_name || log.user.email}</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 font-mono text-[var(--text-secondary)]">{log.work_order?.job_number || '—'}</td>
-                    <td className="px-4 py-3 text-[var(--text-secondary)]">{log.task}</td>
-                    <td className="px-4 py-3 font-mono font-medium text-[var(--text-primary)]">{log.hours}h</td>
-                    <td className="px-4 py-3 font-mono text-[var(--text-secondary)]">{formatDate(log.log_date)}</td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${
-                        log.status === 'approved'
-                          ? 'bg-[var(--phase-install)]/10 text-[var(--phase-install)]'
-                          : 'bg-amber-500/10 text-amber-500'
-                      }`}>
-                        {log.status === 'approved' ? 'Approved' : 'Submitted'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      {log.status === 'submitted' && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleApprove(log.id)}
-                          className="text-[var(--phase-install)] hover:opacity-80"
-                        >
-                          Approve
-                        </Button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
+          }
+        />
       </div>
 
       <LogTimeModal

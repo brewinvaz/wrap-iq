@@ -96,12 +96,12 @@ function buildMonthlySummary(invoices: InvoiceResponse[]) {
 
 const statusStyle: Record<string, { bg: string; text: string }> = {
   draft: { bg: 'bg-[var(--surface-raised)]', text: 'text-[var(--text-secondary)]' },
-  sent: { bg: 'bg-blue-500/10', text: 'text-blue-400' },
-  viewed: { bg: 'bg-indigo-500/10', text: 'text-indigo-400' },
-  partial: { bg: 'bg-orange-500/10', text: 'text-orange-400' },
-  paid: { bg: 'bg-emerald-500/10', text: 'text-emerald-400' },
-  pending: { bg: 'bg-amber-500/10', text: 'text-amber-400' },
-  overdue: { bg: 'bg-rose-500/10', text: 'text-rose-400' },
+  sent: { bg: 'bg-blue-500/15', text: 'text-blue-700 dark:text-blue-400' },
+  viewed: { bg: 'bg-indigo-500/15', text: 'text-indigo-700 dark:text-indigo-400' },
+  partial: { bg: 'bg-orange-500/15', text: 'text-orange-700 dark:text-orange-400' },
+  paid: { bg: 'bg-emerald-500/15', text: 'text-emerald-700 dark:text-emerald-400' },
+  pending: { bg: 'bg-amber-500/15', text: 'text-amber-700 dark:text-amber-400' },
+  overdue: { bg: 'bg-rose-500/15', text: 'text-rose-700 dark:text-rose-400' },
   void: { bg: 'bg-[var(--surface-raised)]', text: 'text-[var(--text-muted)]' },
 };
 

@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
+import DataTable, { type Column } from '@/components/ui/DataTable';
 import { api, ApiError } from '@/lib/api-client';
 
 interface InvoiceResponse {
@@ -30,11 +31,11 @@ interface InvoiceListResponse {
 
 const statusStyle: Record<string, { bg: string; text: string }> = {
   draft: { bg: 'bg-[var(--surface-raised)]', text: 'text-[var(--text-secondary)]' },
-  sent: { bg: 'bg-blue-500/10', text: 'text-blue-400' },
-  viewed: { bg: 'bg-indigo-500/10', text: 'text-indigo-400' },
-  partial: { bg: 'bg-orange-500/10', text: 'text-orange-400' },
-  paid: { bg: 'bg-emerald-500/10', text: 'text-emerald-400' },
-  overdue: { bg: 'bg-rose-500/10', text: 'text-rose-400' },
+  sent: { bg: 'bg-blue-500/15', text: 'text-blue-700 dark:text-blue-400' },
+  viewed: { bg: 'bg-indigo-500/15', text: 'text-indigo-700 dark:text-indigo-400' },
+  partial: { bg: 'bg-orange-500/15', text: 'text-orange-700 dark:text-orange-400' },
+  paid: { bg: 'bg-emerald-500/15', text: 'text-emerald-700 dark:text-emerald-400' },
+  overdue: { bg: 'bg-rose-500/15', text: 'text-rose-700 dark:text-rose-400' },
   void: { bg: 'bg-[var(--surface-raised)]', text: 'text-[var(--text-muted)]' },
 };
 
@@ -78,6 +79,76 @@ export default function InvoicesPage() {
   useEffect(() => {
     fetchInvoices();
   }, [fetchInvoices]);
+
+  const columns = useMemo<Column<InvoiceResponse>[]>(
+    () => [
+      {
+        key: 'invoice_number',
+        header: 'Invoice #',
+        render: (row) => (
+          <span className="font-medium text-[var(--text-primary)]">{row.invoice_number}</span>
+        ),
+      },
+      {
+        key: 'client_name',
+        header: 'Client',
+        render: (row) => (
+          <span className="text-[var(--text-secondary)]">{row.client_name}</span>
+        ),
+      },
+      {
+        key: 'total',
+        header: 'Total',
+        render: (row) => (
+          <span className="font-mono font-medium text-[var(--text-primary)]">
+            {formatCurrency(row.total)}
+          </span>
+        ),
+      },
+      {
+        key: 'balance_due',
+        header: 'Balance Due',
+        render: (row) => (
+          <span className="font-mono font-medium text-[var(--text-primary)]">
+            {formatCurrency(row.balance_due)}
+          </span>
+        ),
+      },
+      {
+        key: 'status',
+        header: 'Status',
+        render: (row) => {
+          const s = statusStyle[row.status] ?? defaultStyle;
+          return (
+            <span
+              className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium capitalize ${s.bg} ${s.text}`}
+            >
+              {row.status}
+            </span>
+          );
+        },
+      },
+      {
+        key: 'due_date',
+        header: 'Due Date',
+        render: (row) => (
+          <span className="text-[var(--text-secondary)]">
+            {row.due_date ? new Date(row.due_date).toLocaleDateString() : '--'}
+          </span>
+        ),
+      },
+      {
+        key: 'created_at',
+        header: 'Created',
+        render: (row) => (
+          <span className="text-[var(--text-secondary)]">
+            {new Date(row.created_at).toLocaleDateString()}
+          </span>
+        ),
+      },
+    ],
+    [],
+  );
 
   const outstandingTotal = invoices
     .filter((inv) => ['sent', 'viewed', 'partial', 'overdue'].includes(inv.status))
@@ -124,7 +195,7 @@ export default function InvoicesPage() {
             </div>
             <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-[18px]">
               <p className="text-xs text-[var(--text-muted)]">Paid</p>
-              <p className="mt-1 text-2xl font-bold text-emerald-400 font-mono">{formatCurrency(paidTotal)}</p>
+              <p className="mt-1 text-2xl font-bold text-emerald-700 dark:text-emerald-400 font-mono">{formatCurrency(paidTotal)}</p>
             </div>
           </div>
         )}
@@ -173,43 +244,11 @@ export default function InvoicesPage() {
         )}
 
         {!loading && !error && invoices.length > 0 && (
-          <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-card)]">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-[var(--border)]">
-                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Invoice #</th>
-                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Client</th>
-                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Total</th>
-                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Balance Due</th>
-                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Status</th>
-                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Due Date</th>
-                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Created</th>
-                </tr>
-              </thead>
-              <tbody>
-                {invoices.map((inv) => {
-                  const s = statusStyle[inv.status] ?? defaultStyle;
-                  return (
-                    <tr key={inv.id} className="border-b border-[var(--border-subtle)] last:border-0 hover:bg-[var(--surface-raised)]">
-                      <td className="px-4 py-3 font-medium text-[var(--text-primary)]">{inv.invoice_number}</td>
-                      <td className="px-4 py-3 text-[var(--text-secondary)]">{inv.client_name}</td>
-                      <td className="px-4 py-3 font-medium text-[var(--text-primary)] font-mono">{formatCurrency(inv.total)}</td>
-                      <td className="px-4 py-3 font-medium text-[var(--text-primary)] font-mono">{formatCurrency(inv.balance_due)}</td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium capitalize ${s.bg} ${s.text}`}>
-                          {inv.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-[var(--text-secondary)]">
-                        {inv.due_date ? new Date(inv.due_date).toLocaleDateString() : '--'}
-                      </td>
-                      <td className="px-4 py-3 text-[var(--text-secondary)]">{new Date(inv.created_at).toLocaleDateString()}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <DataTable<InvoiceResponse>
+            columns={columns}
+            data={invoices}
+            rowKey={(row) => row.id}
+          />
         )}
       </div>
     </div>

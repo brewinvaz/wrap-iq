@@ -93,9 +93,9 @@ interface TimeLogListResponse {
 // --- Styling maps ---
 
 const priorityStyles: Record<string, { bg: string; text: string; label: string }> = {
-  high: { bg: 'bg-red-500/10', text: 'text-red-400', label: 'High' },
-  medium: { bg: 'bg-amber-500/10', text: 'text-amber-400', label: 'Medium' },
-  low: { bg: 'bg-green-500/10', text: 'text-green-400', label: 'Low' },
+  high: { bg: 'bg-rose-500/20', text: 'text-rose-700 dark:text-rose-500', label: 'High' },
+  medium: { bg: 'bg-amber-500/20', text: 'text-amber-700 dark:text-amber-500', label: 'Medium' },
+  low: { bg: 'bg-emerald-500/20', text: 'text-emerald-700 dark:text-emerald-500', label: 'Low' },
 };
 
 const jobTypeLabels: Record<string, string> = {
@@ -416,7 +416,7 @@ function ChecklistTab({ checklist }: { checklist: ChecklistItem[] | null }) {
         <div key={i} className="flex items-center gap-3 px-5 py-3">
           <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border ${
             item.done
-              ? 'border-green-500 bg-green-500/10 text-green-400'
+              ? 'border-green-500 bg-green-500/15 text-green-700 dark:text-green-400'
               : 'border-[var(--border)] text-transparent'
           }`}>
             {item.done && (

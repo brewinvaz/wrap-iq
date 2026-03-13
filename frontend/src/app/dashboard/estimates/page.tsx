@@ -28,11 +28,11 @@ interface EstimateListResponse {
 
 const statusStyle: Record<string, { bg: string; text: string }> = {
   draft: { bg: 'bg-[var(--surface-raised)]', text: 'text-[var(--text-secondary)]' },
-  sent: { bg: 'bg-blue-500/10', text: 'text-blue-400' },
-  viewed: { bg: 'bg-indigo-500/10', text: 'text-indigo-400' },
-  accepted: { bg: 'bg-emerald-500/10', text: 'text-emerald-400' },
-  declined: { bg: 'bg-rose-500/10', text: 'text-rose-400' },
-  expired: { bg: 'bg-amber-500/10', text: 'text-amber-400' },
+  sent: { bg: 'bg-blue-500/15', text: 'text-blue-700 dark:text-blue-400' },
+  viewed: { bg: 'bg-indigo-500/15', text: 'text-indigo-700 dark:text-indigo-400' },
+  accepted: { bg: 'bg-emerald-500/15', text: 'text-emerald-700 dark:text-emerald-400' },
+  declined: { bg: 'bg-rose-500/15', text: 'text-rose-700 dark:text-rose-400' },
+  expired: { bg: 'bg-amber-500/15', text: 'text-amber-700 dark:text-amber-400' },
 };
 
 const defaultStyle = { bg: 'bg-[var(--surface-raised)]', text: 'text-[var(--text-secondary)]' };
@@ -121,7 +121,7 @@ export default function EstimatesPage() {
             </div>
             <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-[18px]">
               <p className="text-xs text-[var(--text-muted)]">Accepted Value</p>
-              <p className="mt-1 text-2xl font-bold text-emerald-400 font-mono">{formatCurrency(acceptedTotal)}</p>
+              <p className="mt-1 text-2xl font-bold text-emerald-700 dark:text-emerald-400 font-mono">{formatCurrency(acceptedTotal)}</p>
             </div>
           </div>
         )}

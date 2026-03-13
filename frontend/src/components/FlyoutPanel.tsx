@@ -79,7 +79,7 @@ export default function FlyoutPanel({
                         <span
                           className={`inline-flex min-w-[18px] items-center justify-center rounded-full px-1.5 font-mono text-[10px] font-medium ${
                             item.badgeVariant === 'amber'
-                              ? 'bg-amber-500/20 text-amber-400'
+                              ? 'bg-amber-500/20 text-amber-700 dark:text-amber-400'
                               : isActive
                                 ? 'bg-[var(--accent-primary)] text-white'
                                 : 'bg-[var(--surface-overlay)] text-[var(--text-secondary)]'

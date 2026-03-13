@@ -100,10 +100,10 @@ const filterTabs: { key: FilterTab; label: string }[] = [
   { key: 'approved', label: 'Approved' },
 ];
 
-const priorityStyles: Record<string, string> = {
-  high: 'text-rose-400 font-medium',
-  medium: 'text-[var(--text-secondary)]',
-  low: 'text-[var(--text-muted)]',
+const priorityBadge: Record<string, { bg: string; text: string }> = {
+  high: { bg: 'bg-rose-500/20', text: 'text-rose-700 dark:text-rose-400' },
+  medium: { bg: 'bg-amber-500/20', text: 'text-amber-700 dark:text-amber-400' },
+  low: { bg: 'bg-emerald-500/20', text: 'text-emerald-700 dark:text-emerald-400' },
 };
 
 function formatDate(dateStr: string | null): string {
@@ -141,11 +141,14 @@ const designQueueColumns: Column<DesignQueueItem>[] = [
   {
     key: 'priority',
     header: 'Priority',
-    render: (item) => (
-      <span className={`text-[10px] font-bold uppercase ${priorityStyles[item.priority] ?? ''}`}>
-        {item.priority}
-      </span>
-    ),
+    render: (item) => {
+      const pb = priorityBadge[item.priority] ?? priorityBadge.medium;
+      return (
+        <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium capitalize ${pb.bg} ${pb.text}`}>
+          {item.priority}
+        </span>
+      );
+    },
   },
   {
     key: 'dateIn',
@@ -167,8 +170,8 @@ const designQueueColumns: Column<DesignQueueItem>[] = [
     header: 'Status',
     render: (item) => (
       <span
-        className="inline-block rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase"
-        style={{ backgroundColor: `${item.statusColor}15`, color: item.statusColor }}
+        className="inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium"
+        style={{ backgroundColor: `${item.statusColor}20`, color: item.statusColor }}
       >
         {item.status}
       </span>

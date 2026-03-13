@@ -36,8 +36,8 @@ interface ApiWorkOrderListResponse {
 type ChecklistStatus = 'in-progress' | 'completed' | 'not-started';
 
 const STATUS_STYLES: Record<ChecklistStatus, { bg: string; text: string; label: string }> = {
-  'in-progress': { bg: 'bg-amber-500/10', text: 'text-amber-400', label: 'In Progress' },
-  completed: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', label: 'Completed' },
+  'in-progress': { bg: 'bg-amber-500/15', text: 'text-amber-700 dark:text-amber-400', label: 'In Progress' },
+  completed: { bg: 'bg-emerald-500/15', text: 'text-emerald-700 dark:text-emerald-400', label: 'Completed' },
   'not-started': { bg: 'bg-[var(--surface-raised)]', text: 'text-[var(--text-muted)]', label: 'Not Started' },
 };
 

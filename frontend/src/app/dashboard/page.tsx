@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import KanbanBoard from '@/components/kanban/KanbanBoard';
 import MetricsBar from '@/components/dashboard/MetricsBar';
 import CreateWorkOrderModal from '@/components/work-orders/CreateWorkOrderModal';
+import DataTable, { type Column } from '@/components/ui/DataTable';
 import { api, ApiError } from '@/lib/api-client';
 import { formatCurrencyCompact, formatCurrency } from '@/lib/format';
 import { KanbanColumn, KPIMetric, ProjectCard } from '@/lib/types';
@@ -225,10 +226,81 @@ function ErrorBanner({ message, onRetry }: { message: string; onRetry: () => voi
 // ---------------------------------------------------------------------------
 
 const PRIORITY_BADGE: Record<string, string> = {
-  high: 'bg-rose-500/10 text-rose-400',
-  medium: 'bg-amber-500/10 text-amber-400',
-  low: 'bg-green-500/10 text-green-400',
+  high: 'bg-rose-500/20 text-rose-700 dark:text-rose-500',
+  medium: 'bg-amber-500/20 text-amber-700 dark:text-amber-500',
+  low: 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-500',
 };
+
+function listViewColumns(stages: KanbanStageResponse[]): Column<WorkOrderResponse>[] {
+  return [
+    {
+      key: 'job_number',
+      header: 'Job #',
+      className: 'font-mono font-medium text-[var(--text-primary)]',
+      render: (wo) => wo.job_number,
+    },
+    {
+      key: 'client',
+      header: 'Client',
+      className: 'text-[var(--text-secondary)]',
+      render: (wo) => wo.client_name ?? 'Unknown',
+    },
+    {
+      key: 'vehicle',
+      header: 'Vehicle',
+      className: 'max-w-[200px] truncate text-[var(--text-secondary)]',
+      render: (wo) =>
+        wo.vehicles.length > 0
+          ? wo.vehicles.map((v) => [v.year, v.make, v.model].filter(Boolean).join(' ')).join(', ')
+          : 'No vehicle',
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      render: (wo) => {
+        const stage = stages.find((s) => s.id === wo.status?.id);
+        if (!stage) return null;
+        return (
+          <span
+            className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium"
+            style={{ backgroundColor: stage.color + '22', color: stage.color }}
+          >
+            <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: stage.color }} />
+            {stage.name}
+          </span>
+        );
+      },
+    },
+    {
+      key: 'priority',
+      header: 'Priority',
+      render: (wo) => (
+        <span className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${PRIORITY_BADGE[wo.priority] ?? ''}`}>
+          {wo.priority}
+        </span>
+      ),
+    },
+    {
+      key: 'type',
+      header: 'Type',
+      className: 'capitalize text-[var(--text-secondary)]',
+      render: (wo) => wo.job_type,
+    },
+    {
+      key: 'value',
+      header: 'Value',
+      className: 'font-mono font-medium text-[var(--text-primary)]',
+      headerClassName: 'text-right',
+      render: (wo) => <span className="block text-right">{formatCurrency(wo.job_value)}</span>,
+    },
+    {
+      key: 'date_in',
+      header: 'Date In',
+      className: 'text-[var(--text-secondary)]',
+      render: (wo) => wo.date_in.slice(0, 10),
+    },
+  ];
+}
 
 function ListView({
   workOrders,
@@ -237,71 +309,15 @@ function ListView({
   workOrders: WorkOrderResponse[];
   stages: KanbanStageResponse[];
 }) {
+  const columns = useMemo(() => listViewColumns(stages), [stages]);
   return (
-    <div className="overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--surface-card)] shadow-[0_1px_4px_rgba(0,0,0,.06)]">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-[var(--border)] bg-[var(--surface-app)] text-left">
-            <th className="px-4 py-3 font-semibold text-[var(--text-primary)]">Job #</th>
-            <th className="px-4 py-3 font-semibold text-[var(--text-primary)]">Client</th>
-            <th className="px-4 py-3 font-semibold text-[var(--text-primary)]">Vehicle</th>
-            <th className="px-4 py-3 font-semibold text-[var(--text-primary)]">Status</th>
-            <th className="px-4 py-3 font-semibold text-[var(--text-primary)]">Priority</th>
-            <th className="px-4 py-3 font-semibold text-[var(--text-primary)]">Type</th>
-            <th className="px-4 py-3 text-right font-semibold text-[var(--text-primary)]">Value</th>
-            <th className="px-4 py-3 font-semibold text-[var(--text-primary)]">Date In</th>
-          </tr>
-        </thead>
-        <tbody>
-          {workOrders.length === 0 ? (
-            <tr>
-              <td colSpan={8} className="px-4 py-12 text-center text-[var(--text-muted)]">
-                No work orders found
-              </td>
-            </tr>
-          ) : (
-            workOrders.map((wo) => {
-              const stage = stages.find((s) => s.id === wo.status?.id);
-              const vehicleSummary =
-                wo.vehicles.length > 0
-                  ? wo.vehicles
-                      .map((v) => [v.year, v.make, v.model].filter(Boolean).join(' '))
-                      .join(', ')
-                  : 'No vehicle';
-
-              return (
-                <tr key={wo.id} className="border-b border-[var(--border)] last:border-b-0 hover:bg-[var(--surface-raised)]">
-                  <td className="px-4 py-3 font-medium font-mono text-[var(--text-primary)]">{wo.job_number}</td>
-                  <td className="px-4 py-3 text-[var(--text-secondary)]">{wo.client_name ?? 'Unknown'}</td>
-                  <td className="max-w-[200px] truncate px-4 py-3 text-[var(--text-secondary)]">{vehicleSummary}</td>
-                  <td className="px-4 py-3">
-                    {stage && (
-                      <span
-                        className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium"
-                        style={{ backgroundColor: stage.color + '22', color: stage.color }}
-                      >
-                        <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: stage.color }} />
-                        {stage.name}
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${PRIORITY_BADGE[wo.priority] ?? ''}`}>
-                      {wo.priority}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 capitalize text-[var(--text-secondary)]">{wo.job_type}</td>
-                  <td className="px-4 py-3 text-right font-medium font-mono text-[var(--text-primary)]">
-                    {formatCurrency(wo.job_value)}
-                  </td>
-                  <td className="px-4 py-3 text-[var(--text-secondary)]">{wo.date_in.slice(0, 10)}</td>
-                </tr>
-              );
-            })
-          )}
-        </tbody>
-      </table>
-    </div>
+    <DataTable
+      columns={columns}
+      data={workOrders}
+      rowKey={(wo) => wo.id}
+      stickyHeader
+      emptyState={<span className="text-sm text-[var(--text-muted)]">No work orders found</span>}
+    />
   );
 }
 

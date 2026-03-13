@@ -111,7 +111,7 @@ export default function APIKeyList({
                   <span
                     className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${
                       key.isActive
-                        ? 'bg-emerald-500/10 text-emerald-400'
+                        ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400'
                         : 'bg-[var(--surface-raised)] text-[var(--text-secondary)]'
                     }`}
                   >

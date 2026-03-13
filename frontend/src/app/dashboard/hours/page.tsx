@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { api, ApiError } from '@/lib/api-client';
 import { Button } from '@/components/ui/Button';
+import DataTable, { type Column } from '@/components/ui/DataTable';
 
 interface TimeLogUser {
   id: string;
@@ -75,10 +76,64 @@ export default function HoursPage() {
   const uniqueDays = new Set(entries.map((e) => e.log_date)).size;
   const avgDaily = uniqueDays > 0 ? totalHours / uniqueDays : 0;
 
+  const columns: Column<TimeLog>[] = useMemo(
+    () => [
+      {
+        key: 'date',
+        header: 'Date',
+        render: (row) => (
+          <span className="font-mono text-[var(--text-secondary)]">{row.log_date}</span>
+        ),
+      },
+      {
+        key: 'job',
+        header: 'Job',
+        render: (row) => (
+          <span className="font-medium text-[var(--text-primary)]">
+            {row.work_order ? `Job #${row.work_order.job_number}` : '—'}
+          </span>
+        ),
+      },
+      {
+        key: 'task',
+        header: 'Task',
+        render: (row) => (
+          <span className="text-[var(--text-secondary)]">{row.task}</span>
+        ),
+      },
+      {
+        key: 'status',
+        header: 'Status',
+        render: (row) => (
+          <span
+            className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${
+              row.status === 'approved'
+                ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400'
+                : 'bg-amber-500/15 text-amber-700 dark:text-amber-400'
+            }`}
+          >
+            {row.status}
+          </span>
+        ),
+      },
+      {
+        key: 'hours',
+        header: 'Hours',
+        headerClassName: 'text-right',
+        render: (row) => (
+          <span className="block text-right font-mono font-semibold text-[var(--text-primary)]">
+            {row.hours.toFixed(1)}
+          </span>
+        ),
+      },
+    ],
+    [],
+  );
+
   const stats = [
-    { label: 'Total Hours', value: summary ? `${summary.total_hours.toFixed(1)}h` : '—' },
-    { label: 'Approved', value: summary ? `${summary.approved_hours.toFixed(1)}h` : '—' },
-    { label: 'Pending', value: summary ? `${summary.pending_hours.toFixed(1)}h` : '—' },
+    { label: 'Total Hours', value: summary ? `${Number(summary.total_hours).toFixed(1)}h` : '—' },
+    { label: 'Approved', value: summary ? `${Number(summary.approved_hours).toFixed(1)}h` : '—' },
+    { label: 'Pending', value: summary ? `${Number(summary.pending_hours).toFixed(1)}h` : '—' },
     { label: 'Avg / Day', value: `${avgDaily.toFixed(1)}h` },
   ];
 
@@ -138,50 +193,14 @@ export default function HoursPage() {
 
       {/* Hours Table */}
       <div className="flex-1 overflow-auto p-6">
-        {entries.length === 0 ? (
-          <div className="flex h-48 items-center justify-center text-sm text-[var(--text-muted)]">
-            No time entries logged yet.
-          </div>
-        ) : (
-          <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)]">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-[var(--border)]">
-                  <th className="px-4 py-3 text-left font-mono text-[9.5px] uppercase tracking-wider text-[var(--text-muted)]">Date</th>
-                  <th className="px-4 py-3 text-left font-mono text-[9.5px] uppercase tracking-wider text-[var(--text-muted)]">Job</th>
-                  <th className="px-4 py-3 text-left font-mono text-[9.5px] uppercase tracking-wider text-[var(--text-muted)]">Task</th>
-                  <th className="px-4 py-3 text-left font-mono text-[9.5px] uppercase tracking-wider text-[var(--text-muted)]">Status</th>
-                  <th className="px-4 py-3 text-right font-mono text-[9.5px] uppercase tracking-wider text-[var(--text-muted)]">Hours</th>
-                </tr>
-              </thead>
-              <tbody>
-                {entries.map((entry) => (
-                  <tr key={entry.id} className="border-b border-[var(--border)] last:border-b-0 hover:bg-[var(--surface-overlay)]">
-                    <td className="px-4 py-3 font-mono text-sm text-[var(--text-secondary)]">{entry.log_date}</td>
-                    <td className="px-4 py-3 text-sm font-medium text-[var(--text-primary)]">
-                      {entry.work_order ? `Job #${entry.work_order.job_number}` : '—'}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-[var(--text-secondary)]">{entry.task}</td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                          entry.status === 'approved'
-                            ? 'bg-emerald-500/10 text-emerald-400'
-                            : 'bg-amber-500/10 text-amber-400'
-                        }`}
-                      >
-                        {entry.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-right font-mono text-sm font-semibold text-[var(--text-primary)]">
-                      {entry.hours.toFixed(1)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+        <DataTable<TimeLog>
+          columns={columns}
+          data={entries}
+          rowKey={(row) => row.id}
+          emptyState={
+            <span className="text-sm text-[var(--text-muted)]">No time entries logged yet.</span>
+          }
+        />
       </div>
     </div>
   );

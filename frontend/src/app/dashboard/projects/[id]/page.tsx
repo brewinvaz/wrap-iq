@@ -124,16 +124,10 @@ function transformWorkOrderToProject(wo: ApiWorkOrderResponse): ProjectDetail {
 
 type Tab = 'overview' | 'checklist' | 'notes' | 'photos' | 'timeline';
 
-const priorityColors: Record<string, string> = {
-  high: 'bg-rose-500',
-  medium: 'bg-amber-500',
-  low: 'bg-emerald-500',
-};
-
-const priorityLabels: Record<string, string> = {
-  high: 'High',
-  medium: 'Medium',
-  low: 'Low',
+const priorityBadgeStyles: Record<string, { bg: string; label: string }> = {
+  high: { bg: 'bg-rose-500/20 text-rose-700 dark:text-rose-500', label: 'High' },
+  medium: { bg: 'bg-amber-500/20 text-amber-700 dark:text-amber-500', label: 'Medium' },
+  low: { bg: 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-500', label: 'Low' },
 };
 
 const statusColors: Record<string, string> = {
@@ -176,10 +170,10 @@ function SaveIndicator({ status }: { status: SaveStatus }) {
     <span
       className={`inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium ${
         status === 'saving'
-          ? 'bg-amber-500/10 text-amber-400'
+          ? 'bg-amber-500/15 text-amber-700 dark:text-amber-400'
           : status === 'saved'
-            ? 'bg-emerald-500/10 text-emerald-400'
-            : 'bg-red-500/10 text-red-400'
+            ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400'
+            : 'bg-red-500/15 text-red-700 dark:text-red-400'
       }`}
     >
       {status === 'saving' && (
@@ -437,10 +431,10 @@ function OverviewTab({ project }: { project: ProjectDetail }) {
           </p>
         </div>
         <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-5">
-          <p className="font-mono text-[10px] uppercase tracking-wider text-emerald-400">
+          <p className="font-mono text-[10px] uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
             Margin
           </p>
-          <p className="mt-1 text-2xl font-bold text-emerald-400">
+          <p className="mt-1 text-2xl font-bold text-emerald-700 dark:text-emerald-400">
             {formatCurrency(margin)}{' '}
             <span className="text-sm font-medium">({marginPct}%)</span>
           </p>
@@ -824,7 +818,7 @@ function NotesTab({ project, workOrderId }: { project: ProjectDetail; workOrderI
                 className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-5"
               >
                 <div className="mb-2 flex items-center gap-2">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-500/10 text-[10px] font-semibold text-blue-400">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-500/15 text-[10px] font-semibold text-blue-700 dark:text-blue-400">
                     {note.author.slice(0, 2).toUpperCase()}
                   </div>
                   <span className="text-sm font-medium text-[var(--text-primary)]">
@@ -1165,9 +1159,10 @@ export default function ProjectDetailPage({
               {project.id}
             </span>
             <span
-              className={`inline-block h-2.5 w-2.5 rounded-full ${priorityColors[project.priority]}`}
-              title={`${priorityLabels[project.priority]} priority`}
-            />
+              className={`inline-block rounded px-1.5 py-0.5 text-[10px] font-medium ${priorityBadgeStyles[project.priority].bg}`}
+            >
+              {priorityBadgeStyles[project.priority].label}
+            </span>
           </div>
           <div className="text-right">
             <p className="text-sm text-[var(--text-secondary)]">{project.client}</p>
