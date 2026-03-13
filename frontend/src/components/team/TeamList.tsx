@@ -17,14 +17,12 @@ const allRoles = [
 
 interface TeamListProps {
   members: TeamMemberDetail[];
-  onInvite: () => void;
   onRoleChange: (memberId: string, newRole: string) => void;
   onToggleActive: (memberId: string) => void;
 }
 
 export default function TeamList({
   members,
-  onInvite,
   onRoleChange,
   onToggleActive,
 }: TeamListProps) {
@@ -39,9 +37,6 @@ export default function TeamList({
             {members.filter((m) => m.isActive).length} active
           </span>
         </div>
-        <Button onClick={onInvite}>
-          + Invite Member
-        </Button>
       </div>
 
       <div className="overflow-x-auto">
