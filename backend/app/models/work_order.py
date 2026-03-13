@@ -1,9 +1,20 @@
 import enum
 import uuid
 from datetime import datetime
+from decimal import Decimal
 
 import sqlalchemy as sa
-from sqlalchemy import DateTime, Enum, ForeignKey, Integer, String, Text, Uuid, func
+from sqlalchemy import (
+    DateTime,
+    Enum,
+    ForeignKey,
+    Integer,
+    Numeric,
+    String,
+    Text,
+    Uuid,
+    func,
+)
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -50,6 +61,9 @@ class WorkOrder(Base, TenantMixin, TimestampMixin):
     )
     completion_date: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
+    )
+    estimated_hours: Mapped[Decimal | None] = mapped_column(
+        Numeric(8, 2), nullable=True
     )
     internal_notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     checklist: Mapped[list | None] = mapped_column(JSONB, nullable=True)

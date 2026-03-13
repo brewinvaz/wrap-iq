@@ -48,6 +48,9 @@ class InstallDetails(Base, TenantMixin, TimestampMixin):
     install_end_date: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
+    estimated_hours: Mapped[Decimal | None] = mapped_column(
+        Numeric(8, 2), nullable=True
+    )
 
     work_order = relationship("WorkOrder", back_populates="install_details")
     time_logs = relationship(

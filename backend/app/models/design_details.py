@@ -16,7 +16,9 @@ class DesignDetails(Base, TenantMixin, TimestampMixin):
     work_order_id: Mapped[uuid.UUID] = mapped_column(
         Uuid, ForeignKey("work_orders.id"), unique=True, index=True
     )
-    design_hours: Mapped[Decimal | None] = mapped_column(Numeric(8, 2), nullable=True)
+    estimated_hours: Mapped[Decimal | None] = mapped_column(
+        Numeric(8, 2), nullable=True
+    )
     design_version_count: Mapped[int] = mapped_column(Integer, default=0)
     revision_count: Mapped[int] = mapped_column(Integer, default=0)
     proofing_data: Mapped[dict | None] = mapped_column(JSONB, nullable=True)

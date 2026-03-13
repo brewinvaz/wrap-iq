@@ -8,7 +8,7 @@ class DesignDetailsCreate(BaseModel):
 
 
 class DesignDetailsResponse(BaseModel):
-    design_hours: Decimal | None = None
+    estimated_hours: Decimal | None = None
     design_version_count: int = 0
     revision_count: int = 0
     proofing_data: dict | None = None
