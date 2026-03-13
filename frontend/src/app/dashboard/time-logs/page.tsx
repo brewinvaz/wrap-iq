@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Clock } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { api, ApiError } from '@/lib/api-client';
+import LogTimeModal from '@/components/time-logs/LogTimeModal';
 
 interface TimeLogUser {
   id: string;
@@ -144,6 +145,7 @@ export default function TimeLogsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [showLogTimeModal, setShowLogTimeModal] = useState(false);
 
   const showToast = useCallback((message: string) => {
     setToast(message);
@@ -232,12 +234,20 @@ export default function TimeLogsPage() {
               {total} total
             </span>
           </div>
-          <Button
-            onClick={handleExportCsv}
-            disabled={logs.length === 0}
-          >
-            Export CSV
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button
+              onClick={() => setShowLogTimeModal(true)}
+            >
+              Log Time
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={handleExportCsv}
+              disabled={logs.length === 0}
+            >
+              Export CSV
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -333,6 +343,16 @@ export default function TimeLogsPage() {
           )}
         </div>
       </div>
+
+      <LogTimeModal
+        isOpen={showLogTimeModal}
+        onClose={() => setShowLogTimeModal(false)}
+        onCreated={() => {
+          fetchLogs();
+          fetchSummary();
+          showToast('Time entry logged successfully');
+        }}
+      />
     </div>
   );
 }

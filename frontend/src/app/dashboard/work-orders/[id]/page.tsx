@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { api, ApiError } from '@/lib/api-client';
 import { formatCurrency } from '@/lib/format';
+import { Button } from '@/components/ui/Button';
+import LogTimeModal from '@/components/time-logs/LogTimeModal';
 
 // --- API response types ---
 
@@ -442,6 +444,7 @@ export default function WorkOrderDetailPage({ params }: { params: Promise<{ id: 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [showLogTimeModal, setShowLogTimeModal] = useState(false);
 
   const fetchWorkOrder = useCallback(async () => {
     setLoading(true);
@@ -519,12 +522,20 @@ export default function WorkOrderDetailPage({ params }: { params: Promise<{ id: 
               {pStyle.label}
             </span>
           </div>
-          <button
-            onClick={() => setShowDeleteModal(true)}
-            className="rounded-lg border border-red-500/30 px-4 py-2 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/10"
-          >
-            Delete
-          </button>
+          <div className="flex items-center gap-3">
+            <Button
+              onClick={() => setShowLogTimeModal(true)}
+              size="sm"
+            >
+              Log Time
+            </Button>
+            <button
+              onClick={() => setShowDeleteModal(true)}
+              className="rounded-lg border border-red-500/30 px-4 py-2 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/10"
+            >
+              Delete
+            </button>
+          </div>
         </div>
       </header>
 
@@ -574,6 +585,14 @@ export default function WorkOrderDetailPage({ params }: { params: Promise<{ id: 
           loading={deleting}
         />
       )}
+
+      <LogTimeModal
+        isOpen={showLogTimeModal}
+        onClose={() => setShowLogTimeModal(false)}
+        onCreated={() => setShowLogTimeModal(false)}
+        workOrderId={wo.id}
+        workOrderJobNumber={wo.job_number}
+      />
     </div>
   );
 }
