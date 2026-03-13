@@ -3,7 +3,6 @@ import logging
 import uuid
 from datetime import UTC, datetime
 
-from fastapi import HTTPException
 from sqlalchemy import delete as sa_delete, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -214,7 +213,7 @@ async def update_status(
 async def delete_work_order(session: AsyncSession, wo: WorkOrder) -> None:
     """Hard-delete a work order and all dependent records.
 
-    Raises HTTPException(409) if invoices are linked.
+    Raises ValueError if invoices are linked.
     R2 cleanup is best-effort — failures are logged but do not block deletion.
     """
     # Invoice guard
@@ -222,10 +221,7 @@ async def delete_work_order(session: AsyncSession, wo: WorkOrder) -> None:
         select(func.count(Invoice.id)).where(Invoice.work_order_id == wo.id)
     )
     if invoice_count.scalar():
-        raise HTTPException(
-            status_code=409,
-            detail="Cannot delete work order with linked invoices",
-        )
+        raise ValueError("Cannot delete work order with linked invoices")
 
     wo_id = wo.id
 

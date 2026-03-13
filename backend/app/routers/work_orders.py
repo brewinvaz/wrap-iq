@@ -252,4 +252,7 @@ async def delete(
     wo = await get_work_order(session, work_order_id, user.organization_id)
     if not wo:
         raise HTTPException(status_code=404, detail="Work order not found")
-    await delete_work_order(session, wo)
+    try:
+        await delete_work_order(session, wo)
+    except ValueError as e:
+        raise HTTPException(status_code=409, detail=str(e))
