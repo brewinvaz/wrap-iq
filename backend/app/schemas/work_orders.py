@@ -104,6 +104,7 @@ class WorkOrderResponse(BaseModel):
     completion_date: datetime | None = None
     internal_notes: str | None = None
     checklist: list[ChecklistItem] | None = None
+    status_timestamps: dict[str, str] | None = None
     status: KanbanStageResponse | None = None
     vehicles: list[VehicleInWorkOrder] = []
     client_id: uuid.UUID | None = None
