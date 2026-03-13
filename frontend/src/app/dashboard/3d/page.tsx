@@ -253,6 +253,39 @@ export default function ThreeDPage() {
     fetchRenders();
   }, [fetchRenders]);
 
+  // Poll individual in-progress renders via detail endpoint
+  useEffect(() => {
+    const inProgress = renders.filter(
+      (r) => r.status === 'pending' || r.status === 'rendering'
+    );
+    if (inProgress.length === 0) return;
+
+    const startTime = Date.now();
+    const MAX_POLL_DURATION = 5 * 60 * 1000; // 5 minutes
+
+    const interval = setInterval(async () => {
+      if (Date.now() - startTime > MAX_POLL_DURATION) {
+        clearInterval(interval);
+        return;
+      }
+      try {
+        const updates = await Promise.all(
+          inProgress.map((r) => api.get<RenderResponse>(`/api/renders/${r.id}`))
+        );
+        setRenders((prev) =>
+          prev.map((r) => {
+            const updated = updates.find((u) => u.id === r.id);
+            return updated ?? r;
+          })
+        );
+      } catch {
+        // Silently ignore polling errors
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [renders]);
+
   const handleShare = async (id: string) => {
     try {
       const data = await api.post<{ share_url: string }>(`/api/renders/${id}/share`);
@@ -586,7 +619,7 @@ export default function ThreeDPage() {
       <NewRenderModal
         isOpen={showNewRender}
         onClose={() => setShowNewRender(false)}
-        onCreate={() => { fetchRenders(); setToast('Render created successfully'); }}
+        onCreate={() => { fetchRenders(); setToast('Render queued — processing will begin shortly'); }}
       />
     </div>
   );
