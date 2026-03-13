@@ -3,7 +3,6 @@
 import { useRouter } from 'next/navigation';
 import { formatCurrency } from '@/lib/format';
 import { ProjectCard } from '@/lib/types';
-import { Button } from '@/components/ui/Button';
 
 const priorityColors: Record<string, string> = {
   high: 'bg-rose-500',
@@ -31,11 +30,10 @@ function formatDate(dateStr: string): string {
 interface KanbanCardProps {
   card: ProjectCard;
   onDragStart: (e: React.DragEvent, cardId: string) => void;
-  onAdvance?: (cardId: string) => void;
   isPending?: boolean;
 }
 
-export default function KanbanCard({ card, onDragStart, onAdvance, isPending }: KanbanCardProps) {
+export default function KanbanCard({ card, onDragStart, isPending }: KanbanCardProps) {
   const router = useRouter();
   const completedTasks = card.tasks?.filter((t) => t.done).length ?? 0;
   const totalTasks = card.tasks?.length ?? 0;
@@ -169,24 +167,6 @@ export default function KanbanCard({ card, onDragStart, onAdvance, isPending }: 
         </div>
       </div>
 
-      {/* Advance button */}
-      {onAdvance && (
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={(e) => {
-            e.stopPropagation();
-            if (!isPending) onAdvance(card.id);
-          }}
-          disabled={isPending}
-          className="mt-2.5 flex w-full items-center justify-center gap-1"
-        >
-          Advance to next stage
-          <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-          </svg>
-        </Button>
-      )}
     </div>
   );
 }

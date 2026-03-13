@@ -11,28 +11,24 @@ const PRIORITY_ORDER: Record<string, number> = { high: 0, medium: 1, low: 2 };
 
 interface KanbanColumnProps {
   column: KanbanColumnType;
-  isLastColumn: boolean;
   onDragStart: (e: React.DragEvent, cardId: string, sourceColumnId: string) => void;
   onDragOver: (e: React.DragEvent) => void;
   onDrop: (e: React.DragEvent, targetColumnId: string) => void;
   onDragEnter: (e: React.DragEvent, columnId: string) => void;
   onDragLeave: (e: React.DragEvent) => void;
   dragOverColumnId: string | null;
-  onAdvanceCard?: (cardId: string) => void;
   pendingCards?: Set<string>;
   onAddProject?: () => void;
 }
 
 export default function KanbanColumn({
   column,
-  isLastColumn,
   onDragStart,
   onDragOver,
   onDrop,
   onDragEnter,
   onDragLeave,
   dragOverColumnId,
-  onAdvanceCard,
   pendingCards,
   onAddProject,
 }: KanbanColumnProps) {
@@ -151,7 +147,6 @@ export default function KanbanColumn({
               key={card.id}
               card={card}
               onDragStart={(e, cardId) => onDragStart(e, cardId, column.id)}
-              onAdvance={!isLastColumn ? onAdvanceCard : undefined}
               isPending={pendingCards?.has(card.id)}
             />
           ))}
