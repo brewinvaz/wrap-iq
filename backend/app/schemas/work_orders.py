@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from decimal import Decimal
 
 from pydantic import BaseModel, field_validator
 
@@ -113,6 +114,8 @@ class WorkOrderResponse(BaseModel):
     design_details: DesignDetailsResponse | None = None
     production_details: ProductionDetailsResponse | None = None
     install_details: InstallDetailsResponse | None = None
+    estimated_hours: Decimal | None = None
+    actual_hours: Decimal | None = None
     created_at: datetime
     updated_at: datetime
 

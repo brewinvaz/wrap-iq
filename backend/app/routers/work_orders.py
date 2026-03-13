@@ -1,13 +1,16 @@
 import uuid
+from decimal import Decimal
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql import functions as sqlfunc
 
 from app.auth.dependencies import get_current_user, get_session
 from app.models.client import Client
 from app.models.equipment import Equipment, EquipmentType
 from app.models.kanban_stage import KanbanStage
+from app.models.time_log import TimeLog, TimeLogStatus
 from app.models.user import User
 from app.models.vehicle import Vehicle
 from app.schemas.work_orders import (
@@ -17,6 +20,7 @@ from app.schemas.work_orders import (
     WorkOrderResponse,
     WorkOrderUpdate,
 )
+from app.services.estimate_matching import find_matching_estimates
 from app.services.work_orders import (
     create_work_order,
     delete_work_order,
@@ -112,7 +116,9 @@ async def _validate_equipment_ownership(
             )
 
 
-def _to_response(wo) -> WorkOrderResponse:
+def _to_response(
+    wo, *, actual_hours: Decimal | None = None
+) -> WorkOrderResponse:
     vehicles = [
         {
             "id": wov.vehicle.id,
@@ -147,6 +153,8 @@ def _to_response(wo) -> WorkOrderResponse:
         design_details=wo.design_details,
         production_details=wo.production_details,
         install_details=wo.install_details,
+        estimated_hours=wo.estimated_hours,
+        actual_hours=actual_hours,
         created_at=wo.created_at,
         updated_at=wo.updated_at,
     )
@@ -208,6 +216,36 @@ async def create(
     wo = await create_work_order(
         session, user.organization_id, stage.id, wo_data, data.vehicle_ids, sub_details
     )
+
+    # Auto-fill estimated hours from estimate defaults
+    wrap_coverage = None
+    if data.wrap_details and data.wrap_details.wrap_coverage:
+        wrap_coverage = data.wrap_details.wrap_coverage.value
+    vehicle_count = len(data.vehicle_ids)
+    match = await find_matching_estimates(
+        session,
+        user.organization_id,
+        job_type=data.job_type.value,
+        vehicle_count=vehicle_count,
+        wrap_coverage=wrap_coverage,
+    )
+    if match:
+        total = Decimal(0)
+        design_hrs = match.design_hours or Decimal(0)
+        prod_hrs = (match.production_hours or Decimal(0)) * max(vehicle_count, 1)
+        inst_hrs = (match.install_hours or Decimal(0)) * max(vehicle_count, 1)
+        total = design_hrs + prod_hrs + inst_hrs
+
+        wo.estimated_hours = total
+        if wo.design_details and match.design_hours is not None:
+            wo.design_details.estimated_hours = match.design_hours
+        if wo.production_details and match.production_hours is not None:
+            wo.production_details.estimated_hours = match.production_hours
+        if wo.install_details and match.install_hours is not None:
+            wo.install_details.estimated_hours = match.install_hours
+        await session.commit()
+        await session.refresh(wo)
+
     return _to_response(wo)
 
 
@@ -238,7 +276,17 @@ async def get_one(
     wo = await get_work_order(session, work_order_id, user.organization_id)
     if not wo:
         raise HTTPException(status_code=404, detail="Work order not found")
-    return _to_response(wo)
+
+    # Compute actual hours from approved time logs
+    result = await session.execute(
+        select(sqlfunc.coalesce(sqlfunc.sum(TimeLog.hours), Decimal(0))).where(
+            TimeLog.work_order_id == work_order_id,
+            TimeLog.status == TimeLogStatus.APPROVED,
+        )
+    )
+    actual_hours = result.scalar()
+
+    return _to_response(wo, actual_hours=actual_hours)
 
 
 @router.patch("/{work_order_id}", response_model=WorkOrderResponse)
