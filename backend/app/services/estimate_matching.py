@@ -32,22 +32,26 @@ async def find_matching_estimates(
     result = await session.execute(query)
     rules = result.scalars().all()
 
+    def _enum_val(v):
+        """Extract string value from enum or return string as-is."""
+        return v.value if hasattr(v, "value") else v
+
     for rule in rules:
         # Check job_type match
         if rule.job_type is not None and (
-            job_type is None or rule.job_type.value != job_type
+            job_type is None or _enum_val(rule.job_type) != job_type
         ):
             continue
 
         # Check wrap_coverage match
         if rule.wrap_coverage is not None and (
-            wrap_coverage is None or rule.wrap_coverage.value != wrap_coverage
+            wrap_coverage is None or _enum_val(rule.wrap_coverage) != wrap_coverage
         ):
             continue
 
         # Check vehicle_type match
         if rule.vehicle_type is not None and (
-            vehicle_type is None or rule.vehicle_type.value != vehicle_type
+            vehicle_type is None or _enum_val(rule.vehicle_type) != vehicle_type
         ):
             continue
 
