@@ -92,3 +92,14 @@ class ClientAggregateReport(BaseModel):
     sub_client_revenue: int
     combined_projects: int
     combined_revenue: int
+
+
+class ClientLookupItem(BaseModel):
+    model_config = {"from_attributes": True}
+
+    id: uuid.UUID
+    name: str
+
+
+class ClientLookupResponse(BaseModel):
+    items: list[ClientLookupItem]
