@@ -29,14 +29,10 @@ class EstimateDefaults(Base, TenantMixin, TimestampMixin):
         Enum(VehicleType, values_callable=lambda e: [m.value for m in e]),
         nullable=True,
     )
-    design_hours: Mapped[Decimal | None] = mapped_column(
-        Numeric(8, 2), nullable=True
-    )
+    design_hours: Mapped[Decimal | None] = mapped_column(Numeric(8, 2), nullable=True)
     production_hours: Mapped[Decimal | None] = mapped_column(
         Numeric(8, 2), nullable=True
     )
-    install_hours: Mapped[Decimal | None] = mapped_column(
-        Numeric(8, 2), nullable=True
-    )
+    install_hours: Mapped[Decimal | None] = mapped_column(Numeric(8, 2), nullable=True)
     priority: Mapped[int] = mapped_column(Integer, default=0)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)

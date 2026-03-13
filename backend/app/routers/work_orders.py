@@ -116,9 +116,7 @@ async def _validate_equipment_ownership(
             )
 
 
-def _to_response(
-    wo, *, actual_hours: Decimal | None = None
-) -> WorkOrderResponse:
+def _to_response(wo, *, actual_hours: Decimal | None = None) -> WorkOrderResponse:
     vehicles = [
         {
             "id": wov.vehicle.id,
