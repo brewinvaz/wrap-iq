@@ -60,6 +60,36 @@ interface PhotoResponse {
   created_at: string;
 }
 
+interface TimeLogUser {
+  id: string;
+  email: string;
+  full_name: string | null;
+}
+
+interface TimeLogWorkOrder {
+  id: string;
+  job_number: string;
+}
+
+interface TimeLogEntry {
+  id: string;
+  user: TimeLogUser;
+  work_order: TimeLogWorkOrder | null;
+  task: string;
+  hours: number;
+  log_date: string;
+  status: 'submitted' | 'approved';
+  phase: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+interface TimeLogListResponse {
+  items: TimeLogEntry[];
+  total: number;
+}
+
 // --- Styling maps ---
 
 const priorityStyles: Record<string, { bg: string; text: string; label: string }> = {
@@ -206,9 +236,120 @@ function ErrorState({ message, onRetry, onBack }: { message: string; onRetry: ()
   );
 }
 
+// --- Time & Efficiency section ---
+
+function TimeEfficiencySection({ timeLogs, jobValue }: { timeLogs: TimeLogEntry[]; jobValue: number }) {
+  if (timeLogs.length === 0) return null;
+
+  const actualHours = timeLogs.reduce((sum, log) => sum + log.hours, 0);
+
+  // Group hours by phase
+  const phaseHours: Record<string, number> = {};
+  for (const log of timeLogs) {
+    const phase = log.phase || 'other';
+    phaseHours[phase] = (phaseHours[phase] || 0) + log.hours;
+  }
+
+  const maxPhaseHours = Math.max(...Object.values(phaseHours), 1);
+
+  // Effective rate: job_value is in cents
+  const effectiveRate = actualHours > 0 ? (jobValue / 100) / actualHours : null;
+
+  const phaseColors: Record<string, string> = {
+    design: 'bg-violet-500',
+    production: 'bg-amber-500',
+    install: 'bg-[var(--phase-install)]',
+    other: 'bg-blue-500',
+  };
+
+  function capitalize(s: string): string {
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  }
+
+  function formatLogDate(iso: string): string {
+    return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  return (
+    <InfoCard title="Time & Efficiency">
+      {/* Summary row */}
+      <div className="grid grid-cols-3 gap-4">
+        <div>
+          <p className="text-xs text-[var(--text-muted)]">Actual Hours</p>
+          <p className="mt-0.5 font-mono text-lg font-bold text-[var(--text-primary)]">{actualHours.toFixed(1)}h</p>
+        </div>
+        <div>
+          <p className="text-xs text-[var(--text-muted)]">Effective Rate</p>
+          <p className="mt-0.5 font-mono text-lg font-bold text-[var(--text-primary)]">
+            {effectiveRate != null ? `$${effectiveRate.toFixed(2)}/hr` : '--'}
+          </p>
+        </div>
+        <div>
+          <p className="text-xs text-[var(--text-muted)]">Time Entries</p>
+          <p className="mt-0.5 font-mono text-lg font-bold text-[var(--text-primary)]">{timeLogs.length}</p>
+        </div>
+      </div>
+
+      {/* Phase breakdown bars */}
+      {Object.keys(phaseHours).length > 0 && (
+        <div className="space-y-2 pt-2">
+          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">Phase Breakdown</p>
+          {Object.entries(phaseHours)
+            .sort((a, b) => b[1] - a[1])
+            .map(([phase, hours]) => {
+              const pct = (hours / maxPhaseHours) * 100;
+              return (
+                <div key={phase} className="flex items-center gap-3">
+                  <span className="w-20 shrink-0 text-xs font-medium text-[var(--text-secondary)]">{capitalize(phase)}</span>
+                  <div className="flex-1 overflow-hidden rounded-full bg-[var(--surface-raised)] h-2">
+                    <div
+                      className={`h-full rounded-full ${phaseColors[phase] || 'bg-blue-500'}`}
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  <span className="w-12 shrink-0 text-right font-mono text-xs text-[var(--text-secondary)]">{hours.toFixed(1)}h</span>
+                </div>
+              );
+            })}
+        </div>
+      )}
+
+      {/* Collapsible time entries list */}
+      <details className="pt-2">
+        <summary className="cursor-pointer text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] hover:text-[var(--text-secondary)]">
+          Time Entries ({timeLogs.length})
+        </summary>
+        <div className="mt-2 divide-y divide-[var(--border-subtle)]">
+          {timeLogs.map((log) => (
+            <div key={log.id} className="flex items-center justify-between py-2">
+              <div className="flex-1">
+                <p className="text-sm text-[var(--text-primary)]">{log.task}</p>
+                <p className="text-xs text-[var(--text-muted)]">
+                  {log.user.full_name || log.user.email} &middot; {formatLogDate(log.log_date)}
+                  {log.phase && <> &middot; {capitalize(log.phase)}</>}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-sm font-medium text-[var(--text-primary)]">{log.hours}h</span>
+                <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${
+                  log.status === 'approved'
+                    ? 'bg-[var(--phase-install)]/10 text-[var(--phase-install)]'
+                    : 'bg-amber-500/10 text-amber-500'
+                }`}>
+                  {log.status === 'approved' ? 'Approved' : 'Submitted'}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </details>
+    </InfoCard>
+  );
+}
+
 // --- Tab content components ---
 
-function OverviewTab({ wo }: { wo: WorkOrderDetail }) {
+function OverviewTab({ wo, timeLogs }: { wo: WorkOrderDetail; timeLogs: TimeLogEntry[] }) {
   return (
     <div className="space-y-6">
       <InfoCard title="Job Details">
@@ -253,6 +394,8 @@ function OverviewTab({ wo }: { wo: WorkOrderDetail }) {
           <p className="whitespace-pre-wrap text-sm text-[var(--text-primary)]">{wo.internal_notes}</p>
         </InfoCard>
       )}
+
+      <TimeEfficiencySection timeLogs={timeLogs} jobValue={wo.job_value} />
     </div>
   );
 }
@@ -445,6 +588,7 @@ export default function WorkOrderDetailPage({ params }: { params: Promise<{ id: 
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [showLogTimeModal, setShowLogTimeModal] = useState(false);
+  const [timeLogs, setTimeLogs] = useState<TimeLogEntry[]>([]);
 
   const fetchWorkOrder = useCallback(async () => {
     setLoading(true);
@@ -468,7 +612,16 @@ export default function WorkOrderDetailPage({ params }: { params: Promise<{ id: 
     }
   }, []);
 
-  useEffect(() => { fetchWorkOrder(); fetchStages(); }, [fetchWorkOrder, fetchStages]);
+  const fetchTimeLogs = useCallback(async () => {
+    try {
+      const data = await api.get<TimeLogListResponse>(`/api/time-logs?work_order_id=${id}&limit=100`);
+      setTimeLogs(data.items);
+    } catch {
+      // non-critical
+    }
+  }, [id]);
+
+  useEffect(() => { fetchWorkOrder(); fetchStages(); fetchTimeLogs(); }, [fetchWorkOrder, fetchStages, fetchTimeLogs]);
 
   const handleDelete = async () => {
     setDeleting(true);
@@ -570,7 +723,7 @@ export default function WorkOrderDetailPage({ params }: { params: Promise<{ id: 
 
       {/* Content */}
       <div className="flex-1 overflow-auto px-6 py-6">
-        {activeTab === 'overview' && <OverviewTab wo={wo} />}
+        {activeTab === 'overview' && <OverviewTab wo={wo} timeLogs={timeLogs} />}
         {activeTab === 'checklist' && <ChecklistTab checklist={wo.checklist} />}
         {activeTab === 'photos' && <PhotosTab workOrderId={wo.id} />}
         {activeTab === 'timeline' && <TimelineTab statusTimestamps={wo.status_timestamps} stages={stages} />}
@@ -589,7 +742,7 @@ export default function WorkOrderDetailPage({ params }: { params: Promise<{ id: 
       <LogTimeModal
         isOpen={showLogTimeModal}
         onClose={() => setShowLogTimeModal(false)}
-        onCreated={() => setShowLogTimeModal(false)}
+        onCreated={() => { setShowLogTimeModal(false); fetchTimeLogs(); }}
         workOrderId={wo.id}
         workOrderJobNumber={wo.job_number}
       />
