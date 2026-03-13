@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth.dependencies import get_current_user, get_session
 from app.models.time_log import TimeLog, TimeLogStatus
 from app.models.user import Role, User
+from app.models.work_order import WorkOrder
 from app.schemas.time_logs import (
     TimeLogCreate,
     TimeLogListResponse,
@@ -61,6 +62,12 @@ async def list_time_logs(
     session: AsyncSession = Depends(get_session),
     user: User = Depends(get_current_user),
 ):
+    if user.role not in INTERNAL_ROLES:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only internal staff can view time logs",
+        )
+
     query = select(TimeLog).where(TimeLog.organization_id == user.organization_id)
     count_query = (
         select(func.count())
@@ -96,6 +103,12 @@ async def get_summary(
     session: AsyncSession = Depends(get_session),
     user: User = Depends(get_current_user),
 ):
+    if user.role not in INTERNAL_ROLES:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only internal staff can view time log summaries",
+        )
+
     # Total hours
     total_q = select(func.coalesce(func.sum(TimeLog.hours), 0)).where(
         TimeLog.organization_id == user.organization_id
@@ -146,6 +159,18 @@ async def create_time_log(
             detail="Only internal staff can log time",
         )
 
+    if data.work_order_id:
+        wo = (
+            await session.execute(
+                select(WorkOrder).where(
+                    WorkOrder.id == data.work_order_id,
+                    WorkOrder.organization_id == user.organization_id,
+                )
+            )
+        ).scalar_one_or_none()
+        if not wo:
+            raise HTTPException(status_code=404, detail="Work order not found")
+
     tl = TimeLog(
         user_id=user.id,
         organization_id=user.organization_id,
@@ -192,6 +217,18 @@ async def update_time_log(
         )
 
     update_data = data.model_dump(exclude_unset=True)
+    if "work_order_id" in update_data and update_data["work_order_id"]:
+        wo = (
+            await session.execute(
+                select(WorkOrder).where(
+                    WorkOrder.id == update_data["work_order_id"],
+                    WorkOrder.organization_id == user.organization_id,
+                )
+            )
+        ).scalar_one_or_none()
+        if not wo:
+            raise HTTPException(status_code=404, detail="Work order not found")
+
     for field, value in update_data.items():
         setattr(tl, field, value)
 

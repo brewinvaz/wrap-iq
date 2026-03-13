@@ -22,10 +22,10 @@ interface LogTimeModalProps {
 
 const PHASE_OPTIONS = [
   { value: '', label: 'Select phase...' },
-  { value: 'DESIGN', label: 'Design' },
-  { value: 'PRODUCTION', label: 'Production' },
-  { value: 'INSTALL', label: 'Install' },
-  { value: 'OTHER', label: 'Other' },
+  { value: 'design', label: 'Design' },
+  { value: 'production', label: 'Production' },
+  { value: 'install', label: 'Install' },
+  { value: 'other', label: 'Other' },
 ];
 
 function todayISO(): string {

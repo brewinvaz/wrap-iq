@@ -62,7 +62,6 @@ async def get_summary(
     completed_q = (
         select(func.count())
         .select_from(WorkOrder)
-        .join(WorkOrder.status)
         .where(
             WorkOrder.organization_id == org_id,
         )
@@ -175,16 +174,22 @@ async def get_efficiency(
     items: list[PhaseEfficiencyItem] = []
 
     for phase, detail_model in phase_map.items():
-        # Actual hours from TimeLog for this phase
-        actual_q = select(func.avg(TimeLog.hours)).where(
-            TimeLog.organization_id == org_id,
-            TimeLog.phase == phase,
-            TimeLog.work_order_id.is_not(None),
+        # Actual hours: sum per work order, then average across work orders
+        per_wo_subq = (
+            select(func.sum(TimeLog.hours).label("wo_total"))
+            .where(
+                TimeLog.organization_id == org_id,
+                TimeLog.phase == phase,
+                TimeLog.work_order_id.is_not(None),
+            )
+            .group_by(TimeLog.work_order_id)
         )
         if start_date:
-            actual_q = actual_q.where(TimeLog.log_date >= start_date)
+            per_wo_subq = per_wo_subq.where(TimeLog.log_date >= start_date)
         if end_date:
-            actual_q = actual_q.where(TimeLog.log_date <= end_date)
+            per_wo_subq = per_wo_subq.where(TimeLog.log_date <= end_date)
+        per_wo_subq = per_wo_subq.subquery()
+        actual_q = select(func.avg(per_wo_subq.c.wo_total))
         avg_actual = (await session.execute(actual_q)).scalar()
 
         # Estimated hours from the detail model
