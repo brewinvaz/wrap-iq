@@ -289,7 +289,7 @@ function AskAIModal({
               <div
                 className={`max-w-[80%] rounded-xl px-4 py-3 text-sm ${
                   msg.role === 'user'
-                    ? 'bg-violet-600 text-white'
+                    ? 'bg-[var(--accent-primary)] text-white'
                     : 'bg-[var(--surface-raised)] text-[var(--text-primary)]'
                 }`}
               >
@@ -322,7 +322,7 @@ function AskAIModal({
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               placeholder="Ask a question about your shop..."
-              className="flex-1 rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-secondary)] transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
+              className="flex-1 rounded-lg border border-[var(--border)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-secondary)] transition-colors focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
               disabled={isLoading}
             />
             <Button
