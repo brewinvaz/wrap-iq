@@ -121,7 +121,7 @@ const WRAP_COVERAGE_COLORS: Record<WrapCoverage, { selected: string; ring: strin
   full:           { selected: 'bg-emerald-600 border-emerald-500 text-white', ring: 'ring-emerald-500' },
   three_quarter:  { selected: 'bg-blue-600 border-blue-500 text-white',      ring: 'ring-blue-500'    },
   half:           { selected: 'bg-orange-600 border-orange-500 text-white',   ring: 'ring-orange-500'  },
-  spot_graphics:  { selected: 'bg-purple-600 border-purple-500 text-white',   ring: 'ring-purple-500'  },
+  spot_graphics:  { selected: 'bg-cyan-600 border-cyan-500 text-white',       ring: 'ring-cyan-500'    },
 };
 
 /* ------------------------------------------------------------------ */
