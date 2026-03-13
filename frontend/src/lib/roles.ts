@@ -73,6 +73,7 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
           { icon: 'CreditCard', label: 'Billing & Settings', href: '/dashboard/settings/billing' },
           { icon: 'Key', label: 'API Keys', href: '/dashboard/settings/api-keys' },
           { icon: 'Settings', label: 'Estimate Defaults', href: '/dashboard/settings/estimate-defaults' },
+          { icon: 'ListChecks', label: 'Task Presets', href: '/dashboard/settings/task-presets' },
           { icon: 'Plug', label: 'Integrations', href: '/dashboard/integrations' },
         ],
       },
