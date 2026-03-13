@@ -38,23 +38,23 @@ export default function WeekView({
 
   return (
     <div className="flex-1 overflow-auto bg-[var(--surface-card)]">
-      <div className="grid min-w-[700px] grid-cols-[140px_repeat(5,1fr)]">
+      <div className="grid min-w-[700px] grid-cols-[160px_repeat(5,1fr)]">
         {/* Header row */}
         <div className="sticky top-0 z-10 border-b border-r border-[var(--border)] bg-[var(--surface-raised)] px-4 py-3">
-          <span className="text-xs font-medium text-[var(--text-muted)]">Installer</span>
+          <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">Installer</span>
         </div>
         {weekDays.map((day) => (
           <div
             key={day.dateStr}
             className={`sticky top-0 z-10 border-b border-r border-[var(--border)] px-3 py-3 text-center last:border-r-0 ${
-              day.isToday ? 'bg-[var(--surface-overlay)]' : 'bg-[var(--surface-raised)]'
+              day.isToday ? 'bg-[var(--accent-primary)]/5' : 'bg-[var(--surface-raised)]'
             }`}
           >
-            <div className="text-xs font-medium text-[var(--text-muted)]">
+            <div className="text-xs font-medium uppercase text-[var(--text-muted)]">
               {dayNames[day.date.getDay()]}
             </div>
             <div
-              className={`mt-0.5 text-sm font-semibold ${
+              className={`mt-1 text-lg font-bold ${
                 day.isToday ? 'text-[var(--accent-primary)]' : 'text-[var(--text-primary)]'
               }`}
             >
@@ -95,14 +95,14 @@ function InstallerRow({
   return (
     <>
       {/* Installer name cell */}
-      <div className="flex items-start gap-2 border-b border-r border-[var(--border)] px-3 py-3">
+      <div className="flex items-start gap-2.5 border-b border-r border-[var(--border)] px-3 py-3">
         <div
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
           style={{ backgroundColor: installer.color }}
         >
           {installer.initials}
         </div>
-        <span className="mt-0.5 text-xs font-medium text-[var(--text-primary)]">
+        <span className="mt-1.5 text-sm font-medium text-[var(--text-primary)]">
           {installer.name}
         </span>
       </div>
@@ -131,8 +131,8 @@ function DayCell({
 }) {
   return (
     <div
-      className={`group relative min-h-[80px] border-b border-r border-[var(--border)] p-1.5 last:border-r-0 ${
-        isToday ? 'bg-[var(--surface-overlay)]/30' : ''
+      className={`group relative min-h-[90px] border-b border-r border-[var(--border)] p-2 last:border-r-0 ${
+        isToday ? 'bg-[var(--accent-primary)]/5' : ''
       }`}
     >
       {events.map((evt) => (
@@ -143,7 +143,7 @@ function DayCell({
           onClick={() => {}}
           className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100"
         >
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--surface-raised)] text-xs text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-overlay)] hover:text-[var(--text-secondary)]">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--surface-raised)] text-sm text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-overlay)] hover:text-[var(--text-secondary)]">
             +
           </span>
         </button>
@@ -156,22 +156,22 @@ function EventBlock({ event }: { event: CalendarEvent }) {
   return (
     <button
       onClick={() => {}}
-      className="mb-1 w-full cursor-pointer rounded-lg p-2 text-left transition-all hover:-translate-y-0.5 hover:shadow-md"
+      className="mb-1.5 w-full cursor-pointer rounded-lg p-2.5 text-left transition-all hover:-translate-y-0.5 hover:shadow-md"
       style={{
         backgroundColor: colorWithOpacity(event.color, 0.1),
         borderLeft: `3px solid ${event.color}`,
       }}
     >
       <div
-        className="truncate text-[11px] font-bold leading-tight"
+        className="truncate text-xs font-semibold leading-tight"
         style={{ color: event.color }}
       >
         {event.title}
       </div>
-      <div className="mt-0.5 truncate font-mono text-[10px] text-[var(--text-secondary)]">
+      <div className="mt-1 truncate text-xs text-[var(--text-secondary)]">
         {event.vehicle}
       </div>
-      <div className="mt-0.5 font-mono text-[10px] text-[var(--text-muted)]">
+      <div className="mt-0.5 font-mono text-xs text-[var(--text-muted)]">
         {event.startTime} – {event.endTime}
       </div>
     </button>
