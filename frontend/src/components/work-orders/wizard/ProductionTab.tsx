@@ -1,5 +1,9 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import Select from '@/components/ui/Select';
+import { fetchEquipment } from '@/lib/api/equipment';
+import type { Equipment } from '@/lib/api/equipment';
 import type { ProductionState } from './types';
 import {
   PRINT_MEDIA_OPTIONS,
@@ -164,6 +168,31 @@ function OptionGrid({
 /* ------------------------------------------------------------------ */
 
 export default function ProductionTab({ data, onChange }: Props) {
+  const [printers, setPrinters] = useState<Equipment[]>([]);
+  const [laminators, setLaminators] = useState<Equipment[]>([]);
+  const [plotters, setPlotters] = useState<Equipment[]>([]);
+
+  useEffect(() => {
+    async function loadEquipment() {
+      const [p, l, c] = await Promise.all([
+        fetchEquipment(undefined, 'printer', true),
+        fetchEquipment(undefined, 'laminator', true),
+        fetchEquipment(undefined, 'plotter', true),
+      ]);
+      setPrinters(p.items);
+      setLaminators(l.items);
+      setPlotters(c.items);
+    }
+    loadEquipment();
+  }, []);
+
+  function equipmentOptions(items: Equipment[]) {
+    return [
+      { value: '', label: 'None' },
+      ...items.map((eq) => ({ value: eq.id, label: eq.name })),
+    ];
+  }
+
   function update(patch: Partial<ProductionState>) {
     onChange({ ...data, ...patch });
   }
@@ -185,14 +214,12 @@ export default function ProductionTab({ data, onChange }: Props) {
           <PrinterIcon />
           Printer
         </label>
-        <div className="mt-2 flex gap-2">
-          <button
-            type="button"
-            className={data.printer === '' ? toggleActive : toggleInactive}
-            onClick={() => update({ printer: '' })}
-          >
-            No Printer
-          </button>
+        <div className="mt-2">
+          <Select
+            value={data.printerId}
+            onChange={(val) => update({ printerId: val })}
+            options={equipmentOptions(printers)}
+          />
         </div>
       </div>
 
@@ -203,14 +230,12 @@ export default function ProductionTab({ data, onChange }: Props) {
           <LayersIcon />
           Laminator
         </label>
-        <div className="mt-2 flex gap-2">
-          <button
-            type="button"
-            className={data.laminator === '' ? toggleActive : toggleInactive}
-            onClick={() => update({ laminator: '' })}
-          >
-            No Laminator
-          </button>
+        <div className="mt-2">
+          <Select
+            value={data.laminatorId}
+            onChange={(val) => update({ laminatorId: val })}
+            options={equipmentOptions(laminators)}
+          />
         </div>
       </div>
 
@@ -221,14 +246,12 @@ export default function ProductionTab({ data, onChange }: Props) {
           <ScissorsIcon />
           Plotter/Cutter
         </label>
-        <div className="mt-2 flex gap-2">
-          <button
-            type="button"
-            className={data.plotterCutter === '' ? toggleActive : toggleInactive}
-            onClick={() => update({ plotterCutter: '' })}
-          >
-            No Plotter
-          </button>
+        <div className="mt-2">
+          <Select
+            value={data.plotterId}
+            onChange={(val) => update({ plotterId: val })}
+            options={equipmentOptions(plotters)}
+          />
         </div>
       </div>
 

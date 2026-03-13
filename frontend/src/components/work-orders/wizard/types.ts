@@ -54,9 +54,9 @@ export interface DesignState {
 }
 
 export interface ProductionState {
-  printer: string;
-  laminator: string;
-  plotterCutter: string;
+  printerId: string;
+  laminatorId: string;
+  plotterId: string;
   printMedia: string;
   laminate: string;
   windowPerf: string;
@@ -116,9 +116,9 @@ export const INITIAL_DESIGN: DesignState = {
 };
 
 export const INITIAL_PRODUCTION: ProductionState = {
-  printer: '',
-  laminator: '',
-  plotterCutter: '',
+  printerId: '',
+  laminatorId: '',
+  plotterId: '',
   printMedia: '',
   laminate: '',
   windowPerf: '',
