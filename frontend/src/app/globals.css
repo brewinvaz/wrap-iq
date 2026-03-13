@@ -3,38 +3,47 @@
 @theme {
   --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+  --font-size-xs: 0.8125rem;
+  --font-size-xs--line-height: 1.125rem;
+  --font-size-sm: 0.9375rem;
+  --font-size-sm--line-height: 1.375rem;
 }
 
 /* ── Dark theme (default) ── */
 :root,
 [data-theme="dark"] {
-  --surface-base: #0d0d14;
-  --surface-app: #111118;
-  --surface-card: #15151f;
-  --surface-raised: #18181f;
-  --surface-overlay: #1e1e2a;
-  --border: #2e2e3a;
-  --border-subtle: #1e1e2a;
+  --surface-base: #060a12;
+  --surface-app: #0c1120;
+  --surface-card: #0f172a;
+  --surface-raised: #1e293b;
+  --surface-overlay: #334155;
+  --border: rgba(6, 182, 212, 0.1);
+  --border-subtle: rgba(6, 182, 212, 0.06);
 
-  --text-primary: #e4e4e7;
-  --text-secondary: #a1a1aa;
-  --text-tertiary: #71717a;
-  --text-muted: #52525b;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-tertiary: #94a3b8;
+  --text-muted: #64748b;
 
-  --accent-primary: #a855f7;
-  --accent-secondary: #ec4899;
+  --accent-primary: #06b6d4;
+  --accent-secondary: #3b82f6;
+
+  --accent-primary-bg: rgba(6, 182, 212, 0.1);
+  --accent-primary-bg-hover: rgba(6, 182, 212, 0.15);
+  --accent-primary-border: rgba(6, 182, 212, 0.3);
+  --accent-primary-glow: rgba(6, 182, 212, 0.08);
 
   --danger-bg: rgba(244, 63, 94, 0.2);
   --danger-text: #fb7185;
   --danger-hover: rgba(244, 63, 94, 0.3);
 
-  --phase-design: #a855f7;
-  --phase-production: #06b6d4;
+  --phase-design: #06b6d4;
+  --phase-production: #3b82f6;
   --phase-install: #10b981;
-  --phase-done: #71717a;
+  --phase-done: #64748b;
 
-  --scrollbar-thumb: #2e2e3a;
-  --scrollbar-thumb-hover: #52525b;
+  --scrollbar-thumb: rgba(6, 182, 212, 0.12);
+  --scrollbar-thumb-hover: rgba(6, 182, 212, 0.2);
 
   color-scheme: dark;
 }
@@ -54,15 +63,20 @@
   --text-tertiary: #71717a;
   --text-muted: #a1a1aa;
 
-  --accent-primary: #9333ea;
-  --accent-secondary: #db2777;
+  --accent-primary: #0891b2;
+  --accent-secondary: #2563eb;
+
+  --accent-primary-bg: rgba(8, 145, 178, 0.1);
+  --accent-primary-bg-hover: rgba(8, 145, 178, 0.15);
+  --accent-primary-border: rgba(8, 145, 178, 0.3);
+  --accent-primary-glow: rgba(8, 145, 178, 0.08);
 
   --danger-bg: rgba(244, 63, 94, 0.1);
   --danger-text: #e11d48;
   --danger-hover: rgba(244, 63, 94, 0.2);
 
-  --phase-design: #a855f7;
-  --phase-production: #06b6d4;
+  --phase-design: #0891b2;
+  --phase-production: #2563eb;
   --phase-install: #10b981;
   --phase-done: #71717a;
 
@@ -72,16 +86,30 @@
   color-scheme: light;
 }
 
-/* ── Grid texture (dark mode only) ── */
+/* ── Cutting mat grid (dark mode only) ── */
 [data-theme="dark"] body::before {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 0;
+  /* Major grid lines every 120px */
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
+    linear-gradient(rgba(6, 182, 212, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(6, 182, 212, 0.06) 1px, transparent 1px);
+  background-size: 120px 120px;
+}
+
+[data-theme="dark"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  /* Minor grid lines every 24px */
+  background-image:
+    linear-gradient(rgba(6, 182, 212, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(6, 182, 212, 0.02) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
@@ -112,7 +140,7 @@
 /* ── Focus ring utility ── */
 .focus-accent:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.15);
+  box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.15);
   border-color: var(--accent-primary);
 }
 
@@ -123,4 +151,41 @@
 }
 .animate-select-in {
   animation: select-fade-in 150ms ease-out;
+}
+
+/* ── Glass surfaces (dark mode only) ── */
+[data-theme="dark"] .glass-surface {
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.4));
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(6, 182, 212, 0.1);
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25),
+              inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="dark"] .glass-surface-cyan {
+  background: linear-gradient(145deg, rgba(6, 182, 212, 0.08), rgba(15, 23, 42, 0.6));
+  border-color: rgba(6, 182, 212, 0.15);
+}
+
+[data-theme="dark"] .glass-surface-blue {
+  background: linear-gradient(145deg, rgba(59, 130, 246, 0.06), rgba(15, 23, 42, 0.6));
+  border-color: rgba(59, 130, 246, 0.15);
+}
+
+/* ── Accent line on cards ── */
+.glass-accent-line::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary), transparent);
+}
+
+/* ── Table hover states ── */
+tbody tr:hover {
+  background: rgba(6, 182, 212, 0.03);
 }

@@ -69,7 +69,7 @@ export default function FlyoutPanel({
                       href={item.href}
                       className={`flex items-center gap-3 px-4 py-2.5 text-[14px] transition-colors ${
                         isActive
-                          ? 'bg-[rgba(168,85,247,0.1)] font-medium text-[#c084fc]'
+                          ? 'bg-[var(--accent-primary-bg)] font-medium text-[var(--accent-primary)]'
                           : 'text-[var(--text-secondary)] hover:bg-[var(--surface-overlay)] hover:text-[var(--text-primary)]'
                       }`}
                     >

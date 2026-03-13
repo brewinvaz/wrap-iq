@@ -159,7 +159,7 @@ export default function CommandPalette() {
                       onMouseEnter={() => setSelectedIndex(idx)}
                       className={`flex w-full items-center gap-3 px-4 py-2 text-left text-[14px] transition-colors ${
                         isCurrent
-                          ? 'bg-[rgba(168,85,247,0.1)] text-[var(--accent-primary)]'
+                          ? 'bg-[var(--accent-primary-bg)] text-[var(--accent-primary)]'
                           : 'text-[var(--text-secondary)] hover:bg-[var(--surface-overlay)]'
                       }`}
                     >

@@ -127,7 +127,7 @@ export default function IconRail({
               title={firstItem.label}
               className={`flex h-[42px] w-[42px] items-center justify-center rounded-xl transition-all ${
                 isActive
-                  ? 'bg-[rgba(168,85,247,0.15)] border border-[rgba(168,85,247,0.3)] text-[var(--accent-primary)]'
+                  ? 'bg-[var(--accent-primary-bg-hover)] border border-[var(--accent-primary-border)] text-[var(--accent-primary)]'
                   : 'text-[var(--text-muted)] hover:bg-[var(--surface-overlay)] hover:text-[var(--text-secondary)]'
               }`}
             >
@@ -145,7 +145,7 @@ export default function IconRail({
           title="Settings"
           className={`flex h-[42px] w-[42px] items-center justify-center rounded-xl transition-colors ${
             pathname.startsWith('/dashboard/settings')
-              ? 'bg-[rgba(168,85,247,0.15)] border border-[rgba(168,85,247,0.3)] text-[var(--accent-primary)]'
+              ? 'bg-[var(--accent-primary-bg-hover)] border border-[var(--accent-primary-border)] text-[var(--accent-primary)]'
               : 'text-[var(--text-muted)] hover:bg-[var(--surface-overlay)] hover:text-[var(--text-secondary)]'
           }`}
         >
