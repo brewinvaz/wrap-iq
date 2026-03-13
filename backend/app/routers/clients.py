@@ -12,6 +12,7 @@ from app.schemas.clients import (
     ClientDetailResponse,
     ClientListItemResponse,
     ClientListResponse,
+    ClientLookupResponse,
     ClientResponse,
     ClientUpdate,
 )
@@ -65,6 +66,18 @@ async def list_clients(
         ],
         total=total,
     )
+
+
+@router.get("/lookup", response_model=ClientLookupResponse)
+async def lookup_clients(
+    search: str | None = Query(None, max_length=100),
+    limit: int = Query(25, ge=1, le=50),
+    session: AsyncSession = Depends(get_session),
+    user: User = Depends(get_current_user),
+):
+    service = ClientService(session)
+    items = await service.lookup(user.organization_id, search, limit)
+    return ClientLookupResponse(items=items)
 
 
 @router.get("/{client_id}", response_model=ClientDetailResponse)
