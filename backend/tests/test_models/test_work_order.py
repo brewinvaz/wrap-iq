@@ -1,5 +1,6 @@
 import uuid
 from datetime import UTC, datetime
+from decimal import Decimal
 
 from sqlalchemy import select
 
@@ -108,3 +109,22 @@ async def test_work_order_with_multiple_vehicles(db_session):
     vehicle_ids = {link.vehicle_id for link in links}
     assert v1.id in vehicle_ids
     assert v2.id in vehicle_ids
+
+
+async def test_work_order_estimated_hours(db_session):
+    org, stage = await _seed(db_session)
+
+    wo = WorkOrder(
+        id=uuid.uuid4(),
+        organization_id=org.id,
+        job_number="WO-0003",
+        status_id=stage.id,
+        date_in=datetime.now(UTC),
+        estimated_hours=Decimal("24.00"),
+    )
+    db_session.add(wo)
+    await db_session.commit()
+
+    result = await db_session.execute(select(WorkOrder).where(WorkOrder.id == wo.id))
+    saved = result.scalar_one()
+    assert saved.estimated_hours == Decimal("24.00")

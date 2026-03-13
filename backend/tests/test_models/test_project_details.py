@@ -98,7 +98,7 @@ async def test_design_details(db_session):
         id=uuid.uuid4(),
         organization_id=org.id,
         work_order_id=wo.id,
-        design_hours=Decimal("12.50"),
+        estimated_hours=Decimal("12.50"),
         design_version_count=3,
         revision_count=2,
         proofing_data={"approved": True, "approved_by": "client@example.com"},
@@ -110,7 +110,7 @@ async def test_design_details(db_session):
         select(DesignDetails).where(DesignDetails.id == dd.id)
     )
     saved = result.scalar_one()
-    assert saved.design_hours == Decimal("12.50")
+    assert saved.estimated_hours == Decimal("12.50")
     assert saved.design_version_count == 3
     assert saved.proofing_data["approved"] is True
 
@@ -198,3 +198,41 @@ async def test_install_details_with_time_log(db_session):
     assert saved_log.hours == Decimal("4.50")
     assert saved_log.log_type == LogType.INSTALL
     assert saved_log.notes == "Completed driver side"
+
+
+async def test_production_details_estimated_hours(db_session):
+    org, wo, vehicle = await _seed(db_session)
+
+    pd = ProductionDetails(
+        id=uuid.uuid4(),
+        organization_id=org.id,
+        work_order_id=wo.id,
+        estimated_hours=Decimal("8.00"),
+    )
+    db_session.add(pd)
+    await db_session.commit()
+
+    result = await db_session.execute(
+        select(ProductionDetails).where(ProductionDetails.id == pd.id)
+    )
+    saved = result.scalar_one()
+    assert saved.estimated_hours == Decimal("8.00")
+
+
+async def test_install_details_estimated_hours(db_session):
+    org, wo, vehicle = await _seed(db_session)
+
+    inst = InstallDetails(
+        id=uuid.uuid4(),
+        organization_id=org.id,
+        work_order_id=wo.id,
+        estimated_hours=Decimal("6.50"),
+    )
+    db_session.add(inst)
+    await db_session.commit()
+
+    result = await db_session.execute(
+        select(InstallDetails).where(InstallDetails.id == inst.id)
+    )
+    saved = result.scalar_one()
+    assert saved.estimated_hours == Decimal("6.50")
