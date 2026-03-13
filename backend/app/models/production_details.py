@@ -16,7 +16,15 @@ class ProductionDetails(Base, TenantMixin, TimestampMixin):
     work_order_id: Mapped[uuid.UUID] = mapped_column(
         Uuid, ForeignKey("work_orders.id"), unique=True, index=True
     )
-    assigned_equipment: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    printer_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid, ForeignKey("equipment.id"), nullable=True
+    )
+    laminator_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid, ForeignKey("equipment.id"), nullable=True
+    )
+    plotter_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid, ForeignKey("equipment.id"), nullable=True
+    )
     print_media_brand_type: Mapped[str | None] = mapped_column(
         String(255), nullable=True
     )
@@ -35,3 +43,6 @@ class ProductionDetails(Base, TenantMixin, TimestampMixin):
     )
 
     work_order = relationship("WorkOrder", back_populates="production_details")
+    printer = relationship("Equipment", foreign_keys=[printer_id])
+    laminator = relationship("Equipment", foreign_keys=[laminator_id])
+    plotter = relationship("Equipment", foreign_keys=[plotter_id])
