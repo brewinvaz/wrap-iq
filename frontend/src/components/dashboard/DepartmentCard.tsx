@@ -7,7 +7,7 @@ interface DepartmentCardProps {
 export default function DepartmentCard({ scorecard }: DepartmentCardProps) {
   return (
     <div
-      className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)] transition-shadow hover:shadow-md hover:border-[rgba(168,85,247,0.3)] hover:shadow-[0_0_16px_rgba(168,85,247,0.08)]"
+      className="rounded-lg border border-[var(--border)] bg-[var(--surface-card)] transition-shadow hover:shadow-md hover:border-[var(--accent-primary-border)] hover:shadow-[0_0_16px_var(--accent-primary-glow)]"
       style={{ borderLeftWidth: '4px', borderLeftColor: scorecard.color }}
     >
       <div className="px-5 py-4">

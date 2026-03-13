@@ -57,7 +57,7 @@ export default function KanbanCard({ card, onDragStart, isPending }: KanbanCardP
       className={`group relative min-h-[140px] flex flex-col rounded-lg border border-[var(--border)] bg-[var(--surface-card)] p-3.5 shadow-[0_1px_4px_rgba(0,0,0,.06)] transition-all duration-200 ${
         isPending
           ? 'cursor-default opacity-70'
-          : 'cursor-grab hover:-translate-y-0.5 hover:border-[rgba(168,85,247,0.3)] hover:shadow-[0_0_16px_rgba(168,85,247,0.08)] active:cursor-grabbing'
+          : 'cursor-grab hover:-translate-y-0.5 hover:border-[var(--accent-primary-border)] hover:shadow-[0_0_16px_var(--accent-primary-glow)] active:cursor-grabbing'
       }`}
     >
       {/* Pending status change indicator */}

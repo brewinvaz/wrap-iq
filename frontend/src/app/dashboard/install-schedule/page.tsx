@@ -188,7 +188,7 @@ function WeekView({ items }: { items: InstallItem[] }) {
               return (
                 <div
                   key={item.id}
-                  className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-2 shadow-sm transition-shadow hover:shadow-[0_0_16px_rgba(168,85,247,0.08)]"
+                  className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-2 shadow-sm transition-shadow hover:shadow-[0_0_16px_var(--accent-primary-glow)]"
                 >
                   <div className="font-mono text-xs font-medium text-[var(--text-primary)]">{item.jobNumber}</div>
                   <div className="mt-0.5 text-[10px] text-[var(--text-secondary)] truncate">{item.clientName}</div>

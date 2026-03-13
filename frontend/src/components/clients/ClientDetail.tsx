@@ -207,7 +207,7 @@ export default function ClientDetail({ client, onClientUpdated }: ClientDetailPr
         {/* Info cards grid */}
         <div className="grid grid-cols-2 gap-6">
           {/* Contact Info */}
-          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-[18px] shadow-sm transition-all hover:border-[rgba(168,85,247,0.3)] hover:shadow-[0_0_16px_rgba(168,85,247,0.08)]">
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-[18px] shadow-sm transition-all hover:border-[var(--accent-primary-border)] hover:shadow-[0_0_16px_var(--accent-primary-glow)]">
             <CardHeader title="Contact Info" />
             {isEditing ? (
               <div className="space-y-3">
@@ -261,7 +261,7 @@ export default function ClientDetail({ client, onClientUpdated }: ClientDetailPr
           </div>
 
           {/* Account Summary */}
-          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-[18px] shadow-sm transition-all hover:border-[rgba(168,85,247,0.3)] hover:shadow-[0_0_16px_rgba(168,85,247,0.08)]">
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-[18px] shadow-sm transition-all hover:border-[var(--accent-primary-border)] hover:shadow-[0_0_16px_var(--accent-primary-glow)]">
             <CardHeader title="Account Summary" />
             <InfoRow label="Total Projects" value={String(client.projectCount)} />
             <InfoRow
@@ -291,7 +291,7 @@ export default function ClientDetail({ client, onClientUpdated }: ClientDetailPr
 
         {/* Business Contacts */}
         {client.type === 'business' && client.contacts && client.contacts.length > 0 && (
-          <div className="mt-6 rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-[18px] shadow-sm transition-all hover:border-[rgba(168,85,247,0.3)] hover:shadow-[0_0_16px_rgba(168,85,247,0.08)]">
+          <div className="mt-6 rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-[18px] shadow-sm transition-all hover:border-[var(--accent-primary-border)] hover:shadow-[0_0_16px_var(--accent-primary-glow)]">
             <CardHeader title="Contacts" />
             <div className="divide-y divide-[var(--border-subtle)]">
               {client.contacts.map((contact) => (
@@ -316,7 +316,7 @@ export default function ClientDetail({ client, onClientUpdated }: ClientDetailPr
 
         {/* Vehicles */}
         {client.vehicles.length > 0 && (
-          <div className="mt-6 rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-[18px] shadow-sm transition-all hover:border-[rgba(168,85,247,0.3)] hover:shadow-[0_0_16px_rgba(168,85,247,0.08)]">
+          <div className="mt-6 rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-[18px] shadow-sm transition-all hover:border-[var(--accent-primary-border)] hover:shadow-[0_0_16px_var(--accent-primary-glow)]">
             <CardHeader title="Tracked Vehicles" />
             <div className="divide-y divide-[var(--border-subtle)]">
               {client.vehicles.map((vehicle) => (
@@ -337,7 +337,7 @@ export default function ClientDetail({ client, onClientUpdated }: ClientDetailPr
 
         {/* Project History */}
         {client.projects.length > 0 && (
-          <div className="mt-6 rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-[18px] shadow-sm transition-all hover:border-[rgba(168,85,247,0.3)] hover:shadow-[0_0_16px_rgba(168,85,247,0.08)]">
+          <div className="mt-6 rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-[18px] shadow-sm transition-all hover:border-[var(--accent-primary-border)] hover:shadow-[0_0_16px_var(--accent-primary-glow)]">
             <CardHeader title="Project History" />
             <div className="divide-y divide-[var(--border-subtle)]">
               {client.projects.map((project) => {
@@ -373,7 +373,7 @@ export default function ClientDetail({ client, onClientUpdated }: ClientDetailPr
         )}
 
         {/* Notes */}
-        <div className="mt-6 rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-[18px] shadow-sm transition-all hover:border-[rgba(168,85,247,0.3)] hover:shadow-[0_0_16px_rgba(168,85,247,0.08)]">
+        <div className="mt-6 rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-[18px] shadow-sm transition-all hover:border-[var(--accent-primary-border)] hover:shadow-[0_0_16px_var(--accent-primary-glow)]">
           <CardHeader title="Notes" />
           <textarea
             className="w-full resize-none rounded-lg border border-[var(--border)] bg-[var(--surface-raised)] p-3 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none focus:border-[var(--accent-primary)]/30 focus:ring-1 focus:ring-[var(--accent-primary)]/30"
