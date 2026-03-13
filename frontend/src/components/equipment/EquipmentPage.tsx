@@ -186,7 +186,7 @@ export default function EquipmentPage() {
               Manage printers, laminators, and other equipment
             </p>
           </div>
-          <Button size="sm" onClick={handleAdd}>
+          <Button onClick={handleAdd}>
             + Add Equipment
           </Button>
         </div>
@@ -272,7 +272,7 @@ export default function EquipmentPage() {
                   : 'Choose an item from the list on the left'}
               </p>
               {items.length === 0 && (
-                <Button size="sm" className="mt-4" onClick={handleAdd}>
+                <Button className="mt-4" onClick={handleAdd}>
                   + Add Equipment
                 </Button>
               )}
