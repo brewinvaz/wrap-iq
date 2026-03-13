@@ -64,8 +64,8 @@ export default function PaymentPage() {
       <div className="flex min-h-screen items-center justify-center bg-[var(--surface-app)] px-4">
         <div className="w-full max-w-md text-center">
           <div className="mb-6 flex justify-center">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)]">
-              <span className="font-mono text-sm font-bold text-white">W</span>
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)]">
+              <span className="font-mono text-xs font-bold text-white">WF</span>
             </div>
           </div>
           <div className="rounded-[12px] border border-[var(--border)] bg-[var(--surface-card)] p-8 shadow-sm">
@@ -85,8 +85,8 @@ export default function PaymentPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center">
-          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)]">
-            <span className="font-mono text-sm font-bold text-white">W</span>
+          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)]">
+            <span className="font-mono text-xs font-bold text-white">WF</span>
           </div>
           <h1 className="text-xl font-bold text-[var(--text-primary)]">
             Invoice Payment

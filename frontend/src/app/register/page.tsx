@@ -73,8 +73,8 @@ export default function RegisterPage() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center">
-          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)]">
-            <span className="font-mono text-sm font-bold text-white">W</span>
+          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)]">
+            <span className="font-mono text-xs font-bold text-white">WF</span>
           </div>
           <h1 className="text-xl font-bold text-[var(--text-primary)]">
             Create your Wrap<span className="text-[var(--accent-primary)]">Flow</span> account
