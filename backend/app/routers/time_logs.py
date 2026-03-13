@@ -6,15 +6,25 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_current_user, get_session
 from app.models.time_log import TimeLog, TimeLogStatus
-from app.models.user import User
+from app.models.user import Role, User
 from app.schemas.time_logs import (
     TimeLogCreate,
     TimeLogListResponse,
     TimeLogResponse,
     TimeLogSummaryResponse,
+    TimeLogUpdate,
 )
 
 router = APIRouter(prefix="/api/time-logs", tags=["time-logs"])
+
+INTERNAL_ROLES = {
+    Role.ADMIN,
+    Role.PROJECT_MANAGER,
+    Role.DESIGNER,
+    Role.INSTALLER,
+    Role.PRODUCTION,
+}
+MANAGER_ROLES = {Role.ADMIN, Role.PROJECT_MANAGER}
 
 
 def _to_response(tl: TimeLog) -> TimeLogResponse:
@@ -35,6 +45,7 @@ def _to_response(tl: TimeLog) -> TimeLogResponse:
         hours=tl.hours,
         log_date=tl.log_date,
         status=tl.status.value,
+        phase=tl.phase.value if tl.phase else None,
         notes=tl.notes,
         created_at=tl.created_at,
         updated_at=tl.updated_at,
@@ -124,6 +135,12 @@ async def create_time_log(
     session: AsyncSession = Depends(get_session),
     user: User = Depends(get_current_user),
 ):
+    if user.role not in INTERNAL_ROLES:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only internal staff can log time",
+        )
+
     tl = TimeLog(
         user_id=user.id,
         organization_id=user.organization_id,
@@ -131,6 +148,7 @@ async def create_time_log(
         task=data.task,
         hours=data.hours,
         log_date=data.log_date,
+        phase=data.phase,
         notes=data.notes,
     )
     session.add(tl)
@@ -139,12 +157,88 @@ async def create_time_log(
     return _to_response(tl)
 
 
+@router.patch("/{time_log_id}", response_model=TimeLogResponse)
+async def update_time_log(
+    time_log_id: uuid.UUID,
+    data: TimeLogUpdate,
+    session: AsyncSession = Depends(get_session),
+    user: User = Depends(get_current_user),
+):
+    if user.role not in INTERNAL_ROLES:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only internal staff can update time logs",
+        )
+
+    result = await session.execute(
+        select(TimeLog).where(
+            TimeLog.id == time_log_id,
+            TimeLog.organization_id == user.organization_id,
+        )
+    )
+    tl = result.scalar_one_or_none()
+    if not tl:
+        raise HTTPException(status_code=404, detail="Time log not found")
+    if tl.user_id != user.id:
+        raise HTTPException(status_code=403, detail="Can only update own time logs")
+    if tl.status != TimeLogStatus.SUBMITTED:
+        raise HTTPException(
+            status_code=400, detail="Can only update submitted time logs"
+        )
+
+    update_data = data.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(tl, field, value)
+
+    await session.commit()
+    await session.refresh(tl)
+    return _to_response(tl)
+
+
+@router.delete("/{time_log_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_time_log(
+    time_log_id: uuid.UUID,
+    session: AsyncSession = Depends(get_session),
+    user: User = Depends(get_current_user),
+):
+    if user.role not in INTERNAL_ROLES:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only internal staff can delete time logs",
+        )
+
+    result = await session.execute(
+        select(TimeLog).where(
+            TimeLog.id == time_log_id,
+            TimeLog.organization_id == user.organization_id,
+        )
+    )
+    tl = result.scalar_one_or_none()
+    if not tl:
+        raise HTTPException(status_code=404, detail="Time log not found")
+    if tl.user_id != user.id:
+        raise HTTPException(status_code=403, detail="Can only delete own time logs")
+    if tl.status != TimeLogStatus.SUBMITTED:
+        raise HTTPException(
+            status_code=400, detail="Can only delete submitted time logs"
+        )
+
+    await session.delete(tl)
+    await session.commit()
+
+
 @router.patch("/{time_log_id}/approve", response_model=TimeLogResponse)
 async def approve_time_log(
     time_log_id: uuid.UUID,
     session: AsyncSession = Depends(get_session),
     user: User = Depends(get_current_user),
 ):
+    if user.role not in MANAGER_ROLES:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only managers can approve time logs",
+        )
+
     result = await session.execute(
         select(TimeLog).where(
             TimeLog.id == time_log_id,
