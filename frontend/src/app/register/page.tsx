@@ -69,11 +69,11 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[var(--surface-app)] px-4">
-      <div className="w-full max-w-sm">
+    <div className="relative flex min-h-screen items-center justify-center bg-[var(--surface-app)] px-4">
+      <div className="relative z-10 w-full max-w-sm">
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center">
-          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)]">
+          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] shadow-[0_2px_12px_var(--accent-primary-glow)]">
             <span className="font-mono text-xs font-bold text-white">WF</span>
           </div>
           <h1 className="text-xl font-bold text-[var(--text-primary)]">
@@ -83,7 +83,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Card */}
-        <div className="rounded-[12px] border border-[var(--border)] bg-[var(--surface-card)] p-6 shadow-sm">
+        <div className="glass-surface glass-accent-line relative rounded-[14px] p-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="org" className="mb-1 block text-[13px] font-medium text-[var(--text-primary)]">
