@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useTheme } from '@/lib/theme';
 
 const MAJOR = 120;
@@ -10,13 +10,19 @@ const RULER_SIZE = 20;
 
 export default function RulerOverlay() {
   const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const isLight = resolvedTheme === 'light';
-  const tickColor = isLight ? '#0891b2' : '#06b6d4';
-  const rulerOpacity = isLight ? 0.09 : 0.15;
-  const cornerBg = isLight ? 'rgba(8, 145, 178, 0.03)' : 'rgba(6, 182, 212, 0.04)';
-  const cornerBorder = isLight ? 'rgba(8, 145, 178, 0.06)' : 'rgba(6, 182, 212, 0.08)';
-  const borderLine = isLight ? 'rgba(8,145,178,0.06)' : 'rgba(6,182,212,0.08)';
+  const tickColor = isLight ? '#64748b' : '#06b6d4';
+  const rulerOpacity = isLight ? 1 : 0.15;
+  const rulerBg = isLight ? '#e2e8f0' : 'transparent';
+  const cornerBg = isLight ? '#cbd5e1' : 'rgba(6, 182, 212, 0.04)';
+  const cornerBorder = isLight ? '#94a3b8' : 'rgba(6, 182, 212, 0.08)';
+  const borderLine = isLight ? '#94a3b8' : 'rgba(6,182,212,0.08)';
 
   const horizontalTicks = useMemo(() => {
     const ticks: React.JSX.Element[] = [];
@@ -46,6 +52,8 @@ export default function RulerOverlay() {
     return ticks;
   }, [tickColor]);
 
+  if (!mounted) return null;
+
   return (
     <>
       {/* Corner square */}
@@ -63,7 +71,7 @@ export default function RulerOverlay() {
       {/* Top ruler */}
       <div
         className="fixed top-0 right-0 z-[1] pointer-events-none"
-        style={{ left: RULER_SIZE, height: RULER_SIZE }}
+        style={{ left: RULER_SIZE, height: RULER_SIZE, background: rulerBg }}
       >
         <svg width="100%" height={RULER_SIZE} style={{ opacity: rulerOpacity }}>
           {horizontalTicks}
@@ -74,7 +82,7 @@ export default function RulerOverlay() {
       {/* Left ruler */}
       <div
         className="fixed left-0 bottom-0 z-[1] pointer-events-none"
-        style={{ top: RULER_SIZE, width: RULER_SIZE }}
+        style={{ top: RULER_SIZE, width: RULER_SIZE, background: rulerBg }}
       >
         <svg width={RULER_SIZE} height="100%" style={{ opacity: rulerOpacity }}>
           {verticalTicks}
