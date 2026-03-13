@@ -64,10 +64,10 @@ interface AIActivity {
 }
 
 const typeStyles: Record<AIActivity['type'], { bg: string; text: string; label: string }> = {
-  'new-lead': { bg: 'bg-blue-500/10', text: 'text-blue-400', label: 'New Lead' },
-  'high-priority': { bg: 'bg-amber-500/10', text: 'text-amber-400', label: 'High Priority' },
-  completed: { bg: 'bg-violet-500/10', text: 'text-violet-400', label: 'Completed' },
-  'status-update': { bg: 'bg-emerald-500/10', text: 'text-emerald-400', label: 'Status Update' },
+  'new-lead': { bg: 'bg-blue-500/15', text: 'text-blue-700 dark:text-blue-400', label: 'New Lead' },
+  'high-priority': { bg: 'bg-amber-500/15', text: 'text-amber-700 dark:text-amber-400', label: 'High Priority' },
+  completed: { bg: 'bg-violet-500/15', text: 'text-violet-700 dark:text-violet-400', label: 'Completed' },
+  'status-update': { bg: 'bg-emerald-500/15', text: 'text-emerald-700 dark:text-emerald-400', label: 'Status Update' },
 };
 
 function vehicleLabel(vehicles: ApiVehicle[]): string {
@@ -243,7 +243,7 @@ function AskAIModal({
             <h3 id="ask-ai-title" className="text-lg font-semibold text-[var(--text-primary)]">
               Ask AI
             </h3>
-            <span className="rounded-full bg-violet-500/10 px-2 py-0.5 text-xs font-medium text-violet-400">
+            <span className="rounded-full bg-violet-500/15 px-2 py-0.5 text-xs font-medium text-violet-700 dark:text-violet-400">
               Shop Intelligence
             </span>
           </div>
@@ -429,7 +429,7 @@ export default function AIPage() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <h1 className="text-xl font-bold text-[var(--text-primary)]">Shop Intelligence</h1>
-            <span className="rounded-full bg-violet-500/10 px-2.5 py-0.5 text-xs font-medium text-violet-400">
+            <span className="rounded-full bg-violet-500/15 px-2.5 py-0.5 text-xs font-medium text-violet-700 dark:text-violet-400">
               AI Powered
             </span>
           </div>

@@ -29,7 +29,7 @@ export default function PaymentMethodCard({
           </p>
         </div>
         {method.isDefault && (
-          <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-400">
+          <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-400">
             Default
           </span>
         )}

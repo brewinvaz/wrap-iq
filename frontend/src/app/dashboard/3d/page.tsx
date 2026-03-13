@@ -35,10 +35,10 @@ interface RenderListResponse {
 // --- Styling maps ---
 
 const statusStyles: Record<string, { bg: string; text: string; label: string }> = {
-  pending: { bg: 'bg-gray-500/10', text: 'text-gray-400', label: 'Pending' },
-  rendering: { bg: 'bg-amber-500/10', text: 'text-amber-400', label: 'Rendering...' },
-  completed: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', label: 'Completed' },
-  failed: { bg: 'bg-red-500/10', text: 'text-red-400', label: 'Failed' },
+  pending: { bg: 'bg-gray-500/15', text: 'text-gray-700 dark:text-gray-400', label: 'Pending' },
+  rendering: { bg: 'bg-amber-500/15', text: 'text-amber-700 dark:text-amber-400', label: 'Rendering...' },
+  completed: { bg: 'bg-emerald-500/15', text: 'text-emerald-700 dark:text-emerald-400', label: 'Completed' },
+  failed: { bg: 'bg-red-500/15', text: 'text-red-700 dark:text-red-400', label: 'Failed' },
 };
 
 // --- Helper ---

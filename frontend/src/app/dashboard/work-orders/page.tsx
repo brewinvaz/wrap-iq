@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { api, ApiError } from '@/lib/api-client';
 import { Button } from '@/components/ui/Button';
+import DataTable, { type Column } from '@/components/ui/DataTable';
 import { formatCurrency } from '@/lib/format';
 import CreateWorkOrderModal from '@/components/work-orders/CreateWorkOrderModal';
 
@@ -43,9 +44,9 @@ interface WorkOrderListResponse {
 // --- Styling maps ---
 
 const priorityStyles: Record<string, { bg: string; text: string }> = {
-  high: { bg: 'bg-red-500/10', text: 'text-red-400' },
-  medium: { bg: 'bg-amber-500/10', text: 'text-amber-400' },
-  low: { bg: 'bg-green-500/10', text: 'text-green-400' },
+  high: { bg: 'bg-rose-500/20', text: 'text-rose-700 dark:text-rose-500' },
+  medium: { bg: 'bg-amber-500/20', text: 'text-amber-700 dark:text-amber-500' },
+  low: { bg: 'bg-emerald-500/20', text: 'text-emerald-700 dark:text-emerald-500' },
 };
 
 const jobTypeLabels: Record<string, string> = {
@@ -66,6 +67,100 @@ function vehicleSummary(vehicles: WorkOrder['vehicles']): string {
   return vehicles
     .map((v) => [v.year, v.make, v.model].filter(Boolean).join(' ') || 'Unknown')
     .join(', ');
+}
+
+// --- Column definitions ---
+
+function useWorkOrderColumns(
+  setDeleteTarget: (wo: WorkOrder) => void,
+  setShowDeleteModal: (show: boolean) => void,
+): Column<WorkOrder>[] {
+  return useMemo(() => [
+    {
+      key: 'job_number',
+      header: 'Job #',
+      className: 'font-mono font-medium text-[var(--text-primary)]',
+      render: (wo) => wo.job_number,
+    },
+    {
+      key: 'client',
+      header: 'Client',
+      className: 'text-[var(--text-secondary)]',
+      render: (wo) => wo.client_name ?? '—',
+    },
+    {
+      key: 'vehicle',
+      header: 'Vehicle',
+      className: 'max-w-[200px] truncate text-[var(--text-secondary)]',
+      render: (wo) => vehicleSummary(wo.vehicles),
+    },
+    {
+      key: 'type',
+      header: 'Type',
+      className: 'text-[var(--text-secondary)]',
+      render: (wo) => jobTypeLabels[wo.job_type] ?? wo.job_type,
+    },
+    {
+      key: 'priority',
+      header: 'Priority',
+      render: (wo) => {
+        const pStyle = priorityStyles[wo.priority] ?? priorityStyles.medium;
+        return (
+          <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium capitalize ${pStyle.bg} ${pStyle.text}`}>
+            {wo.priority}
+          </span>
+        );
+      },
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      render: (wo) =>
+        wo.status ? (
+          <span
+            className="inline-flex rounded-full px-2 py-0.5 text-xs font-medium"
+            style={{ backgroundColor: `${wo.status.color}20`, color: wo.status.color }}
+          >
+            {wo.status.name}
+          </span>
+        ) : (
+          <span className="text-[var(--text-muted)]">—</span>
+        ),
+    },
+    {
+      key: 'value',
+      header: 'Value',
+      className: 'font-mono text-[var(--text-secondary)]',
+      render: (wo) => (wo.job_value ? formatCurrency(wo.job_value) : '—'),
+    },
+    {
+      key: 'due',
+      header: 'Due',
+      className: 'text-[var(--text-secondary)]',
+      render: (wo) => formatDate(wo.estimated_completion_date),
+    },
+    {
+      key: 'actions',
+      header: '',
+      headerClassName: 'w-12',
+      className: 'text-right',
+      render: (wo) => (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setDeleteTarget(wo);
+            setShowDeleteModal(true);
+          }}
+          className="rounded-lg p-1.5 text-[var(--text-muted)] transition-colors hover:bg-red-500/10 hover:text-red-400"
+          title="Delete work order"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+        </button>
+      ),
+    },
+  ], [setDeleteTarget, setShowDeleteModal]);
 }
 
 // --- Loading skeleton ---
@@ -117,6 +212,8 @@ export default function WorkOrdersPage() {
   const [deleteTarget, setDeleteTarget] = useState<WorkOrder | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const woColumns = useWorkOrderColumns(setDeleteTarget, setShowDeleteModal);
 
   const fetchStages = useCallback(async () => {
     try {
@@ -258,79 +355,21 @@ export default function WorkOrdersPage() {
 
       {/* Table */}
       <div className="flex-1 overflow-auto p-6">
-        {workOrders.length === 0 && !loading ? (
-          <div className="flex h-64 flex-col items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface-card)]">
-            <p className="text-sm font-medium text-[var(--text-primary)]">No work orders found</p>
-            <p className="mt-1 text-xs text-[var(--text-secondary)]">
-              {search ? 'Try a different search term' : 'Create your first work order to get started'}
-            </p>
-          </div>
-        ) : (
-          <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-card)]">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="sticky top-0 z-10 border-b border-[var(--border)] bg-[var(--surface-app)]">
-                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Job #</th>
-                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Client</th>
-                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Vehicle</th>
-                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Type</th>
-                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Priority</th>
-                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Status</th>
-                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Value</th>
-                  <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Due</th>
-                  <th className="px-4 py-3 text-right font-medium text-[var(--text-secondary)]">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {workOrders.map((wo) => {
-                  const pStyle = priorityStyles[wo.priority] ?? priorityStyles.medium;
-                  return (
-                    <tr key={wo.id} className="border-b border-[var(--border)] last:border-0 hover:bg-[var(--surface-raised)] cursor-pointer" onClick={() => router.push(`/dashboard/work-orders/${wo.id}`)}>
-                      <td className="px-4 py-3 font-medium font-mono text-[var(--text-primary)]">{wo.job_number}</td>
-                      <td className="px-4 py-3 text-[var(--text-secondary)]">{wo.client_name ?? '—'}</td>
-                      <td className="max-w-[200px] truncate px-4 py-3 text-[var(--text-secondary)]">{vehicleSummary(wo.vehicles)}</td>
-                      <td className="px-4 py-3 text-[var(--text-secondary)]">{jobTypeLabels[wo.job_type] ?? wo.job_type}</td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium capitalize ${pStyle.bg} ${pStyle.text}`}>
-                          {wo.priority}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        {wo.status ? (
-                          <span
-                            className="inline-flex rounded-full px-2 py-0.5 text-xs font-medium"
-                            style={{ backgroundColor: `${wo.status.color}20`, color: wo.status.color }}
-                          >
-                            {wo.status.name}
-                          </span>
-                        ) : (
-                          <span className="text-[var(--text-muted)]">—</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 font-mono text-[var(--text-secondary)]">{wo.job_value ? formatCurrency(wo.job_value) : '—'}</td>
-                      <td className="px-4 py-3 text-[var(--text-secondary)]">{formatDate(wo.estimated_completion_date)}</td>
-                      <td className="px-4 py-3 text-right">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setDeleteTarget(wo);
-                            setShowDeleteModal(true);
-                          }}
-                          className="rounded-lg p-1.5 text-[var(--text-muted)] transition-colors hover:bg-red-500/10 hover:text-red-400"
-                          title="Delete work order"
-                        >
-                          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
+        <DataTable
+          columns={woColumns}
+          data={workOrders}
+          rowKey={(wo) => wo.id}
+          onRowClick={(wo) => router.push(`/dashboard/work-orders/${wo.id}`)}
+          stickyHeader
+          emptyState={
+            <div>
+              <p className="text-sm font-medium text-[var(--text-primary)]">No work orders found</p>
+              <p className="mt-1 text-xs text-[var(--text-secondary)]">
+                {search ? 'Try a different search term' : 'Create your first work order to get started'}
+              </p>
+            </div>
+          }
+        />
 
         {/* Pagination */}
         {totalPages > 1 && (

@@ -139,7 +139,7 @@ export default function PhotosPage() {
                         <p className="text-sm font-semibold text-[var(--text-primary)]">
                           {group.workOrder.client_name ?? 'Unknown Client'} — #{group.workOrder.job_number}
                         </p>
-                        <span className="rounded-full bg-blue-500/10 px-2 py-0.5 text-[10px] font-medium text-blue-400">
+                        <span className="rounded-full bg-blue-500/15 px-2 py-0.5 text-[10px] font-medium text-blue-700 dark:text-blue-400">
                           {group.photos.length} photos
                         </span>
                       </div>

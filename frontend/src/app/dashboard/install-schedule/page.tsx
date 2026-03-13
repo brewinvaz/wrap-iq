@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { CalendarDays } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import DataTable, { type Column } from '@/components/ui/DataTable';
 import { api, ApiError } from '@/lib/api-client';
 
 type ViewMode = 'list' | 'week';
@@ -99,9 +100,9 @@ const filterTabs: { key: FilterTab; label: string }[] = [
 ];
 
 const priorityBadge: Record<string, { bg: string; text: string }> = {
-  high: { bg: 'bg-rose-500/10', text: 'text-rose-500' },
-  medium: { bg: 'bg-amber-500/10', text: 'text-amber-500' },
-  low: { bg: 'bg-[var(--text-muted)]/10', text: 'text-[var(--text-muted)]' },
+  high: { bg: 'bg-rose-500/20', text: 'text-rose-700 dark:text-rose-400' },
+  medium: { bg: 'bg-amber-500/20', text: 'text-amber-700 dark:text-amber-400' },
+  low: { bg: 'bg-emerald-500/20', text: 'text-emerald-700 dark:text-emerald-400' },
 };
 
 function formatDate(dateStr: string | null): string {
@@ -116,6 +117,70 @@ function isOverdue(dueDate: string | null, completionDate: string | null): boole
   if (completionDate || !dueDate) return false;
   return new Date(dueDate) < new Date();
 }
+
+const installColumns: Column<InstallItem>[] = [
+  {
+    key: 'jobNumber',
+    header: 'Job #',
+    className: 'font-mono font-medium text-[var(--text-primary)]',
+    render: (item) => item.jobNumber,
+  },
+  {
+    key: 'client',
+    header: 'Client',
+    className: 'text-[var(--text-secondary)]',
+    render: (item) => item.clientName,
+  },
+  {
+    key: 'vehicle',
+    header: 'Vehicle',
+    className: 'text-[var(--text-secondary)]',
+    render: (item) => item.vehicle,
+  },
+  {
+    key: 'priority',
+    header: 'Priority',
+    render: (item) => {
+      const pb = priorityBadge[item.priority] ?? priorityBadge.medium;
+      return (
+        <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium capitalize ${pb.bg} ${pb.text}`}>
+          {item.priority}
+        </span>
+      );
+    },
+  },
+  {
+    key: 'scheduled',
+    header: 'Scheduled',
+    className: 'font-mono text-[var(--text-secondary)]',
+    render: (item) => formatDate(item.dateIn),
+  },
+  {
+    key: 'due',
+    header: 'Due',
+    render: (item) => {
+      const overdue = isOverdue(item.dueDate, item.completionDate);
+      return (
+        <span className={`font-mono ${overdue ? 'font-medium text-rose-400' : 'text-[var(--text-secondary)]'}`}>
+          {formatDate(item.dueDate)}
+          {overdue && <span className="ml-1 text-[10px] font-bold uppercase">OVERDUE</span>}
+        </span>
+      );
+    },
+  },
+  {
+    key: 'status',
+    header: 'Status',
+    render: (item) => (
+      <span
+        className="inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium"
+        style={{ backgroundColor: `${item.statusColor}20`, color: item.statusColor }}
+      >
+        {item.status}
+      </span>
+    ),
+  },
+];
 
 function getWeekDays(): { label: string; date: string; dayName: string }[] {
   const today = new Date();
@@ -323,64 +388,22 @@ export default function InstallSchedulePage() {
       <div className="flex-1 overflow-auto">
         {viewMode === 'week' ? (
           <WeekView items={filtered} />
-        ) : filtered.length === 0 ? (
-          <div className="flex h-full flex-col items-center justify-center">
-            <CalendarDays className="mb-3 h-10 w-10 text-[var(--text-muted)]" strokeWidth={1.5} />
-            <p className="text-sm font-medium text-[var(--text-secondary)]">No installs scheduled</p>
-            <p className="mt-1 text-xs text-[var(--text-muted)]">Installations will appear here as jobs are scheduled.</p>
-          </div>
         ) : (
-          <table className="w-full">
-            <thead className="sticky top-0 z-10 bg-[var(--surface-raised)]">
-              <tr className="text-left text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
-                <th className="px-6 py-2.5 font-medium">Job #</th>
-                <th className="px-4 py-2.5 font-medium">Client</th>
-                <th className="px-4 py-2.5 font-medium">Vehicle</th>
-                <th className="px-4 py-2.5 font-medium">Priority</th>
-                <th className="px-4 py-2.5 font-medium">Scheduled</th>
-                <th className="px-4 py-2.5 font-medium">Due</th>
-                <th className="px-4 py-2.5 font-medium">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[var(--border-subtle)]">
-              {filtered.map((item) => {
-                const pb = priorityBadge[item.priority] ?? priorityBadge.medium;
-                const overdue = isOverdue(item.dueDate, item.completionDate);
-                return (
-                  <tr key={item.id} className="transition-colors hover:bg-[var(--surface-raised)]">
-                    <td className="px-6 py-3 font-mono text-sm font-medium text-[var(--text-primary)]">
-                      {item.jobNumber}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-[var(--text-secondary)]">{item.clientName}</td>
-                    <td className="px-4 py-3 text-sm text-[var(--text-secondary)]">{item.vehicle}</td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${pb.bg} ${pb.text}`}>
-                        {item.priority}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 font-mono text-sm text-[var(--text-secondary)]">{formatDate(item.dateIn)}</td>
-                    <td className="px-4 py-3">
-                      <span className={`font-mono text-sm ${overdue ? 'font-medium text-rose-400' : 'text-[var(--text-secondary)]'}`}>
-                        {formatDate(item.dueDate)}
-                        {overdue && <span className="ml-1 text-[10px] font-bold uppercase">OVERDUE</span>}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className="inline-block rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase"
-                        style={{
-                          backgroundColor: `${item.statusColor}15`,
-                          color: item.statusColor,
-                        }}
-                      >
-                        {item.status}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <div className="p-6">
+            <DataTable
+              columns={installColumns}
+              data={filtered}
+              rowKey={(item) => item.id}
+              stickyHeader
+              emptyState={
+                <div>
+                  <CalendarDays className="mx-auto mb-3 h-10 w-10 text-[var(--text-muted)]" strokeWidth={1.5} />
+                  <p className="text-sm font-medium text-[var(--text-secondary)]">No installs scheduled</p>
+                  <p className="mt-1 text-xs text-[var(--text-muted)]">Installations will appear here as jobs are scheduled.</p>
+                </div>
+              }
+            />
+          </div>
         )}
       </div>
     </div>

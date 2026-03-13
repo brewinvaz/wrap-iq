@@ -153,7 +153,7 @@ export default function BillingPage() {
               Billing &amp; Subscription
             </h1>
             {subscription && (
-              <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-400">
+              <span className="rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-400">
                 {subscription.status === 'active'
                   ? 'Active'
                   : subscription.status}
@@ -202,7 +202,7 @@ export default function BillingPage() {
                 </p>
               </div>
               {subscription.cancelAtPeriodEnd && (
-                <span className="rounded-full bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-400">
+                <span className="rounded-full bg-amber-500/15 px-3 py-1 text-xs font-medium text-amber-700 dark:text-amber-400">
                   Cancels at period end
                 </span>
               )}

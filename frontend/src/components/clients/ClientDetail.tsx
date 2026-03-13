@@ -7,16 +7,16 @@ import { formatCurrency } from '@/lib/format';
 import { Button } from '@/components/ui/Button';
 
 const tagColors: Record<string, string> = {
-  VIP: 'bg-amber-500/10 text-amber-400',
-  Repeat: 'bg-emerald-500/10 text-emerald-400',
-  Fleet: 'bg-blue-500/10 text-blue-400',
-  New: 'bg-violet-500/10 text-violet-400',
+  VIP: 'bg-amber-500/15 text-amber-700 dark:text-amber-400',
+  Repeat: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400',
+  Fleet: 'bg-blue-500/15 text-blue-700 dark:text-blue-400',
+  New: 'bg-violet-500/15 text-violet-700 dark:text-violet-400',
 };
 
 const statusStyles: Record<string, { dot: string; text: string }> = {
-  completed: { dot: 'bg-emerald-500', text: 'text-emerald-400' },
-  'in-progress': { dot: 'bg-blue-500', text: 'text-blue-400' },
-  scheduled: { dot: 'bg-amber-500', text: 'text-amber-400' },
+  completed: { dot: 'bg-emerald-500', text: 'text-emerald-700 dark:text-emerald-400' },
+  'in-progress': { dot: 'bg-blue-500', text: 'text-blue-700 dark:text-blue-400' },
+  scheduled: { dot: 'bg-amber-500', text: 'text-amber-700 dark:text-amber-400' },
 };
 
 function CardHeader({ title }: { title: string }) {

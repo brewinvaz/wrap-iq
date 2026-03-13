@@ -59,7 +59,7 @@ export default function EquipmentDetail({ equipment, onEdit, onDelete }: Props) 
           </p>
           <p
             className={`mt-1 text-sm font-medium ${
-              equipment.isActive ? 'text-green-400' : 'text-amber-400'
+              equipment.isActive ? 'text-green-700 dark:text-green-400' : 'text-amber-700 dark:text-amber-400'
             }`}
           >
             {equipment.isActive ? '\u25CF Active' : '\u25CF Inactive'}

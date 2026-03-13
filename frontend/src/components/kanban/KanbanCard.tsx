@@ -5,20 +5,20 @@ import { formatCurrency } from '@/lib/format';
 import { ProjectCard } from '@/lib/types';
 
 const priorityBadgeStyles: Record<string, { bg: string; label: string }> = {
-  high: { bg: 'bg-rose-500/15 text-rose-400', label: 'High' },
-  medium: { bg: 'bg-amber-500/15 text-amber-400', label: 'Medium' },
-  low: { bg: 'bg-emerald-500/15 text-emerald-400', label: 'Low' },
+  high: { bg: 'bg-rose-500/20 text-rose-700 dark:text-rose-500', label: 'High' },
+  medium: { bg: 'bg-amber-500/20 text-amber-700 dark:text-amber-500', label: 'Medium' },
+  low: { bg: 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-500', label: 'Low' },
 };
 
 const tagStyles: Record<string, { bg: string; text: string }> = {
-  'full-wrap': { bg: 'bg-blue-500/10 text-blue-400', text: 'Full Wrap' },
-  partial: { bg: 'bg-violet-500/10 text-violet-400', text: 'Partial' },
-  commercial: { bg: 'bg-amber-500/10 text-amber-400', text: 'Commercial' },
-  fleet: { bg: 'bg-emerald-500/10 text-emerald-400', text: 'Fleet' },
-  rush: { bg: 'bg-rose-500/10 text-rose-400', text: 'Rush' },
-  design: { bg: 'bg-orange-500/10 text-orange-400', text: 'Design' },
-  print: { bg: 'bg-cyan-500/10 text-cyan-400', text: 'Print' },
-  install: { bg: 'bg-indigo-500/10 text-indigo-400', text: 'Install' },
+  'full-wrap': { bg: 'bg-blue-500/15 text-blue-700 dark:text-blue-400', text: 'Full Wrap' },
+  partial: { bg: 'bg-violet-500/15 text-violet-700 dark:text-violet-400', text: 'Partial' },
+  commercial: { bg: 'bg-amber-500/15 text-amber-700 dark:text-amber-400', text: 'Commercial' },
+  fleet: { bg: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400', text: 'Fleet' },
+  rush: { bg: 'bg-rose-500/15 text-rose-700 dark:text-rose-400', text: 'Rush' },
+  design: { bg: 'bg-orange-500/15 text-orange-700 dark:text-orange-400', text: 'Design' },
+  print: { bg: 'bg-cyan-500/15 text-cyan-700 dark:text-cyan-400', text: 'Print' },
+  install: { bg: 'bg-indigo-500/15 text-indigo-700 dark:text-indigo-400', text: 'Install' },
 };
 
 

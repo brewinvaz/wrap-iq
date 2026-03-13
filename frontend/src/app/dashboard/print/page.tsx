@@ -123,7 +123,7 @@ const statusStyles: Record<PrintJob['status'], { bg: string; text: string; label
 };
 
 const priorityStyles: Record<PrintJob['priority'], string> = {
-  high: 'text-rose-400',
+  high: 'text-rose-700 dark:text-rose-400',
   normal: 'text-[var(--text-secondary)]',
   low: 'text-[var(--text-muted)]',
 };
