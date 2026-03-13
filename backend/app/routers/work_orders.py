@@ -18,6 +18,7 @@ from app.schemas.work_orders import (
 )
 from app.services.work_orders import (
     create_work_order,
+    delete_work_order,
     get_work_order,
     list_work_orders,
     update_status,
@@ -240,3 +241,15 @@ async def change_status(
 
     updated = await update_status(session, wo, data.status_id)
     return _to_response(updated)
+
+
+@router.delete("/{work_order_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete(
+    work_order_id: uuid.UUID,
+    session: AsyncSession = Depends(get_session),
+    user: User = Depends(get_current_user),
+):
+    wo = await get_work_order(session, work_order_id, user.organization_id)
+    if not wo:
+        raise HTTPException(status_code=404, detail="Work order not found")
+    await delete_work_order(session, wo)
