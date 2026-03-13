@@ -19,8 +19,6 @@ from app.services.r2 import (
     delete_object,
     download_object,
     generate_download_url,
-    generate_object_key,
-    upload_object,
 )
 
 logger = logging.getLogger("wrapiq")
