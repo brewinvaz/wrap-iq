@@ -12,7 +12,6 @@ from starlette.responses import JSONResponse
 
 from app.config import settings
 from app.db import async_session
-from app.services.arq import close_arq_pool
 from app.logging_config import setup_logging
 from app.middleware.rate_limit import limiter
 from app.routers.admin import router as admin_router
@@ -46,6 +45,7 @@ from app.routers.vin import router as vin_router
 from app.routers.webhooks import router as webhooks_router
 from app.routers.work_order_photos import router as work_order_photos_router
 from app.routers.work_orders import router as work_orders_router
+from app.services.arq import close_arq_pool
 
 logger = logging.getLogger("wrapiq")
 
