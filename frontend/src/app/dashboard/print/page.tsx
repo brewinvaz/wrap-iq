@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Printer, X, Check } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import DataTable, { type Column } from '@/components/ui/DataTable';
 import Select from '@/components/ui/Select';
 import { api, ApiError } from '@/lib/api-client';
 import { useModalAccessibility } from '@/hooks/useModalAccessibility';
@@ -126,6 +127,60 @@ const priorityStyles: Record<PrintJob['priority'], string> = {
   normal: 'text-[var(--text-secondary)]',
   low: 'text-[var(--text-muted)]',
 };
+
+const printColumns: Column<PrintJob>[] = [
+  {
+    key: 'job',
+    header: 'Job',
+    className: 'font-medium text-[var(--text-primary)]',
+    render: (job) => job.jobName,
+  },
+  {
+    key: 'client',
+    header: 'Client',
+    className: 'text-[var(--text-secondary)]',
+    render: (job) => job.client,
+  },
+  {
+    key: 'material',
+    header: 'Material',
+    className: 'font-mono text-[var(--text-secondary)]',
+    render: (job) => job.material,
+  },
+  {
+    key: 'size',
+    header: 'Size',
+    className: 'font-mono text-[var(--text-secondary)]',
+    render: (job) => job.size,
+  },
+  {
+    key: 'status',
+    header: 'Status',
+    render: (job) => {
+      const style = statusStyles[job.status];
+      return (
+        <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${style.bg} ${style.text}`}>
+          {style.label}
+        </span>
+      );
+    },
+  },
+  {
+    key: 'priority',
+    header: 'Priority',
+    render: (job) => (
+      <span className={`text-[10px] font-bold uppercase ${priorityStyles[job.priority]}`}>
+        {job.priority}
+      </span>
+    ),
+  },
+  {
+    key: 'due',
+    header: 'Due',
+    className: 'font-mono text-[var(--text-secondary)]',
+    render: (job) => formatDate(job.dueDate),
+  },
+];
 
 /* ------------------------------------------------------------------ */
 /*  Toast                                                              */
@@ -541,43 +596,11 @@ export default function PrintPage() {
             <p className="mt-1 text-xs text-[var(--text-muted)]">Print queue items will appear here as jobs come in.</p>
           </div>
         ) : (
-          <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-card)]">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-[var(--border-subtle)] bg-[var(--surface-raised)]">
-                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Job</th>
-                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Client</th>
-                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Material</th>
-                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Size</th>
-                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Status</th>
-                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Priority</th>
-                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Due</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((job) => {
-                  const style = statusStyles[job.status];
-                  return (
-                    <tr key={job.id} className="border-b border-[var(--border-subtle)] last:border-0 hover:bg-[var(--surface-raised)]">
-                      <td className="px-4 py-3 font-medium text-[var(--text-primary)]">{job.jobName}</td>
-                      <td className="px-4 py-3 text-[var(--text-secondary)]">{job.client}</td>
-                      <td className="px-4 py-3 font-mono text-[var(--text-secondary)]">{job.material}</td>
-                      <td className="px-4 py-3 font-mono text-[var(--text-secondary)]">{job.size}</td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${style.bg} ${style.text}`}>
-                          {style.label}
-                        </span>
-                      </td>
-                      <td className={`px-4 py-3 text-[10px] font-bold uppercase ${priorityStyles[job.priority]}`}>
-                        {job.priority}
-                      </td>
-                      <td className="px-4 py-3 font-mono text-[var(--text-secondary)]">{formatDate(job.dueDate)}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <DataTable
+            columns={printColumns}
+            data={filtered}
+            rowKey={(job) => job.id}
+          />
         )}
       </div>
 

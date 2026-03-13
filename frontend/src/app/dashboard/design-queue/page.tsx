@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Paintbrush } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import DataTable, { type Column } from '@/components/ui/DataTable';
 import { api, ApiError } from '@/lib/api-client';
 
 type FilterTab = 'all' | 'in_design' | 'in_revision' | 'proof_sent' | 'approved';
@@ -117,6 +118,63 @@ function isOverdue(dueDate: string | null): boolean {
   if (!dueDate) return false;
   return new Date(dueDate) < new Date();
 }
+
+const designQueueColumns: Column<DesignQueueItem>[] = [
+  {
+    key: 'jobNumber',
+    header: 'Job #',
+    className: 'font-mono font-medium text-[var(--text-primary)]',
+    render: (item) => item.jobNumber,
+  },
+  {
+    key: 'client',
+    header: 'Client',
+    className: 'text-[var(--text-secondary)]',
+    render: (item) => item.clientName,
+  },
+  {
+    key: 'vehicle',
+    header: 'Vehicle',
+    className: 'text-[var(--text-secondary)]',
+    render: (item) => item.vehicle,
+  },
+  {
+    key: 'priority',
+    header: 'Priority',
+    render: (item) => (
+      <span className={`text-[10px] font-bold uppercase ${priorityStyles[item.priority] ?? ''}`}>
+        {item.priority}
+      </span>
+    ),
+  },
+  {
+    key: 'dateIn',
+    header: 'Date In',
+    className: 'font-mono text-[var(--text-secondary)]',
+    render: (item) => formatDate(item.dateIn),
+  },
+  {
+    key: 'due',
+    header: 'Due',
+    render: (item) => (
+      <span className={`font-mono ${isOverdue(item.dueDate) ? 'font-medium text-rose-400' : 'text-[var(--text-secondary)]'}`}>
+        {formatDate(item.dueDate)}
+      </span>
+    ),
+  },
+  {
+    key: 'status',
+    header: 'Status',
+    render: (item) => (
+      <span
+        className="inline-block rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase"
+        style={{ backgroundColor: `${item.statusColor}15`, color: item.statusColor }}
+      >
+        {item.status}
+      </span>
+    ),
+  },
+];
 
 function LoadingSkeleton() {
   return (
@@ -234,7 +292,7 @@ export default function DesignQueuePage() {
       </div>
 
       {/* Table */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto p-6">
         {filtered.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center">
             <Paintbrush className="mb-3 h-10 w-10 text-[var(--text-muted)]" strokeWidth={1.5} />
@@ -242,52 +300,12 @@ export default function DesignQueuePage() {
             <p className="mt-1 text-xs text-[var(--text-muted)]">Design queue items will appear here as jobs come in.</p>
           </div>
         ) : (
-          <table className="w-full">
-            <thead className="sticky top-0 z-10 bg-[var(--surface-raised)]">
-              <tr className="text-left text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
-                <th className="px-6 py-2.5 font-medium">Job #</th>
-                <th className="px-4 py-2.5 font-medium">Client</th>
-                <th className="px-4 py-2.5 font-medium">Vehicle</th>
-                <th className="px-4 py-2.5 font-medium">Priority</th>
-                <th className="px-4 py-2.5 font-medium">Date In</th>
-                <th className="px-4 py-2.5 font-medium">Due</th>
-                <th className="px-4 py-2.5 font-medium">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[var(--border-subtle)]">
-              {filtered.map((item) => (
-                <tr key={item.id} className="transition-colors hover:bg-[var(--surface-raised)]">
-                  <td className="px-6 py-3 font-mono text-sm font-medium text-[var(--text-primary)]">
-                    {item.jobNumber}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-[var(--text-secondary)]">{item.clientName}</td>
-                  <td className="px-4 py-3 text-sm text-[var(--text-secondary)]">{item.vehicle}</td>
-                  <td className="px-4 py-3">
-                    <span className={`text-[10px] font-bold uppercase ${priorityStyles[item.priority] ?? ''}`}>
-                      {item.priority}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 font-mono text-sm text-[var(--text-secondary)]">{formatDate(item.dateIn)}</td>
-                  <td className="px-4 py-3">
-                    <span className={`font-mono text-sm ${isOverdue(item.dueDate) ? 'font-medium text-rose-400' : 'text-[var(--text-secondary)]'}`}>
-                      {formatDate(item.dueDate)}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span
-                      className="inline-block rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase"
-                      style={{
-                        backgroundColor: `${item.statusColor}15`,
-                        color: item.statusColor,
-                      }}
-                    >
-                      {item.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <DataTable
+            columns={designQueueColumns}
+            data={filtered}
+            rowKey={(item) => item.id}
+            stickyHeader
+          />
         )}
       </div>
     </div>

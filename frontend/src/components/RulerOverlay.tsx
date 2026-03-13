@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useSyncExternalStore } from 'react';
 import { useTheme } from '@/lib/theme';
 
 const MAJOR = 120;
@@ -8,13 +8,14 @@ const MEDIUM = 24;
 const MINOR = 12;
 const RULER_SIZE = 20;
 
+const subscribe = () => () => {};
+function useMounted() {
+  return useSyncExternalStore(subscribe, () => true, () => false);
+}
+
 export default function RulerOverlay() {
   const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useMounted();
 
   const isLight = resolvedTheme === 'light';
   const tickColor = isLight ? '#0891b2' : '#06b6d4';
