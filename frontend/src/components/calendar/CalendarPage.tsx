@@ -9,7 +9,6 @@ import {
 } from '@schedule-x/calendar';
 import { createEventsServicePlugin } from '@schedule-x/events-service';
 import 'temporal-polyfill/global';
-import '@schedule-x/theme-default/dist/index.css';
 
 import { useRole } from '@/lib/role-context';
 import { api, ApiError } from '@/lib/api-client';
@@ -266,37 +265,64 @@ interface SXEvent {
 
 const TZ = Temporal.Now.timeZoneId();
 
-function toScheduleXEvents(events: CalendarEvent[], colorBy: ColorBy): SXEvent[] {
-  return events.map((e) => {
-    const calendarId = colorBy === 'installer' ? e.installer : e.phase;
+function isWeekday(date: Temporal.PlainDate): boolean {
+  return date.dayOfWeek >= 1 && date.dayOfWeek <= 5;
+}
 
-    // Multi-day detection: if dueDate exists and differs from date
+function getBusinessDays(start: Temporal.PlainDate, end: Temporal.PlainDate): Temporal.PlainDate[] {
+  const days: Temporal.PlainDate[] = [];
+  let current = start;
+  while (Temporal.PlainDate.compare(current, end) <= 0) {
+    if (isWeekday(current)) {
+      days.push(current);
+    }
+    current = current.add({ days: 1 });
+  }
+  return days;
+}
+
+function toScheduleXEvents(events: CalendarEvent[], colorBy: ColorBy): SXEvent[] {
+  const result: SXEvent[] = [];
+
+  for (const e of events) {
+    const calendarId = colorBy === 'installer' ? e.installer : e.phase;
+    const description = `${e.vehicle} · ${e.clientName}`;
+
     const isMultiDay = e.dueDate && e.dueDate !== e.date;
 
-    let start: Temporal.ZonedDateTime | Temporal.PlainDate;
-    let end: Temporal.ZonedDateTime | Temporal.PlainDate;
-
     if (isMultiDay) {
-      start = Temporal.PlainDate.from(e.date);
-      end = Temporal.PlainDate.from(e.dueDate!);
-    } else {
-      start = Temporal.PlainDate.from(e.date)
-        .toPlainDateTime(Temporal.PlainTime.from(e.startTime))
-        .toZonedDateTime(TZ);
-      end = Temporal.PlainDate.from(e.date)
-        .toPlainDateTime(Temporal.PlainTime.from(e.endTime))
-        .toZonedDateTime(TZ);
-    }
+      const startDate = Temporal.PlainDate.from(e.date);
+      const endDate = Temporal.PlainDate.from(e.dueDate!);
+      const businessDays = getBusinessDays(startDate, endDate);
+      const totalDays = businessDays.length;
 
-    return {
-      id: e.id,
-      title: e.title,
-      start,
-      end,
-      calendarId,
-      description: `${e.vehicle} · ${e.clientName}`,
-    };
-  });
+      for (let i = 0; i < totalDays; i++) {
+        const day = businessDays[i];
+        const dayNum = i + 1;
+        result.push({
+          id: `${e.id}-day${dayNum}`,
+          title: `${e.title} (Day ${dayNum}/${totalDays})`,
+          start: day.toPlainDateTime(Temporal.PlainTime.from('08:00')).toZonedDateTime(TZ),
+          end: day.toPlainDateTime(Temporal.PlainTime.from('17:00')).toZonedDateTime(TZ),
+          calendarId,
+          description,
+        });
+      }
+    } else {
+      const date = Temporal.PlainDate.from(e.date);
+      if (!isWeekday(date)) continue;
+      result.push({
+        id: e.id,
+        title: e.title,
+        start: date.toPlainDateTime(Temporal.PlainTime.from(e.startTime)).toZonedDateTime(TZ),
+        end: date.toPlainDateTime(Temporal.PlainTime.from(e.endTime)).toZonedDateTime(TZ),
+        calendarId,
+        description,
+      });
+    }
+  }
+
+  return result;
 }
 
 // ---------------------------------------------------------------------------
@@ -556,7 +582,7 @@ export default function CalendarPage() {
         </div>
       ) : (
         <>
-          <div className={`flex-1 overflow-auto ${isListView ? 'hidden' : ''}`}>
+          <div className={`flex-1 overflow-hidden ${isListView ? 'hidden' : ''}`} style={{ minHeight: 0 }}>
             <ScheduleXCalendar key={isDark ? 'dark' : 'light'} calendarApp={calendar} />
           </div>
           {isListView && <ListView events={filteredEvents} />}

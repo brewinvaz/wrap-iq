@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "@schedule-x/theme-default/dist/index.css";
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
@@ -56,7 +57,8 @@
 
 /* ── Schedule-X theme integration (dark) ── */
 :root,
-[data-theme="dark"] {
+[data-theme="dark"],
+.is-dark {
   --sx-color-surface: var(--surface-base);
   --sx-color-surface-dim: var(--surface-app);
   --sx-color-surface-bright: var(--surface-raised);
@@ -76,6 +78,7 @@
   --sx-color-on-secondary: #ffffff;
   --sx-color-secondary-container: rgba(59, 130, 246, 0.1);
   --sx-color-on-secondary-container: var(--accent-secondary);
+  --sx-internal-color-text: var(--text-primary);
 }
 
 /* ── Light theme ── */
@@ -141,6 +144,12 @@
   --sx-color-on-secondary: #ffffff;
   --sx-color-secondary-container: rgba(37, 99, 235, 0.1);
   --sx-color-on-secondary-container: var(--accent-secondary);
+  --sx-internal-color-text: var(--text-primary);
+}
+
+/* ── Schedule-X calendar fills available height ── */
+.sx__calendar-wrapper {
+  height: 100%;
 }
 
 /* ── Cutting mat grid (light mode) ── */
