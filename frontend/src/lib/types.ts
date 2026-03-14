@@ -39,18 +39,22 @@ export interface KanbanColumn {
 
 export interface CalendarEvent {
   id: string;
-  projectId: string;
+  jobNumber: string;
   title: string;
   vehicle: string;
+  clientName: string;
+  date: string;               // YYYY-MM-DD
+  startTime: string;          // HH:MM
+  endTime: string;            // HH:MM
+  phase: 'design' | 'production' | 'install';
+  status: string;
+  systemStatus: string | null;
+  priority: 'high' | 'medium' | 'low';
+  dueDate: string | null;
+  isOverdue: boolean;
   installer: string;
   installerInitials: string;
   installerColor: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  difficulty: 'easy' | 'standard' | 'complex';
-  location: 'shop' | 'on-site';
-  color: string;
 }
 
 export interface Installer {
