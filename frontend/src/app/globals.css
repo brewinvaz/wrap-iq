@@ -170,17 +170,61 @@
   min-height: 0;
 }
 
-/* ── Compact hour rows so day/week views fit in viewport ── */
-.sx__week-grid {
-  --sx-week-grid-hour-height: 50px !important;
+/* ── Hide Schedule-X view switcher (month-only mode) ── */
+.sx__view-selection {
+  display: none !important;
 }
 
-.sx__week-grid__hour {
-  height: 50px !important;
+/* ── Compact calendar header ── */
+.sx__calendar-header {
+  padding: 4px 8px !important;
+  gap: 4px !important;
 }
 
-.sx__time-grid-day {
-  height: auto !important;
+.sx__calendar-header .sx__today-button,
+.sx__calendar-header .sx__range-heading {
+  font-size: 12px !important;
+}
+
+.sx__range-heading {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
+/* ── Hide date picker ── */
+.sx__calendar-header .sx__date-input {
+  display: none !important;
+}
+
+/* ── Month grid event styling ── */
+.sx__month-grid-event {
+  border-radius: 4px !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  padding: 1px 6px !important;
+}
+
+.sx__month-grid-day__header-date {
+  font-weight: 600 !important;
+}
+
+/* ── Make day-of-week labels visible ── */
+.sx__month-grid-day__header-day-name {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  color: var(--text-secondary) !important;
+  opacity: 1 !important;
+}
+
+/* ── Hide scrollbar on toolbar work order pills ── */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }
 
 /* ── Cutting mat grid (light mode) ── */
