@@ -415,7 +415,7 @@ export default function CalendarPage() {
         else if (dayDiff <= 7) setViewLabel('This week');
         else setViewLabel('This month');
       },
-      onEventClick(calendarEvent, _e) {
+      onEventClick(calendarEvent) {
         // Future: navigate to work order detail
         console.log('Event clicked:', calendarEvent.id);
       },
