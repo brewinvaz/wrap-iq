@@ -248,7 +248,7 @@ function TimeEfficiencySection({ timeLogs, jobValue, estimatedHours }: { timeLog
   const phaseHours: Record<string, number> = {};
   for (const log of timeLogs) {
     const phase = log.phase || 'other';
-    phaseHours[phase] = (phaseHours[phase] || 0) + log.hours;
+    phaseHours[phase] = (phaseHours[phase] || 0) + Number(log.hours);
   }
 
   const maxPhaseHours = Math.max(...Object.values(phaseHours), 1);
