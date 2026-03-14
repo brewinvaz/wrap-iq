@@ -42,8 +42,7 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
       {
         label: 'Workspace',
         items: [
-          { icon: 'ClipboardList', label: 'Jobs Board', href: '/dashboard', badgeKey: 'work_orders' },
-          { icon: 'Package', label: 'Jobs List', href: '/dashboard/work-orders' },
+          { icon: 'ClipboardList', label: 'Jobs', href: '/dashboard', badgeKey: 'work_orders' },
           { icon: 'Calendar', label: 'Calendar', href: '/dashboard/calendar' },
           { icon: 'MessageSquare', label: 'Communications', href: '/dashboard/comms' },
           { icon: 'Users', label: 'Customers', href: '/dashboard/customers' },
@@ -190,7 +189,7 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
       {
         label: 'Jobs',
         items: [
-          { icon: 'ClipboardList', label: 'Assigned Jobs', href: '/dashboard/jobs' },
+          { icon: 'ClipboardList', label: 'Assigned Jobs', href: '/dashboard' },
           { icon: 'Calendar', label: 'Calendar', href: '/dashboard/calendar' },
         ],
       },
