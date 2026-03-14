@@ -32,6 +32,7 @@ interface WorkOrder {
   vehicles: { id: string; make: string | null; model: string | null; year: number | null; vin: string | null }[];
   client_id: string | null;
   client_name: string | null;
+  estimated_hours: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -132,6 +133,12 @@ function useWorkOrderColumns(
       header: 'Value',
       className: 'font-mono text-[var(--text-secondary)]',
       render: (wo) => (wo.job_value ? formatCurrency(wo.job_value) : '—'),
+    },
+    {
+      key: 'est_hours',
+      header: 'Est. Hours',
+      className: 'font-mono text-[var(--text-secondary)]',
+      render: (wo) => (wo.estimated_hours != null ? `${wo.estimated_hours}h` : '—'),
     },
     {
       key: 'due',
