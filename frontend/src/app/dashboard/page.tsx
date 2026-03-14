@@ -355,6 +355,20 @@ export default function DashboardPage() {
   // Import modal state
   const [showImportModal, setShowImportModal] = useState(false);
 
+  // List-mode state (server-side paginated)
+  const [activeStage, setActiveStage] = useState<string | null>(null);
+  const [listPage, setListPage] = useState(0);
+  const listLimit = 20;
+  const [listWorkOrders, setListWorkOrders] = useState<WorkOrderResponse[]>([]);
+  const [listTotal, setListTotal] = useState(0);
+  const [listLoading, setListLoading] = useState(false);
+
+  // Delete modal state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<WorkOrderResponse | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
   // Data state
   const [columns, setColumns] = useState<KanbanColumn[]>([]);
   const [kpis, setKpis] = useState<KPIMetric[]>([]);
@@ -454,6 +468,73 @@ export default function DashboardPage() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  const fetchListData = useCallback(async () => {
+    setListLoading(true);
+    try {
+      const params = new URLSearchParams({
+        skip: String(listPage * listLimit),
+        limit: String(listLimit),
+      });
+      if (activeStage) params.set('status_id', activeStage);
+      if (debouncedSearch) params.set('search', debouncedSearch);
+      const data = await api.get<WorkOrderListResponse>(`/api/work-orders?${params}`);
+      setListWorkOrders(data.items);
+      setListTotal(data.total);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(`Failed to load jobs list: ${err.message}`);
+      } else {
+        setError('Failed to load jobs list.');
+      }
+    } finally {
+      setListLoading(false);
+    }
+  }, [listPage, activeStage, debouncedSearch]);
+
+  // Track whether page was auto-reset to avoid double-fetch
+  const skipNextListFetch = useRef(false);
+
+  useEffect(() => {
+    if (viewMode === 'list') {
+      if (skipNextListFetch.current) {
+        skipNextListFetch.current = false;
+        return;
+      }
+      fetchListData();
+    }
+  }, [viewMode, fetchListData]);
+
+  const handleDelete = useCallback(async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      await api.delete(`/api/work-orders/${deleteTarget.id}`);
+      setShowDeleteModal(false);
+      setDeleteTarget(null);
+      fetchListData();
+      fetchData(); // Refresh kanban data + KPIs too
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 409) {
+        setDeleteError('Cannot delete — this job has linked invoices');
+      } else {
+        setDeleteError(err instanceof ApiError ? err.message : 'Failed to delete');
+      }
+    } finally {
+      setDeleting(false);
+    }
+  }, [deleteTarget, fetchListData, fetchData]);
+
+  // Reset list pagination when filters change
+  useEffect(() => {
+    setListPage((prev) => {
+      if (prev !== 0) {
+        skipNextListFetch.current = true;
+      }
+      return 0;
+    });
+  }, [activeStage, debouncedSearch]);
 
   // ------ Filtered columns (apply quick-filter + dropdown filters) ------
 
