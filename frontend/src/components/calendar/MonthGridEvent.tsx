@@ -268,7 +268,7 @@ export default function MonthGridEvent({ calendarEvent }: MonthGridEventProps) {
               {_woId && (
                 <div className="mt-3 border-t border-[var(--border)] pt-2.5">
                   <Link
-                    href={`/dashboard/work-orders/${_woId}`}
+                    href={`/dashboard/jobs/${_woId}`}
                     className="group/link inline-flex items-center gap-1 text-[11.5px] font-semibold text-[var(--accent-primary)] transition-colors hover:text-[var(--accent-secondary)]"
                   >
                     View details
