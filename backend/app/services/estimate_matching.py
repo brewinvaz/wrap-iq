@@ -6,6 +6,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.estimate_defaults import EstimateDefaults
 
 
+def extract_vehicle_type(work_order_vehicles) -> str | None:
+    """Return the shared vehicle_type string if all vehicles have the same type, else None."""
+    if not work_order_vehicles:
+        return None
+    types = set()
+    for wov in work_order_vehicles:
+        vt = wov.vehicle.vehicle_type
+        types.add(vt.value if hasattr(vt, "value") else vt)
+    return types.pop() if len(types) == 1 else None
+
+
 async def find_matching_estimates(
     session: AsyncSession,
     org_id: uuid.UUID,
