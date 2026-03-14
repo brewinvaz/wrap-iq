@@ -50,6 +50,7 @@ interface WorkOrderResponse {
   vehicles: VehicleInWorkOrder[];
   client_id: string | null;
   client_name: string | null;
+  estimated_hours: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -346,6 +347,13 @@ export default function DashboardPage() {
   const filterBtnRef = useRef<HTMLButtonElement>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
+  // Search state
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+
+  // Import modal state
+  const [showImportModal, setShowImportModal] = useState(false);
+
   // Data state
   const [columns, setColumns] = useState<KanbanColumn[]>([]);
   const [kpis, setKpis] = useState<KPIMetric[]>([]);
@@ -380,6 +388,12 @@ export default function DashboardPage() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [filterOpen]);
+
+  // Debounce search input (300ms)
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   // ------ View mode handler ------
 
