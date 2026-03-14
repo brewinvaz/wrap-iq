@@ -148,8 +148,39 @@
 }
 
 /* ── Schedule-X calendar fills available height ── */
+.sx-react-calendar-wrapper {
+  height: 100%;
+  overflow: hidden;
+}
+
 .sx__calendar-wrapper {
   height: 100%;
+}
+
+.sx__calendar {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.sx__calendar .sx__week-wrapper,
+.sx__calendar .sx__month-grid-wrapper {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+}
+
+/* ── Compact hour rows so day/week views fit in viewport ── */
+.sx__week-grid {
+  --sx-week-grid-hour-height: 50px !important;
+}
+
+.sx__week-grid__hour {
+  height: 50px !important;
+}
+
+.sx__time-grid-day {
+  height: auto !important;
 }
 
 /* ── Cutting mat grid (light mode) ── */

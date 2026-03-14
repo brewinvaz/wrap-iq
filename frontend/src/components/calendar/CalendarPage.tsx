@@ -209,21 +209,9 @@ function transformWorkOrders(workOrders: WorkOrderResponse[], installerMap: Map<
     const installerName = wo.client_name ?? 'Unassigned';
     const inst = installerMap.get(installerName);
 
-    const startHour = dateIn.getHours();
-    const startMin = dateIn.getMinutes();
-    let startTime = `${String(startHour).padStart(2, '0')}:${String(startMin).padStart(2, '0')}`;
-    if (startTime === '00:00') startTime = '08:00';
-
-    let endTime = '17:00';
-    if (wo.estimated_completion_date) {
-      const endDate = new Date(wo.estimated_completion_date);
-      if (formatDateStr(endDate) === dateStr) {
-        const eh = endDate.getHours();
-        const em = endDate.getMinutes();
-        const et = `${String(eh).padStart(2, '0')}:${String(em).padStart(2, '0')}`;
-        if (et !== '00:00') endTime = et;
-      }
-    }
+    // Default to business hours — API dates are date-only (midnight UTC shifts with timezone)
+    const startTime = '08:00';
+    const endTime = '17:00';
 
     const dueDateStr = wo.estimated_completion_date?.slice(0, 10) ?? null;
     const isOverdue = dueDateStr !== null && dueDateStr < todayStr && wo.status?.system_status !== 'completed';
@@ -263,7 +251,8 @@ interface SXEvent {
   description?: string;
 }
 
-const TZ = Temporal.Now.timeZoneId();
+// Use UTC to avoid timezone offset issues — Schedule-X displays ZonedDateTime in UTC
+const DISPLAY_TZ = 'UTC';
 
 function isWeekday(date: Temporal.PlainDate): boolean {
   return date.dayOfWeek >= 1 && date.dayOfWeek <= 5;
@@ -302,8 +291,8 @@ function toScheduleXEvents(events: CalendarEvent[], colorBy: ColorBy): SXEvent[]
         result.push({
           id: `${e.id}-day${dayNum}`,
           title: `${e.title} (Day ${dayNum}/${totalDays})`,
-          start: day.toPlainDateTime(Temporal.PlainTime.from('08:00')).toZonedDateTime(TZ),
-          end: day.toPlainDateTime(Temporal.PlainTime.from('17:00')).toZonedDateTime(TZ),
+          start: day.toPlainDateTime(Temporal.PlainTime.from('08:00')).toZonedDateTime(DISPLAY_TZ),
+          end: day.toPlainDateTime(Temporal.PlainTime.from('17:00')).toZonedDateTime(DISPLAY_TZ),
           calendarId,
           description,
         });
@@ -314,8 +303,8 @@ function toScheduleXEvents(events: CalendarEvent[], colorBy: ColorBy): SXEvent[]
       result.push({
         id: e.id,
         title: e.title,
-        start: date.toPlainDateTime(Temporal.PlainTime.from(e.startTime)).toZonedDateTime(TZ),
-        end: date.toPlainDateTime(Temporal.PlainTime.from(e.endTime)).toZonedDateTime(TZ),
+        start: date.toPlainDateTime(Temporal.PlainTime.from(e.startTime)).toZonedDateTime(DISPLAY_TZ),
+        end: date.toPlainDateTime(Temporal.PlainTime.from(e.endTime)).toZonedDateTime(DISPLAY_TZ),
         calendarId,
         description,
       });
@@ -488,7 +477,7 @@ export default function CalendarPage() {
   useEffect(() => {
     if (isLoading) return;
     const sxEvents = toScheduleXEvents(filteredEvents, colorBy);
-    const key = JSON.stringify(sxEvents);
+    const key = sxEvents.map((e) => `${e.id}|${e.calendarId}`).join(',');
     if (key !== prevEventsRef.current) {
       prevEventsRef.current = key;
       replaceAllEvents(eventsService, sxEvents);
