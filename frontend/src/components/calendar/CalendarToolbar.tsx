@@ -16,6 +16,8 @@ interface CalendarToolbarProps {
   installers: Installer[];
   activeInstallers: Set<string>;
   onToggleInstaller: (id: string) => void;
+  isListView: boolean;
+  onToggleListView: () => void;
 }
 
 const PHASES: { key: Phase; label: string; color: string }[] = [
@@ -41,6 +43,8 @@ export default function CalendarToolbar({
   installers,
   activeInstallers,
   onToggleInstaller,
+  isListView,
+  onToggleListView,
 }: CalendarToolbarProps) {
   return (
     <div className="flex flex-wrap items-center gap-3 border-b border-[var(--glass-border)] bg-[var(--glass-bg)] px-6 py-2.5 backdrop-blur-sm">
@@ -89,6 +93,17 @@ export default function CalendarToolbar({
         <option value="phase">Phase</option>
         <option value="installer">Installer</option>
       </select>
+      <div className="h-4 w-px bg-[var(--glass-border)]" />
+      <button
+        onClick={onToggleListView}
+        className={`rounded-md px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider transition-colors ${
+          isListView
+            ? 'bg-[var(--accent-primary-bg)] text-[var(--accent-primary)] border border-[var(--accent-primary-border)]'
+            : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)] border border-transparent'
+        }`}
+      >
+        List
+      </button>
       {colorBy === 'installer' && installers.length > 0 && (
         <>
           <div className="h-4 w-px bg-[var(--glass-border)]" />
