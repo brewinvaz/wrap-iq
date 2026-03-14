@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 
 from pydantic import BaseModel
 
@@ -13,4 +14,6 @@ class InstallDetailsCreate(BaseModel):
 
 
 class InstallDetailsResponse(InstallDetailsCreate):
+    estimated_hours: Decimal | None = None
+
     model_config = {"from_attributes": True}

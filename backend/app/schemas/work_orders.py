@@ -57,6 +57,7 @@ class WorkOrderUpdate(BaseModel):
     internal_notes: str | None = None
     checklist: list[ChecklistItem] | None = None
     client_id: uuid.UUID | None = None
+    estimated_hours: Decimal | None = None
 
     @field_validator("client_id", mode="before")
     @classmethod
@@ -81,6 +82,7 @@ class VehicleInWorkOrder(BaseModel):
     model: str | None = None
     year: int | None = None
     vin: str | None = None
+    vehicle_type: str | None = None
 
     model_config = {"from_attributes": True}
 
