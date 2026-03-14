@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import KanbanBoard from '@/components/kanban/KanbanBoard';
 import MetricsBar from '@/components/dashboard/MetricsBar';
 import CreateWorkOrderModal from '@/components/work-orders/CreateWorkOrderModal';
+import ImportCSVModal from '@/components/work-orders/ImportCSVModal';
 import DataTable, { type Column } from '@/components/ui/DataTable';
 import { api, ApiError } from '@/lib/api-client';
 import { formatCurrencyCompact, formatCurrency } from '@/lib/format';
@@ -461,11 +462,17 @@ export default function DashboardPage() {
 
   const matchesFilter = useCallback(
     (wo: WorkOrderResponse): boolean => {
+      // Search filter (client-side for kanban)
+      if (debouncedSearch) {
+        const q = debouncedSearch.toLowerCase();
+        const matchesSearch =
+          wo.job_number.toLowerCase().includes(q) ||
+          (wo.client_name ?? '').toLowerCase().includes(q);
+        if (!matchesSearch) return false;
+      }
       // Quick-filter toggles
       if (filter === 'urgent' && wo.priority !== 'high') return false;
       if (filter === 'my-jobs') {
-        // Simulate "my jobs" by showing only commercial jobs as a toggle demo
-        // (no user assignment data available in the API)
         if (wo.job_type !== 'commercial') return false;
       }
       // Dropdown filters
@@ -481,7 +488,7 @@ export default function DashboardPage() {
         return false;
       return true;
     },
-    [filter, filterCriteria]
+    [filter, filterCriteria, debouncedSearch]
   );
 
   const filteredColumns = useMemo(() => {
@@ -629,6 +636,19 @@ export default function DashboardPage() {
             </span>
           </div>
           <div className="flex items-center gap-3">
+            <input
+              type="text"
+              placeholder="Search by job # or client..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="h-9 w-56 rounded-lg border border-[var(--border)] bg-[var(--surface-app)] px-3 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none focus:border-[var(--accent-primary)]/40 focus:bg-[var(--surface-card)] focus:ring-2 focus:ring-[var(--accent-primary)]/20"
+            />
+            <Button
+              variant="secondary"
+              onClick={() => setShowImportModal(true)}
+            >
+              Import CSV
+            </Button>
             <div className="relative">
               <Button
                 ref={filterBtnRef}
@@ -857,6 +877,11 @@ export default function DashboardPage() {
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onCreate={() => { fetchData(); }}
+      />
+      <ImportCSVModal
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        onImportComplete={() => { fetchData(); }}
       />
     </div>
   );
