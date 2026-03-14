@@ -44,6 +44,10 @@
   --phase-install: #10b981;
   --phase-done: #64748b;
 
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --glass-bg-hover: rgba(255, 255, 255, 0.06);
+
   --scrollbar-thumb: rgba(6, 182, 212, 0.12);
   --scrollbar-thumb-hover: rgba(6, 182, 212, 0.2);
 
@@ -81,6 +85,10 @@
   --phase-production: #2563eb;
   --phase-install: #10b981;
   --phase-done: #71717a;
+
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(0, 0, 0, 0.06);
+  --glass-bg-hover: rgba(255, 255, 255, 0.9);
 
   --scrollbar-thumb: #d1d5db;
   --scrollbar-thumb-hover: #9ca3af;
