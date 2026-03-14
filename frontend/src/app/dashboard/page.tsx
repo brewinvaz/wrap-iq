@@ -722,7 +722,7 @@ export default function DashboardPage() {
 
   const filteredColumns = useMemo(() => {
     const hasAnyFilter =
-      filter !== 'all' || activeFilterCount > 0;
+      filter !== 'all' || activeFilterCount > 0 || !!debouncedSearch;
 
     if (!hasAnyFilter) return columns;
 
@@ -733,14 +733,7 @@ export default function DashboardPage() {
         return wo ? matchesFilter(wo) : true;
       }),
     }));
-  }, [columns, filter, matchesFilter, workOrders, activeFilterCount]);
-
-  /** Filtered work orders for list view */
-  const filteredWorkOrders = useMemo(() => {
-    const hasAnyFilter = filter !== 'all' || activeFilterCount > 0;
-    if (!hasAnyFilter) return workOrders;
-    return workOrders.filter(matchesFilter);
-  }, [workOrders, filter, matchesFilter, activeFilterCount]);
+  }, [columns, filter, matchesFilter, workOrders, activeFilterCount, debouncedSearch]);
 
   // ------ Drag-and-drop status change ------
 
