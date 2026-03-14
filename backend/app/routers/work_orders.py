@@ -20,7 +20,7 @@ from app.schemas.work_orders import (
     WorkOrderResponse,
     WorkOrderUpdate,
 )
-from app.services.estimate_matching import find_matching_estimates
+from app.services.estimate_matching import extract_vehicle_type, find_matching_estimates
 from app.services.work_orders import (
     create_work_order,
     delete_work_order,
@@ -124,6 +124,11 @@ def _to_response(wo, *, actual_hours: Decimal | None = None) -> WorkOrderRespons
             "model": wov.vehicle.model,
             "year": wov.vehicle.year,
             "vin": wov.vehicle.vin,
+            "vehicle_type": (
+                wov.vehicle.vehicle_type.value
+                if hasattr(wov.vehicle.vehicle_type, "value")
+                else wov.vehicle.vehicle_type
+            ),
         }
         for wov in (wo.work_order_vehicles or [])
     ]
@@ -220,12 +225,14 @@ async def create(
     if data.wrap_details and data.wrap_details.wrap_coverage:
         wrap_coverage = data.wrap_details.wrap_coverage.value
     vehicle_count = len(data.vehicle_ids)
+    vehicle_type = extract_vehicle_type(wo.work_order_vehicles or [])
     match = await find_matching_estimates(
         session,
         user.organization_id,
         job_type=data.job_type.value,
         vehicle_count=vehicle_count,
         wrap_coverage=wrap_coverage,
+        vehicle_type=vehicle_type,
     )
     if match:
         total = Decimal(0)
@@ -302,7 +309,56 @@ async def update(
     if data.client_id is not None:
         await _validate_client_ownership(session, data.client_id, user.organization_id)
 
-    updated = await update_work_order(session, wo, data.model_dump(exclude_unset=True))
+    payload = data.model_dump(exclude_unset=True)
+    # Remove estimated_hours from payload passed to update_work_order — handled below
+    manual_hours = payload.pop("estimated_hours", None)
+    has_manual_override = "estimated_hours" in data.model_fields_set
+
+    updated = await update_work_order(session, wo, payload)
+
+    # Handle estimated hours: manual override vs auto re-matching
+    if has_manual_override:
+        updated.estimated_hours = manual_hours
+        await session.commit()
+        await session.refresh(updated)
+    elif "job_type" in payload:
+        # Estimate-relevant field changed — re-run matching
+        wrap_coverage = None
+        wrap_detail = updated.wrap_details[0] if updated.wrap_details else None
+        if wrap_detail and wrap_detail.wrap_coverage:
+            wrap_coverage = (
+                wrap_detail.wrap_coverage.value
+                if hasattr(wrap_detail.wrap_coverage, "value")
+                else wrap_detail.wrap_coverage
+            )
+        vehicle_count = len(updated.work_order_vehicles or [])
+        vehicle_type = extract_vehicle_type(updated.work_order_vehicles or [])
+        match = await find_matching_estimates(
+            session,
+            user.organization_id,
+            job_type=(
+                updated.job_type.value
+                if hasattr(updated.job_type, "value")
+                else updated.job_type
+            ),
+            vehicle_count=vehicle_count,
+            wrap_coverage=wrap_coverage,
+            vehicle_type=vehicle_type,
+        )
+        if match:
+            design_hrs = match.design_hours or Decimal(0)
+            prod_hrs = (match.production_hours or Decimal(0)) * max(vehicle_count, 1)
+            inst_hrs = (match.install_hours or Decimal(0)) * max(vehicle_count, 1)
+            updated.estimated_hours = design_hrs + prod_hrs + inst_hrs
+            if updated.design_details and match.design_hours is not None:
+                updated.design_details.estimated_hours = match.design_hours
+            if updated.production_details and match.production_hours is not None:
+                updated.production_details.estimated_hours = match.production_hours
+            if updated.install_details and match.install_hours is not None:
+                updated.install_details.estimated_hours = match.install_hours
+            await session.commit()
+            await session.refresh(updated)
+
     return _to_response(updated)
 
 
