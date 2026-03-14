@@ -90,6 +90,11 @@ function toProjectCard(wo: WorkOrderResponse): ProjectCard {
   };
 }
 
+function formatDate(iso: string | null): string {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
 /** Compute KPI metrics client-side from work order data. */
 function computeKPIs(workOrders: WorkOrderResponse[], stages: KanbanStageResponse[]): KPIMetric[] {
   const completedStatuses = stages
@@ -233,7 +238,11 @@ const PRIORITY_BADGE: Record<string, string> = {
   low: 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-500',
 };
 
-function listViewColumns(stages: KanbanStageResponse[]): Column<WorkOrderResponse>[] {
+function listViewColumns(
+  stages: KanbanStageResponse[],
+  setDeleteTarget: (wo: WorkOrderResponse) => void,
+  setShowDeleteModal: (show: boolean) => void,
+): Column<WorkOrderResponse>[] {
   return [
     {
       key: 'job_number',
@@ -245,7 +254,7 @@ function listViewColumns(stages: KanbanStageResponse[]): Column<WorkOrderRespons
       key: 'client',
       header: 'Client',
       className: 'text-[var(--text-secondary)]',
-      render: (wo) => wo.client_name ?? 'Unknown',
+      render: (wo) => wo.client_name ?? '—',
     },
     {
       key: 'vehicle',
@@ -254,14 +263,29 @@ function listViewColumns(stages: KanbanStageResponse[]): Column<WorkOrderRespons
       render: (wo) =>
         wo.vehicles.length > 0
           ? wo.vehicles.map((v) => [v.year, v.make, v.model].filter(Boolean).join(' ')).join(', ')
-          : 'No vehicle',
+          : '—',
+    },
+    {
+      key: 'type',
+      header: 'Type',
+      className: 'capitalize text-[var(--text-secondary)]',
+      render: (wo) => wo.job_type,
+    },
+    {
+      key: 'priority',
+      header: 'Priority',
+      render: (wo) => (
+        <span className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${PRIORITY_BADGE[wo.priority] ?? ''}`}>
+          {wo.priority}
+        </span>
+      ),
     },
     {
       key: 'status',
       header: 'Status',
       render: (wo) => {
         const stage = stages.find((s) => s.id === wo.status?.id);
-        if (!stage) return null;
+        if (!stage) return <span className="text-[var(--text-muted)]">—</span>;
         return (
           <span
             className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium"
@@ -274,32 +298,44 @@ function listViewColumns(stages: KanbanStageResponse[]): Column<WorkOrderRespons
       },
     },
     {
-      key: 'priority',
-      header: 'Priority',
-      render: (wo) => (
-        <span className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${PRIORITY_BADGE[wo.priority] ?? ''}`}>
-          {wo.priority}
-        </span>
-      ),
-    },
-    {
-      key: 'type',
-      header: 'Type',
-      className: 'capitalize text-[var(--text-secondary)]',
-      render: (wo) => wo.job_type,
-    },
-    {
       key: 'value',
       header: 'Value',
       className: 'font-mono font-medium text-[var(--text-primary)]',
       headerClassName: 'text-right',
-      render: (wo) => <span className="block text-right">{formatCurrency(wo.job_value)}</span>,
+      render: (wo) => <span className="block text-right">{wo.job_value ? formatCurrency(wo.job_value) : '—'}</span>,
     },
     {
-      key: 'date_in',
-      header: 'Date In',
+      key: 'est_hours',
+      header: 'Est. Hours',
+      className: 'font-mono text-[var(--text-secondary)]',
+      render: (wo) => (wo.estimated_hours != null ? `${wo.estimated_hours}h` : '—'),
+    },
+    {
+      key: 'due',
+      header: 'Due',
       className: 'text-[var(--text-secondary)]',
-      render: (wo) => wo.date_in.slice(0, 10),
+      render: (wo) => formatDate(wo.estimated_completion_date),
+    },
+    {
+      key: 'actions',
+      header: '',
+      headerClassName: 'w-12',
+      className: 'text-right',
+      render: (wo) => (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setDeleteTarget(wo);
+            setShowDeleteModal(true);
+          }}
+          className="rounded-lg p-1.5 text-[var(--text-muted)] transition-colors hover:bg-red-500/10 hover:text-red-400"
+          title="Delete job"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+        </button>
+      ),
     },
   ];
 }
@@ -307,19 +343,131 @@ function listViewColumns(stages: KanbanStageResponse[]): Column<WorkOrderRespons
 function ListView({
   workOrders,
   stages,
+  loading,
+  total,
+  page,
+  limit,
+  activeStage,
+  onStageChange,
+  onPageChange,
+  onRowClick,
+  setDeleteTarget,
+  setShowDeleteModal,
+  filterCriteria,
 }: {
   workOrders: WorkOrderResponse[];
   stages: KanbanStageResponse[];
+  loading: boolean;
+  total: number;
+  page: number;
+  limit: number;
+  activeStage: string | null;
+  onStageChange: (stageId: string | null) => void;
+  onPageChange: (page: number) => void;
+  onRowClick: (wo: WorkOrderResponse) => void;
+  setDeleteTarget: (wo: WorkOrderResponse) => void;
+  setShowDeleteModal: (show: boolean) => void;
+  filterCriteria: FilterCriteria;
 }) {
-  const columns = useMemo(() => listViewColumns(stages), [stages]);
+  const columns = useMemo(
+    () => listViewColumns(stages, setDeleteTarget, setShowDeleteModal),
+    [stages, setDeleteTarget, setShowDeleteModal]
+  );
+
+  // Client-side post-filter for priority and job type
+  const filteredWorkOrders = useMemo(() => {
+    let filtered = workOrders;
+    if (filterCriteria.priority.length > 0) {
+      filtered = filtered.filter((wo) => filterCriteria.priority.includes(wo.priority));
+    }
+    if (filterCriteria.jobType.length > 0) {
+      filtered = filtered.filter((wo) => filterCriteria.jobType.includes(wo.job_type));
+    }
+    return filtered;
+  }, [workOrders, filterCriteria]);
+
+  const totalPages = Math.ceil(total / limit);
+
   return (
-    <DataTable
-      columns={columns}
-      data={workOrders}
-      rowKey={(wo) => wo.id}
-      stickyHeader
-      emptyState={<span className="text-sm text-[var(--text-muted)]">No work orders found</span>}
-    />
+    <div>
+      {/* Status tabs */}
+      {stages.length > 0 && (
+        <div className="mb-4 flex gap-1">
+          <button
+            onClick={() => onStageChange(null)}
+            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+              activeStage === null
+                ? 'bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]'
+                : 'text-[var(--text-secondary)] hover:bg-[var(--surface-raised)]'
+            }`}
+          >
+            All
+          </button>
+          {stages.map((stage) => (
+            <button
+              key={stage.id}
+              onClick={() => onStageChange(stage.id)}
+              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+                activeStage === stage.id
+                  ? 'bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]'
+                  : 'text-[var(--text-secondary)] hover:bg-[var(--surface-raised)]'
+              }`}
+            >
+              {stage.name}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {loading ? (
+        <div className="flex items-center justify-center py-16">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--border)] border-t-[var(--accent-primary)]" />
+        </div>
+      ) : (
+        <>
+          <DataTable
+            columns={columns}
+            data={filteredWorkOrders}
+            rowKey={(wo) => wo.id}
+            onRowClick={onRowClick}
+            stickyHeader
+            emptyState={
+              <div>
+                <p className="text-sm font-medium text-[var(--text-primary)]">No jobs found</p>
+                <p className="mt-1 text-xs text-[var(--text-secondary)]">Try a different search or filter</p>
+              </div>
+            }
+          />
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="mt-4 flex items-center justify-between">
+              <p className="text-xs text-[var(--text-secondary)]">
+                Showing {page * limit + 1}–{Math.min((page + 1) * limit, total)} of {total}
+              </p>
+              <div className="flex gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  disabled={page === 0}
+                  onClick={() => onPageChange(page - 1)}
+                >
+                  Previous
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  disabled={page >= totalPages - 1}
+                  onClick={() => onPageChange(page + 1)}
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </div>
   );
 }
 
@@ -910,25 +1058,27 @@ export default function DashboardPage() {
           ))}
         </div>
 
-        <div className="flex items-center gap-2">
-          {([
-            { key: 'all', label: 'All' },
-            { key: 'my-jobs', label: 'My Jobs' },
-            { key: 'urgent', label: 'Urgent' },
-          ] as const).map((f) => (
-            <button
-              key={f.key}
-              onClick={() => setFilter((prev) => prev === f.key ? 'all' : f.key)}
-              className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                filter === f.key
-                  ? 'bg-[var(--accent-primary)] text-white'
-                  : 'bg-[var(--surface-card)] text-[var(--text-secondary)] border border-[var(--border)] hover:bg-[var(--surface-raised)]'
-              }`}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
+        {viewMode === 'kanban' && (
+          <div className="flex items-center gap-2">
+            {([
+              { key: 'all', label: 'All' },
+              { key: 'my-jobs', label: 'My Jobs' },
+              { key: 'urgent', label: 'Urgent' },
+            ] as const).map((f) => (
+              <button
+                key={f.key}
+                onClick={() => setFilter((prev) => prev === f.key ? 'all' : f.key)}
+                className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                  filter === f.key
+                    ? 'bg-[var(--accent-primary)] text-white'
+                    : 'bg-[var(--surface-card)] text-[var(--text-secondary)] border border-[var(--border)] hover:bg-[var(--surface-raised)]'
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Board */}
@@ -946,11 +1096,21 @@ export default function DashboardPage() {
           )
         )}
         {viewMode === 'list' && (
-          loading ? (
-            <KanbanBoardSkeleton />
-          ) : (
-            <ListView workOrders={filteredWorkOrders} stages={stages} />
-          )
+          <ListView
+            workOrders={listWorkOrders}
+            stages={stages}
+            loading={listLoading}
+            total={listTotal}
+            page={listPage}
+            limit={listLimit}
+            activeStage={activeStage}
+            onStageChange={setActiveStage}
+            onPageChange={setListPage}
+            onRowClick={(wo) => router.push(`/dashboard/jobs/${wo.id}`)}
+            setDeleteTarget={setDeleteTarget}
+            setShowDeleteModal={setShowDeleteModal}
+            filterCriteria={filterCriteria}
+          />
         )}
       </div>
 
@@ -964,6 +1124,36 @@ export default function DashboardPage() {
         onClose={() => setShowImportModal(false)}
         onImportComplete={() => { fetchData(); }}
       />
+      {showDeleteModal && deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => { setShowDeleteModal(false); setDeleteTarget(null); setDeleteError(null); }} />
+          <div className="relative w-full max-w-md rounded-2xl border border-[var(--border)] bg-[var(--surface-card)] p-6 shadow-xl">
+            <h2 className="text-lg font-semibold text-[var(--text-primary)]">Delete Job</h2>
+            <p className="mt-2 text-sm text-[var(--text-secondary)]">
+              Are you sure you want to delete <span className="font-mono font-medium text-[var(--text-primary)]">{deleteTarget.job_number}</span>? This action cannot be undone.
+            </p>
+            {deleteError && (
+              <p className="mt-3 text-sm text-red-400">{deleteError}</p>
+            )}
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => { setShowDeleteModal(false); setDeleteTarget(null); setDeleteError(null); }}
+                disabled={deleting}
+                className="rounded-lg border border-[var(--border)] px-4 py-2 text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-raised)] disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700 disabled:opacity-50"
+              >
+                {deleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
