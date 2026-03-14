@@ -242,7 +242,7 @@ function ErrorState({ message, onRetry, onBack }: { message: string; onRetry: ()
 function TimeEfficiencySection({ timeLogs, jobValue, estimatedHours }: { timeLogs: TimeLogEntry[]; jobValue: number; estimatedHours: number | null }) {
   if (timeLogs.length === 0 && estimatedHours == null) return null;
 
-  const actualHours = timeLogs.reduce((sum, log) => sum + log.hours, 0);
+  const actualHours = timeLogs.reduce((sum, log) => sum + Number(log.hours), 0);
 
   // Group hours by phase
   const phaseHours: Record<string, number> = {};
