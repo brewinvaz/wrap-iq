@@ -142,9 +142,25 @@ export default function MonthGridEvent({ calendarEvent }: MonthGridEventProps) {
         color: 'var(--text-primary)',
       };
 
-  // Client display — truncate long names, hide dashes
-  const client =
-    _clientName && _clientName !== '—' ? _clientName : '';
+  // Smart pill label: prefer client/vehicle, fall back to WO number
+  const hasClient = _clientName && _clientName !== '—';
+  const hasVehicle = _vehicle && _vehicle !== '—' && _vehicle.toLowerCase() !== 'no vehicle';
+
+  let pillPrimary: string;
+  let pillSecondary: string | null = null;
+
+  if (hasClient && hasVehicle) {
+    pillPrimary = _clientName!;
+    pillSecondary = _vehicle!;
+  } else if (hasClient) {
+    pillPrimary = _clientName!;
+    pillSecondary = _jobNumber ?? null;
+  } else if (hasVehicle) {
+    pillPrimary = _vehicle!;
+    pillSecondary = _jobNumber ?? null;
+  } else {
+    pillPrimary = _jobNumber ?? 'Untitled';
+  }
 
   return (
     <>
@@ -159,11 +175,11 @@ export default function MonthGridEvent({ calendarEvent }: MonthGridEventProps) {
         {/* Priority dot */}
         <span className={`ml-1 inline-block h-[5px] w-[5px] shrink-0 rounded-full ${priority.dot}`} />
 
-        {/* Job # + Client */}
+        {/* Primary + Secondary label */}
         <span className="truncate text-[10.5px] font-semibold leading-none tracking-tight">
-          {_jobNumber}
-          {client && (
-            <span className="font-normal opacity-70"> {client}</span>
+          {pillPrimary}
+          {pillSecondary && (
+            <span className="font-normal opacity-60"> · {pillSecondary}</span>
           )}
         </span>
 
