@@ -1,183 +1,89 @@
 'use client';
 
+import { Fragment } from 'react';
 import { CalendarEvent, Installer } from '@/lib/types';
+import EventCard from './EventCard';
 
 interface DayViewProps {
-  date: Date;
   dateStr: string;
   isToday: boolean;
-  installers: Installer[];
   events: CalendarEvent[];
+  colorBy: 'phase' | 'installer';
+  installers: Installer[];
   activeInstallers: Set<string>;
 }
 
-const HOURS = Array.from({ length: 10 }, (_, i) => i + 8); // 8 AM – 5 PM
-
-function colorWithOpacity(hex: string, opacity: number): string {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-}
+const HOURS = Array.from({ length: 10 }, (_, i) => i + 8);
 
 function formatHour(hour: number): string {
-  if (hour === 0) return '12 AM';
-  if (hour < 12) return `${hour} AM`;
-  if (hour === 12) return '12 PM';
-  return `${hour - 12} PM`;
-}
-
-function getEventsForInstaller(
-  events: CalendarEvent[],
-  installerId: string,
-  dateStr: string,
-): CalendarEvent[] {
-  return events.filter((e) => e.installer === installerId && e.date === dateStr);
+  if (hour === 0 || hour === 12) return '12 PM';
+  return hour < 12 ? `${hour} AM` : `${hour - 12} PM`;
 }
 
 export default function DayView({
-  date,
   dateStr,
   isToday,
-  installers,
   events,
+  colorBy,
+  installers,
   activeInstallers,
 }: DayViewProps) {
-  const filteredInstallers = installers.filter((inst) =>
-    activeInstallers.has(inst.id),
-  );
+  const dayEvents = events.filter((e) => e.date === dateStr);
 
-  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  const dayLabel = `${dayNames[date.getDay()]}, ${date.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}`;
+  const useInstallerColumns = colorBy === 'installer';
+  const filteredInstallers = installers.filter((i) => activeInstallers.has(i.id));
+  const columns = useInstallerColumns ? filteredInstallers : [{ id: 'all', name: 'All', initials: '', color: '' }];
 
   return (
-    <div className="flex-1 overflow-auto bg-[var(--surface-card)]">
-      {/* Day header */}
+    <div className="flex-1 overflow-auto">
       <div
-        className={`border-b border-[var(--border)] px-6 py-3 ${isToday ? 'bg-[var(--accent-primary)]/5' : 'bg-[var(--surface-raised)]'}`}
+        className="grid min-w-[600px]"
+        style={{
+          gridTemplateColumns: `80px repeat(${columns.length}, 1fr)`,
+        }}
       >
-        <span
-          className={`text-sm font-semibold ${isToday ? 'text-[var(--accent-primary)]' : 'text-[var(--text-primary)]'}`}
-        >
-          {dayLabel}
-        </span>
-      </div>
-
-      <div className="grid min-w-[600px] grid-cols-[80px_repeat(var(--cols),1fr)]" style={{ '--cols': filteredInstallers.length } as React.CSSProperties}>
-        {/* Column headers: time + installer names */}
-        <div className="sticky top-0 z-10 border-b border-r border-[var(--border)] bg-[var(--surface-raised)] px-2 py-3">
-          <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">Time</span>
-        </div>
-        {filteredInstallers.map((installer) => (
+        <div className="sticky top-0 z-10 border-b border-[var(--glass-border)] bg-[var(--surface-card)] p-2" />
+        {columns.map((col) => (
           <div
-            key={installer.id}
-            className="sticky top-0 z-10 border-b border-r border-[var(--border)] bg-[var(--surface-raised)] px-3 py-3 text-center last:border-r-0"
+            key={col.id}
+            className="sticky top-0 z-10 border-b border-l border-[var(--glass-border)] bg-[var(--surface-card)] p-2 text-center text-xs font-semibold text-[var(--text-secondary)]"
           >
-            <div className="flex items-center justify-center gap-2">
-              <div
-                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
-                style={{ backgroundColor: installer.color }}
-              >
-                {installer.initials}
-              </div>
-              <span className="text-sm font-medium text-[var(--text-primary)]">
-                {installer.name}
-              </span>
-            </div>
+            {useInstallerColumns ? col.name : ''}
           </div>
         ))}
 
-        {/* Time rows */}
         {HOURS.map((hour) => (
-          <TimeRow
-            key={hour}
-            hour={hour}
-            installers={filteredInstallers}
-            events={events}
-            dateStr={dateStr}
-          />
-        ))}
-      </div>
+          <Fragment key={`row-${hour}`}>
+            <div
+              className="border-b border-[var(--glass-border)] px-3 py-3 text-right text-[10px] font-medium text-[var(--text-muted)]"
+            >
+              {formatHour(hour)}
+            </div>
+            {columns.map((col) => {
+              const cellEvents = dayEvents.filter((e) => {
+                const eventHour = parseInt(e.startTime.split(':')[0], 10);
+                if (useInstallerColumns) {
+                  return eventHour === hour && e.installer === col.id;
+                }
+                return eventHour === hour;
+              });
 
-      {filteredInstallers.length === 0 && (
-        <div className="flex h-48 items-center justify-center text-sm text-[var(--text-muted)]">
-          No installers selected. Use the filter chips above to show installers.
-        </div>
-      )}
-    </div>
-  );
-}
-
-function TimeRow({
-  hour,
-  installers,
-  events,
-  dateStr,
-}: {
-  hour: number;
-  installers: Installer[];
-  events: CalendarEvent[];
-  dateStr: string;
-}) {
-  return (
-    <>
-      <div className="border-b border-r border-[var(--border)] px-2 py-3">
-        <span className="font-mono text-xs font-medium text-[var(--text-muted)]">
-          {formatHour(hour)}
-        </span>
-      </div>
-      {installers.map((installer) => {
-        const installerEvents = getEventsForInstaller(events, installer.id, dateStr);
-        const cellEvents = installerEvents.filter((e) => {
-          const startHour = parseInt(e.startTime.split(':')[0], 10);
-          const endHour = parseInt(e.endTime.split(':')[0], 10);
-          return hour >= startHour && hour < endHour;
-        });
-
-        return (
-          <div
-            key={installer.id}
-            className="group relative min-h-[56px] border-b border-r border-[var(--border)] p-1.5 last:border-r-0"
-          >
-            {cellEvents.map((evt) => {
-              const startHour = parseInt(evt.startTime.split(':')[0], 10);
-              // Only render the event block in the first hour it appears
-              if (hour !== startHour) return null;
-              const endHour = parseInt(evt.endTime.split(':')[0], 10);
-              const span = Math.max(endHour - startHour, 1);
               return (
-                <button
-                  key={evt.id}
-                  onClick={() => {}}
-                  className="w-full cursor-pointer rounded-lg p-2.5 text-left transition-all hover:-translate-y-0.5 hover:shadow-md"
-                  style={{
-                    backgroundColor: colorWithOpacity(evt.color, 0.1),
-                    borderLeft: `3px solid ${evt.color}`,
-                    height: span > 1 ? `${span * 56 - 8}px` : undefined,
-                    position: span > 1 ? 'absolute' : undefined,
-                    zIndex: span > 1 ? 5 : undefined,
-                    left: span > 1 ? '6px' : undefined,
-                    right: span > 1 ? '6px' : undefined,
-                  }}
+                <div
+                  key={`cell-${hour}-${col.id}`}
+                  className={`border-b border-l border-[var(--glass-border)] p-1 ${
+                    isToday ? 'bg-[rgba(6,182,212,0.02)]' : ''
+                  }`}
                 >
-                  <div
-                    className="truncate text-xs font-semibold leading-tight"
-                    style={{ color: evt.color }}
-                  >
-                    {evt.title}
-                  </div>
-                  <div className="mt-1 truncate text-xs text-[var(--text-secondary)]">
-                    {evt.vehicle}
-                  </div>
-                  <div className="mt-0.5 font-mono text-xs text-[var(--text-muted)]">
-                    {evt.startTime} – {evt.endTime}
-                  </div>
-                </button>
+                  {cellEvents.map((event) => (
+                    <EventCard key={event.id} event={event} colorBy={colorBy} />
+                  ))}
+                </div>
               );
             })}
-          </div>
-        );
-      })}
-    </>
+          </Fragment>
+        ))}
+      </div>
+    </div>
   );
 }
