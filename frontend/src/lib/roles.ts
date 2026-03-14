@@ -45,9 +45,8 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
           { icon: 'ClipboardList', label: 'Jobs Board', href: '/dashboard', badgeKey: 'work_orders' },
           { icon: 'BarChart3', label: 'All Jobs Board', href: '/dashboard/jobs' },
           { icon: 'Package', label: 'Work Orders', href: '/dashboard/work-orders' },
-          { icon: 'Calendar', label: 'Calendar', href: '/dashboard/calendar', badgeKey: 'unread_notifications', badgeVariant: 'amber' },
+          { icon: 'Calendar', label: 'Calendar', href: '/dashboard/calendar' },
           { icon: 'MessageSquare', label: 'Communications', href: '/dashboard/comms' },
-          { icon: 'CalendarDays', label: 'Schedule', href: '/dashboard/schedule' },
           { icon: 'Users', label: 'Customers', href: '/dashboard/customers' },
         ],
       },
@@ -56,7 +55,6 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
         items: [
           { icon: 'Palette', label: 'Design Queue', href: '/dashboard/design-queue', badgeKey: 'design_queue' },
           { icon: 'Printer', label: 'Print / Lam', href: '/dashboard/print' },
-          { icon: 'Wrench', label: 'Install Schedule', href: '/dashboard/install-schedule' },
           { icon: 'Settings', label: 'Equipment', href: '/dashboard/equipment' },
         ],
       },
@@ -98,7 +96,7 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
         items: [
           { icon: 'ClipboardList', label: 'My Jobs', href: '/dashboard', badgeKey: 'work_orders' },
           { icon: 'BarChart3', label: 'All Jobs Board', href: '/dashboard/jobs' },
-          { icon: 'CalendarDays', label: 'Schedule', href: '/dashboard/schedule' },
+          { icon: 'Calendar', label: 'Calendar', href: '/dashboard/calendar' },
           { icon: 'Users', label: 'Team Assignments', href: '/dashboard/team' },
         ],
       },
@@ -131,7 +129,7 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
         label: 'My Work',
         items: [
           { icon: 'ClipboardList', label: 'My Jobs', href: '/dashboard', badgeKey: 'work_orders' },
-          { icon: 'CalendarDays', label: 'My Schedule', href: '/dashboard/schedule' },
+          { icon: 'Calendar', label: 'My Schedule', href: '/dashboard/calendar' },
           { icon: 'Camera', label: 'Photos', href: '/dashboard/photos' },
           { icon: 'Clock', label: 'Time Tracking', href: '/dashboard/time-logs' },
           { icon: 'Settings', label: 'Equipment', href: '/dashboard/equipment' },
@@ -159,6 +157,7 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
         label: 'Design',
         items: [
           { icon: 'Palette', label: 'My Queue', href: '/dashboard', badgeKey: 'design_queue' },
+          { icon: 'Calendar', label: 'Calendar', href: '/dashboard/calendar' },
           { icon: 'Upload', label: 'Proofs Sent', href: '/dashboard/proofs', badgeKey: 'unread_notifications', badgeVariant: 'amber' },
           { icon: 'Clock', label: 'Design Hours', href: '/dashboard/hours' },
           { icon: 'MessageSquare', label: 'Team Comms', href: '/dashboard/comms' },
@@ -194,7 +193,7 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
         label: 'Jobs',
         items: [
           { icon: 'ClipboardList', label: 'Assigned Jobs', href: '/dashboard/jobs' },
-          { icon: 'CalendarDays', label: 'Schedule', href: '/dashboard/schedule' },
+          { icon: 'Calendar', label: 'Calendar', href: '/dashboard/calendar' },
         ],
       },
     ],
