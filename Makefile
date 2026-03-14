@@ -1,4 +1,4 @@
-.PHONY: help up down restart build rebuild logs logs-api logs-web ps migrate test lint clean docker-prune-all prune-branches release
+.PHONY: help up down restart build rebuild logs logs-api logs-web ps migrate test lint clean docker-prune-all prune-branches release web-cache
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -49,6 +49,9 @@ lint: ## Run linting
 lint-fix: ## Fix linting issues
 	docker compose exec backend uv run ruff check --fix app
 	docker compose exec backend uv run ruff format app
+
+web-cache: ## Clear frontend Next.js cache and restart
+	docker compose down frontend && docker compose up -d frontend
 
 clean: ## Remove all containers, volumes, and images
 	docker compose down -v --rmi local
