@@ -300,7 +300,7 @@ export default function WorkOrdersPage() {
       <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-[22px] font-[800] tracking-[-0.4px] text-[var(--text-primary)]">Work Orders</h1>
+            <h1 className="text-[22px] font-[800] tracking-[-0.4px] text-[var(--text-primary)]">Jobs</h1>
             <span className="rounded-full bg-[var(--surface-raised)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-secondary)]">
               {total} total
             </span>
@@ -320,7 +320,7 @@ export default function WorkOrdersPage() {
               Import CSV
             </Link>
             <Button onClick={() => setShowCreateModal(true)}>
-              + New Work Order
+              + New Job
             </Button>
           </div>
         </div>
@@ -416,7 +416,7 @@ export default function WorkOrdersPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => { setShowDeleteModal(false); setDeleteTarget(null); setDeleteError(null); }} />
           <div className="relative w-full max-w-md rounded-2xl border border-[var(--border)] bg-[var(--surface-card)] p-6 shadow-xl">
-            <h2 className="text-lg font-semibold text-[var(--text-primary)]">Delete Work Order</h2>
+            <h2 className="text-lg font-semibold text-[var(--text-primary)]">Delete Job</h2>
             <p className="mt-2 text-sm text-[var(--text-secondary)]">
               Are you sure you want to delete <span className="font-mono font-medium text-[var(--text-primary)]">{deleteTarget.job_number}</span>? This action cannot be undone.
             </p>

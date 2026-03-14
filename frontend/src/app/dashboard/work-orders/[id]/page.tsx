@@ -160,7 +160,7 @@ function DeleteModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onCancel} />
       <div className="relative w-full max-w-md rounded-2xl border border-[var(--border)] bg-[var(--surface-card)] p-6 shadow-xl">
-        <h2 className="text-lg font-semibold text-[var(--text-primary)]">Delete Work Order</h2>
+        <h2 className="text-lg font-semibold text-[var(--text-primary)]">Delete Job</h2>
         <p className="mt-2 text-sm text-[var(--text-secondary)]">
           Are you sure you want to delete <span className="font-mono font-medium text-[var(--text-primary)]">{jobNumber}</span>? This action cannot be undone.
         </p>
@@ -223,11 +223,11 @@ function ErrorState({ message, onRetry, onBack }: { message: string; onRetry: ()
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.072 16.5c-.77.833.192 2.5 1.732 2.5z" />
         </svg>
       </div>
-      <p className="text-lg font-semibold text-[var(--text-primary)]">Failed to load work order</p>
+      <p className="text-lg font-semibold text-[var(--text-primary)]">Failed to load job</p>
       <p className="text-sm text-[var(--text-secondary)]">{message}</p>
       <div className="flex gap-3">
         <button onClick={onBack} className="rounded-lg border border-[var(--border)] px-4 py-2 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--surface-raised)]">
-          Back to Work Orders
+          Back to Jobs
         </button>
         <button onClick={onRetry} className="rounded-lg bg-[var(--accent-primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--accent-primary)]/90">
           Retry
@@ -630,7 +630,7 @@ export default function WorkOrderDetailPage({ params }: { params: Promise<{ id: 
       const data = await api.get<WorkOrderDetail>(`/api/work-orders/${id}`);
       setWo(data);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Failed to load work order');
+      setError(err instanceof ApiError ? err.message : 'Failed to load job');
     } finally {
       setLoading(false);
     }
@@ -673,7 +673,7 @@ export default function WorkOrderDetailPage({ params }: { params: Promise<{ id: 
   };
 
   if (loading) return <LoadingSkeleton />;
-  if (error || !wo) return <ErrorState message={error ?? 'Work order not found'} onRetry={fetchWorkOrder} onBack={() => router.push('/dashboard/work-orders')} />;
+  if (error || !wo) return <ErrorState message={error ?? 'Job not found'} onRetry={fetchWorkOrder} onBack={() => router.push('/dashboard/work-orders')} />;
 
   const pStyle = priorityStyles[wo.priority] ?? priorityStyles.medium;
   const tabs: { key: Tab; label: string }[] = [
@@ -691,7 +691,7 @@ export default function WorkOrderDetailPage({ params }: { params: Promise<{ id: 
           onClick={() => router.push('/dashboard/work-orders')}
           className="mb-3 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
         >
-          &larr; Work Orders
+          &larr; Jobs
         </button>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">

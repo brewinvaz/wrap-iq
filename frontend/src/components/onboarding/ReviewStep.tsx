@@ -58,7 +58,7 @@ export function ReviewStep({ contact, vehicle, project, files, submitting, onBac
           <Field label="Type" value={vehicle.vehicle_type} />
         </Section>
 
-        <Section title="Project">
+        <Section title="Job">
           <Field label="Job type" value={project.job_type === 'commercial' ? 'Commercial' : 'Personal'} />
           <Field label="Description" value={project.project_description} />
           <Field label="Referral" value={project.referral_source} />

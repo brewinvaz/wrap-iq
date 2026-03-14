@@ -83,7 +83,7 @@ function formatDate(iso: string): string {
 // --- CSV export ---
 
 function exportTimeLogsCsv(logs: TimeLog[]) {
-  const headers = ['Team Member', 'Project', 'Task', 'Hours', 'Date', 'Status'];
+  const headers = ['Team Member', 'Job', 'Task', 'Hours', 'Date', 'Status'];
   const rows = logs.map((log) => [
     log.user.full_name || log.user.email,
     log.work_order?.job_number || '—',
@@ -218,7 +218,7 @@ export default function TimeLogsPage() {
     },
     {
       key: 'project',
-      header: 'Project',
+      header: 'Job',
       className: 'font-mono text-[var(--text-secondary)]',
       render: (log) => <>{log.work_order?.job_number || '\u2014'}</>,
     },

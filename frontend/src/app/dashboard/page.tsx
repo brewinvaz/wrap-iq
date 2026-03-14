@@ -609,7 +609,7 @@ export default function DashboardPage() {
       <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-[22px] font-[800] tracking-[-0.4px] text-[var(--text-primary)]">Projects</h1>
+            <h1 className="text-[22px] font-[800] tracking-[-0.4px] text-[var(--text-primary)]">Jobs</h1>
             <span className="rounded-full bg-[var(--surface-raised)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-secondary)]">
               {loading ? '...' : `${totalWorkOrders} total`}
             </span>
@@ -741,7 +741,7 @@ export default function DashboardPage() {
             <Button
               onClick={() => setShowCreateModal(true)}
             >
-              + New Project
+              + New Job
             </Button>
           </div>
         </div>

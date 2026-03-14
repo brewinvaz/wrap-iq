@@ -566,7 +566,7 @@ export default function CalendarPage() {
           <div className="flex items-center gap-3">
             <h1 className="text-[22px] font-[800] tracking-[-0.4px] text-[var(--text-primary)]">Calendar</h1>
             <span className="rounded-full bg-[var(--surface-raised)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-secondary)]">
-              {uniqueWoCount} work {uniqueWoCount === 1 ? 'order' : 'orders'}
+              {uniqueWoCount} {uniqueWoCount === 1 ? 'job' : 'jobs'}
             </span>
           </div>
           <div className="relative">
@@ -675,11 +675,11 @@ export default function CalendarPage() {
 
       {hasNoData ? (
         <div className="flex flex-1 items-center justify-center">
-          <p className="text-sm text-[var(--text-muted)]">No work orders found</p>
+          <p className="text-sm text-[var(--text-muted)]">No jobs found</p>
         </div>
       ) : hasNoFilteredResults ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-3">
-          <p className="text-sm text-[var(--text-muted)]">No work orders match your filter</p>
+          <p className="text-sm text-[var(--text-muted)]">No jobs match your filter</p>
           <Button
             variant="secondary"
             size="sm"

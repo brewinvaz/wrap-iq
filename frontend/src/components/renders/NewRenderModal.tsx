@@ -236,7 +236,7 @@ export default function NewRenderModal({ isOpen, onClose, onCreate }: NewRenderM
 
           {/* Work Order dropdown */}
           <div>
-            <label htmlFor="work-order" className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]">Work Order <span className="text-[var(--text-tertiary)]">(optional)</span></label>
+            <label htmlFor="work-order" className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]">Job <span className="text-[var(--text-tertiary)]">(optional)</span></label>
             <Select
               id="work-order"
               value={workOrderId}

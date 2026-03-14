@@ -68,7 +68,7 @@ export default function UsageMetrics({ metrics }: UsageMetricsProps) {
         />
         <div className="flex items-center justify-between rounded-lg bg-[var(--surface-raised)] px-4 py-3">
           <span className="text-sm font-medium text-[var(--text-primary)]">
-            Total Projects
+            Total Jobs
           </span>
           <span className="text-lg font-semibold text-[var(--text-primary)]">
             {metrics.projectsCount}

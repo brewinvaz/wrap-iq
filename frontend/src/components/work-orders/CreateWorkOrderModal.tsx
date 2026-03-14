@@ -275,7 +275,7 @@ export default function CreateWorkOrderModal({
             id="create-work-order-title"
             className="text-lg font-semibold text-[var(--text-primary)]"
           >
-            Create Work Order
+            Create Job
           </h3>
           <Button
             variant="ghost"
@@ -355,7 +355,7 @@ export default function CreateWorkOrderModal({
             loading={isSubmitting}
             className="flex-1"
           >
-            Create Work Order
+            Create Job
           </Button>
         </div>
       </div>

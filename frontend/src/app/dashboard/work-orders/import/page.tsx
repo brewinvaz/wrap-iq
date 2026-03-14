@@ -175,7 +175,7 @@ export default function ImportWorkOrdersPage() {
             href="/dashboard/work-orders"
             className="text-sm text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)]"
           >
-            Work Orders
+            Jobs
           </Link>
           <span className="text-sm text-[var(--text-muted)]">/</span>
           <h1 className="text-xl font-bold text-[var(--text-primary)]">Import CSV</h1>
@@ -353,7 +353,7 @@ export default function ImportWorkOrdersPage() {
               {/* Actions */}
               <div className="flex items-center gap-3">
                 <Button size="lg" onClick={handleUpload}>
-                  Import {preview.total_rows} Work Orders
+                  Import {preview.total_rows} Jobs
                 </Button>
                 <Button variant="secondary" size="lg" onClick={handleReset}>
                   Cancel
@@ -366,7 +366,7 @@ export default function ImportWorkOrdersPage() {
           {step === 'uploading' && (
             <div className="flex flex-col items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface-card)] px-6 py-16">
               <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--border)] border-t-[var(--accent-primary)]" />
-              <p className="mt-4 text-sm font-medium text-[var(--text-primary)]">Importing work orders...</p>
+              <p className="mt-4 text-sm font-medium text-[var(--text-primary)]">Importing jobs...</p>
               <p className="mt-1 text-xs text-[var(--text-secondary)]">This may take a moment.</p>
             </div>
           )}
@@ -388,8 +388,8 @@ export default function ImportWorkOrdersPage() {
                   }`}
                 >
                   {result.failed === 0
-                    ? `Successfully imported all ${result.successful} work orders!`
-                    : `Imported ${result.successful} of ${result.total_rows} work orders.`}
+                    ? `Successfully imported all ${result.successful} jobs!`
+                    : `Imported ${result.successful} of ${result.total_rows} jobs.`}
                 </p>
                 {result.failed > 0 && (
                   <p className="mt-1 text-xs text-amber-400">
@@ -422,7 +422,7 @@ export default function ImportWorkOrdersPage() {
                   href="/dashboard/work-orders"
                   className="rounded-lg bg-[var(--accent-primary)] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[var(--accent-primary)]/80"
                 >
-                  View Work Orders
+                  View Jobs
                 </Link>
                 <Button variant="secondary" size="lg" onClick={handleReset}>
                   Import Another File

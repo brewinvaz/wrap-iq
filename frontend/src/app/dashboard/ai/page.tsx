@@ -104,7 +104,7 @@ function deriveStats(workOrders: ApiWorkOrder[]): AIStat[] {
   const revenueStr = formatCurrencyCompact(totalRevenue);
 
   return [
-    { label: 'Total Work Orders', value: total.toLocaleString(), sub: 'All time', icon: '\uD83D\uDCCB' },
+    { label: 'Total Jobs', value: total.toLocaleString(), sub: 'All time', icon: '\uD83D\uDCCB' },
     { label: 'Active Jobs', value: active.toLocaleString(), sub: 'In progress', icon: '\uD83D\uDD27' },
     { label: 'Completion Rate', value: `${completionRate}%`, sub: `${completed} completed`, icon: '\u2705' },
     { label: 'Pipeline Value', value: revenueStr, sub: 'Total job value', icon: '\uD83D\uDCB0' },
