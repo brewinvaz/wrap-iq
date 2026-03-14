@@ -227,6 +227,16 @@ interface SXEvent {
   end: Temporal.ZonedDateTime | Temporal.PlainDate;
   calendarId: string;
   description?: string;
+  // Custom fields for MonthGridEvent component
+  _priority?: 'high' | 'medium' | 'low';
+  _phase?: 'design' | 'production' | 'install';
+  _status?: string;
+  _vehicle?: string;
+  _clientName?: string;
+  _jobNumber?: string;
+  _woId?: string;
+  _dayLabel?: string | null;
+  _jobType?: string;
 }
 
 const DISPLAY_TZ = 'UTC';
@@ -253,8 +263,22 @@ function toScheduleXEvents(events: CalendarEvent[]): SXEvent[] {
   for (const e of events) {
     const calendarId = e.installer; // maps to work order calendar
     const description = `${e.vehicle} · ${e.clientName}`;
+    // Extract job type from title (format: "{JobType} - {JobNumber}")
+    const jobType = e.title.split(' - ')[0] ?? e.title;
 
     const isMultiDay = e.dueDate && e.dueDate !== e.date;
+
+    // Shared custom fields for MonthGridEvent component
+    const customFields = {
+      _priority: e.priority,
+      _phase: e.phase,
+      _status: e.status,
+      _vehicle: e.vehicle,
+      _clientName: e.clientName,
+      _jobNumber: e.jobNumber,
+      _woId: e.id,
+      _jobType: jobType,
+    };
 
     if (isMultiDay) {
       const startDate = Temporal.PlainDate.from(e.date);
@@ -267,11 +291,13 @@ function toScheduleXEvents(events: CalendarEvent[]): SXEvent[] {
         const dayNum = i + 1;
         result.push({
           id: `${e.id}-day${dayNum}`,
-          title: `${e.title} (Day ${dayNum}/${totalDays})`,
+          title: e.title,
           start: day.toPlainDateTime(Temporal.PlainTime.from('08:00')).toZonedDateTime(DISPLAY_TZ),
           end: day.toPlainDateTime(Temporal.PlainTime.from('17:00')).toZonedDateTime(DISPLAY_TZ),
           calendarId,
           description,
+          ...customFields,
+          _dayLabel: `Day ${dayNum}/${totalDays}`,
         });
       }
     } else {
@@ -284,6 +310,8 @@ function toScheduleXEvents(events: CalendarEvent[]): SXEvent[] {
         end: date.toPlainDateTime(Temporal.PlainTime.from(e.endTime)).toZonedDateTime(DISPLAY_TZ),
         calendarId,
         description,
+        ...customFields,
+        _dayLabel: null,
       });
     }
   }
