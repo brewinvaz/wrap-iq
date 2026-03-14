@@ -1,20 +1,24 @@
 'use client';
 
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Installer } from '@/lib/types';
 import { Button } from '@/components/ui/Button';
+
+type ViewMode = 'day' | 'week' | 'month' | 'list';
 
 interface CalendarHeaderProps {
   dateLabel: string;
   onPrev: () => void;
   onNext: () => void;
   onToday: () => void;
-  activeView: 'day' | 'week' | 'month';
-  onViewChange: (view: 'day' | 'week' | 'month') => void;
-  installers: Installer[];
-  activeInstallers: Set<string>;
-  onToggleInstaller: (id: string) => void;
+  activeView: ViewMode;
+  onViewChange: (view: ViewMode) => void;
 }
+
+const VIEWS: { key: ViewMode; label: string }[] = [
+  { key: 'day', label: 'Day' },
+  { key: 'week', label: 'Week' },
+  { key: 'month', label: 'Month' },
+  { key: 'list', label: 'List' },
+];
 
 export default function CalendarHeader({
   dateLabel,
@@ -23,91 +27,42 @@ export default function CalendarHeader({
   onToday,
   activeView,
   onViewChange,
-  installers,
-  activeInstallers,
-  onToggleInstaller,
 }: CalendarHeaderProps) {
-  const views = ['day', 'week', 'month'] as const;
-
   return (
-    <div className="flex flex-col gap-4 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
-      {/* Top row: navigation + view toggle */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          {/* Navigation */}
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onPrev}
-            >
-              <ChevronLeft className="h-4 w-4" strokeWidth={2} />
-            </Button>
-            <span className="min-w-[240px] text-center text-base font-bold text-[var(--text-primary)]">
-              {dateLabel}
-            </span>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onNext}
-            >
-              <ChevronRight className="h-4 w-4" strokeWidth={2} />
-            </Button>
-          </div>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={onToday}
-          >
-            Today
-          </Button>
-        </div>
-
-        {/* View toggle */}
-        <div className="flex rounded-lg border border-[var(--border)] bg-[var(--surface-card)] p-0.5">
-          {views.map((view) => (
-            <button
-              key={view}
-              onClick={() => onViewChange(view)}
-              className={`rounded-md px-3 py-1.5 text-xs font-medium capitalize transition-colors ${
-                activeView === view
-                  ? 'bg-[var(--accent-primary)] text-white'
-                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-raised)]'
-              }`}
-            >
-              {view}
-            </button>
-          ))}
-        </div>
+    <div className="flex items-center justify-between border-b border-[var(--glass-border)] bg-[var(--glass-bg)] px-6 py-3 backdrop-blur-sm">
+      <div className="flex items-center gap-2">
+        <Button variant="ghost" size="icon" onClick={onPrev} aria-label="Previous">
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+        </Button>
+        <Button variant="ghost" size="icon" onClick={onNext} aria-label="Next">
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </Button>
+        <Button variant="secondary" size="sm" onClick={onToday}>
+          Today
+        </Button>
+        <h2 className="ml-2 min-w-[200px] text-base font-bold text-[var(--text-primary)]">
+          {dateLabel}
+        </h2>
       </div>
-
-      {/* Bottom row: installer filter chips */}
-      {installers.length > 0 && (
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">Installers</span>
-          {installers.map((installer) => {
-            const isActive = activeInstallers.has(installer.id);
-            return (
-              <button
-                key={installer.id}
-                onClick={() => onToggleInstaller(installer.id)}
-                className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all ${
-                  isActive
-                    ? 'border-transparent text-white shadow-sm'
-                    : 'border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--text-muted)]'
-                }`}
-                style={isActive ? { backgroundColor: installer.color } : undefined}
-              >
-                <span
-                  className="inline-block h-2 w-2 rounded-full"
-                  style={{ backgroundColor: isActive ? '#fff' : installer.color }}
-                />
-                {installer.name}
-              </button>
-            );
-          })}
-        </div>
-      )}
+      <div className="flex gap-[3px] rounded-lg bg-[var(--surface-raised)] p-[3px]">
+        {VIEWS.map((v) => (
+          <button
+            key={v.key}
+            onClick={() => onViewChange(v.key)}
+            className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+              activeView === v.key
+                ? 'bg-[var(--accent-primary)] text-white'
+                : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
+            }`}
+          >
+            {v.label}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
