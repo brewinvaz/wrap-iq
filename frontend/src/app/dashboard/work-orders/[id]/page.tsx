@@ -45,6 +45,7 @@ interface WorkOrderDetail {
   vehicles: VehicleInWorkOrder[];
   client_id: string | null;
   client_name: string | null;
+  estimated_hours: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -238,8 +239,8 @@ function ErrorState({ message, onRetry, onBack }: { message: string; onRetry: ()
 
 // --- Time & Efficiency section ---
 
-function TimeEfficiencySection({ timeLogs, jobValue }: { timeLogs: TimeLogEntry[]; jobValue: number }) {
-  if (timeLogs.length === 0) return null;
+function TimeEfficiencySection({ timeLogs, jobValue, estimatedHours }: { timeLogs: TimeLogEntry[]; jobValue: number; estimatedHours: number | null }) {
+  if (timeLogs.length === 0 && estimatedHours == null) return null;
 
   const actualHours = timeLogs.reduce((sum, log) => sum + log.hours, 0);
 
@@ -273,7 +274,13 @@ function TimeEfficiencySection({ timeLogs, jobValue }: { timeLogs: TimeLogEntry[
   return (
     <InfoCard title="Time & Efficiency">
       {/* Summary row */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div>
+          <p className="text-xs text-[var(--text-muted)]">Estimated Hours</p>
+          <p className="mt-0.5 font-mono text-lg font-bold text-[var(--text-primary)]">
+            {estimatedHours != null ? `${estimatedHours}h` : '--'}
+          </p>
+        </div>
         <div>
           <p className="text-xs text-[var(--text-muted)]">Actual Hours</p>
           <p className="mt-0.5 font-mono text-lg font-bold text-[var(--text-primary)]">{actualHours.toFixed(1)}h</p>
@@ -289,6 +296,32 @@ function TimeEfficiencySection({ timeLogs, jobValue }: { timeLogs: TimeLogEntry[
           <p className="mt-0.5 font-mono text-lg font-bold text-[var(--text-primary)]">{timeLogs.length}</p>
         </div>
       </div>
+
+      {/* Utilization bar */}
+      {estimatedHours != null && estimatedHours > 0 && actualHours > 0 && (
+        <div className="pt-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold uppercase tracking-wider text-[var(--text-muted)]">Utilization</span>
+            <span className={`font-mono font-medium ${
+              (actualHours / estimatedHours) > 1 ? 'text-rose-500' :
+              (actualHours / estimatedHours) >= 0.9 ? 'text-amber-500' :
+              'text-emerald-500'
+            }`}>
+              {((actualHours / estimatedHours) * 100).toFixed(0)}%
+            </span>
+          </div>
+          <div className="mt-1 h-2 overflow-hidden rounded-full bg-[var(--surface-raised)]">
+            <div
+              className={`h-full rounded-full transition-all ${
+                (actualHours / estimatedHours) > 1 ? 'bg-rose-500' :
+                (actualHours / estimatedHours) >= 0.9 ? 'bg-amber-500' :
+                'bg-emerald-500'
+              }`}
+              style={{ width: `${Math.min((actualHours / estimatedHours) * 100, 100)}%` }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Phase breakdown bars */}
       {Object.keys(phaseHours).length > 0 && (
@@ -395,7 +428,7 @@ function OverviewTab({ wo, timeLogs }: { wo: WorkOrderDetail; timeLogs: TimeLogE
         </InfoCard>
       )}
 
-      <TimeEfficiencySection timeLogs={timeLogs} jobValue={wo.job_value} />
+      <TimeEfficiencySection timeLogs={timeLogs} jobValue={wo.job_value} estimatedHours={wo.estimated_hours} />
     </div>
   );
 }
