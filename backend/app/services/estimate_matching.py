@@ -7,7 +7,7 @@ from app.models.estimate_defaults import EstimateDefaults
 
 
 def extract_vehicle_type(work_order_vehicles) -> str | None:
-    """Return the shared vehicle_type string if all vehicles have the same type, else None."""
+    """Return shared vehicle_type if all vehicles match, else None."""
     if not work_order_vehicles:
         return None
     types = set()
