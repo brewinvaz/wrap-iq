@@ -2,25 +2,18 @@
 
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useNextCalendarApp, ScheduleXCalendar } from '@schedule-x/react';
-import {
-  createViewDay,
-  createViewWeek,
-  createViewMonthGrid,
-} from '@schedule-x/calendar';
+import { createViewMonthGrid } from '@schedule-x/calendar';
 import { createEventsServicePlugin } from '@schedule-x/events-service';
 import 'temporal-polyfill/global';
 
-import { useRole } from '@/lib/role-context';
 import { api, ApiError } from '@/lib/api-client';
-import { CalendarEvent, Installer } from '@/lib/types';
-import { RoleKey } from '@/lib/roles';
+import { CalendarEvent } from '@/lib/types';
 import { Button } from '@/components/ui/Button';
 import CalendarToolbar from './CalendarToolbar';
-import ListView from './ListView';
 import SummaryBar from './SummaryBar';
 
 // ---------------------------------------------------------------------------
-// API types (unchanged from original)
+// API types
 // ---------------------------------------------------------------------------
 
 interface WorkOrderVehicle {
@@ -65,27 +58,21 @@ interface WorkOrderListResponse {
 // ---------------------------------------------------------------------------
 
 type Phase = 'design' | 'production' | 'install';
-type StatusFilter = 'all' | 'upcoming' | 'in_progress' | 'completed';
-type ColorBy = 'phase' | 'installer';
 
-interface CalendarPreset {
-  view: string; // Schedule-X view name
-  phases: Phase[];
-  status: StatusFilter;
-}
-
-const ROLE_PRESETS: Record<RoleKey, CalendarPreset> = {
-  admin:      { view: 'week', phases: ['design', 'production', 'install'], status: 'all' },
-  pm:         { view: 'week', phases: ['design', 'production', 'install'], status: 'all' },
-  installer:  { view: 'week', phases: ['install'], status: 'all' },
-  production: { view: 'list', phases: ['production', 'install'], status: 'in_progress' },
-  designer:   { view: 'week', phases: ['design'], status: 'all' },
-  client:     { view: 'week', phases: ['design', 'production', 'install'], status: 'all' },
-};
-
-const INSTALLER_COLORS = [
-  '#2563eb', '#7c3aed', '#059669', '#e11d48',
-  '#d97706', '#0891b2', '#4f46e5', '#be185d',
+/** 12 distinct hues for work-order color coding — visually separable in both themes. */
+const WORK_ORDER_COLORS = [
+  '#2563eb', // blue
+  '#dc2626', // red
+  '#059669', // emerald
+  '#7c3aed', // violet
+  '#d97706', // amber
+  '#0891b2', // cyan
+  '#c026d3', // fuchsia
+  '#16a34a', // green
+  '#e11d48', // rose
+  '#4f46e5', // indigo
+  '#ea580c', // orange
+  '#0d9488', // teal
 ];
 
 // ---------------------------------------------------------------------------
@@ -116,41 +103,45 @@ function lighten(hex: string, factor: number): string {
 }
 
 // ---------------------------------------------------------------------------
-// Schedule-X calendar configs
+// Schedule-X calendar configs — one calendar per work order
 // ---------------------------------------------------------------------------
 
-const PHASE_CALENDARS: Record<string, { colorName: string; lightColors: { main: string; container: string; onContainer: string }; darkColors: { main: string; container: string; onContainer: string } }> = {
-  design: {
-    colorName: 'design',
-    darkColors:  { main: '#06b6d4', container: '#0e4a5a', onContainer: '#67e8f9' },
-    lightColors: { main: '#0891b2', container: '#cffafe', onContainer: '#155e75' },
-  },
-  production: {
-    colorName: 'production',
-    darkColors:  { main: '#3b82f6', container: '#1e3a5f', onContainer: '#93c5fd' },
-    lightColors: { main: '#2563eb', container: '#dbeafe', onContainer: '#1e40af' },
-  },
-  install: {
-    colorName: 'install',
-    darkColors:  { main: '#10b981', container: '#134e3a', onContainer: '#6ee7b7' },
-    lightColors: { main: '#059669', container: '#d1fae5', onContainer: '#065f46' },
-  },
-};
+export interface WorkOrderCalendar {
+  jobNumber: string;
+  color: string;
+  calendarId: string;
+}
 
-function buildInstallerCalendars(installers: Installer[]) {
-  const result: Record<string, typeof PHASE_CALENDARS[string]> = {};
-  for (const inst of installers) {
-    result[inst.id] = {
-      colorName: inst.id,
-      darkColors:  { main: inst.color, container: darken(inst.color, 0.6), onContainer: lighten(inst.color, 0.4) },
-      lightColors: { main: inst.color, container: lighten(inst.color, 0.85), onContainer: darken(inst.color, 0.3) },
+type SXCalendarConfig = Record<string, {
+  colorName: string;
+  lightColors: { main: string; container: string; onContainer: string };
+  darkColors: { main: string; container: string; onContainer: string };
+}>;
+
+function buildWorkOrderCalendars(
+  workOrders: WorkOrderResponse[],
+): { calendars: SXCalendarConfig; woCalendars: WorkOrderCalendar[] } {
+  const seen = new Map<string, WorkOrderCalendar>();
+  const calendars: SXCalendarConfig = {};
+
+  for (const wo of workOrders) {
+    if (seen.has(wo.job_number)) continue;
+    const idx = seen.size % WORK_ORDER_COLORS.length;
+    const color = WORK_ORDER_COLORS[idx];
+    const calendarId = `wo-${wo.job_number}`;
+    seen.set(wo.job_number, { jobNumber: wo.job_number, color, calendarId });
+    calendars[calendarId] = {
+      colorName: calendarId,
+      darkColors:  { main: color, container: darken(color, 0.65), onContainer: lighten(color, 0.45) },
+      lightColors: { main: darken(color, 0.1), container: lighten(color, 0.88), onContainer: darken(color, 0.35) },
     };
   }
-  return result;
+
+  return { calendars, woCalendars: Array.from(seen.values()) };
 }
 
 // ---------------------------------------------------------------------------
-// Data helpers (unchanged from original)
+// Data helpers
 // ---------------------------------------------------------------------------
 
 function formatDateStr(d: Date): string {
@@ -183,33 +174,15 @@ function jobTypeLabel(jobType: string): string {
   return jobType.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-function initials(name: string): string {
-  return name.split(/\s+/).map((w) => w[0]).join('').toUpperCase().slice(0, 2);
-}
-
-function extractInstallers(workOrders: WorkOrderResponse[]): Installer[] {
-  const seen = new Map<string, Installer>();
-  for (const wo of workOrders) {
-    const name = wo.client_name ?? 'Unassigned';
-    if (!seen.has(name)) {
-      const idx = seen.size % INSTALLER_COLORS.length;
-      seen.set(name, { id: `installer-${seen.size}`, name, initials: initials(name), color: INSTALLER_COLORS[idx] });
-    }
-  }
-  return Array.from(seen.values());
-}
-
-function transformWorkOrders(workOrders: WorkOrderResponse[], installerMap: Map<string, Installer>): CalendarEvent[] {
+function transformWorkOrders(workOrders: WorkOrderResponse[], woCalendarMap: Map<string, WorkOrderCalendar>): CalendarEvent[] {
   const todayStr = formatDateStr(new Date());
 
   return workOrders.map((wo) => {
     const dateIn = new Date(wo.date_in);
     const dateStr = formatDateStr(dateIn);
 
-    const installerName = wo.client_name ?? 'Unassigned';
-    const inst = installerMap.get(installerName);
+    const woCal = woCalendarMap.get(wo.job_number);
 
-    // Default to business hours — API dates are date-only (midnight UTC shifts with timezone)
     const startTime = '08:00';
     const endTime = '17:00';
 
@@ -231,9 +204,9 @@ function transformWorkOrders(workOrders: WorkOrderResponse[], installerMap: Map<
       priority: wo.priority ?? 'medium',
       dueDate: dueDateStr,
       isOverdue,
-      installer: inst?.id ?? 'installer-0',
-      installerInitials: inst?.initials ?? '??',
-      installerColor: inst?.color ?? INSTALLER_COLORS[0],
+      installer: woCal?.calendarId ?? 'wo-unknown',
+      installerInitials: wo.job_number.slice(0, 3),
+      installerColor: woCal?.color ?? WORK_ORDER_COLORS[0],
     };
   });
 }
@@ -251,7 +224,6 @@ interface SXEvent {
   description?: string;
 }
 
-// Use UTC to avoid timezone offset issues — Schedule-X displays ZonedDateTime in UTC
 const DISPLAY_TZ = 'UTC';
 
 function isWeekday(date: Temporal.PlainDate): boolean {
@@ -270,11 +242,11 @@ function getBusinessDays(start: Temporal.PlainDate, end: Temporal.PlainDate): Te
   return days;
 }
 
-function toScheduleXEvents(events: CalendarEvent[], colorBy: ColorBy): SXEvent[] {
+function toScheduleXEvents(events: CalendarEvent[]): SXEvent[] {
   const result: SXEvent[] = [];
 
   for (const e of events) {
-    const calendarId = colorBy === 'installer' ? e.installer : e.phase;
+    const calendarId = e.installer; // maps to work order calendar
     const description = `${e.vehicle} · ${e.clientName}`;
 
     const isMultiDay = e.dueDate && e.dueDate !== e.date;
@@ -348,8 +320,8 @@ function CalendarSkeleton() {
         ))}
       </div>
       <div className="flex-1 overflow-auto p-4">
-        <div className="grid grid-cols-5 gap-3">
-          {Array.from({ length: 5 }).map((_, i) => (
+        <div className="grid grid-cols-7 gap-3">
+          {Array.from({ length: 7 }).map((_, i) => (
             <div key={i}>
               <div className="mb-2 h-6 w-16 animate-pulse rounded bg-[var(--surface-overlay)]" />
               <div className="h-32 animate-pulse rounded-lg bg-[var(--surface-raised)]" />
@@ -362,80 +334,95 @@ function CalendarSkeleton() {
 }
 
 // ---------------------------------------------------------------------------
-// Main Component
+// Inner calendar component — mounts only after data is ready so
+// useNextCalendarApp gets the correct calendar colors at init.
 // ---------------------------------------------------------------------------
 
-export default function CalendarPage() {
-  const { currentRole } = useRole();
-  const preset = ROLE_PRESETS[currentRole];
+interface MonthCalendarProps {
+  calendars: SXCalendarConfig;
+  events: CalendarEvent[];
+  isDark: boolean;
+  onRangeUpdate: (range: { start: string; end: string }) => void;
+}
 
-  // Data state
-  const [allEvents, setAllEvents] = useState<CalendarEvent[]>([]);
-  const [installers, setInstallers] = useState<Installer[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Filter state
-  const [activePhases, setActivePhases] = useState<Set<Phase>>(() => new Set(preset.phases));
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>(preset.status);
-  const [colorBy, setColorBy] = useState<ColorBy>('phase');
-  const [activeInstallers, setActiveInstallers] = useState<Set<string>>(new Set());
-
-  // View state
-  const [isListView, setIsListView] = useState(preset.view === 'list');
-  const [viewLabel, setViewLabel] = useState('This week');
-  const [visibleRange, setVisibleRange] = useState<{ start: string; end: string } | null>(null);
-
-  // Theme detection
-  const isDark = typeof document !== 'undefined'
-    ? document.documentElement.getAttribute('data-theme') !== 'light'
-    : true;
-
-  // Schedule-X events service
+function MonthCalendar({ calendars, events, isDark, onRangeUpdate }: MonthCalendarProps) {
   const eventsService = useState(() => createEventsServicePlugin())[0];
-
-  // Build all calendars (phase + installer) upfront
-  const allCalendars = useMemo(() => {
-    return { ...PHASE_CALENDARS, ...buildInstallerCalendars(installers) };
-  }, [installers]);
-
-  // Schedule-X calendar app
-  const sxDefaultView = preset.view === 'list' ? 'week' : preset.view;
   const todayStr = formatDateStr(new Date());
 
+  // Capture initial events once at mount time (Schedule-X init only)
+  const [initialSxEvents] = useState(() => toScheduleXEvents(events));
+
   const calendar = useNextCalendarApp({
-    views: [createViewDay(), createViewWeek(), createViewMonthGrid()],
-    defaultView: sxDefaultView,
+    views: [createViewMonthGrid()],
+    defaultView: 'month-grid',
     selectedDate: Temporal.PlainDate.from(todayStr),
     isDark,
     locale: 'en-US',
-    firstDayOfWeek: 1,
-    dayBoundaries: { start: '08:00', end: '18:00' },
-    weekOptions: {
-      nDays: 5,
-      eventWidth: 95,
-    },
+    firstDayOfWeek: 7, // Sunday (Schedule-X enum: 1=Mon..7=Sun)
     monthGridOptions: {
-      nEventsPerDay: 3,
+      nEventsPerDay: 4,
     },
-    calendars: allCalendars,
-    events: [],
+    calendars,
+    events: initialSxEvents,
     plugins: [eventsService],
     callbacks: {
       onRangeUpdate(range) {
-        setVisibleRange({ start: range.start.toString(), end: range.end.toString() });
-        // Derive view label from range span
-        const dayDiff = range.start.until(range.end, { largestUnit: 'days' }).days;
-        if (dayDiff <= 1) setViewLabel('Today');
-        else if (dayDiff <= 7) setViewLabel('This week');
-        else setViewLabel('This month');
+        onRangeUpdate({ start: range.start.toString(), end: range.end.toString() });
       },
       onEventClick(calendarEvent) {
-        // Future: navigate to work order detail
         console.log('Event clicked:', calendarEvent.id);
       },
     },
   });
+
+  // Sync subsequent event changes (e.g. filter toggles) into Schedule-X
+  const mountedRef = useRef(false);
+  useEffect(() => {
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+      return; // skip first render — initial events already passed to hook
+    }
+    const sxEvents = toScheduleXEvents(events);
+    replaceAllEvents(eventsService, sxEvents);
+  }, [events, eventsService]);
+
+  return <ScheduleXCalendar calendarApp={calendar} />;
+}
+
+// ---------------------------------------------------------------------------
+// Main Component
+// ---------------------------------------------------------------------------
+
+export default function CalendarPage() {
+  // Data state
+  const [allEvents, setAllEvents] = useState<CalendarEvent[]>([]);
+  const [woCalendars, setWoCalendars] = useState<WorkOrderCalendar[]>([]);
+  const [sxCalendars, setSxCalendars] = useState<SXCalendarConfig>({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Filter state — set of active work order job numbers
+  const [activeWorkOrders, setActiveWorkOrders] = useState<Set<string>>(new Set());
+
+  // View state
+  const [viewLabel, setViewLabel] = useState('This month');
+  const [visibleRange, setVisibleRange] = useState<{ start: string; end: string } | null>(null);
+
+  // Theme detection — reactive via MutationObserver
+  const [isDark, setIsDark] = useState(() =>
+    typeof document !== 'undefined'
+      ? document.documentElement.getAttribute('data-theme') !== 'light'
+      : true
+  );
+
+  useEffect(() => {
+    const el = document.documentElement;
+    const observer = new MutationObserver(() => {
+      setIsDark(el.getAttribute('data-theme') !== 'light');
+    });
+    observer.observe(el, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => observer.disconnect();
+  }, []);
 
   // Fetch work orders
   const fetchData = useCallback(async () => {
@@ -443,12 +430,13 @@ export default function CalendarPage() {
     setError(null);
     try {
       const data = await api.get<WorkOrderListResponse>('/api/work-orders?limit=100');
-      const extracted = extractInstallers(data.items);
-      setInstallers(extracted);
-      const installerMap = new Map(extracted.map((i) => [i.name, i]));
-      const events = transformWorkOrders(data.items, installerMap);
+      const { calendars, woCalendars: woCals } = buildWorkOrderCalendars(data.items);
+      setWoCalendars(woCals);
+      setSxCalendars(calendars);
+      const woCalendarMap = new Map(woCals.map((wc) => [wc.jobNumber, wc]));
+      const events = transformWorkOrders(data.items, woCalendarMap);
       setAllEvents(events);
-      setActiveInstallers(new Set(extracted.map((i) => i.id)));
+      setActiveWorkOrders(new Set(woCals.map((wc) => wc.jobNumber)));
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Failed to load calendar data');
     } finally {
@@ -458,60 +446,35 @@ export default function CalendarPage() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  // Filter events
+  // Filter events by active work orders
   const filteredEvents = useMemo(() => {
-    return allEvents.filter((e) => {
-      if (!activePhases.has(e.phase)) return false;
-      if (colorBy === 'installer' && !activeInstallers.has(e.installer)) return false;
-      if (statusFilter === 'upcoming') {
-        return e.systemStatus === null || (e.systemStatus !== 'in_progress' && e.systemStatus !== 'completed');
-      }
-      if (statusFilter === 'in_progress') return e.systemStatus === 'in_progress';
-      if (statusFilter === 'completed') return e.systemStatus === 'completed';
-      return true;
-    });
-  }, [allEvents, activePhases, statusFilter, colorBy, activeInstallers]);
-
-  // Sync filtered events to Schedule-X
-  const prevEventsRef = useRef<string>('');
-  useEffect(() => {
-    if (isLoading) return;
-    const sxEvents = toScheduleXEvents(filteredEvents, colorBy);
-    const key = sxEvents.map((e) => `${e.id}|${e.calendarId}`).join(',');
-    if (key !== prevEventsRef.current) {
-      prevEventsRef.current = key;
-      replaceAllEvents(eventsService, sxEvents);
-    }
-  }, [filteredEvents, colorBy, eventsService, isLoading]);
+    return allEvents.filter((e) => activeWorkOrders.has(e.jobNumber));
+  }, [allEvents, activeWorkOrders]);
 
   // Visible events for SummaryBar (scoped to range)
   const summaryEvents = useMemo(() => {
-    if (isListView) return filteredEvents;
     if (!visibleRange) return filteredEvents;
     const startStr = visibleRange.start.slice(0, 10);
     const endStr = visibleRange.end.slice(0, 10);
     return filteredEvents.filter((e) => e.date >= startStr && e.date <= endStr);
-  }, [filteredEvents, visibleRange, isListView]);
+  }, [filteredEvents, visibleRange]);
 
   // Filter handlers
-  const handleTogglePhase = useCallback((phase: Phase) => {
-    setActivePhases((prev) => {
+  const handleToggleWorkOrder = useCallback((jobNumber: string) => {
+    setActiveWorkOrders((prev) => {
       const next = new Set(prev);
-      if (next.has(phase)) next.delete(phase); else next.add(phase);
+      if (next.has(jobNumber)) next.delete(jobNumber); else next.add(jobNumber);
       return next;
     });
   }, []);
 
-  const handleToggleInstaller = useCallback((id: string) => {
-    setActiveInstallers((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
-      return next;
-    });
+  const handleSetAllWorkOrders = useCallback((jobNumbers: string[]) => {
+    setActiveWorkOrders(new Set(jobNumbers));
   }, []);
 
-  const handleToggleListView = useCallback(() => {
-    setIsListView((prev) => !prev);
+  const handleRangeUpdate = useCallback((range: { start: string; end: string }) => {
+    setVisibleRange(range);
+    setViewLabel('This month');
   }, []);
 
   // Loading / Error
@@ -535,20 +498,25 @@ export default function CalendarPage() {
   const hasNoData = allEvents.length === 0;
   const hasNoFilteredResults = !hasNoData && filteredEvents.length === 0;
 
+  const uniqueWoCount = new Set(allEvents.map((e) => e.jobNumber)).size;
+
   return (
     <div className="flex h-full flex-col">
+      {/* Page header */}
+      <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
+        <div className="flex items-center gap-3">
+          <h1 className="text-[22px] font-[800] tracking-[-0.4px] text-[var(--text-primary)]">Calendar</h1>
+          <span className="rounded-full bg-[var(--surface-raised)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-secondary)]">
+            {uniqueWoCount} work {uniqueWoCount === 1 ? 'order' : 'orders'}
+          </span>
+        </div>
+      </header>
+
       <CalendarToolbar
-        activePhases={activePhases}
-        onTogglePhase={handleTogglePhase}
-        statusFilter={statusFilter}
-        onStatusChange={setStatusFilter}
-        colorBy={colorBy}
-        onColorByChange={setColorBy}
-        installers={installers}
-        activeInstallers={activeInstallers}
-        onToggleInstaller={handleToggleInstaller}
-        isListView={isListView}
-        onToggleListView={handleToggleListView}
+        woCalendars={woCalendars}
+        activeWorkOrders={activeWorkOrders}
+        onToggleWorkOrder={handleToggleWorkOrder}
+        onSetAllWorkOrders={handleSetAllWorkOrders}
       />
 
       {hasNoData ? (
@@ -557,28 +525,28 @@ export default function CalendarPage() {
         </div>
       ) : hasNoFilteredResults ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-3">
-          <p className="text-sm text-[var(--text-muted)]">No jobs match your filters</p>
+          <p className="text-sm text-[var(--text-muted)]">No work orders match your filter</p>
           <Button
             variant="secondary"
             size="sm"
-            onClick={() => {
-              setActivePhases(new Set<Phase>(['design', 'production', 'install']));
-              setStatusFilter('all');
-            }}
+            onClick={() => setActiveWorkOrders(new Set(woCalendars.map((wc) => wc.jobNumber)))}
           >
-            Clear filters
+            Show all
           </Button>
         </div>
       ) : (
-        <>
-          <div className={`flex-1 overflow-hidden ${isListView ? 'hidden' : ''}`} style={{ minHeight: 0 }}>
-            <ScheduleXCalendar key={isDark ? 'dark' : 'light'} calendarApp={calendar} />
-          </div>
-          {isListView && <ListView events={filteredEvents} />}
-        </>
+        <div className="flex-1 overflow-hidden" style={{ minHeight: 0 }}>
+          <MonthCalendar
+            key={`${isDark ? 'dark' : 'light'}-${woCalendars.length}`}
+            calendars={sxCalendars}
+            events={filteredEvents}
+            isDark={isDark}
+            onRangeUpdate={handleRangeUpdate}
+          />
+        </div>
       )}
 
-      <SummaryBar events={summaryEvents} viewLabel={isListView ? 'Showing' : viewLabel} />
+      <SummaryBar events={summaryEvents} viewLabel={viewLabel} />
     </div>
   );
 }
