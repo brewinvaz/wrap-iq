@@ -601,7 +601,7 @@ export default function CalendarPage() {
                     {activeFilterCount > 0 && (
                       <button
                         onClick={() => setFilterCriteria({ priority: [], client: [] })}
-                        className="text-[12px] font-medium text-[var(--accent-primary)] hover:text-[var(--accent-primary)]"
+                        className="text-[12px] font-medium text-[var(--accent-primary)] hover:underline"
                       >
                         Clear all
                       </button>
@@ -638,7 +638,7 @@ export default function CalendarPage() {
                   {/* Client filter */}
                   <div>
                     <p className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-[var(--text-muted)]">Client</p>
-                    <div className="space-y-1.5">
+                    <div className="max-h-48 space-y-1.5 overflow-y-auto">
                       {uniqueClients.map((c) => (
                         <label key={c} className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-[var(--text-primary)] hover:bg-[var(--surface-raised)]">
                           <input
