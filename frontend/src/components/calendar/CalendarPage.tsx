@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import CalendarHeader from './CalendarHeader';
+import CalendarToolbar from './CalendarToolbar';
 import WeekView from './WeekView';
 import DayView from './DayView';
 import MonthView from './MonthView';
@@ -337,7 +338,7 @@ export default function CalendarPage() {
     year: new Date().getFullYear(),
     month: new Date().getMonth(),
   }));
-  const [activeView, setActiveView] = useState<'day' | 'week' | 'month'>('week');
+  const [activeView, setActiveView] = useState<'day' | 'week' | 'month' | 'list'>('week');
 
   // Data state
   const [installers, setInstallers] = useState<Installer[]>([]);
@@ -348,6 +349,16 @@ export default function CalendarPage() {
   const [activeInstallers, setActiveInstallers] = useState<Set<string>>(
     new Set<string>(),
   );
+
+  type Phase = 'design' | 'production' | 'install';
+  type StatusFilter = 'all' | 'upcoming' | 'in_progress' | 'completed';
+  type ColorBy = 'phase' | 'installer';
+
+  const [activePhases, setActivePhases] = useState<Set<Phase>>(
+    new Set<Phase>(['design', 'production', 'install']),
+  );
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [colorBy, setColorBy] = useState<ColorBy>('phase');
 
   // -----------------------------------------------------------------------
   // Fetch work orders
@@ -482,8 +493,28 @@ export default function CalendarPage() {
     setActiveView('day');
   }, []);
 
-  const handleViewChange = useCallback((view: 'day' | 'week' | 'month') => {
+  const handleViewChange = useCallback((view: 'day' | 'week' | 'month' | 'list') => {
     setActiveView(view);
+  }, []);
+
+  const handleTogglePhase = useCallback((phase: Phase) => {
+    setActivePhases((prev) => {
+      const next = new Set(prev);
+      if (next.has(phase)) {
+        next.delete(phase);
+      } else {
+        next.add(phase);
+      }
+      return next;
+    });
+  }, []);
+
+  const handleStatusChange = useCallback((status: StatusFilter) => {
+    setStatusFilter(status);
+  }, []);
+
+  const handleColorByChange = useCallback((newColorBy: ColorBy) => {
+    setColorBy(newColorBy);
   }, []);
 
   const handleToggleInstaller = useCallback((id: string) => {
@@ -508,15 +539,17 @@ export default function CalendarPage() {
         return formatDayLabel(selectedDay);
       case 'month':
         return formatMonthLabel(monthYear.year, monthYear.month);
+      case 'list':
+        return formatMonthLabel(monthYear.year, monthYear.month);
       case 'week':
       default:
         return formatWeekLabel(weekStart);
     }
   }, [activeView, selectedDay, monthYear, weekStart]);
 
-  const onPrev = activeView === 'day' ? handlePrevDay : activeView === 'month' ? handlePrevMonth : handlePrevWeek;
-  const onNext = activeView === 'day' ? handleNextDay : activeView === 'month' ? handleNextMonth : handleNextWeek;
-  const onToday = activeView === 'day' ? handleTodayDay : activeView === 'month' ? handleTodayMonth : handleTodayWeek;
+  const onPrev = activeView === 'day' ? handlePrevDay : (activeView === 'month' || activeView === 'list') ? handlePrevMonth : handlePrevWeek;
+  const onNext = activeView === 'day' ? handleNextDay : (activeView === 'month' || activeView === 'list') ? handleNextMonth : handleNextWeek;
+  const onToday = activeView === 'day' ? handleTodayDay : (activeView === 'month' || activeView === 'list') ? handleTodayMonth : handleTodayWeek;
 
   // -----------------------------------------------------------------------
   // Summary metrics
@@ -527,6 +560,7 @@ export default function CalendarPage() {
       case 'day':
         return 'Today';
       case 'month':
+      case 'list':
         return 'This month';
       case 'week':
       default:
@@ -540,7 +574,8 @@ export default function CalendarPage() {
         const dayStr = formatDateStr(selectedDay);
         return calendarEvents.filter((e) => e.date === dayStr);
       }
-      case 'month': {
+      case 'month':
+      case 'list': {
         const firstDay = new Date(monthYear.year, monthYear.month, 1);
         const lastDay = new Date(monthYear.year, monthYear.month + 1, 0);
         const startStr = formatDateStr(firstDay);
@@ -583,6 +618,14 @@ export default function CalendarPage() {
         onToday={onToday}
         activeView={activeView}
         onViewChange={handleViewChange}
+      />
+      <CalendarToolbar
+        activePhases={activePhases}
+        onTogglePhase={handleTogglePhase}
+        statusFilter={statusFilter}
+        onStatusChange={handleStatusChange}
+        colorBy={colorBy}
+        onColorByChange={handleColorByChange}
         installers={installers}
         activeInstallers={activeInstallers}
         onToggleInstaller={handleToggleInstaller}
