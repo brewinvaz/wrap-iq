@@ -13,15 +13,24 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 # Copy dependency files
 COPY pyproject.toml uv.lock ./
 
-# Install dependencies with cache mount
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --no-dev --no-install-project
+# Install dependencies (cached layer)
+RUN uv sync --no-dev --no-install-project
 
 # Copy application code
 COPY . .
 
 # Install the project itself
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --no-dev
+RUN uv sync --no-dev
+
+# Create non-root user
+RUN groupadd --system --gid 1001 appgroup && \
+    useradd --system --uid 1001 --gid appgroup --create-home appuser
+
+# Set ownership
+RUN chown -R appuser:appgroup /app
+
+ENV UV_CACHE_DIR=/home/appuser/.cache/uv
+
+USER appuser
 
 CMD ["uv", "run", "python", "-m", "arq", "app.worker.WorkerSettings"]
