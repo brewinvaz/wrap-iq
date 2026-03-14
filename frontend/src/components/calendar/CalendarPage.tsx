@@ -59,6 +59,11 @@ interface WorkOrderListResponse {
 
 type Phase = 'design' | 'production' | 'install';
 
+interface FilterCriteria {
+  priority: ('high' | 'medium' | 'low')[];
+  client: string[];
+}
+
 /** 12 distinct hues for work-order color coding — visually separable in both themes. */
 const WORK_ORDER_COLORS = [
   '#2563eb', // blue
@@ -404,6 +409,15 @@ export default function CalendarPage() {
   // Filter state — set of active work order job numbers
   const [activeWorkOrders, setActiveWorkOrders] = useState<Set<string>>(new Set());
 
+  // Filter dropdown state
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>({
+    priority: [],
+    client: [],
+  });
+  const filterRef = useRef<HTMLDivElement>(null);
+  const filterBtnRef = useRef<HTMLButtonElement>(null);
+
   // View state
   const [viewLabel, setViewLabel] = useState('This month');
   const [visibleRange, setVisibleRange] = useState<{ start: string; end: string } | null>(null);
@@ -423,6 +437,23 @@ export default function CalendarPage() {
     observer.observe(el, { attributes: true, attributeFilter: ['data-theme'] });
     return () => observer.disconnect();
   }, []);
+
+  // Close filter dropdown on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (
+        filterOpen &&
+        filterRef.current &&
+        filterBtnRef.current &&
+        !filterRef.current.contains(e.target as Node) &&
+        !filterBtnRef.current.contains(e.target as Node)
+      ) {
+        setFilterOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [filterOpen]);
 
   // Fetch work orders
   const fetchData = useCallback(async () => {
@@ -446,10 +477,35 @@ export default function CalendarPage() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  // Filter events by active work orders
+  // Derive unique client names for the filter dropdown
+  const uniqueClients = useMemo(() => {
+    const clients = new Set(allEvents.map((e) => e.clientName));
+    return Array.from(clients).sort((a, b) => {
+      if (a === '—') return 1;
+      if (b === '—') return -1;
+      return a.localeCompare(b);
+    });
+  }, [allEvents]);
+
+  // Apply criteria filters (priority + client) — before work order pills
+  const criteriaFilteredEvents = useMemo(() => {
+    return allEvents.filter((e) => {
+      if (filterCriteria.priority.length > 0 && !filterCriteria.priority.includes(e.priority)) return false;
+      if (filterCriteria.client.length > 0 && !filterCriteria.client.includes(e.clientName)) return false;
+      return true;
+    });
+  }, [allEvents, filterCriteria]);
+
+  // Derive visible work order calendars from criteria-filtered events
+  const visibleWoCalendars = useMemo(() => {
+    const visibleJobs = new Set(criteriaFilteredEvents.map((e) => e.jobNumber));
+    return woCalendars.filter((wc) => visibleJobs.has(wc.jobNumber));
+  }, [criteriaFilteredEvents, woCalendars]);
+
+  // Apply work order pills filter
   const filteredEvents = useMemo(() => {
-    return allEvents.filter((e) => activeWorkOrders.has(e.jobNumber));
-  }, [allEvents, activeWorkOrders]);
+    return criteriaFilteredEvents.filter((e) => activeWorkOrders.has(e.jobNumber));
+  }, [criteriaFilteredEvents, activeWorkOrders]);
 
   // Visible events for SummaryBar (scoped to range)
   const summaryEvents = useMemo(() => {
@@ -495,6 +551,8 @@ export default function CalendarPage() {
     );
   }
 
+  const activeFilterCount = filterCriteria.priority.length + filterCriteria.client.length;
+
   const hasNoData = allEvents.length === 0;
   const hasNoFilteredResults = !hasNoData && filteredEvents.length === 0;
 
@@ -504,16 +562,112 @@ export default function CalendarPage() {
     <div className="flex h-full flex-col">
       {/* Page header */}
       <header className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-card)] px-6 py-4">
-        <div className="flex items-center gap-3">
-          <h1 className="text-[22px] font-[800] tracking-[-0.4px] text-[var(--text-primary)]">Calendar</h1>
-          <span className="rounded-full bg-[var(--surface-raised)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-secondary)]">
-            {uniqueWoCount} work {uniqueWoCount === 1 ? 'order' : 'orders'}
-          </span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <h1 className="text-[22px] font-[800] tracking-[-0.4px] text-[var(--text-primary)]">Calendar</h1>
+            <span className="rounded-full bg-[var(--surface-raised)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-secondary)]">
+              {uniqueWoCount} work {uniqueWoCount === 1 ? 'order' : 'orders'}
+            </span>
+          </div>
+          <div className="relative">
+            <Button
+              ref={filterBtnRef}
+              variant="secondary"
+              onClick={() => setFilterOpen((o) => !o)}
+              className={activeFilterCount > 0
+                ? 'border-[var(--accent-primary)]/30 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/15'
+                : ''
+              }
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
+              </svg>
+              Filter
+              {activeFilterCount > 0 && (
+                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--accent-primary)] px-1 text-[11px] font-semibold text-white">
+                  {activeFilterCount}
+                </span>
+              )}
+            </Button>
+
+            {filterOpen && (
+              <div
+                ref={filterRef}
+                className="absolute right-0 top-11 z-50 w-60 rounded-xl border border-[var(--border)] bg-[var(--surface-card)] shadow-lg"
+              >
+                <div className="border-b border-[var(--border)] px-4 py-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-[14px] font-semibold text-[var(--text-primary)]">Filters</h3>
+                    {activeFilterCount > 0 && (
+                      <button
+                        onClick={() => setFilterCriteria({ priority: [], client: [] })}
+                        className="text-[12px] font-medium text-[var(--accent-primary)] hover:text-[var(--accent-primary)]"
+                      >
+                        Clear all
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="p-4 space-y-4">
+                  {/* Priority filter */}
+                  <div>
+                    <p className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-[var(--text-muted)]">Priority</p>
+                    <div className="space-y-1.5">
+                      {(['high', 'medium', 'low'] as const).map((p) => (
+                        <label key={p} className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-[var(--text-primary)] hover:bg-[var(--surface-raised)]">
+                          <input
+                            type="checkbox"
+                            checked={filterCriteria.priority.includes(p)}
+                            onChange={() =>
+                              setFilterCriteria((prev) => ({
+                                ...prev,
+                                priority: prev.priority.includes(p)
+                                  ? prev.priority.filter((x) => x !== p)
+                                  : [...prev.priority, p],
+                              }))
+                            }
+                            className="h-4 w-4 rounded border-[var(--border)] text-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
+                          />
+                          <span className="capitalize">{p}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Client filter */}
+                  <div>
+                    <p className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-[var(--text-muted)]">Client</p>
+                    <div className="space-y-1.5">
+                      {uniqueClients.map((c) => (
+                        <label key={c} className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-[var(--text-primary)] hover:bg-[var(--surface-raised)]">
+                          <input
+                            type="checkbox"
+                            checked={filterCriteria.client.includes(c)}
+                            onChange={() =>
+                              setFilterCriteria((prev) => ({
+                                ...prev,
+                                client: prev.client.includes(c)
+                                  ? prev.client.filter((x) => x !== c)
+                                  : [...prev.client, c],
+                              }))
+                            }
+                            className="h-4 w-4 rounded border-[var(--border)] text-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
+                          />
+                          <span>{c === '—' ? '(No client)' : c}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
       <CalendarToolbar
-        woCalendars={woCalendars}
+        woCalendars={visibleWoCalendars}
         activeWorkOrders={activeWorkOrders}
         onToggleWorkOrder={handleToggleWorkOrder}
         onSetAllWorkOrders={handleSetAllWorkOrders}
@@ -529,7 +683,10 @@ export default function CalendarPage() {
           <Button
             variant="secondary"
             size="sm"
-            onClick={() => setActiveWorkOrders(new Set(woCalendars.map((wc) => wc.jobNumber)))}
+            onClick={() => {
+              setFilterCriteria({ priority: [], client: [] });
+              setActiveWorkOrders(new Set(woCalendars.map((wc) => wc.jobNumber)));
+            }}
           >
             Show all
           </Button>
