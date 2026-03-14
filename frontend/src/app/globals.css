@@ -54,6 +54,30 @@
   color-scheme: dark;
 }
 
+/* ── Schedule-X theme integration (dark) ── */
+:root,
+[data-theme="dark"] {
+  --sx-color-surface: var(--surface-base);
+  --sx-color-surface-dim: var(--surface-app);
+  --sx-color-surface-bright: var(--surface-raised);
+  --sx-color-background: var(--surface-app);
+  --sx-color-on-surface: var(--text-primary);
+  --sx-color-on-background: var(--text-primary);
+  --sx-color-surface-container: var(--surface-card);
+  --sx-color-surface-container-low: var(--surface-raised);
+  --sx-color-surface-container-high: var(--surface-overlay);
+  --sx-color-outline: var(--glass-border);
+  --sx-color-outline-variant: var(--glass-border);
+  --sx-color-primary: var(--accent-primary);
+  --sx-color-on-primary: #ffffff;
+  --sx-color-primary-container: var(--accent-primary-bg);
+  --sx-color-on-primary-container: var(--accent-primary);
+  --sx-color-secondary: var(--accent-secondary);
+  --sx-color-on-secondary: #ffffff;
+  --sx-color-secondary-container: rgba(59, 130, 246, 0.1);
+  --sx-color-on-secondary-container: var(--accent-secondary);
+}
+
 /* ── Light theme ── */
 [data-theme="light"] {
   --surface-base: #f0f0f3;
@@ -94,6 +118,29 @@
   --scrollbar-thumb-hover: #9ca3af;
 
   color-scheme: light;
+}
+
+/* ── Schedule-X theme integration (light) ── */
+[data-theme="light"] {
+  --sx-color-surface: var(--surface-base);
+  --sx-color-surface-dim: var(--surface-app);
+  --sx-color-surface-bright: var(--surface-raised);
+  --sx-color-background: var(--surface-app);
+  --sx-color-on-surface: var(--text-primary);
+  --sx-color-on-background: var(--text-primary);
+  --sx-color-surface-container: var(--surface-card);
+  --sx-color-surface-container-low: var(--surface-raised);
+  --sx-color-surface-container-high: var(--surface-overlay);
+  --sx-color-outline: var(--glass-border);
+  --sx-color-outline-variant: var(--glass-border);
+  --sx-color-primary: var(--accent-primary);
+  --sx-color-on-primary: #ffffff;
+  --sx-color-primary-container: var(--accent-primary-bg);
+  --sx-color-on-primary-container: var(--accent-primary);
+  --sx-color-secondary: var(--accent-secondary);
+  --sx-color-on-secondary: #ffffff;
+  --sx-color-secondary-container: rgba(37, 99, 235, 0.1);
+  --sx-color-on-secondary-container: var(--accent-secondary);
 }
 
 /* ── Cutting mat grid (light mode) ── */
