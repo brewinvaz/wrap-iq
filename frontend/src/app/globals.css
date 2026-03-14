@@ -201,8 +201,31 @@
   border-radius: 4px !important;
   font-size: 11px !important;
   font-weight: 500 !important;
-  padding: 2px 4px !important;
-  line-height: 1.2 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  margin-bottom: 1px !important;
+  overflow: hidden !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Remove default Schedule-X time display when using custom component */
+.sx__month-grid-event .sx__month-grid-event-time,
+.sx__month-grid-event .sx__month-grid-event-title {
+  display: none !important;
+}
+
+/* Tighten day cell spacing to fit more events */
+.sx__month-grid-day {
+  overflow: hidden !important;
+}
+
+/* "+N more" link styling */
+.sx__month-grid-blocker {
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  opacity: 0.5 !important;
+  padding: 0 4px !important;
 }
 
 .sx__month-grid-day__header-date {
