@@ -15,22 +15,16 @@ export default function CalendarToolbar({
   onToggleWorkOrder,
   onSetAllWorkOrders,
 }: CalendarToolbarProps) {
-  const allActive = woCalendars.length > 0 && woCalendars.every((wc) => activeWorkOrders.has(wc.jobNumber));
-
   return (
     <div className="flex items-center gap-3 border-b border-[var(--glass-border)] bg-[var(--glass-bg)] px-6 py-2.5 backdrop-blur-sm overflow-hidden">
       <span className="shrink-0 text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
-        Work Orders
+        Jobs
       </span>
 
       {/* Select all / none toggle */}
       <button
         onClick={() => {
-          if (allActive) {
-            onSetAllWorkOrders([]);
-          } else {
-            onSetAllWorkOrders(woCalendars.map((wc) => wc.jobNumber));
-          }
+          onSetAllWorkOrders(woCalendars.map((wc) => wc.jobNumber));
         }}
         className="shrink-0 rounded-md border border-[var(--glass-border)] px-2 py-0.5 text-[10px] font-medium text-[var(--text-tertiary)] transition-colors hover:text-[var(--text-secondary)] hover:border-[var(--text-muted)]"
       >

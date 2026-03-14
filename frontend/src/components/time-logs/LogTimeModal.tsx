@@ -159,7 +159,7 @@ export default function LogTimeModal({
               htmlFor="log-work-order"
               className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]"
             >
-              Work Order <span className="text-[var(--text-muted)]">(optional)</span>
+              Job <span className="text-[var(--text-muted)]">(optional)</span>
             </label>
             <WorkOrderSearch
               selectedId={selectedWorkOrderId}

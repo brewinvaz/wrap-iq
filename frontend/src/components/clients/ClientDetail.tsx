@@ -263,14 +263,14 @@ export default function ClientDetail({ client, onClientUpdated }: ClientDetailPr
           {/* Account Summary */}
           <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-[18px] shadow-sm transition-all hover:border-[var(--accent-primary-border)] hover:shadow-[0_0_16px_var(--accent-primary-glow)]">
             <CardHeader title="Account Summary" />
-            <InfoRow label="Total Projects" value={String(client.projectCount)} />
+            <InfoRow label="Total Jobs" value={String(client.projectCount)} />
             <InfoRow
               label="Total Spent"
               value={formatCurrency(client.totalSpent)}
             />
             {client.lastProject && (
               <InfoRow
-                label="Last Project"
+                label="Last Job"
                 value={new Date(client.lastProject).toLocaleDateString('en-US', {
                   month: 'short',
                   day: 'numeric',

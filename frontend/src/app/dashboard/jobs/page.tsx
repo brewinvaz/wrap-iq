@@ -101,7 +101,7 @@ function toJob(wo: ApiWorkOrder): Job {
 
 const phaseStyles: Record<PhaseFilter, { bg: string; text: string; label: string }> = {
   'all': { bg: '', text: '', label: '' },
-  'work-order': { bg: 'bg-blue-500/15', text: 'text-blue-700 dark:text-blue-400', label: 'Work Order' },
+  'work-order': { bg: 'bg-blue-500/15', text: 'text-blue-700 dark:text-blue-400', label: 'Intake' },
   design: { bg: 'bg-violet-500/15', text: 'text-violet-700 dark:text-violet-400', label: 'Design' },
   production: { bg: 'bg-amber-500/15', text: 'text-amber-700 dark:text-amber-400', label: 'Production' },
   install: { bg: 'bg-emerald-500/15', text: 'text-emerald-700 dark:text-emerald-400', label: 'Install' },
@@ -109,7 +109,7 @@ const phaseStyles: Record<PhaseFilter, { bg: string; text: string; label: string
 
 const tabs: { key: PhaseFilter; label: string }[] = [
   { key: 'all', label: 'All Jobs' },
-  { key: 'work-order', label: 'Work Orders' },
+  { key: 'work-order', label: 'Intake' },
   { key: 'design', label: 'Design' },
   { key: 'production', label: 'Production' },
   { key: 'install', label: 'Install' },

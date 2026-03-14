@@ -1148,7 +1148,7 @@ export default function ProjectDetailPage({
                 d="M15 19l-7-7 7-7"
               />
             </svg>
-            Back to Projects
+            Back to Jobs
           </Button>
         </div>
 

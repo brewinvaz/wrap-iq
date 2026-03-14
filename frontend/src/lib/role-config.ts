@@ -29,7 +29,7 @@ const allRoles = [
 
 export const permissionsMatrix: Permission[] = [
   {
-    feature: 'Projects',
+    feature: 'Jobs',
     roles: allRoles.map((role) => ({
       role,
       access:

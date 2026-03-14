@@ -43,8 +43,7 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
         label: 'Workspace',
         items: [
           { icon: 'ClipboardList', label: 'Jobs Board', href: '/dashboard', badgeKey: 'work_orders' },
-          { icon: 'BarChart3', label: 'All Jobs Board', href: '/dashboard/jobs' },
-          { icon: 'Package', label: 'Work Orders', href: '/dashboard/work-orders' },
+          { icon: 'Package', label: 'Jobs List', href: '/dashboard/work-orders' },
           { icon: 'Calendar', label: 'Calendar', href: '/dashboard/calendar' },
           { icon: 'MessageSquare', label: 'Communications', href: '/dashboard/comms' },
           { icon: 'Users', label: 'Customers', href: '/dashboard/customers' },
@@ -92,10 +91,9 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
     showPhaseKey: true,
     navGroups: [
       {
-        label: 'Projects',
+        label: 'Jobs',
         items: [
           { icon: 'ClipboardList', label: 'My Jobs', href: '/dashboard', badgeKey: 'work_orders' },
-          { icon: 'BarChart3', label: 'All Jobs Board', href: '/dashboard/jobs' },
           { icon: 'Calendar', label: 'Calendar', href: '/dashboard/calendar' },
           { icon: 'Users', label: 'Team Assignments', href: '/dashboard/team' },
         ],
