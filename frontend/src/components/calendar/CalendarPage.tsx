@@ -10,6 +10,7 @@ import { api, ApiError } from '@/lib/api-client';
 import { CalendarEvent } from '@/lib/types';
 import { Button } from '@/components/ui/Button';
 import CalendarToolbar from './CalendarToolbar';
+import MonthGridEvent from './MonthGridEvent';
 import SummaryBar from './SummaryBar';
 
 // ---------------------------------------------------------------------------
@@ -419,7 +420,7 @@ function MonthCalendar({ calendars, events, isDark, onRangeUpdate }: MonthCalend
     replaceAllEvents(eventsService, sxEvents);
   }, [events, eventsService]);
 
-  return <ScheduleXCalendar calendarApp={calendar} />;
+  return <ScheduleXCalendar calendarApp={calendar} customComponents={{ monthGridEvent: MonthGridEvent }} />;
 }
 
 // ---------------------------------------------------------------------------
