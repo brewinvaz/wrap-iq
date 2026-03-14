@@ -3,7 +3,7 @@ import uuid
 from app.models.estimate_defaults import EstimateDefaults
 from app.models.organization import Organization
 from app.models.plan import Plan
-from app.services.estimate_matching import find_matching_estimates
+from app.services.estimate_matching import extract_vehicle_type, find_matching_estimates
 
 
 async def _seed_org(db_session):
@@ -118,3 +118,48 @@ async def test_vehicle_count_range(db_session):
         vehicle_count=25,
     )
     assert match is None
+
+
+# --- extract_vehicle_type tests ---
+
+
+class _FakeVehicle:
+    def __init__(self, vehicle_type):
+        self.vehicle_type = vehicle_type
+
+
+class _FakeWOV:
+    def __init__(self, vehicle_type):
+        self.vehicle = _FakeVehicle(vehicle_type)
+
+
+def test_extract_vehicle_type_empty():
+    assert extract_vehicle_type([]) is None
+
+
+def test_extract_vehicle_type_single():
+    assert extract_vehicle_type([_FakeWOV("van")]) == "van"
+
+
+def test_extract_vehicle_type_all_same():
+    wovs = [_FakeWOV("suv"), _FakeWOV("suv"), _FakeWOV("suv")]
+    assert extract_vehicle_type(wovs) == "suv"
+
+
+def test_extract_vehicle_type_mixed():
+    wovs = [_FakeWOV("van"), _FakeWOV("suv")]
+    assert extract_vehicle_type(wovs) is None
+
+
+def test_extract_vehicle_type_with_enum():
+    from app.models.vehicle import VehicleType
+
+    wovs = [_FakeWOV(VehicleType.VAN), _FakeWOV(VehicleType.VAN)]
+    assert extract_vehicle_type(wovs) == "van"
+
+
+def test_extract_vehicle_type_mixed_enum():
+    from app.models.vehicle import VehicleType
+
+    wovs = [_FakeWOV(VehicleType.VAN), _FakeWOV(VehicleType.SUV)]
+    assert extract_vehicle_type(wovs) is None
