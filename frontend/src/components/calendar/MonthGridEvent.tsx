@@ -33,7 +33,7 @@ interface MonthGridEventProps {
     _dayLabel?: string | null;
     _jobType?: string;
   };
-  hasStartDate: boolean;
+  hasStartDate?: boolean;
 }
 
 // ---------------------------------------------------------------------------
