@@ -1,4 +1,5 @@
 import uuid
+from decimal import Decimal
 
 from pydantic import BaseModel
 
@@ -30,5 +31,6 @@ class ProductionDetailsResponse(BaseModel):
     laminate_brand_type: str | None = None
     laminate_width: str | None = None
     window_perf_details: dict | None = None
+    estimated_hours: Decimal | None = None
 
     model_config = {"from_attributes": True}
