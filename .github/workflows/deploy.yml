@@ -35,3 +35,17 @@ jobs:
       - name: Deploy WrapFlow
         run: railway up --service wrapflow --detach
         working-directory: frontend
+
+  deploy-worker:
+    name: Deploy Worker
+    runs-on: ubuntu-latest
+    needs: deploy-api
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy Worker
+        run: railway up --service worker --detach
+        working-directory: backend
