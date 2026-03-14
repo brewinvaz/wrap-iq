@@ -1,21 +1,27 @@
 'use client';
 
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { useNextCalendarApp, ScheduleXCalendar } from '@schedule-x/react';
+import {
+  createViewDay,
+  createViewWeek,
+  createViewMonthGrid,
+} from '@schedule-x/calendar';
+import { createEventsServicePlugin } from '@schedule-x/events-service';
+import 'temporal-polyfill/global';
+import '@schedule-x/theme-default/dist/index.css';
+
 import { useRole } from '@/lib/role-context';
 import { api, ApiError } from '@/lib/api-client';
 import { CalendarEvent, Installer } from '@/lib/types';
 import { RoleKey } from '@/lib/roles';
 import { Button } from '@/components/ui/Button';
-import CalendarHeader from './CalendarHeader';
 import CalendarToolbar from './CalendarToolbar';
-import WeekView from './WeekView';
-import DayView from './DayView';
-import MonthView from './MonthView';
 import ListView from './ListView';
 import SummaryBar from './SummaryBar';
 
 // ---------------------------------------------------------------------------
-// API types
+// API types (unchanged from original)
 // ---------------------------------------------------------------------------
 
 interface WorkOrderVehicle {
@@ -56,27 +62,26 @@ interface WorkOrderListResponse {
 }
 
 // ---------------------------------------------------------------------------
-// Constants
+// Types & Constants
 // ---------------------------------------------------------------------------
 
 type Phase = 'design' | 'production' | 'install';
 type StatusFilter = 'all' | 'upcoming' | 'in_progress' | 'completed';
-type ViewMode = 'day' | 'week' | 'month' | 'list';
 type ColorBy = 'phase' | 'installer';
 
 interface CalendarPreset {
-  view: ViewMode;
+  view: string; // Schedule-X view name
   phases: Phase[];
   status: StatusFilter;
 }
 
 const ROLE_PRESETS: Record<RoleKey, CalendarPreset> = {
-  admin: { view: 'week', phases: ['design', 'production', 'install'], status: 'all' },
-  pm: { view: 'week', phases: ['design', 'production', 'install'], status: 'all' },
-  installer: { view: 'week', phases: ['install'], status: 'all' },
+  admin:      { view: 'week', phases: ['design', 'production', 'install'], status: 'all' },
+  pm:         { view: 'week', phases: ['design', 'production', 'install'], status: 'all' },
+  installer:  { view: 'week', phases: ['install'], status: 'all' },
   production: { view: 'list', phases: ['production', 'install'], status: 'in_progress' },
-  designer: { view: 'week', phases: ['design'], status: 'all' },
-  client: { view: 'week', phases: ['design', 'production', 'install'], status: 'all' },
+  designer:   { view: 'week', phases: ['design'], status: 'all' },
+  client:     { view: 'week', phases: ['design', 'production', 'install'], status: 'all' },
 };
 
 const INSTALLER_COLORS = [
@@ -85,7 +90,68 @@ const INSTALLER_COLORS = [
 ];
 
 // ---------------------------------------------------------------------------
-// Helpers
+// Color helpers
+// ---------------------------------------------------------------------------
+
+function hexToRgb(hex: string): [number, number, number] {
+  const h = hex.replace('#', '');
+  return [
+    parseInt(h.substring(0, 2), 16),
+    parseInt(h.substring(2, 4), 16),
+    parseInt(h.substring(4, 6), 16),
+  ];
+}
+
+function rgbToHex(r: number, g: number, b: number): string {
+  return '#' + [r, g, b].map((c) => Math.round(c).toString(16).padStart(2, '0')).join('');
+}
+
+function darken(hex: string, factor: number): string {
+  const [r, g, b] = hexToRgb(hex);
+  return rgbToHex(r * (1 - factor), g * (1 - factor), b * (1 - factor));
+}
+
+function lighten(hex: string, factor: number): string {
+  const [r, g, b] = hexToRgb(hex);
+  return rgbToHex(r + (255 - r) * factor, g + (255 - g) * factor, b + (255 - b) * factor);
+}
+
+// ---------------------------------------------------------------------------
+// Schedule-X calendar configs
+// ---------------------------------------------------------------------------
+
+const PHASE_CALENDARS: Record<string, { colorName: string; lightColors: { main: string; container: string; onContainer: string }; darkColors: { main: string; container: string; onContainer: string } }> = {
+  design: {
+    colorName: 'design',
+    darkColors:  { main: '#06b6d4', container: '#0e4a5a', onContainer: '#67e8f9' },
+    lightColors: { main: '#0891b2', container: '#cffafe', onContainer: '#155e75' },
+  },
+  production: {
+    colorName: 'production',
+    darkColors:  { main: '#3b82f6', container: '#1e3a5f', onContainer: '#93c5fd' },
+    lightColors: { main: '#2563eb', container: '#dbeafe', onContainer: '#1e40af' },
+  },
+  install: {
+    colorName: 'install',
+    darkColors:  { main: '#10b981', container: '#134e3a', onContainer: '#6ee7b7' },
+    lightColors: { main: '#059669', container: '#d1fae5', onContainer: '#065f46' },
+  },
+};
+
+function buildInstallerCalendars(installers: Installer[]) {
+  const result: Record<string, typeof PHASE_CALENDARS[string]> = {};
+  for (const inst of installers) {
+    result[inst.id] = {
+      colorName: inst.id,
+      darkColors:  { main: inst.color, container: darken(inst.color, 0.6), onContainer: lighten(inst.color, 0.4) },
+      lightColors: { main: inst.color, container: lighten(inst.color, 0.85), onContainer: darken(inst.color, 0.3) },
+    };
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Data helpers (unchanged from original)
 // ---------------------------------------------------------------------------
 
 function formatDateStr(d: Date): string {
@@ -93,15 +159,6 @@ function formatDateStr(d: Date): string {
   const m = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
   return `${y}-${m}-${day}`;
-}
-
-function getMonday(date: Date): Date {
-  const d = new Date(date);
-  const dow = d.getDay();
-  const diff = dow === 0 ? -6 : 1 - dow;
-  d.setDate(d.getDate() + diff);
-  d.setHours(0, 0, 0, 0);
-  return d;
 }
 
 function derivePhase(wo: WorkOrderResponse): Phase {
@@ -195,28 +252,68 @@ function transformWorkOrders(workOrders: WorkOrderResponse[], installerMap: Map<
 }
 
 // ---------------------------------------------------------------------------
-// Date label helpers
+// Schedule-X event conversion
 // ---------------------------------------------------------------------------
 
-function formatWeekLabel(monday: Date): string {
-  const friday = new Date(monday);
-  friday.setDate(monday.getDate() + 4);
-  const opts: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric' };
-  const mLabel = monday.toLocaleDateString('en-US', opts);
-  if (monday.getMonth() === friday.getMonth()) {
-    return `${mLabel} \u2013 ${friday.getDate()}, ${monday.getFullYear()}`;
+interface SXEvent {
+  id: string;
+  title: string;
+  start: Temporal.ZonedDateTime | Temporal.PlainDate;
+  end: Temporal.ZonedDateTime | Temporal.PlainDate;
+  calendarId: string;
+  description?: string;
+}
+
+const TZ = Temporal.Now.timeZoneId();
+
+function toScheduleXEvents(events: CalendarEvent[], colorBy: ColorBy): SXEvent[] {
+  return events.map((e) => {
+    const calendarId = colorBy === 'installer' ? e.installer : e.phase;
+
+    // Multi-day detection: if dueDate exists and differs from date
+    const isMultiDay = e.dueDate && e.dueDate !== e.date;
+
+    let start: Temporal.ZonedDateTime | Temporal.PlainDate;
+    let end: Temporal.ZonedDateTime | Temporal.PlainDate;
+
+    if (isMultiDay) {
+      start = Temporal.PlainDate.from(e.date);
+      end = Temporal.PlainDate.from(e.dueDate!);
+    } else {
+      start = Temporal.PlainDate.from(e.date)
+        .toPlainDateTime(Temporal.PlainTime.from(e.startTime))
+        .toZonedDateTime(TZ);
+      end = Temporal.PlainDate.from(e.date)
+        .toPlainDateTime(Temporal.PlainTime.from(e.endTime))
+        .toZonedDateTime(TZ);
+    }
+
+    return {
+      id: e.id,
+      title: e.title,
+      start,
+      end,
+      calendarId,
+      description: `${e.vehicle} · ${e.clientName}`,
+    };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Events service bulk replace helper
+// ---------------------------------------------------------------------------
+
+function replaceAllEvents(
+  eventsService: ReturnType<typeof createEventsServicePlugin>,
+  newEvents: SXEvent[]
+) {
+  const existing = eventsService.getAll();
+  for (const e of existing) {
+    eventsService.remove(e.id as string);
   }
-  const fLabel = friday.toLocaleDateString('en-US', opts);
-  return `${mLabel} \u2013 ${fLabel}, ${friday.getFullYear()}`;
-}
-
-function formatDayLabel(date: Date): string {
-  return date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-}
-
-function formatMonthLabel(year: number, month: number): string {
-  const names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  return `${names[month]} ${year}`;
+  for (const e of newEvents) {
+    eventsService.add(e);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -257,11 +354,11 @@ export default function CalendarPage() {
   const { currentRole } = useRole();
   const preset = ROLE_PRESETS[currentRole];
 
-  // View state
-  const [activeView, setActiveView] = useState<ViewMode>(preset.view);
-  const [weekStart, setWeekStart] = useState(() => getMonday(new Date()));
-  const [selectedDay, setSelectedDay] = useState(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; });
-  const [monthYear, setMonthYear] = useState(() => ({ year: new Date().getFullYear(), month: new Date().getMonth() }));
+  // Data state
+  const [allEvents, setAllEvents] = useState<CalendarEvent[]>([]);
+  const [installers, setInstallers] = useState<Installer[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Filter state
   const [activePhases, setActivePhases] = useState<Set<Phase>>(() => new Set(preset.phases));
@@ -269,11 +366,61 @@ export default function CalendarPage() {
   const [colorBy, setColorBy] = useState<ColorBy>('phase');
   const [activeInstallers, setActiveInstallers] = useState<Set<string>>(new Set());
 
-  // Data state
-  const [allEvents, setAllEvents] = useState<CalendarEvent[]>([]);
-  const [installers, setInstallers] = useState<Installer[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // View state
+  const [isListView, setIsListView] = useState(preset.view === 'list');
+  const [viewLabel, setViewLabel] = useState('This week');
+  const [visibleRange, setVisibleRange] = useState<{ start: string; end: string } | null>(null);
+
+  // Theme detection
+  const isDark = typeof document !== 'undefined'
+    ? document.documentElement.getAttribute('data-theme') !== 'light'
+    : true;
+
+  // Schedule-X events service
+  const eventsService = useState(() => createEventsServicePlugin())[0];
+
+  // Build all calendars (phase + installer) upfront
+  const allCalendars = useMemo(() => {
+    return { ...PHASE_CALENDARS, ...buildInstallerCalendars(installers) };
+  }, [installers]);
+
+  // Schedule-X calendar app
+  const sxDefaultView = preset.view === 'list' ? 'week' : preset.view;
+  const todayStr = formatDateStr(new Date());
+
+  const calendar = useNextCalendarApp({
+    views: [createViewDay(), createViewWeek(), createViewMonthGrid()],
+    defaultView: sxDefaultView,
+    selectedDate: Temporal.PlainDate.from(todayStr),
+    isDark,
+    locale: 'en-US',
+    firstDayOfWeek: 1,
+    dayBoundaries: { start: '08:00', end: '18:00' },
+    weekOptions: {
+      nDays: 5,
+      eventWidth: 95,
+    },
+    monthGridOptions: {
+      nEventsPerDay: 3,
+    },
+    calendars: allCalendars,
+    events: [],
+    plugins: [eventsService],
+    callbacks: {
+      onRangeUpdate(range) {
+        setVisibleRange({ start: range.start.toString(), end: range.end.toString() });
+        // Derive view label from range span
+        const dayDiff = range.start.until(range.end, { largestUnit: 'days' }).days;
+        if (dayDiff <= 1) setViewLabel('Today');
+        else if (dayDiff <= 7) setViewLabel('This week');
+        else setViewLabel('This month');
+      },
+      onEventClick(calendarEvent, _e) {
+        // Future: navigate to work order detail
+        console.log('Event clicked:', calendarEvent.id);
+      },
+    },
+  });
 
   // Fetch work orders
   const fetchData = useCallback(async () => {
@@ -310,70 +457,28 @@ export default function CalendarPage() {
     });
   }, [allEvents, activePhases, statusFilter, colorBy, activeInstallers]);
 
-  // Visible events scoped to current view range
-  const todayStr = formatDateStr(new Date());
-
-  const weekDays = useMemo(() => {
-    return Array.from({ length: 5 }, (_, i) => {
-      const d = new Date(weekStart);
-      d.setDate(weekStart.getDate() + i);
-      const dateStr = formatDateStr(d);
-      return {
-        date: d,
-        label: d.toLocaleDateString('en-US', { weekday: 'short' }),
-        dateStr,
-        isToday: dateStr === todayStr,
-      };
-    });
-  }, [weekStart, todayStr]);
-
-  const visibleEvents = useMemo(() => {
-    switch (activeView) {
-      case 'day':
-        return filteredEvents.filter((e) => e.date === formatDateStr(selectedDay));
-      case 'week':
-        return filteredEvents.filter((e) => weekDays.some((d) => d.dateStr === e.date));
-      case 'month': {
-        const first = formatDateStr(new Date(monthYear.year, monthYear.month, 1));
-        const last = formatDateStr(new Date(monthYear.year, monthYear.month + 1, 0));
-        return filteredEvents.filter((e) => e.date >= first && e.date <= last);
-      }
-      case 'list':
-        return filteredEvents;
+  // Sync filtered events to Schedule-X
+  const prevEventsRef = useRef<string>('');
+  useEffect(() => {
+    if (isLoading) return;
+    const sxEvents = toScheduleXEvents(filteredEvents, colorBy);
+    const key = JSON.stringify(sxEvents);
+    if (key !== prevEventsRef.current) {
+      prevEventsRef.current = key;
+      replaceAllEvents(eventsService, sxEvents);
     }
-  }, [activeView, filteredEvents, selectedDay, weekDays, monthYear]);
+  }, [filteredEvents, colorBy, eventsService, isLoading]);
 
-  // Navigation handlers
-  const handlePrev = useCallback(() => {
-    switch (activeView) {
-      case 'day': setSelectedDay((p) => { const d = new Date(p); d.setDate(d.getDate() - 1); return d; }); break;
-      case 'week': setWeekStart((p) => { const d = new Date(p); d.setDate(d.getDate() - 7); return d; }); break;
-      case 'month': setMonthYear((p) => p.month === 0 ? { year: p.year - 1, month: 11 } : { ...p, month: p.month - 1 }); break;
-    }
-  }, [activeView]);
+  // Visible events for SummaryBar (scoped to range)
+  const summaryEvents = useMemo(() => {
+    if (isListView) return filteredEvents;
+    if (!visibleRange) return filteredEvents;
+    const startStr = visibleRange.start.slice(0, 10);
+    const endStr = visibleRange.end.slice(0, 10);
+    return filteredEvents.filter((e) => e.date >= startStr && e.date <= endStr);
+  }, [filteredEvents, visibleRange, isListView]);
 
-  const handleNext = useCallback(() => {
-    switch (activeView) {
-      case 'day': setSelectedDay((p) => { const d = new Date(p); d.setDate(d.getDate() + 1); return d; }); break;
-      case 'week': setWeekStart((p) => { const d = new Date(p); d.setDate(d.getDate() + 7); return d; }); break;
-      case 'month': setMonthYear((p) => p.month === 11 ? { year: p.year + 1, month: 0 } : { ...p, month: p.month + 1 }); break;
-    }
-  }, [activeView]);
-
-  const handleToday = useCallback(() => {
-    const now = new Date();
-    switch (activeView) {
-      case 'day': { const d = new Date(now); d.setHours(0, 0, 0, 0); setSelectedDay(d); break; }
-      case 'week': setWeekStart(getMonday(now)); break;
-      case 'month': setMonthYear({ year: now.getFullYear(), month: now.getMonth() }); break;
-    }
-  }, [activeView]);
-
-  const handleMonthDayClick = useCallback((date: Date) => {
-    setSelectedDay(date);
-    setActiveView('day');
-  }, []);
-
+  // Filter handlers
   const handleTogglePhase = useCallback((phase: Phase) => {
     setActivePhases((prev) => {
       const next = new Set(prev);
@@ -390,15 +495,9 @@ export default function CalendarPage() {
     });
   }, []);
 
-  // Date label
-  const dateLabel = useMemo(() => {
-    switch (activeView) {
-      case 'day': return formatDayLabel(selectedDay);
-      case 'month': return formatMonthLabel(monthYear.year, monthYear.month);
-      case 'list': return 'All Jobs';
-      default: return formatWeekLabel(weekStart);
-    }
-  }, [activeView, selectedDay, monthYear, weekStart]);
+  const handleToggleListView = useCallback(() => {
+    setIsListView((prev) => !prev);
+  }, []);
 
   // Loading / Error
   if (isLoading) return <CalendarSkeleton />;
@@ -419,20 +518,10 @@ export default function CalendarPage() {
   }
 
   const hasNoData = allEvents.length === 0;
-  const hasNoFilteredResults = !hasNoData && visibleEvents.length === 0;
-  const selectedDayStr = formatDateStr(selectedDay);
+  const hasNoFilteredResults = !hasNoData && filteredEvents.length === 0;
 
   return (
     <div className="flex h-full flex-col">
-      <CalendarHeader
-        dateLabel={dateLabel}
-        onPrev={handlePrev}
-        onNext={handleNext}
-        onToday={handleToday}
-        activeView={activeView}
-        onViewChange={setActiveView}
-      />
-
       <CalendarToolbar
         activePhases={activePhases}
         onTogglePhase={handleTogglePhase}
@@ -443,6 +532,8 @@ export default function CalendarPage() {
         installers={installers}
         activeInstallers={activeInstallers}
         onToggleInstaller={handleToggleInstaller}
+        isListView={isListView}
+        onToggleListView={handleToggleListView}
       />
 
       {hasNoData ? (
@@ -465,33 +556,14 @@ export default function CalendarPage() {
         </div>
       ) : (
         <>
-          {activeView === 'day' && (
-            <DayView
-              dateStr={selectedDayStr}
-              isToday={selectedDayStr === todayStr}
-              events={filteredEvents}
-              colorBy={colorBy}
-              installers={installers}
-              activeInstallers={activeInstallers}
-            />
-          )}
-          {activeView === 'week' && (
-            <WeekView weekDays={weekDays} events={filteredEvents} colorBy={colorBy} />
-          )}
-          {activeView === 'month' && (
-            <MonthView
-              year={monthYear.year}
-              month={monthYear.month}
-              events={filteredEvents}
-              colorBy={colorBy}
-              onDayClick={handleMonthDayClick}
-            />
-          )}
-          {activeView === 'list' && <ListView events={filteredEvents} />}
+          <div className={`flex-1 overflow-auto ${isListView ? 'hidden' : ''}`}>
+            <ScheduleXCalendar key={isDark ? 'dark' : 'light'} calendarApp={calendar} />
+          </div>
+          {isListView && <ListView events={filteredEvents} />}
         </>
       )}
 
-      <SummaryBar events={visibleEvents} activeView={activeView} />
+      <SummaryBar events={summaryEvents} viewLabel={isListView ? 'Showing' : viewLabel} />
     </div>
   );
 }
